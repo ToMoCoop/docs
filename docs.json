@@ -45,7 +45,7 @@
           },
           {
             "group": "API reference",
-            "openapi": "openapi.json"
+            "openapi": "api-reference/openapi.json"
           },
           {
             "group": "Endpoint Examples",
