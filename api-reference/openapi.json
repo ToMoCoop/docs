@@ -17,15 +17,10 @@
               "schema": {
                 "$ref": "#/components/schemas/User"
               },
-              "examples": {
-                "example1": {
-                  "summary": "Basic user creation example",
-                  "value": {
-                    "name": "Alice Johnson",
-                    "email": "alice@example.com",
-                    "age": 30
-                  }
-                }
+              "example": {
+                "name": "Alice Johnson",
+                "email": "alice@example.com",
+                "age": 30
               }
             }
           }
