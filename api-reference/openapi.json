@@ -42,8 +42,7 @@
           }
         }
       }
-    }
-  },
+    },
     "/graphql": {
       "post": {
         "summary": "Retrieve a Warehouse",
