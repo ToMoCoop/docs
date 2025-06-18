@@ -16,34 +16,27 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Alice Johnson"
                   },
                   "email": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "example": "alice@example.com"
                   },
                   "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 30
                   }
                 },
-                "required": ["name", "email"],
-                              "example": {
-                "name": "Alice Johnson",
-                "email": "alice@example.com",
-                "age": 30
-              }
-              },
-              "example": {
-                "name": "Alice Johnson",
-                "email": "alice@example.com",
-                "age": 30
+                "required": ["name", "email"]
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "User created successfully"
+            "description": "User created"
           }
         }
       }
