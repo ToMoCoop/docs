@@ -7,6 +7,36 @@
   },
   "tags": [],
   "paths": {
+    "/users": {
+      "post": {
+        "summary": "Create a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              },
+              "examples": {
+                "example1": {
+                  "summary": "Basic user creation example",
+                  "value": {
+                    "name": "Alice Johnson",
+                    "email": "alice@example.com",
+                    "age": 30
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          }
+        }
+      }
+    },
     "/graphql": {
       "post": {
         "summary": "Retrieve a Warehouse",
@@ -608,6 +638,23 @@
   },
   "components": {
     "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": ["name", "email"]
+      },
       "Site": {
         "type": "object",
         "properties": {
