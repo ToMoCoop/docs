@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.1",
   "info": {
     "title": "Clarus WMS",
     "description": "",
@@ -7,47 +7,74 @@
   },
   "tags": [],
   "paths": {
-    "/users": {
+    "/users/sign_in": {
       "post": {
-        "summary": "Create a new user",
+        "summary": "Sign In",
+        "deprecated": false,
+        "description": "Sign into the application.",
+        "tags": [],
+        "parameters": [],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {
-                    "type": "string",
-                    "example": "Alice Johnson"
-                  },
-                  "email": {
-                    "type": "string",
-                    "format": "email",
-                    "example": "alice@example.com"
-                  },
-                  "age": {
-                    "type": "integer",
-                    "example": 30
+                  "user": {
+                    "type": "object",
+                    "properties": {
+                      "email": {
+                        "type": "string"
+                      },
+                      "password": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "email",
+                      "password"
+                    ]
                   }
                 },
-                "required": ["name", "email"]
+                "required": [
+                  "user"
+                ]
+              },
+              "example": {
+                "user": {
+                  "email": "myemail@email.com",
+                  "password": "myPassword!"
+                }
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "User created"
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
           }
-        }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/graphql": {
       "post": {
         "summary": "Retrieve a Warehouse",
         "deprecated": false,
-        "description": "",
+        "description": "\n<Columns>\n  <Column>\n      \nYou can retrieve an individual Warehouse using the GraphQL endpoint. The data in the response can be controlled based on the request you make, provided it is supported by the schema.\n      \n      The example request and variables on the right can be sent to the GraphQL endpoint, and provided the ID of the record is located, the response will return details of the record and the data in the requested fields.\n  </Column>\n  <Column>\n      \n<AccordionGroup>\n  <Accordion title=\"Example Query\">\n      \n```graphql\nquery getWarehouse(\n    $first: Int,\n    $after: String\n    $code: String\n    $id: ID\n    $name: String\n) {\n    warehouses {\n        all(\n            after: $after\n            code: $code\n            id: $id\n            name: $name\n            first: $first\n        ) {\n            pageInfo {\n                hasNextPage\n                hasPreviousPage\n                startCursor\n                endCursor\n            }\n            edges {\n                cursor\n                node {\n                    id\n                    code\n                    name\n                    address {\n                        id\n                        code\n                        name\n                        address_1\n                        address_2\n                        address_3\n                        address_4\n                        address_5\n                        postcode\n                        country_code\n                        email_address\n                        phone_number\n                        is_active\n                        external_delivery_id\n                        external_system_reference1\n                        external_system_reference2\n                        external_system_reference3\n                        created_at\n                        created_at_formatted\n                        updated_at\n                        updated_at_formatted\n                    }\n                    site {\n                        id\n                        code\n                        name\n                    }\n                    opening_times_enabled\n                    opening_times {\n                      id\n                      monday_open\n                      monday_from\n                      monday_to\n                      tuesday_open\n                      tuesday_from\n                      tuesday_to\n                      wednesday_open\n                      wednesday_from\n                      wednesday_to\n                      thursday_open\n                      thursday_from\n                      thursday_to\n                      friday_open\n                      friday_from\n                      friday_to\n                      saturday_open\n                      saturday_from\n                      saturday_to\n                      sunday_open\n                      sunday_from\n                      sunday_to\n                      created_at\n                      created_at_formatted\n                      updated_at\n                      updated_at_formatted\n                    }\n                    consolidate_pick_enabled\n                    default_goods_in_bay {\n                      id\n                    }\n                    default_goods_in_bay_id\n                    default_goods_out_bay {\n                      id\n                    }\n                    default_goods_out_bay_id\n                    external_system_reference1\n                    external_system_reference2\n                    external_system_reference3\n                    trusted_warehouses {\n                        id\n                        auto_receive\n                        warehouse {\n                          id\n                        }\n                        warehouse_id\n                        trusted_warehouse {\n                          id\n                        }\n                        trusted_warehouse_id\n                        receive_location {\n                          id\n                        }\n                        created_at\n                        created_at_formatted\n                        updated_at\n                        updated_at_formatted\n                    }\n                    created_at\n                    updated_at\n                }\n            }\n        }\n    }\n}\n```\n  </Accordion>\n  <Accordion title=\"Example Variables\">\n```json\n{\n    \"first\": 1,\n    \"id\": 1\n}\n```\n  </Accordion>\n</AccordionGroup>\n  </Column>\n</Columns>",
         "tags": [],
         "parameters": [],
         "requestBody": {
@@ -222,7 +249,6 @@
                     "type": "object",
                     "properties": {
                       "attributes": {
-                        "description": "The site that this warehouse sits within.",
                         "$ref": "#/components/schemas/Site"
                       }
                     },
@@ -282,45 +308,32 @@
                       "default": "none"
                     },
                     "boolean1": {
-                      "type": [
-                        "boolean",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+                      "type": "boolean",
+                      "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+                      "nullable": true
                     },
                     "boolean2": {
-                      "type": [
-                        "boolean",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+                      "type": "boolean",
+                      "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+                      "nullable": true
                     },
                     "boolean3": {
-                      "type": [
-                        "boolean",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+                      "type": "boolean",
+                      "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+                      "nullable": true
                     },
                     "boolean4": {
-                      "type": [
-                        "boolean",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+                      "type": "boolean",
+                      "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+                      "nullable": true
                     },
                     "boolean5": {
-                      "type": [
-                        "boolean",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+                      "type": "boolean",
+                      "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+                      "nullable": true
                     },
                     "datetime1": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
+                      "type": "string",
                       "format": "date-time",
                       "examples": [
                         "2023-11-09T10:06:36.593+00:00"
@@ -328,13 +341,11 @@
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
-                      "description": "A bespoke field that can be used to store any custom date time value against the resource."
+                      "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+                      "nullable": true
                     },
                     "datetime2": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
+                      "type": "string",
                       "format": "date-time",
                       "examples": [
                         "2023-11-09T10:06:36.593+00:00"
@@ -342,13 +353,11 @@
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
-                      "description": "A bespoke field that can be used to store any custom date time value against the resource."
+                      "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+                      "nullable": true
                     },
                     "datetime3": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
+                      "type": "string",
                       "format": "date-time",
                       "examples": [
                         "2023-11-09T10:06:36.593+00:00"
@@ -356,13 +365,11 @@
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
-                      "description": "A bespoke field that can be used to store any custom date time value against the resource."
+                      "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+                      "nullable": true
                     },
                     "datetime4": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
+                      "type": "string",
                       "format": "date-time",
                       "examples": [
                         "2023-11-09T10:06:36.593+00:00"
@@ -370,13 +377,11 @@
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
-                      "description": "A bespoke field that can be used to store any custom date time value against the resource."
+                      "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+                      "nullable": true
                     },
                     "datetime5": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
+                      "type": "string",
                       "format": "date-time",
                       "examples": [
                         "2023-11-09T10:06:36.593+00:00"
@@ -384,7 +389,8 @@
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
-                      "description": "A bespoke field that can be used to store any custom date time value against the resource."
+                      "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+                      "nullable": true
                     },
                     "default": {
                       "type": "boolean",
@@ -392,95 +398,69 @@
                       "description": "A true or false value that indicates whether this site will be the default site for new Warehouses. \n\nOnly one Site can be set as the default at any one point.\nIf true is set for the creation or update of a Site, then this will become the default if it so not already."
                     },
                     "external_system_reference1": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+                      "type": "string",
+                      "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+                      "nullable": true
                     },
                     "external_system_reference2": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+                      "type": "string",
+                      "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+                      "nullable": true
                     },
                     "external_system_reference3": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+                      "type": "string",
+                      "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+                      "nullable": true
                     },
                     "integer1": {
-                      "type": [
-                        "integer",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+                      "type": "integer",
+                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+                      "nullable": true
                     },
                     "integer2": {
-                      "type": [
-                        "integer",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+                      "type": "integer",
+                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+                      "nullable": true
                     },
                     "integer3": {
-                      "type": [
-                        "integer",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+                      "type": "integer",
+                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+                      "nullable": true
                     },
                     "integer4": {
-                      "type": [
-                        "integer",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+                      "type": "integer",
+                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+                      "nullable": true
                     },
                     "integer5": {
-                      "type": [
-                        "integer",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+                      "type": "integer",
+                      "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+                      "nullable": true
                     },
                     "string1": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any text against the resource."
+                      "type": "string",
+                      "description": "A bespoke field that can be used to store any text against the resource.",
+                      "nullable": true
                     },
                     "string2": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any text against the resource."
+                      "type": "string",
+                      "description": "A bespoke field that can be used to store any text against the resource.",
+                      "nullable": true
                     },
                     "string3": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any text against the resource."
+                      "type": "string",
+                      "description": "A bespoke field that can be used to store any text against the resource.",
+                      "nullable": true
                     },
                     "string4": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any text against the resource."
+                      "type": "string",
+                      "description": "A bespoke field that can be used to store any text against the resource.",
+                      "nullable": true
                     },
                     "string5": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "description": "A bespoke field that can be used to store any text against the resource."
+                      "type": "string",
+                      "description": "A bespoke field that can be used to store any text against the resource.",
+                      "nullable": true
                     },
                     "created_at": {
                       "type": "string",
@@ -551,12 +531,12 @@
           "content": {
             "application/json": {
               "schema": {
+                "type": "object",
                 "properties": {
                   "data": {
                     "type": "object",
                     "properties": {
                       "attributes": {
-                        "description": "The site that this warehouse sits within.",
                         "$ref": "#/components/schemas/Site"
                       }
                     },
@@ -644,23 +624,6 @@
   },
   "components": {
     "schemas": {
-      "User": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "age": {
-            "type": "integer",
-            "minimum": 0
-          }
-        },
-        "required": ["name", "email"]
-      },
       "Site": {
         "type": "object",
         "properties": {
@@ -691,45 +654,32 @@
             "default": "none"
           },
           "boolean1": {
-            "type": [
-              "boolean",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+            "type": "boolean",
+            "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+            "nullable": true
           },
           "boolean2": {
-            "type": [
-              "boolean",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+            "type": "boolean",
+            "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+            "nullable": true
           },
           "boolean3": {
-            "type": [
-              "boolean",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+            "type": "boolean",
+            "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+            "nullable": true
           },
           "boolean4": {
-            "type": [
-              "boolean",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+            "type": "boolean",
+            "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+            "nullable": true
           },
           "boolean5": {
-            "type": [
-              "boolean",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom true or false value against the resource."
+            "type": "boolean",
+            "description": "A bespoke field that can be used to store any custom true or false value against the resource.",
+            "nullable": true
           },
           "datetime1": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time",
             "examples": [
               "2023-11-09T10:06:36.593+00:00"
@@ -737,13 +687,11 @@
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
-            "description": "A bespoke field that can be used to store any custom date time value against the resource."
+            "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+            "nullable": true
           },
           "datetime1_formatted": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "description": "The datetime1 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
@@ -752,13 +700,11 @@
             ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
-            "minLength": 16
+            "minLength": 16,
+            "nullable": true
           },
           "datetime2": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time",
             "examples": [
               "2023-11-09T10:06:36.593+00:00"
@@ -766,13 +712,11 @@
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
-            "description": "A bespoke field that can be used to store any custom date time value against the resource."
+            "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+            "nullable": true
           },
           "datetime2_formatted": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "description": "The datetime2 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
@@ -781,13 +725,11 @@
             ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
-            "minLength": 16
+            "minLength": 16,
+            "nullable": true
           },
           "datetime3": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time",
             "examples": [
               "2023-11-09T10:06:36.593+00:00"
@@ -795,13 +737,11 @@
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
-            "description": "A bespoke field that can be used to store any custom date time value against the resource."
+            "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+            "nullable": true
           },
           "datetime3_formatted": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "description": "The datetime3 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
@@ -810,13 +750,11 @@
             ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
-            "minLength": 16
+            "minLength": 16,
+            "nullable": true
           },
           "datetime4": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time",
             "examples": [
               "2023-11-09T10:06:36.593+00:00"
@@ -824,13 +762,11 @@
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
-            "description": "A bespoke field that can be used to store any custom date time value against the resource."
+            "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+            "nullable": true
           },
           "datetime4_formatted": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "description": "The datetime4 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
@@ -839,13 +775,11 @@
             ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
-            "minLength": 16
+            "minLength": 16,
+            "nullable": true
           },
           "datetime5": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time",
             "examples": [
               "2023-11-09T10:06:36.593+00:00"
@@ -853,13 +787,11 @@
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
-            "description": "A bespoke field that can be used to store any custom date time value against the resource."
+            "description": "A bespoke field that can be used to store any custom date time value against the resource.",
+            "nullable": true
           },
           "datetime5_formatted": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "description": "The datetime5 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
@@ -868,7 +800,8 @@
             ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
-            "minLength": 16
+            "minLength": 16,
+            "nullable": true
           },
           "default": {
             "type": "boolean",
@@ -876,95 +809,69 @@
             "description": "A true or false value that indicates whether this site will be the default site for new Warehouses. \n\nOnly one Site can be set as the default at any one point.\nIf true is set for the creation or update of a Site, then this will become the default if it so not already."
           },
           "external_system_reference1": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+            "type": "string",
+            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+            "nullable": true
           },
           "external_system_reference2": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+            "type": "string",
+            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+            "nullable": true
           },
           "external_system_reference3": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+            "type": "string",
+            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+            "nullable": true
           },
           "integer1": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+            "type": "integer",
+            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+            "nullable": true
           },
           "integer2": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+            "type": "integer",
+            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+            "nullable": true
           },
           "integer3": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+            "type": "integer",
+            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+            "nullable": true
           },
           "integer4": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+            "type": "integer",
+            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+            "nullable": true
           },
           "integer5": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource."
+            "type": "integer",
+            "description": "A bespoke field that can be used to store any custom numerical (integer) value against the resource.",
+            "nullable": true
           },
           "string1": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any text against the resource."
+            "type": "string",
+            "description": "A bespoke field that can be used to store any text against the resource.",
+            "nullable": true
           },
           "string2": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any text against the resource."
+            "type": "string",
+            "description": "A bespoke field that can be used to store any text against the resource.",
+            "nullable": true
           },
           "string3": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any text against the resource."
+            "type": "string",
+            "description": "A bespoke field that can be used to store any text against the resource.",
+            "nullable": true
           },
           "string4": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any text against the resource."
+            "type": "string",
+            "description": "A bespoke field that can be used to store any text against the resource.",
+            "nullable": true
           },
           "string5": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A bespoke field that can be used to store any text against the resource."
+            "type": "string",
+            "description": "A bespoke field that can be used to store any text against the resource.",
+            "nullable": true
           },
           "created_at": {
             "type": "string",
@@ -1039,9 +946,8 @@
             "description": "The identifiable name of the warehouse."
           },
           "address": {
-            "description": "The postal address of the warehouse.",
-            "type": "object",
-            "properties": {}
+            "$ref": "#/components/schemas/Address",
+            "description": "The postal address of the warehouse."
           },
           "site_id": {
             "type": "integer",
@@ -1208,25 +1114,19 @@
             "readOnly": true
           },
           "external_system_reference1": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+            "type": "string",
+            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+            "nullable": true
           },
           "external_system_reference2": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+            "type": "string",
+            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+            "nullable": true
           },
           "external_system_reference3": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+            "type": "string",
+            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+            "nullable": true
           },
           "trusted_warehouses": {
             "type": "array",
@@ -1278,88 +1178,6 @@
           "site_id"
         ]
       },
-      "All Sites": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "object",
-            "properties": {
-              "sites": {
-                "type": "object",
-                "properties": {
-                  "all": {
-                    "type": "object",
-                    "properties": {
-                      "edges": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "cursor": {
-                              "type": "string",
-                              "description": "The cursor position representative of this page, which can be used in further requests via `after` or `before`."
-                            },
-                            "node": {
-                              "description": "The site that this warehouse sits within.",
-                              "$ref": "#/components/schemas/Site"
-                            }
-                          },
-                          "description": "Each individual item, including cursor and resource data."
-                        },
-                        "description": "An array of items on the page returned, including cursor and resource data."
-                      },
-                      "pageInfo": {
-                        "type": "object",
-                        "properties": {
-                          "hasNextPage": {
-                            "type": "boolean",
-                            "description": "Can we request another page, are there more records?"
-                          },
-                          "hasPreviousPage": {
-                            "type": "boolean",
-                            "description": "Can we request another page, are there previous records?"
-                          },
-                          "startCursor": {
-                            "type": "string",
-                            "description": "What this set of results started at."
-                          },
-                          "endCursor": {
-                            "type": "string",
-                            "description": "What this set of results ended at."
-                          }
-                        },
-                        "required": [
-                          "hasNextPage",
-                          "hasPreviousPage",
-                          "startCursor",
-                          "endCursor"
-                        ],
-                        "description": "Metadata regarding this page."
-                      }
-                    },
-                    "required": [
-                      "pageInfo",
-                      "edges"
-                    ],
-                    "description": "What endpoint of the resource we are requesting."
-                  }
-                },
-                "required": [
-                  "all"
-                ],
-                "description": "The name of the headline resource we are requesting."
-              }
-            },
-            "required": [
-              "sites"
-            ],
-            "description": "The root data to retrieve."
-          }
-        },
-        "required": [
-          "data"
-        ]
-      },
       "Address": {
         "type": "object",
         "properties": {
@@ -1377,82 +1195,66 @@
             "description": "The name associated with the postal address. This may be the receipient connected to this postal address."
           },
           "address_1": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "examples": [
               "Flat 44"
             ],
-            "description": "The first line of the address."
+            "description": "The first line of the address.",
+            "nullable": true
           },
           "address_2": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "examples": [
               "9 King Road"
             ],
-            "description": "The first line of the address."
+            "description": "The first line of the address.",
+            "nullable": true
           },
           "address_3": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "examples": [
               "Horwich"
             ],
-            "description": "The third line of the address."
+            "description": "The third line of the address.",
+            "nullable": true
           },
           "address_4": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "examples": [
               "Bolton"
             ],
-            "description": "The fourth line of the address."
+            "description": "The fourth line of the address.",
+            "nullable": true
           },
           "address_5": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "examples": [
               "Greater Manchester"
             ],
-            "description": "The fifth line of the address."
+            "description": "The fifth line of the address.",
+            "nullable": true
           },
           "postcode": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "examples": [
               "BL7 5RF"
             ],
-            "description": "The postcode or zip code associated with the address."
+            "description": "The postcode or zip code associated with the address.",
+            "nullable": true
           },
           "country_code": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "examples": [
               "GB-UKM"
             ],
-            "description": "An ISO 3166 standard country code."
+            "description": "An ISO 3166 standard country code.",
+            "nullable": true
           },
           "email_address": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "email",
-            "description": "An email address associated with the address."
+            "description": "An email address associated with the address.",
+            "nullable": true
           },
           "phone_number": {
             "type": "string",
@@ -1468,25 +1270,19 @@
             "readOnly": true
           },
           "external_system_reference1": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+            "type": "string",
+            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+            "nullable": true
           },
           "external_system_reference2": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+            "type": "string",
+            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+            "nullable": true
           },
           "external_system_reference3": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system."
+            "type": "string",
+            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
+            "nullable": true
           },
           "created_at": {
             "type": "string",
@@ -1556,8 +1352,8 @@
             "type": "object",
             "properties": {
               "attributes": {
-                "description": "The site that this warehouse sits within.",
-                "$ref": "#/components/schemas/Site"
+                "$ref": "#/components/schemas/Site",
+                "description": "The attributes of the Site resource."
               }
             },
             "required": [
@@ -1570,6 +1366,88 @@
           "data"
         ],
         "description": "The body of the request."
+      },
+      "All Sites": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "sites": {
+                "type": "object",
+                "properties": {
+                  "all": {
+                    "type": "object",
+                    "properties": {
+                      "edges": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "cursor": {
+                              "type": "string",
+                              "description": "The cursor position representative of this page, which can be used in further requests via `after` or `before`."
+                            },
+                            "node": {
+                              "$ref": "#/components/schemas/Site",
+                              "description": "The Site resource."
+                            }
+                          },
+                          "description": "Each individual item, including cursor and resource data."
+                        },
+                        "description": "An array of items on the page returned, including cursor and resource data."
+                      },
+                      "pageInfo": {
+                        "type": "object",
+                        "properties": {
+                          "hasNextPage": {
+                            "type": "boolean",
+                            "description": "Can we request another page, are there more records?"
+                          },
+                          "hasPreviousPage": {
+                            "type": "boolean",
+                            "description": "Can we request another page, are there previous records?"
+                          },
+                          "startCursor": {
+                            "type": "string",
+                            "description": "What this set of results started at."
+                          },
+                          "endCursor": {
+                            "type": "string",
+                            "description": "What this set of results ended at."
+                          }
+                        },
+                        "required": [
+                          "hasNextPage",
+                          "hasPreviousPage",
+                          "startCursor",
+                          "endCursor"
+                        ],
+                        "description": "Metadata regarding this page."
+                      }
+                    },
+                    "required": [
+                      "pageInfo",
+                      "edges"
+                    ],
+                    "description": "What endpoint of the resource we are requesting."
+                  }
+                },
+                "required": [
+                  "all"
+                ],
+                "description": "The name of the headline resource we are requesting."
+              }
+            },
+            "required": [
+              "sites"
+            ],
+            "description": "The root data to retrieve."
+          }
+        },
+        "required": [
+          "data"
+        ]
       },
       "All Warehouses": {
         "type": "object",
