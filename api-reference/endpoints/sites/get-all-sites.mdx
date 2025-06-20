@@ -1,0 +1,133 @@
+---
+title: "Get All Sites"
+description: "Use the GraphQL API to retrieve all sites."
+openapi: "POST /graphql"
+---
+
+<RequestExample>
+```http Query
+query getSites(
+    $first: Int,
+    $after: String
+) {
+    sites{
+        all(
+            after: $after
+            first: $first
+        ) {
+            pageInfo {
+                hasNextPage
+                hasPreviousPage
+                startCursor
+                endCursor
+            }
+            edges {
+                cursor
+                node {
+                    id
+                    code
+                    name
+                    boolean1
+                    boolean2
+                    boolean3
+                    boolean4
+                    boolean4
+                    boolean5
+                    datetime1
+                    datetime1_formatted
+                    datetime2
+                    datetime2_formatted
+                    datetime3
+                    datetime3_formatted
+                    datetime4
+                    datetime4_formatted
+                    datetime5
+                    datetime5_formatted
+                    default
+                    external_system_reference1
+                    external_system_reference2
+                    external_system_reference3
+                    integer1
+                    integer2
+                    integer3
+                    integer4
+                    integer5
+                    string1
+                    string2
+                    string3
+                    string4
+                    string5
+                    tier
+                    created_at
+                    created_at_formatted
+                    updated_at
+                    updated_at_formatted
+                }
+            }
+        }
+    }
+}
+```
+</RequestExample>
+<ResponseExample>
+```http Response
+{
+    "data": {
+        "sites": {
+            "all": {
+                "pageInfo": {
+                    "hasNextPage": false,
+                    "hasPreviousPage": false,
+                    "startCursor": "MQ",
+                    "endCursor": "MQ"
+                },
+                "edges": [
+                    {
+                        "cursor": "MQ",
+                        "node": {
+                            "id": "1",
+                            "code": "DEF001",
+                            "name": "Default Site",
+                            "boolean1": null,
+                            "boolean2": null,
+                            "boolean3": null,
+                            "boolean4": null,
+                            "boolean5": null,
+                            "datetime1": null,
+                            "datetime1_formatted": null,
+                            "datetime2": null,
+                            "datetime2_formatted": null,
+                            "datetime3": null,
+                            "datetime3_formatted": null,
+                            "datetime4": null,
+                            "datetime4_formatted": null,
+                            "datetime5": null,
+                            "datetime5_formatted": null,
+                            "default": true,
+                            "external_system_reference1": null,
+                            "external_system_reference2": null,
+                            "external_system_reference3": null,
+                            "integer1": null,
+                            "integer2": null,
+                            "integer3": null,
+                            "integer4": null,
+                            "integer5": null,
+                            "string1": null,
+                            "string2": null,
+                            "string3": null,
+                            "string4": null,
+                            "string5": null,
+                            "tier": "none",
+                            "created_at": "2023-11-09T10:06:36.593+00:00",
+                            "created_at_formatted": "09/11/2023 10:06",
+                            "updated_at": "2024-07-17T14:30:16.787+01:00",
+                            "updated_at_formatted": "17/07/2024 14:30"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}
+```
+</ResponseExample>
