@@ -106,7 +106,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/All%20Warehouses"
+                  "$ref": "#/components/schemas/AllWarehouses"
                 },
                 "examples": {
                   "1": {
@@ -335,9 +335,6 @@
                     "datetime1": {
                       "type": "string",
                       "format": "date-time",
-                      "examples": [
-                        "2023-11-09T10:06:36.593+00:00"
-                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -347,9 +344,6 @@
                     "datetime2": {
                       "type": "string",
                       "format": "date-time",
-                      "examples": [
-                        "2023-11-09T10:06:36.593+00:00"
-                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -359,9 +353,6 @@
                     "datetime3": {
                       "type": "string",
                       "format": "date-time",
-                      "examples": [
-                        "2023-11-09T10:06:36.593+00:00"
-                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -371,9 +362,6 @@
                     "datetime4": {
                       "type": "string",
                       "format": "date-time",
-                      "examples": [
-                        "2023-11-09T10:06:36.593+00:00"
-                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -383,9 +371,6 @@
                     "datetime5": {
                       "type": "string",
                       "format": "date-time",
-                      "examples": [
-                        "2023-11-09T10:06:36.593+00:00"
-                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -469,18 +454,12 @@
                       "maxLength": 29,
                       "minLength": 29,
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
-                      "examples": [
-                        "2023-11-09T10:06:36.593+00:00"
-                      ],
                       "readOnly": true
                     },
                     "updated_at": {
                       "type": "string",
                       "description": "The date and time the resource was last updated in ISO-8601 format.",
                       "format": "date-time",
-                      "examples": [
-                        "2023-11-09T10:06:36.593+00:00"
-                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -520,10 +499,7 @@
             "required": true,
             "example": 1,
             "schema": {
-              "type": "integer",
-              "examples": [
-                1
-              ]
+              "type": "integer"
             }
           }
         ],
@@ -593,10 +569,7 @@
             "description": "The ID of the site to update.",
             "required": true,
             "schema": {
-              "type": "integer",
-              "examples": [
-                1
-              ]
+              "type": "integer"
             }
           }
         ],
@@ -681,9 +654,6 @@
           "datetime1": {
             "type": "string",
             "format": "date-time",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -695,9 +665,6 @@
             "description": "The datetime1 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
-            "examples": [
-              "09/11/2023 10:06"
-            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -706,9 +673,6 @@
           "datetime2": {
             "type": "string",
             "format": "date-time",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -720,9 +684,6 @@
             "description": "The datetime2 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
-            "examples": [
-              "09/11/2023 10:06"
-            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -731,9 +692,6 @@
           "datetime3": {
             "type": "string",
             "format": "date-time",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -745,9 +703,6 @@
             "description": "The datetime3 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
-            "examples": [
-              "09/11/2023 10:06"
-            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -756,9 +711,6 @@
           "datetime4": {
             "type": "string",
             "format": "date-time",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -770,9 +722,6 @@
             "description": "The datetime4 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
-            "examples": [
-              "09/11/2023 10:06"
-            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -781,9 +730,6 @@
           "datetime5": {
             "type": "string",
             "format": "date-time",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -795,9 +741,6 @@
             "description": "The datetime5 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
-            "examples": [
-              "09/11/2023 10:06"
-            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -880,18 +823,12 @@
             "maxLength": 29,
             "minLength": 29,
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "readOnly": true
           },
           "updated_at": {
             "type": "string",
             "description": "The date and time the resource was last updated in ISO-8601 format.",
             "format": "date-time",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -901,9 +838,6 @@
             "type": "string",
             "readOnly": true,
             "format": "date-time",
-            "examples": [
-              "09/11/2023 10:06"
-            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -913,9 +847,6 @@
             "type": "string",
             "readOnly": true,
             "format": "date-time",
-            "examples": [
-              "09/11/2023 10:06"
-            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -1141,9 +1072,6 @@
             "maxLength": 29,
             "minLength": 29,
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "readOnly": true
           },
           "updated_at": {
@@ -1153,9 +1081,6 @@
             "maxLength": 29,
             "minLength": 29,
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "readOnly": true
           }
         },
@@ -1196,57 +1121,36 @@
           },
           "address_1": {
             "type": "string",
-            "examples": [
-              "Flat 44"
-            ],
             "description": "The first line of the address.",
             "nullable": true
           },
           "address_2": {
             "type": "string",
-            "examples": [
-              "9 King Road"
-            ],
             "description": "The first line of the address.",
             "nullable": true
           },
           "address_3": {
             "type": "string",
-            "examples": [
-              "Horwich"
-            ],
             "description": "The third line of the address.",
             "nullable": true
           },
           "address_4": {
             "type": "string",
-            "examples": [
-              "Bolton"
-            ],
             "description": "The fourth line of the address.",
             "nullable": true
           },
           "address_5": {
             "type": "string",
-            "examples": [
-              "Greater Manchester"
-            ],
             "description": "The fifth line of the address.",
             "nullable": true
           },
           "postcode": {
             "type": "string",
-            "examples": [
-              "BL7 5RF"
-            ],
             "description": "The postcode or zip code associated with the address.",
             "nullable": true
           },
           "country_code": {
             "type": "string",
-            "examples": [
-              "GB-UKM"
-            ],
             "description": "An ISO 3166 standard country code.",
             "nullable": true
           },
@@ -1291,18 +1195,12 @@
             "maxLength": 29,
             "minLength": 29,
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "readOnly": true
           },
           "updated_at": {
             "type": "string",
             "description": "The date and time the resource was last updated in ISO-8601 format.",
             "format": "date-time",
-            "examples": [
-              "2023-11-09T10:06:36.593+00:00"
-            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -1312,9 +1210,6 @@
             "type": "string",
             "readOnly": true,
             "format": "date-time",
-            "examples": [
-              "09/11/2023 10:06"
-            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -1324,9 +1219,6 @@
             "type": "string",
             "readOnly": true,
             "format": "date-time",
-            "examples": [
-              "09/11/2023 10:06"
-            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -1367,7 +1259,7 @@
         ],
         "description": "The body of the request."
       },
-      "All Sites": {
+      "AllSites": {
         "type": "object",
         "properties": {
           "data": {
@@ -1449,7 +1341,7 @@
           "data"
         ]
       },
-      "All Warehouses": {
+      "AllWarehouses": {
         "type": "object",
         "properties": {
           "data": {
