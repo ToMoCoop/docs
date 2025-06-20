@@ -1,238 +1,24 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "info": {
-    "title": "Clarus WMS",
-    "description": "",
+    "title": "OpenAPI Plant Store",
+    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
+    "license": {
+      "name": "MIT"
+    },
     "version": "1.0.0"
   },
-  "tags": [],
+  "servers": [
+    {
+      "url": "http://sandbox.mintlify.com"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
   "paths": {
-    "/users/sign_in": {
-      "post": {
-        "summary": "Sign In",
-        "deprecated": false,
-        "description": "Sign into the application.",
-        "tags": [],
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "properties": {
-                      "email": {
-                        "type": "string"
-                      },
-                      "password": {
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "email",
-                      "password"
-                    ]
-                  }
-                },
-                "required": [
-                  "user"
-                ]
-              },
-              "example": {
-                "user": {
-                  "email": "myemail@email.com",
-                  "password": "myPassword!"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/graphql": {
-      "post": {
-        "summary": "Retrieve a Warehouse",
-        "deprecated": false,
-        "description": "yes",
-        "tags": [],
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "query": {
-                    "type": "string"
-                  },
-                  "variables": {
-                    "type": "object",
-                    "properties": {},
-                    "nullable": true
-                  }
-                },
-                "required": [
-                  "query"
-                ]
-              },
-              "example": "{\"query\":\"query getWarehouse(\\n    $first: Int,\\n    $after: String\\n    $code: String\\n    $id: ID\\n    $name: String\\n) {\\n    warehouses {\\n        all(\\n            after: $after\\n            code: $code\\n            id: $id\\n            name: $name\\n            first: $first\\n        ) {\\n            pageInfo {\\n                hasNextPage\\n                hasPreviousPage\\n                startCursor\\n                endCursor\\n            }\\n            edges {\\n                cursor\\n                node {\\n                    id\\n                    code\\n                    name\\n                    address {\\n                        id\\n                        code\\n                        name\\n                        address_1\\n                        address_2\\n                        address_3\\n                        address_4\\n                        address_5\\n                        postcode\\n                        country_code\\n                        email_address\\n                        phone_number\\n                        is_active\\n                        external_delivery_id\\n                        external_system_reference1\\n                        external_system_reference2\\n                        external_system_reference3\\n                        created_at\\n                        created_at_formatted\\n                        updated_at\\n                        updated_at_formatted\\n                    }\\n                    site {\\n                        id\\n                        code\\n                        name\\n                    }\\n                    opening_times_enabled\\n                    opening_times {\\n                      id\\n                      monday_open\\n                      monday_from\\n                      monday_to\\n                      tuesday_open\\n                      tuesday_from\\n                      tuesday_to\\n                      wednesday_open\\n                      wednesday_from\\n                      wednesday_to\\n                      thursday_open\\n                      thursday_from\\n                      thursday_to\\n                      friday_open\\n                      friday_from\\n                      friday_to\\n                      saturday_open\\n                      saturday_from\\n                      saturday_to\\n                      sunday_open\\n                      sunday_from\\n                      sunday_to\\n                      created_at\\n                      created_at_formatted\\n                      updated_at\\n                      updated_at_formatted\\n                    }\\n                    consolidate_pick_enabled\\n                    default_goods_in_bay {\\n                      id\\n                    }\\n                    default_goods_in_bay_id\\n                    default_goods_out_bay {\\n                      id\\n                    }\\n                    default_goods_out_bay_id\\n                    external_system_reference1\\n                    external_system_reference2\\n                    external_system_reference3\\n                    trusted_warehouses {\\n                        id\\n                        auto_receive\\n                        warehouse {\\n                          id\\n                        }\\n                        warehouse_id\\n                        trusted_warehouse {\\n                          id\\n                        }\\n                        trusted_warehouse_id\\n                        receive_location {\\n                          id\\n                        }\\n                        created_at\\n                        created_at_formatted\\n                        updated_at\\n                        updated_at_formatted\\n                    }\\n                    created_at\\n                    updated_at\\n                }\\n            }\\n        }\\n    }\\n}\",\"variables\":{\n    \"first\": 1,\n    \"id\": 1\n}}"
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AllWarehouses"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "Success",
-                    "value": {
-                      "data": {
-                        "warehouses": {
-                          "all": {
-                            "pageInfo": {
-                              "hasNextPage": false,
-                              "hasPreviousPage": false,
-                              "startCursor": "MQ",
-                              "endCursor": "MQ"
-                            },
-                            "edges": [
-                              {
-                                "cursor": "MQ",
-                                "node": {
-                                  "id": "1",
-                                  "code": "WAR01",
-                                  "name": "Warehouse 01",
-                                  "address": {
-                                    "id": "5",
-                                    "code": null,
-                                    "name": null,
-                                    "address_1": null,
-                                    "address_2": null,
-                                    "address_3": null,
-                                    "address_4": null,
-                                    "address_5": null,
-                                    "postcode": "52123",
-                                    "country_code": "GB-UKM",
-                                    "email_address": null,
-                                    "phone_number": null,
-                                    "is_active": true,
-                                    "external_delivery_id": null,
-                                    "external_system_reference1": null,
-                                    "external_system_reference2": null,
-                                    "external_system_reference3": null,
-                                    "created_at": "2019-05-29T09:34:05.693+01:00",
-                                    "created_at_formatted": "29/05/2019 09:34",
-                                    "updated_at": "2024-06-20T13:59:46.882+01:00",
-                                    "updated_at_formatted": "20/06/2024 13:59"
-                                  },
-                                  "site": {
-                                    "id": "1",
-                                    "code": "DEF001",
-                                    "name": "Default Site"
-                                  },
-                                  "opening_times_enabled": true,
-                                  "opening_times": {
-                                    "id": "1",
-                                    "monday_open": true,
-                                    "monday_from": "09:00",
-                                    "monday_to": "17:00",
-                                    "tuesday_open": true,
-                                    "tuesday_from": "09:00",
-                                    "tuesday_to": "17:00",
-                                    "wednesday_open": true,
-                                    "wednesday_from": "09:00",
-                                    "wednesday_to": "17:00",
-                                    "thursday_open": true,
-                                    "thursday_from": "09:00",
-                                    "thursday_to": "17:00",
-                                    "friday_open": true,
-                                    "friday_from": "09:00",
-                                    "friday_to": "12:00",
-                                    "saturday_open": false,
-                                    "saturday_from": "00:00",
-                                    "saturday_to": "23:59",
-                                    "sunday_open": false,
-                                    "sunday_from": "00:00",
-                                    "sunday_to": "23:59",
-                                    "created_at": "2023-12-07T15:55:25.373+00:00",
-                                    "created_at_formatted": "07/12/2023 15:55",
-                                    "updated_at": "2023-12-07T15:55:25.373+00:00",
-                                    "updated_at_formatted": "07/12/2023 15:55"
-                                  },
-                                  "consolidate_pick_enabled": true,
-                                  "default_goods_in_bay": {
-                                    "id": "1"
-                                  },
-                                  "default_goods_in_bay_id": "1",
-                                  "default_goods_out_bay": {
-                                    "id": "2"
-                                  },
-                                  "default_goods_out_bay_id": "2",
-                                  "external_system_reference1": "594866000000063175",
-                                  "external_system_reference2": null,
-                                  "external_system_reference3": null,
-                                  "trusted_warehouses": [],
-                                  "created_at": "2017-04-13T21:05:37.508+01:00",
-                                  "updated_at": "2024-06-20T11:22:27.491+01:00"
-                                }
-                              }
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "2": {
-                    "summary": "Exception",
-                    "value": {
-                      "data": {
-                        "sites": {
-                          "all": {
-                            "edges": []
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/api/sites": {
       "post": {
         "summary": "Create a Site",
@@ -335,6 +121,9 @@
                     "datetime1": {
                       "type": "string",
                       "format": "date-time",
+                      "examples": [
+                        "2023-11-09T10:06:36.593+00:00"
+                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -344,6 +133,9 @@
                     "datetime2": {
                       "type": "string",
                       "format": "date-time",
+                      "examples": [
+                        "2023-11-09T10:06:36.593+00:00"
+                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -353,6 +145,9 @@
                     "datetime3": {
                       "type": "string",
                       "format": "date-time",
+                      "examples": [
+                        "2023-11-09T10:06:36.593+00:00"
+                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -362,6 +157,9 @@
                     "datetime4": {
                       "type": "string",
                       "format": "date-time",
+                      "examples": [
+                        "2023-11-09T10:06:36.593+00:00"
+                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -371,6 +169,9 @@
                     "datetime5": {
                       "type": "string",
                       "format": "date-time",
+                      "examples": [
+                        "2023-11-09T10:06:36.593+00:00"
+                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -454,12 +255,18 @@
                       "maxLength": 29,
                       "minLength": 29,
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
+                      "examples": [
+                        "2023-11-09T10:06:36.593+00:00"
+                      ],
                       "readOnly": true
                     },
                     "updated_at": {
                       "type": "string",
                       "description": "The date and time the resource was last updated in ISO-8601 format.",
                       "format": "date-time",
+                      "examples": [
+                        "2023-11-09T10:06:36.593+00:00"
+                      ],
                       "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
                       "maxLength": 29,
                       "minLength": 29,
@@ -485,113 +292,136 @@
         ]
       }
     },
-    "/api/sites/{siteId}": {
-      "patch": {
-        "summary": "Update a Site",
-        "deprecated": false,
-        "description": "",
-        "tags": [],
+    "/plants": {
+      "get": {
+        "description": "Returns all plants from the system that the user has access to",
         "parameters": [
           {
-            "name": "siteId",
-            "in": "path",
-            "description": "The ID of the site to update.",
-            "required": true,
-            "example": 1,
+            "name": "limit",
+            "in": "query",
+            "description": "The maximum number of results to return",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Plant response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Plant"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a new plant in the store",
         "requestBody": {
+          "description": "Plant to add to the store",
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "attributes": {
-                        "$ref": "#/components/schemas/Site"
-                      }
-                    },
-                    "required": [
-                      "attributes"
-                    ]
-                  }
-                },
-                "required": [
-                  "data"
-                ],
-                "$ref": "#/components/schemas/Site1"
-              },
-              "example": {
-                "data": {
-                  "attributes": {
-                    "code": "SITE55",
-                    "name": "Site 55"
-                  }
+                "$ref": "#/components/schemas/NewPlant"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "plant response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plant"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
           }
-        },
-        "responses": {
-          "204": {
-            "description": "",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
+        }
+      }
+    },
+    "/plants/{id}": {
       "delete": {
-        "summary": "Delete a Site",
-        "deprecated": false,
-        "description": "",
-        "tags": [],
+        "description": "Deletes a single plant based on the ID supplied",
         "parameters": [
           {
-            "name": "siteId",
+            "name": "id",
             "in": "path",
-            "description": "The ID of the site to update.",
+            "description": "ID of plant to delete",
             "required": true,
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "format": "int64"
             }
           }
         ],
         "responses": {
           "204": {
-            "description": "",
+            "description": "Plant deleted",
+            "content": {}
+          },
+          "400": {
+            "description": "unexpected error",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {}
+                  "$ref": "#/components/schemas/Error"
                 }
               }
-            },
-            "headers": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {
+    "/plant/webhook": {
+      "post": {
+        "description": "Information about a new plant added to the store",
+        "requestBody": {
+          "description": "Plant added to the store",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewPlant"
+              }
+            }
           }
         },
-        "security": [
-          {
-            "bearer": []
+        "responses": {
+          "200": {
+            "description": "Return a 200 status to indicate that the data was received successfully"
           }
-        ]
+        }
       }
     }
   },
@@ -654,6 +484,9 @@
           "datetime1": {
             "type": "string",
             "format": "date-time",
+            "examples": [
+              "2023-11-09T10:06:36.593+00:00"
+            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -665,6 +498,9 @@
             "description": "The datetime1 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
+            "examples": [
+              "09/11/2023 10:06"
+            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -673,6 +509,9 @@
           "datetime2": {
             "type": "string",
             "format": "date-time",
+            "examples": [
+              "2023-11-09T10:06:36.593+00:00"
+            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -684,6 +523,9 @@
             "description": "The datetime2 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
+            "examples": [
+              "09/11/2023 10:06"
+            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -692,6 +534,9 @@
           "datetime3": {
             "type": "string",
             "format": "date-time",
+            "examples": [
+              "2023-11-09T10:06:36.593+00:00"
+            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -703,6 +548,9 @@
             "description": "The datetime3 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
+            "examples": [
+              "09/11/2023 10:06"
+            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -711,6 +559,9 @@
           "datetime4": {
             "type": "string",
             "format": "date-time",
+            "examples": [
+              "2023-11-09T10:06:36.593+00:00"
+            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -722,6 +573,9 @@
             "description": "The datetime4 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
+            "examples": [
+              "09/11/2023 10:06"
+            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -730,6 +584,9 @@
           "datetime5": {
             "type": "string",
             "format": "date-time",
+            "examples": [
+              "2023-11-09T10:06:36.593+00:00"
+            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -741,6 +598,9 @@
             "description": "The datetime5 field in readable format, localised to UTC.",
             "readOnly": true,
             "format": "date-time",
+            "examples": [
+              "09/11/2023 10:06"
+            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -823,12 +683,18 @@
             "maxLength": 29,
             "minLength": 29,
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
+            "examples": [
+              "2023-11-09T10:06:36.593+00:00"
+            ],
             "readOnly": true
           },
           "updated_at": {
             "type": "string",
             "description": "The date and time the resource was last updated in ISO-8601 format.",
             "format": "date-time",
+            "examples": [
+              "2023-11-09T10:06:36.593+00:00"
+            ],
             "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
             "maxLength": 29,
             "minLength": 29,
@@ -838,6 +704,9 @@
             "type": "string",
             "readOnly": true,
             "format": "date-time",
+            "examples": [
+              "09/11/2023 10:06"
+            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -847,6 +716,9 @@
             "type": "string",
             "readOnly": true,
             "format": "date-time",
+            "examples": [
+              "09/11/2023 10:06"
+            ],
             "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
             "maxLength": 16,
             "minLength": 16,
@@ -858,383 +730,6 @@
           "name",
           "tier",
           "code"
-        ]
-      },
-      "Warehouse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "The unique identifier of the resource.",
-            "readOnly": true
-          },
-          "code": {
-            "type": "string",
-            "description": "The unique code for the warehouse. This can be any series of characters that are unique to your operation."
-          },
-          "name": {
-            "type": "string",
-            "description": "The identifiable name of the warehouse."
-          },
-          "address": {
-            "$ref": "#/components/schemas/Address",
-            "description": "The postal address of the warehouse."
-          },
-          "site_id": {
-            "type": "integer",
-            "description": "The unique identifier of the site that the warehouse sits within.",
-            "writeOnly": true
-          },
-          "site": {
-            "description": "The site that this warehouse sits within.",
-            "$ref": "#/components/schemas/Site"
-          },
-          "opening_times_enabled": {
-            "type": "boolean",
-            "default": false,
-            "description": "A true or false value that indicates whether this warehouse has opening times set to support the booking diary."
-          },
-          "opening_times": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "monday_open": {
-                "type": "boolean"
-              },
-              "monday_from": {
-                "type": "string"
-              },
-              "monday_to": {
-                "type": "string"
-              },
-              "tuesday_open": {
-                "type": "boolean"
-              },
-              "tuesday_from": {
-                "type": "string"
-              },
-              "tuesday_to": {
-                "type": "string"
-              },
-              "wednesday_open": {
-                "type": "boolean"
-              },
-              "wednesday_from": {
-                "type": "string"
-              },
-              "wednesday_to": {
-                "type": "string"
-              },
-              "thursday_open": {
-                "type": "boolean"
-              },
-              "thursday_from": {
-                "type": "string"
-              },
-              "thursday_to": {
-                "type": "string"
-              },
-              "friday_open": {
-                "type": "boolean"
-              },
-              "friday_from": {
-                "type": "string"
-              },
-              "friday_to": {
-                "type": "string"
-              },
-              "saturday_open": {
-                "type": "boolean"
-              },
-              "saturday_from": {
-                "type": "string"
-              },
-              "saturday_to": {
-                "type": "string"
-              },
-              "sunday_open": {
-                "type": "boolean"
-              },
-              "sunday_from": {
-                "type": "string"
-              },
-              "sunday_to": {
-                "type": "string"
-              },
-              "created_at": {
-                "type": "string"
-              },
-              "created_at_formatted": {
-                "type": "string"
-              },
-              "updated_at": {
-                "type": "string"
-              },
-              "updated_at_formatted": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "monday_open",
-              "monday_from",
-              "monday_to",
-              "tuesday_open",
-              "tuesday_from",
-              "tuesday_to",
-              "wednesday_open",
-              "wednesday_from",
-              "wednesday_to",
-              "thursday_open",
-              "thursday_from",
-              "thursday_to",
-              "friday_open",
-              "friday_from",
-              "friday_to",
-              "saturday_open",
-              "saturday_from",
-              "saturday_to",
-              "sunday_open",
-              "sunday_from",
-              "sunday_to",
-              "created_at",
-              "created_at_formatted",
-              "updated_at",
-              "updated_at_formatted"
-            ]
-          },
-          "consolidate_pick_enabled": {
-            "type": "boolean",
-            "default": false,
-            "description": "A true or false value that indicates whether this warehouse supports consolidate picking."
-          },
-          "default_goods_in_bay": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id"
-            ],
-            "readOnly": true
-          },
-          "default_goods_in_bay_id": {
-            "type": "integer",
-            "description": "The unique identifier of the location that is the default goods in bay for this warehouse.",
-            "readOnly": true
-          },
-          "default_goods_out_bay": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id"
-            ],
-            "readOnly": true
-          },
-          "default_goods_out_bay_id": {
-            "type": "integer",
-            "description": "The unique identifier of the location that is the default goods out bay for this warehouse.",
-            "readOnly": true
-          },
-          "external_system_reference1": {
-            "type": "string",
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
-            "nullable": true
-          },
-          "external_system_reference2": {
-            "type": "string",
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
-            "nullable": true
-          },
-          "external_system_reference3": {
-            "type": "string",
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
-            "nullable": true
-          },
-          "trusted_warehouses": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "created_at": {
-            "type": "string",
-            "description": "The date and time the resource was created in ISO-8601 format.",
-            "format": "date-time",
-            "maxLength": 29,
-            "minLength": 29,
-            "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
-            "readOnly": true
-          },
-          "updated_at": {
-            "type": "string",
-            "description": "The date and time the resource was last updated in ISO-8601 format.",
-            "format": "date-time",
-            "maxLength": 29,
-            "minLength": 29,
-            "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
-            "readOnly": true
-          }
-        },
-        "required": [
-          "id",
-          "code",
-          "name",
-          "address",
-          "site",
-          "opening_times_enabled",
-          "opening_times",
-          "consolidate_pick_enabled",
-          "default_goods_in_bay",
-          "default_goods_in_bay_id",
-          "default_goods_out_bay",
-          "default_goods_out_bay_id",
-          "trusted_warehouses",
-          "created_at",
-          "updated_at",
-          "site_id"
-        ]
-      },
-      "Address": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "The unique identifier of the resource.",
-            "readOnly": true
-          },
-          "code": {
-            "type": "string",
-            "description": "The unique code for the address. Utilised when the address is a re-usable collection or delivery address."
-          },
-          "name": {
-            "type": "string",
-            "description": "The name associated with the postal address. This may be the receipient connected to this postal address."
-          },
-          "address_1": {
-            "type": "string",
-            "description": "The first line of the address.",
-            "nullable": true
-          },
-          "address_2": {
-            "type": "string",
-            "description": "The first line of the address.",
-            "nullable": true
-          },
-          "address_3": {
-            "type": "string",
-            "description": "The third line of the address.",
-            "nullable": true
-          },
-          "address_4": {
-            "type": "string",
-            "description": "The fourth line of the address.",
-            "nullable": true
-          },
-          "address_5": {
-            "type": "string",
-            "description": "The fifth line of the address.",
-            "nullable": true
-          },
-          "postcode": {
-            "type": "string",
-            "description": "The postcode or zip code associated with the address.",
-            "nullable": true
-          },
-          "country_code": {
-            "type": "string",
-            "description": "An ISO 3166 standard country code.",
-            "nullable": true
-          },
-          "email_address": {
-            "type": "string",
-            "format": "email",
-            "description": "An email address associated with the address.",
-            "nullable": true
-          },
-          "phone_number": {
-            "type": "string",
-            "description": "A phone number associated with the address."
-          },
-          "is_active": {
-            "type": "boolean",
-            "default": false,
-            "description": "A true or false value that indicates whether this warehouse has opening times set to support the booking diary."
-          },
-          "external_delivery_id": {
-            "type": "integer",
-            "readOnly": true
-          },
-          "external_system_reference1": {
-            "type": "string",
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
-            "nullable": true
-          },
-          "external_system_reference2": {
-            "type": "string",
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
-            "nullable": true
-          },
-          "external_system_reference3": {
-            "type": "string",
-            "description": "A field commonly use to associate the resource with the reference of a matching entity in an external system.",
-            "nullable": true
-          },
-          "created_at": {
-            "type": "string",
-            "description": "The date and time the resource was created in ISO-8601 format.",
-            "format": "date-time",
-            "maxLength": 29,
-            "minLength": 29,
-            "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
-            "readOnly": true
-          },
-          "updated_at": {
-            "type": "string",
-            "description": "The date and time the resource was last updated in ISO-8601 format.",
-            "format": "date-time",
-            "pattern": "^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}[+-]\\\\d{2}:\\\\d{2}$",
-            "maxLength": 29,
-            "minLength": 29,
-            "readOnly": true
-          },
-          "created_at_formatted": {
-            "type": "string",
-            "readOnly": true,
-            "format": "date-time",
-            "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
-            "maxLength": 16,
-            "minLength": 16,
-            "description": "The date and time the resource was created in readable format, localised to UTC."
-          },
-          "updated_at_formatted": {
-            "type": "string",
-            "readOnly": true,
-            "format": "date-time",
-            "pattern": "^\\\\d{2}/\\\\d{2}/\\\\d{4} \\\\d{2}:\\\\d{2}$",
-            "maxLength": 16,
-            "minLength": 16,
-            "description": "The date and time the resource was last updated in readable format, localised to UTC."
-          }
-        },
-        "required": [
-          "id",
-          "code",
-          "name",
-          "phone_number",
-          "is_active",
-          "created_at",
-          "created_at_formatted",
-          "updated_at",
-          "updated_at_formatted"
         ]
       },
       "Site1": {
@@ -1259,182 +754,64 @@
         ],
         "description": "The body of the request."
       },
-      "AllSites": {
+      "Plant": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
-          "data": {
+          "name": {
+            "description": "The name of the plant",
+            "type": "string"
+          },
+          "tag": {
+            "description": "Tag to specify the type",
+            "type": "string"
+          }
+        }
+      },
+      "NewPlant": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Plant"
+          },
+          {
+            "required": [
+              "id"
+            ],
             "type": "object",
             "properties": {
-              "sites": {
-                "type": "object",
-                "properties": {
-                  "all": {
-                    "type": "object",
-                    "properties": {
-                      "edges": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "cursor": {
-                              "type": "string",
-                              "description": "The cursor position representative of this page, which can be used in further requests via `after` or `before`."
-                            },
-                            "node": {
-                              "$ref": "#/components/schemas/Site",
-                              "description": "The Site resource."
-                            }
-                          },
-                          "description": "Each individual item, including cursor and resource data."
-                        },
-                        "description": "An array of items on the page returned, including cursor and resource data."
-                      },
-                      "pageInfo": {
-                        "type": "object",
-                        "properties": {
-                          "hasNextPage": {
-                            "type": "boolean",
-                            "description": "Can we request another page, are there more records?"
-                          },
-                          "hasPreviousPage": {
-                            "type": "boolean",
-                            "description": "Can we request another page, are there previous records?"
-                          },
-                          "startCursor": {
-                            "type": "string",
-                            "description": "What this set of results started at."
-                          },
-                          "endCursor": {
-                            "type": "string",
-                            "description": "What this set of results ended at."
-                          }
-                        },
-                        "required": [
-                          "hasNextPage",
-                          "hasPreviousPage",
-                          "startCursor",
-                          "endCursor"
-                        ],
-                        "description": "Metadata regarding this page."
-                      }
-                    },
-                    "required": [
-                      "pageInfo",
-                      "edges"
-                    ],
-                    "description": "What endpoint of the resource we are requesting."
-                  }
-                },
-                "required": [
-                  "all"
-                ],
-                "description": "The name of the headline resource we are requesting."
+              "id": {
+                "description": "Identification number of the plant",
+                "type": "integer",
+                "format": "int64"
               }
-            },
-            "required": [
-              "sites"
-            ],
-            "description": "The root data to retrieve."
+            }
           }
-        },
-        "required": [
-          "data"
         ]
       },
-      "AllWarehouses": {
+      "Error": {
+        "required": [
+          "error",
+          "message"
+        ],
         "type": "object",
         "properties": {
-          "data": {
-            "type": "object",
-            "properties": {
-              "warehouses": {
-                "type": "object",
-                "properties": {
-                  "all": {
-                    "type": "object",
-                    "properties": {
-                      "edges": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "cursor": {
-                              "type": "string",
-                              "description": "The cursor position representative of this page, which can be used in further requests via `after` or `before`."
-                            },
-                            "node": {
-                              "description": "The Warehouse resource.",
-                              "$ref": "#/components/schemas/Warehouse"
-                            }
-                          },
-                          "description": "Each individual item, including cursor and resource data."
-                        },
-                        "description": "An array of items on the page returned, including cursor and resource data."
-                      },
-                      "pageInfo": {
-                        "type": "object",
-                        "properties": {
-                          "hasNextPage": {
-                            "type": "boolean",
-                            "description": "Can we request another page, are there more records?"
-                          },
-                          "hasPreviousPage": {
-                            "type": "boolean",
-                            "description": "Can we request another page, are there previous records?"
-                          },
-                          "startCursor": {
-                            "type": "string",
-                            "description": "What this set of results started at."
-                          },
-                          "endCursor": {
-                            "type": "string",
-                            "description": "What this set of results ended at."
-                          }
-                        },
-                        "required": [
-                          "hasNextPage",
-                          "hasPreviousPage",
-                          "startCursor",
-                          "endCursor"
-                        ],
-                        "description": "Metadata regarding this page."
-                      }
-                    },
-                    "required": [
-                      "pageInfo",
-                      "edges"
-                    ],
-                    "description": "What endpoint of the resource we are requesting."
-                  }
-                },
-                "required": [
-                  "all"
-                ],
-                "description": "The name of the headline resource we are requesting."
-              }
-            },
-            "required": [
-              "warehouses"
-            ],
-            "description": "The root data to retrieve."
+          "error": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
           }
-        },
-        "required": [
-          "data"
-        ]
+        }
       }
     },
     "securitySchemes": {
-      "bearer": {
+      "bearerAuth": {
         "type": "http",
         "scheme": "bearer"
       }
     }
-  },
-  "servers": [],
-  "security": [
-    {
-      "bearer": []
-    }
-  ]
+  }
 }
