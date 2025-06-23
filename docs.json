@@ -71,6 +71,7 @@
           {
             "group": "Core Resources",
             "pages": [
+              "api-reference/core-resources/Address",
               "api-reference/core-resources/Site"
             ]
           }

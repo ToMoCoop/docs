@@ -437,6 +437,93 @@ webhooks:
           description: Return a 200 status to indicate that the data was received successfully
 components:
   schemas:
+    Address:
+      type: object
+      required:
+        - id
+        - name
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique internal identifier for the address record.
+        name:
+          type: string
+          description: A human-readable name for the address. Often represents a site, person, or organisation.
+        address_1:
+          type: string
+          maxLength: 80
+          description: Primary address line, typically used for building name or street address.
+        address_2:
+          type: string
+          maxLength: 80
+          description: Secondary address line, often used for unit or suite numbers.
+        address_3:
+          type: string
+          maxLength: 80
+          description: Tertiary address line, available for additional location details.
+        address_4:
+          type: string
+          maxLength: 80
+          description: Optional fourth address line for extended address formatting needs.
+        address_5:
+          type: string
+          maxLength: 80
+          description: Optional fifth address line, used in complex or international formats.
+        postcode:
+          type: string
+          maxLength: 10
+          description: Postal code or ZIP code for the address.
+        country_code:
+          type: string
+          maxLength: 2
+          description: Two-letter ISO 3166-1 alpha-2 country code (e.g., "GB" for United Kingdom).
+        email_address:
+          type: string
+          format: email
+          description: Contact email associated with this address, if available.
+        phone_number:
+          type: string
+          description: Phone number linked to this address, preferably in international format (e.g., +44...).
+        code:
+          type: string
+          description: Optional internal or external reference code used to identify the address programmatically.
+        addressable_type:
+          type: string
+          description: Polymorphic type representing the kind of entity this address is associated with (e.g., "Warehouse", "Customer").
+        external_delivery_id:
+          type: string
+          description: Identifier used by an external delivery system to reference this address.
+        external_system_reference1:
+          type: string
+          description: Optional external reference field #1 for integrations or third-party systems.
+        external_system_reference2:
+          type: string
+          description: Optional external reference field #2 for integrations or third-party systems.
+        external_system_reference3:
+          type: string
+          description: Optional external reference field #3 for integrations or third-party systems.
+        is_active:
+          type: boolean
+          default: true
+          description: Indicates whether this address is active and available for use.
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp marking when the address was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp marking the last time the address was modified.
+        created_at_formatted:
+          type: string
+          description: Human-readable formatted version of the creation date (e.g., "12 Jan 2024").
+        updated_at_formatted:
+          type: string
+          description: Human-readable formatted version of the update date (e.g., "20 Jun 2025").
     Site:
       type: object
       properties:
