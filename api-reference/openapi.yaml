@@ -1,10 +1,16 @@
-openapi: 3.1.0
+openapi: 3.0.3
 info:
-  title: OpenAPI Plant Store
-  description: A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification
-  license:
-    name: MIT
+  title: ClarusWMS API
+  description: |
+    ClarusWMS is a multi-tenanted SaaS warehouse management system that provides comprehensive
+    warehouse operations including inventory management, inbound/outbound logistics, and 
+    multi-site warehouse routing.
+
+    This API documentation covers the Address management endpoints and related operations.
   version: 1.0.0
+  contact:
+    name: Clarus Software
+    url: https://claruswms.com
 servers:
   - url: https://{Subdomain}.api.clarussoftware.co.uk
     description: Staging
@@ -15,822 +21,1002 @@ servers:
 security:
   - ApiKeyAuth: []
 paths:
-  /graphql:
+  /api/v1/addresses:
     post:
-      summary: Retrieve a Warehouse
-      deprecated: false
-      description: etrieve a Warehous
-      tags: []
-      parameters: []
+      tags:
+        - Addresses
+      summary: Create a new address
+      description: |
+        Creates a new address in the system. Addresses are polymorphic entities that can be 
+        associated with various business objects like customers, suppliers, or warehouses.
+
+        **Validation Rules:**
+        - All address text fields (address_1 to address_5) are limited to 80 characters
+        - Country code must be valid ISO 3166-1 alpha-2 format (e.g., "US", "GB-UKM")
+        - Email address must be valid email format (max 254 characters)
+        - Phone number is limited to 50 characters
+        - Postcode is limited to 10 characters
+        - All text fields automatically strip leading and trailing whitespace
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                query:
-                  type: string
-                  format: textarea
-                variables:
-                  type: object
-                  properties: {}
-                  nullable: true
-              required:
-                - query
+              $ref: '#/components/schemas/AddressRequest'
+            examples:
+              basic_address:
+                summary: Basic warehouse address
+                value:
+                  address:
+                    name: Main Warehouse Loading Bay
+                    address_1: 123 Industrial Estate
+                    address_2: Unit 4B
+                    address_4: Manchester
+                    address_5: Greater Manchester
+                    postcode: M1 4ET
+                    country_code: GB
+                    phone_number: +44 161 123 4567
+                    email_address: warehouse@company.com
+                    is_active: true
+              customer_address:
+                summary: Customer delivery address
+                value:
+                  address:
+                    name: Customer XYZ Warehouse
+                    address_1: 456 Business Park
+                    address_4: Birmingham
+                    postcode: B1 1AA
+                    country_code: GB
+                    addressable_type: Customer
+                    addressable_id: 789
+                    external_system_reference1: ERP-CUST-001
+      responses:
+        '201':
+          $ref: '#/components/responses/AddressResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Addresses
+      summary: Delete multiple addresses
+      description: |
+        Deletes multiple addresses by their IDs. This is a bulk operation that removes
+        multiple address records in a single request.
+
+        **Important Notes:**
+        - Only addresses that are not currently referenced by other entities can be deleted
+        - The operation will fail if any of the specified addresses are in use
+        - IDs should be provided as a comma-separated string in the query parameter
+      parameters:
+        - name: ids
+          in: query
+          required: true
+          description: Comma-separated list of address IDs to delete
+          schema:
+            type: string
+            pattern: ^[0-9]+(,[0-9]+)*$
+            example: 123,456,789
       responses:
         '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/All%20Warehouses'
-              examples:
-                '1':
-                  summary: Success
-                  value:
-                    data:
-                      warehouses:
-                        all:
-                          pageInfo:
-                            hasNextPage: false
-                            hasPreviousPage: false
-                            startCursor: MQ
-                            endCursor: MQ
-                          edges:
-                            - cursor: MQ
-                              node:
-                                id: '1'
-                                code: WAR01
-                                name: Warehouse 01
-                                address:
-                                  id: '5'
-                                  code: null
-                                  name: null
-                                  address_1: null
-                                  address_2: null
-                                  address_3: null
-                                  address_4: null
-                                  address_5: null
-                                  postcode: '52123'
-                                  country_code: GB-UKM
-                                  email_address: null
-                                  phone_number: null
-                                  is_active: true
-                                  external_delivery_id: null
-                                  external_system_reference1: null
-                                  external_system_reference2: null
-                                  external_system_reference3: null
-                                  created_at: '2019-05-29T09:34:05.693+01:00'
-                                  created_at_formatted: 29/05/2019 09:34
-                                  updated_at: '2024-06-20T13:59:46.882+01:00'
-                                  updated_at_formatted: 20/06/2024 13:59
-                                site:
-                                  id: '1'
-                                  code: DEF001
-                                  name: Default Site
-                                opening_times_enabled: true
-                                opening_times:
-                                  id: '1'
-                                  monday_open: true
-                                  monday_from: '09:00'
-                                  monday_to: '17:00'
-                                  tuesday_open: true
-                                  tuesday_from: '09:00'
-                                  tuesday_to: '17:00'
-                                  wednesday_open: true
-                                  wednesday_from: '09:00'
-                                  wednesday_to: '17:00'
-                                  thursday_open: true
-                                  thursday_from: '09:00'
-                                  thursday_to: '17:00'
-                                  friday_open: true
-                                  friday_from: '09:00'
-                                  friday_to: '12:00'
-                                  saturday_open: false
-                                  saturday_from: '00:00'
-                                  saturday_to: '23:59'
-                                  sunday_open: false
-                                  sunday_from: '00:00'
-                                  sunday_to: '23:59'
-                                  created_at: '2023-12-07T15:55:25.373+00:00'
-                                  created_at_formatted: 07/12/2023 15:55
-                                  updated_at: '2023-12-07T15:55:25.373+00:00'
-                                  updated_at_formatted: 07/12/2023 15:55
-                                consolidate_pick_enabled: true
-                                default_goods_in_bay:
-                                  id: '1'
-                                default_goods_in_bay_id: '1'
-                                default_goods_out_bay:
-                                  id: '2'
-                                default_goods_out_bay_id: '2'
-                                external_system_reference1: '594866000000063175'
-                                external_system_reference2: null
-                                external_system_reference3: null
-                                trusted_warehouses: []
-                                created_at: '2017-04-13T21:05:37.508+01:00'
-                                updated_at: '2024-06-20T11:22:27.491+01:00'
-                '2':
-                  summary: Exception
-                  value:
-                    data:
-                      sites:
-                        all:
-                          edges: []
-          headers: {}
-  /api/sites:
-    post:
-      summary: Create a Site
-      deprecated: false
-      description: ''
-      tags: []
-      parameters: []
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/addresses/{id}:
+    put:
+      tags:
+        - Addresses
+      summary: Update an existing address
+      description: |
+        Updates an existing address with new information. Only the fields provided in the
+        request body will be updated; other fields will remain unchanged.
+
+        **Validation Rules:**
+        - Same validation rules as creation apply
+        - For regular addresses (non-typed), addressable_id and addressable_type cannot be changed
+        - Country code validation enforces ISO 3166-1 alpha-2 format
+        - All text fields are automatically stripped of leading/trailing whitespace
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the address to update
+          schema:
+            type: integer
+            format: int64
+            example: 12345
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              properties:
-                data:
-                  type: object
-                  properties:
-                    attributes:
-                      $ref: '#/components/schemas/Site'
-                  required:
-                    - attributes
-              required:
-                - data
-              $ref: '#/components/schemas/Site1'
-            example:
-              data:
-                attributes:
-                  code: SITE55
-                  name: Site 55
+              $ref: '#/components/schemas/AddressRequest'
+            examples:
+              update_contact_info:
+                summary: Update contact information
+                value:
+                  address:
+                    phone_number: +44 161 987 6543
+                    email_address: newcontact@company.com
+              update_full_address:
+                summary: Update complete address
+                value:
+                  address:
+                    name: Updated Warehouse Name
+                    address_1: 789 New Industrial Way
+                    address_2: Building C
+                    address_4: Leeds
+                    address_5: West Yorkshire
+                    postcode: LS1 2AB
+                    country_code: GB
+                    is_active: true
       responses:
         '200':
-          description: ''
+          $ref: '#/components/responses/AddressResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Addresses
+      summary: Delete a single address
+      description: |
+        Deletes a single address by its ID. The address will only be deleted if it is not
+        currently referenced by other entities in the system.
+
+        **Important Notes:**
+        - Cannot delete addresses that are currently in use by orders, shipments, or other entities
+        - Deletion is permanent and cannot be undone
+        - Consider deactivating the address (set is_active to false) instead of deletion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the address to delete
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Conflict - Address is currently in use
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    description: The unique identifier of the resource.
-                    readOnly: true
-                  code:
+                  status:
                     type: string
-                    description: The unique code for the site. This can be any series of characters that are unique to your operation.
-                    title: ''
-                    maxLength: 50
-                  name:
+                    example: error
+                  message:
                     type: string
-                    description: The identifiable name of the site.
-                    maxLength: 50
-                  tier:
-                    type: string
-                    description: |-
-                      The tier of the site related to the Control of major accident hazards (COMAH) Establishment Tier.
-
-                      If you store or use more than the lower threshold for a dangerous substance your site is classed as a "lower" tier establishment. If you store or use more than the higher threshold your site is an "upper" tier establishment.
-
-                      If this does not apply to your site, then select "none".
-                    enum:
-                      - none
-                      - lower
-                      - upper
-                    default: none
-                  boolean1:
-                    type: boolean
-                    description: A bespoke field that can be used to store any custom true or false value against the resource.
-                    nullable: true
-                  boolean2:
-                    type: boolean
-                    description: A bespoke field that can be used to store any custom true or false value against the resource.
-                    nullable: true
-                  boolean3:
-                    type: boolean
-                    description: A bespoke field that can be used to store any custom true or false value against the resource.
-                    nullable: true
-                  boolean4:
-                    type: boolean
-                    description: A bespoke field that can be used to store any custom true or false value against the resource.
-                    nullable: true
-                  boolean5:
-                    type: boolean
-                    description: A bespoke field that can be used to store any custom true or false value against the resource.
-                    nullable: true
-                  datetime1:
-                    type: string
-                    format: date-time
-                    examples:
-                      - '2023-11-09T10:06:36.593+00:00'
-                    pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-                    maxLength: 29
-                    minLength: 29
-                    description: A bespoke field that can be used to store any custom date time value against the resource.
-                    nullable: true
-                  datetime2:
-                    type: string
-                    format: date-time
-                    examples:
-                      - '2023-11-09T10:06:36.593+00:00'
-                    pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-                    maxLength: 29
-                    minLength: 29
-                    description: A bespoke field that can be used to store any custom date time value against the resource.
-                    nullable: true
-                  datetime3:
-                    type: string
-                    format: date-time
-                    examples:
-                      - '2023-11-09T10:06:36.593+00:00'
-                    pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-                    maxLength: 29
-                    minLength: 29
-                    description: A bespoke field that can be used to store any custom date time value against the resource.
-                    nullable: true
-                  datetime4:
-                    type: string
-                    format: date-time
-                    examples:
-                      - '2023-11-09T10:06:36.593+00:00'
-                    pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-                    maxLength: 29
-                    minLength: 29
-                    description: A bespoke field that can be used to store any custom date time value against the resource.
-                    nullable: true
-                  datetime5:
-                    type: string
-                    format: date-time
-                    examples:
-                      - '2023-11-09T10:06:36.593+00:00'
-                    pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-                    maxLength: 29
-                    minLength: 29
-                    description: A bespoke field that can be used to store any custom date time value against the resource.
-                    nullable: true
-                  default:
-                    type: boolean
-                    default: false
-                    description: |-
-                      A true or false value that indicates whether this site will be the default site for new Warehouses. 
-
-                      Only one Site can be set as the default at any one point.
-                      If true is set for the creation or update of a Site, then this will become the default if it so not already.
-                  external_system_reference1:
-                    type: string
-                    description: A field commonly use to associate the resource with the reference of a matching entity in an external system.
-                    nullable: true
-                  external_system_reference2:
-                    type: string
-                    description: A field commonly use to associate the resource with the reference of a matching entity in an external system.
-                    nullable: true
-                  external_system_reference3:
-                    type: string
-                    description: A field commonly use to associate the resource with the reference of a matching entity in an external system.
-                    nullable: true
-                  integer1:
-                    type: integer
-                    description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-                    nullable: true
-                  integer2:
-                    type: integer
-                    description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-                    nullable: true
-                  integer3:
-                    type: integer
-                    description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-                    nullable: true
-                  integer4:
-                    type: integer
-                    description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-                    nullable: true
-                  integer5:
-                    type: integer
-                    description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-                    nullable: true
-                  string1:
-                    type: string
-                    description: A bespoke field that can be used to store any text against the resource.
-                    nullable: true
-                  string2:
-                    type: string
-                    description: A bespoke field that can be used to store any text against the resource.
-                    nullable: true
-                  string3:
-                    type: string
-                    description: A bespoke field that can be used to store any text against the resource.
-                    nullable: true
-                  string4:
-                    type: string
-                    description: A bespoke field that can be used to store any text against the resource.
-                    nullable: true
-                  string5:
-                    type: string
-                    description: A bespoke field that can be used to store any text against the resource.
-                    nullable: true
-                  created_at:
-                    type: string
-                    description: The date and time the resource was created in ISO-8601 format.
-                    format: date-time
-                    maxLength: 29
-                    minLength: 29
-                    pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-                    examples:
-                      - '2023-11-09T10:06:36.593+00:00'
-                    readOnly: true
-                  updated_at:
-                    type: string
-                    description: The date and time the resource was last updated in ISO-8601 format.
-                    format: date-time
-                    examples:
-                      - '2023-11-09T10:06:36.593+00:00'
-                    pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-                    maxLength: 29
-                    minLength: 29
-                    readOnly: true
-                required:
-                  - id
-                  - code
-                  - name
-                  - tier
-          headers: {}
-  /plants:
-    get:
-      description: Returns all plants from the system that the user has access to
-      parameters:
-        - name: limit
-          in: query
-          description: The maximum number of results to return
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '200':
-          description: Plant response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Plant'
-        '400':
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                    example: Cannot delete address - it is currently in use
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/delivery_addresses:
     post:
-      description: Creates a new plant in the store
+      tags:
+        - Delivery Addresses
+      summary: Create a new delivery address
+      description: |
+        Creates a new delivery address specifically for customer delivery operations. Delivery addresses
+        are specialized address types that inherit from the base Address model with additional requirements.
+
+        **Required Fields:**
+        - `name`: Display name for the delivery address
+        - `code`: Unique identifier code within the system (max 50 characters)
+
+        **Validation Rules:**
+        - All standard address validation rules apply
+        - `addressable_type` must be "Customer" if specified
+        - Code must be unique across all delivery addresses
+        - Cannot be associated with accounts via account_ids parameter
+
+        **Usage Context:**
+        Delivery addresses are used for outbound logistics, shipping destinations, and customer delivery operations.
+        They support integration with external delivery systems and carrier management.
       requestBody:
-        description: Plant to add to the store
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewPlant'
-        required: true
+              $ref: '#/components/schemas/DeliveryAddressRequest'
+            examples:
+              customer_delivery:
+                summary: Customer delivery address
+                value:
+                  delivery_address:
+                    name: Acme Corp - Main Delivery
+                    code: ACME-DEL-001
+                    address_1: 789 Customer Business Park
+                    address_2: Loading Bay 3
+                    address_4: London
+                    address_5: Greater London
+                    postcode: SW1A 1AA
+                    country_code: GB
+                    phone_number: +44 20 7123 4567
+                    email_address: receiving@acmecorp.com
+                    addressable_type: Customer
+                    addressable_id: 456
+                    external_delivery_id: DHL-LOC-789
+                    is_active: true
+              retail_store:
+                summary: Retail store delivery address
+                value:
+                  delivery_address:
+                    name: Retail Store Central London
+                    code: STORE-LON-001
+                    address_1: 123 High Street
+                    address_4: London
+                    postcode: W1D 4FA
+                    country_code: GB
+                    phone_number: +44 20 7987 6543
+                    external_system_reference1: POS-STORE-001
+                    external_delivery_id: ROYAL-MAIL-123
+      responses:
+        '201':
+          $ref: '#/components/responses/DeliveryAddressResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Delivery Addresses
+      summary: Delete multiple delivery addresses
+      description: |
+        Deletes multiple delivery addresses by their IDs. This is a bulk operation specifically
+        for delivery address management.
+
+        **Important Considerations:**
+        - Cannot delete delivery addresses that are currently assigned to active orders
+        - Cannot delete addresses that are associated with account relationships
+        - All delivery-specific validations apply
+        - Operation is atomic - if any address cannot be deleted, the entire operation fails
+      parameters:
+        - name: ids
+          in: query
+          required: true
+          description: Comma-separated list of delivery address IDs to delete
+          schema:
+            type: string
+            pattern: ^[0-9]+(,[0-9]+)*$
+            example: 123,456,789
       responses:
         '200':
-          description: plant response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Plant'
+          $ref: '#/components/responses/SuccessResponse'
         '400':
-          description: unexpected error
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Conflict - One or more delivery addresses are currently in use
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  /plants/{id}:
-    delete:
-      description: Deletes a single plant based on the ID supplied
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot delete delivery addresses - some are currently assigned to orders
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/delivery_addresses/{id}:
+    put:
+      tags:
+        - Delivery Addresses
+      summary: Update an existing delivery address
+      description: |
+        Updates an existing delivery address with new information. All delivery address
+        validation rules apply to the update operation.
+
+        **Update Rules:**
+        - Required fields (name, code) must be provided if being changed
+        - Code uniqueness is enforced across all delivery addresses
+        - Cannot change the STI type from DeliveryAddress to another type
+        - addressable_type restriction to "Customer" is enforced
+
+        **Impact Areas:**
+        Updates may affect active orders, shipments, and delivery schedules that reference this address.
       parameters:
         - name: id
           in: path
-          description: ID of plant to delete
           required: true
+          description: Unique identifier of the delivery address to update
           schema:
             type: integer
             format: int64
-      responses:
-        '204':
-          description: Plant deleted
-          content: {}
-        '400':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-webhooks:
-  /plant/webhook:
-    post:
-      description: Information about a new plant added to the store
+            example: 12345
       requestBody:
-        description: Plant added to the store
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewPlant'
+              $ref: '#/components/schemas/DeliveryAddressRequest'
+            examples:
+              update_delivery_details:
+                summary: Update delivery contact information
+                value:
+                  delivery_address:
+                    name: Acme Corp - Updated Delivery Point
+                    phone_number: +44 20 7999 8888
+                    email_address: newreceiving@acmecorp.com
+                    external_delivery_id: UPS-LOC-456
+              change_delivery_location:
+                summary: Update delivery location
+                value:
+                  delivery_address:
+                    name: Acme Corp - Secondary Location
+                    code: ACME-DEL-002
+                    address_1: 456 New Business Center
+                    address_4: Birmingham
+                    address_5: West Midlands
+                    postcode: B1 2CD
       responses:
         '200':
-          description: Return a 200 status to indicate that the data was received successfully
+          $ref: '#/components/responses/DeliveryAddressResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Delivery Addresses
+      summary: Delete a single delivery address
+      description: |
+        Deletes a single delivery address by its ID. The operation includes delivery-specific
+        validation to ensure the address is not currently in use for active delivery operations.
+
+        **Pre-deletion Checks:**
+        - Verifies the address is not assigned to any active or pending orders
+        - Checks for account associations that must be removed first
+        - Validates that dependent delivery schedules are not affected
+
+        **Alternative Action:**
+        Consider deactivating the delivery address instead of deletion to maintain historical records.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the delivery address to delete
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Conflict - Delivery address is currently in use
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot delete delivery address - it is assigned to active orders
+                  details:
+                    type: object
+                    properties:
+                      active_orders:
+                        type: integer
+                        example: 3
+                      account_associations:
+                        type: integer
+                        example: 1
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/collection_addresses:
+    post:
+      tags:
+        - Collection Addresses
+      summary: Create a new collection address
+      description: |
+        Creates a new collection address specifically for supplier collection operations. Collection addresses
+        are specialized address types that inherit from the base Address model with additional requirements.
+
+        **Required Fields:**
+        - `name`: Display name for the collection address
+        - `code`: Unique identifier code within the system (max 50 characters)
+
+        **Validation Rules:**
+        - All standard address validation rules apply
+        - `addressable_type` must be "Supplier" if specified
+        - Code must be unique across all collection addresses
+        - Cannot be associated with accounts via account_ids parameter
+
+        **Usage Context:**
+        Collection addresses are used for inbound logistics, supplier pickup operations, and goods receipt.
+        They support integration with supplier management and procurement systems.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollectionAddressRequest'
+            examples:
+              supplier_collection:
+                summary: Supplier collection address
+                value:
+                  collection_address:
+                    name: Global Supplier Ltd - Main Pickup
+                    code: GSUP-COL-001
+                    address_1: 456 Manufacturing District
+                    address_2: Warehouse 7
+                    address_4: Sheffield
+                    address_5: South Yorkshire
+                    postcode: S1 2HE
+                    country_code: GB
+                    phone_number: +44 114 123 4567
+                    email_address: dispatch@globalsupplier.com
+                    addressable_type: Supplier
+                    addressable_id: 789
+                    external_system_reference1: ERP-SUP-001
+                    external_system_reference2: SAP-VENDOR-123
+                    is_active: true
+              manufacturer_pickup:
+                summary: Manufacturer pickup location
+                value:
+                  collection_address:
+                    name: TechMfg Inc - Production Facility
+                    code: TECH-COL-PROD
+                    address_1: 789 Industrial Complex
+                    address_4: Coventry
+                    address_5: West Midlands
+                    postcode: CV1 3FG
+                    country_code: GB
+                    phone_number: +44 24 7123 4567
+                    external_system_reference1: MFG-PLANT-001
+      responses:
+        '201':
+          $ref: '#/components/responses/CollectionAddressResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Collection Addresses
+      summary: Delete multiple collection addresses
+      description: |
+        Deletes multiple collection addresses by their IDs. This is a bulk operation specifically
+        for collection address management.
+
+        **Important Considerations:**
+        - Cannot delete collection addresses that are currently assigned to active purchase orders
+        - Cannot delete addresses that are associated with account relationships
+        - All collection-specific validations apply
+        - Operation is atomic - if any address cannot be deleted, the entire operation fails
+      parameters:
+        - name: ids
+          in: query
+          required: true
+          description: Comma-separated list of collection address IDs to delete
+          schema:
+            type: string
+            pattern: ^[0-9]+(,[0-9]+)*$
+            example: 123,456,789
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Conflict - One or more collection addresses are currently in use
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot delete collection addresses - some are currently assigned to purchase orders
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/collection_addresses/{id}:
+    put:
+      tags:
+        - Collection Addresses
+      summary: Update an existing collection address
+      description: |
+        Updates an existing collection address with new information. All collection address
+        validation rules apply to the update operation.
+
+        **Update Rules:**
+        - Required fields (name, code) must be provided if being changed
+        - Code uniqueness is enforced across all collection addresses
+        - Cannot change the STI type from CollectionAddress to another type
+        - addressable_type restriction to "Supplier" is enforced
+
+        **Impact Areas:**
+        Updates may affect active purchase orders, goods receipt schedules, and collection plans
+        that reference this address.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the collection address to update
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollectionAddressRequest'
+            examples:
+              update_collection_details:
+                summary: Update collection contact information
+                value:
+                  collection_address:
+                    name: Global Supplier Ltd - Updated Pickup Point
+                    phone_number: +44 114 999 8888
+                    email_address: newdispatch@globalsupplier.com
+                    external_system_reference2: SAP-VENDOR-456
+              change_collection_location:
+                summary: Update collection location
+                value:
+                  collection_address:
+                    name: Global Supplier Ltd - Secondary Facility
+                    code: GSUP-COL-002
+                    address_1: 789 New Manufacturing Park
+                    address_4: Leeds
+                    address_5: West Yorkshire
+                    postcode: LS2 7AB
+      responses:
+        '200':
+          $ref: '#/components/responses/CollectionAddressResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Collection Addresses
+      summary: Delete a single collection address
+      description: |
+        Deletes a single collection address by its ID. The operation includes collection-specific
+        validation to ensure the address is not currently in use for active collection operations.
+
+        **Pre-deletion Checks:**
+        - Verifies the address is not assigned to any active or pending purchase orders
+        - Checks for account associations that must be removed first
+        - Validates that dependent collection schedules are not affected
+        - Ensures no goods receipt operations are planned for this address
+
+        **Alternative Action:**
+        Consider deactivating the collection address instead of deletion to maintain historical records
+        and preserve supply chain audit trails.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the collection address to delete
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Conflict - Collection address is currently in use
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot delete collection address - it is assigned to active purchase orders
+                  details:
+                    type: object
+                    properties:
+                      active_purchase_orders:
+                        type: integer
+                        example: 2
+                      scheduled_collections:
+                        type: integer
+                        example: 1
+                      account_associations:
+                        type: integer
+                        example: 1
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/account_delivery_addresses:
+    post:
+      tags:
+        - Account Associations
+      summary: Create account-delivery address association
+      description: |
+        Creates an association between an account and a delivery address, allowing multiple accounts
+        to share delivery destinations. This is useful for multi-tenant scenarios where different
+        accounts need access to the same delivery locations.
+
+        **Requirements:**
+        - Both account_id and address_id must reference existing, active records
+        - The address must be a DeliveryAddress type (not a regular Address)
+        - The account must have appropriate permissions to use the delivery address
+        - Duplicate associations are not allowed
+
+        **Business Context:**
+        This association enables complex delivery scenarios such as:
+        - Multiple subsidiaries sharing a central delivery hub
+        - Third-party logistics providers managing deliveries for multiple clients
+        - Corporate accounts with multiple delivery destinations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDeliveryAddressRequest'
+            examples:
+              basic_association:
+                summary: Basic account-delivery address association
+                value:
+                  account_delivery_address:
+                    account_id: 123
+                    address_id: 456
+              multi_tenant_scenario:
+                summary: Multi-tenant delivery sharing
+                value:
+                  account_delivery_address:
+                    account_id: 789
+                    address_id: 456
+      responses:
+        '201':
+          $ref: '#/components/responses/AccountDeliveryAddressResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          description: Account or delivery address not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Account or delivery address not found
+        '409':
+          description: Association already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Account-delivery address association already exists
+        '422':
+          description: Invalid address type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Address must be a DeliveryAddress type for account associations
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/account_delivery_addresses/{id}:
+    delete:
+      tags:
+        - Account Associations
+      summary: Remove account-delivery address association
+      description: |
+        Removes the association between an account and a delivery address. This operation
+        only removes the association relationship - it does not delete the account or
+        the delivery address itself.
+
+        **Impact Considerations:**
+        - Active orders using this account-address combination may be affected
+        - Delivery schedules dependent on this association will need to be updated
+        - Historical records referencing this association will remain intact
+
+        **Post-deletion Effects:**
+        - The account will no longer have access to the delivery address
+        - Any dependent delivery workflows will need reconfiguration
+        - The delivery address remains available for other account associations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the account-delivery address association to remove
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Association is currently in use
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot remove association - it is currently used by active orders
+                  details:
+                    type: object
+                    properties:
+                      active_orders:
+                        type: integer
+                        example: 5
+                      pending_deliveries:
+                        type: integer
+                        example: 2
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/account_collection_addresses:
+    post:
+      tags:
+        - Account Associations
+      summary: Create account-collection address association
+      description: |
+        Creates an association between an account and a collection address, allowing multiple accounts
+        to share collection sources. This is useful for multi-tenant scenarios where different
+        accounts need access to the same supplier pickup locations.
+
+        **Requirements:**
+        - Both account_id and address_id must reference existing, active records
+        - The address must be a CollectionAddress type (not a regular Address)
+        - The account must have appropriate permissions to use the collection address
+        - Duplicate associations are not allowed
+
+        **Business Context:**
+        This association enables complex collection scenarios such as:
+        - Multiple subsidiaries sharing supplier relationships
+        - Third-party logistics providers managing collections for multiple clients
+        - Corporate accounts with shared supplier collection points
+        - Consolidated purchasing operations across account boundaries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCollectionAddressRequest'
+            examples:
+              basic_association:
+                summary: Basic account-collection address association
+                value:
+                  account_collection_address:
+                    account_id: 123
+                    address_id: 789
+              shared_supplier_scenario:
+                summary: Shared supplier collection point
+                value:
+                  account_collection_address:
+                    account_id: 456
+                    address_id: 789
+      responses:
+        '201':
+          $ref: '#/components/responses/AccountCollectionAddressResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          description: Account or collection address not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Account or collection address not found
+        '409':
+          description: Association already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Account-collection address association already exists
+        '422':
+          description: Invalid address type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Address must be a CollectionAddress type for account associations
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/account_collection_addresses/{id}:
+    delete:
+      tags:
+        - Account Associations
+      summary: Remove account-collection address association
+      description: |
+        Removes the association between an account and a collection address. This operation
+        only removes the association relationship - it does not delete the account or
+        the collection address itself.
+
+        **Impact Considerations:**
+        - Active purchase orders using this account-address combination may be affected
+        - Collection schedules dependent on this association will need to be updated
+        - Supplier relationships dependent on this association require attention
+        - Historical records referencing this association will remain intact
+
+        **Post-deletion Effects:**
+        - The account will no longer have access to the collection address
+        - Any dependent collection workflows will need reconfiguration
+        - The collection address remains available for other account associations
+        - Procurement processes may need alternative collection arrangements
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the account-collection address association to remove
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Association is currently in use
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot remove association - it is currently used by active purchase orders
+                  details:
+                    type: object
+                    properties:
+                      active_purchase_orders:
+                        type: integer
+                        example: 3
+                      scheduled_collections:
+                        type: integer
+                        example: 1
+                      pending_receipts:
+                        type: integer
+                        example: 2
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 components:
-  schemas:
-    Address:
-      type: object
-      required:
-        - id
-        - name
-        - is_active
-        - created_at
-        - updated_at
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Unique internal identifier for the address record.
-        name:
-          type: string
-          description: A human-readable name for the address. Often represents a site, person, or organisation.
-        address_1:
-          type: string
-          maxLength: 80
-          description: Primary address line, typically used for building name or street address.
-        address_2:
-          type: string
-          maxLength: 80
-          description: Secondary address line, often used for unit or suite numbers.
-        address_3:
-          type: string
-          maxLength: 80
-          description: Tertiary address line, available for additional location details.
-        address_4:
-          type: string
-          maxLength: 80
-          description: Optional fourth address line for extended address formatting needs.
-        address_5:
-          type: string
-          maxLength: 80
-          description: Optional fifth address line, used in complex or international formats.
-        postcode:
-          type: string
-          maxLength: 10
-          description: Postal code or ZIP code for the address.
-        country_code:
-          type: string
-          maxLength: 2
-          description: Two-letter ISO 3166-1 alpha-2 country code (e.g., "GB" for United Kingdom).
-        email_address:
-          type: string
-          format: email
-          description: Contact email associated with this address, if available.
-        phone_number:
-          type: string
-          description: Phone number linked to this address, preferably in international format (e.g., +44...).
-        code:
-          type: string
-          description: Optional internal or external reference code used to identify the address programmatically.
-        addressable_type:
-          type: string
-          description: Polymorphic type representing the kind of entity this address is associated with (e.g., "Warehouse", "Customer").
-        external_delivery_id:
-          type: string
-          description: Identifier used by an external delivery system to reference this address.
-        external_system_reference1:
-          type: string
-          description: Optional external reference field #1 for integrations or third-party systems.
-        external_system_reference2:
-          type: string
-          description: Optional external reference field #2 for integrations or third-party systems.
-        external_system_reference3:
-          type: string
-          description: Optional external reference field #3 for integrations or third-party systems.
-        is_active:
-          type: boolean
-          default: true
-          description: Indicates whether this address is active and available for use.
-        created_at:
-          type: string
-          format: date-time
-          description: ISO 8601 timestamp marking when the address was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: ISO 8601 timestamp marking the last time the address was modified.
-        created_at_formatted:
-          type: string
-          description: Human-readable formatted version of the creation date (e.g., "12 Jan 2024").
-        updated_at_formatted:
-          type: string
-          description: Human-readable formatted version of the update date (e.g., "20 Jun 2025").
-    Site:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: The unique identifier of the resource.
-          readOnly: true
-        code:
-          type: string
-          description: The unique code for the site. This can be any series of characters that are unique to your operation.
-          title: ''
-          maxLength: 50
-        name:
-          type: string
-          description: The identifiable name of the site.
-          maxLength: 50
-        tier:
-          type: string
-          description: |-
-            The tier of the site related to the Control of major accident hazards (COMAH) Establishment Tier.
-
-            If you store or use more than the lower threshold for a dangerous substance your site is classed as a "lower" tier establishment. If you store or use more than the higher threshold your site is an "upper" tier establishment.
-
-            If this does not apply to your site, then select "none".
-          enum:
-            - none
-            - lower
-            - upper
-          default: none
-        boolean1:
-          type: boolean
-          description: A bespoke field that can be used to store any custom true or false value against the resource.
-          nullable: true
-        boolean2:
-          type: boolean
-          description: A bespoke field that can be used to store any custom true or false value against the resource.
-          nullable: true
-        boolean3:
-          type: boolean
-          description: A bespoke field that can be used to store any custom true or false value against the resource.
-          nullable: true
-        boolean4:
-          type: boolean
-          description: A bespoke field that can be used to store any custom true or false value against the resource.
-          nullable: true
-        boolean5:
-          type: boolean
-          description: A bespoke field that can be used to store any custom true or false value against the resource.
-          nullable: true
-        datetime1:
-          type: string
-          format: date-time
-          examples:
-            - '2023-11-09T10:06:36.593+00:00'
-          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-          maxLength: 29
-          minLength: 29
-          description: A bespoke field that can be used to store any custom date time value against the resource.
-          nullable: true
-        datetime1_formatted:
-          type: string
-          description: The datetime1 field in readable format, localised to UTC.
-          readOnly: true
-          format: date-time
-          examples:
-            - 09/11/2023 10:06
-          pattern: ^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}$
-          maxLength: 16
-          minLength: 16
-          nullable: true
-        datetime2:
-          type: string
-          format: date-time
-          examples:
-            - '2023-11-09T10:06:36.593+00:00'
-          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-          maxLength: 29
-          minLength: 29
-          description: A bespoke field that can be used to store any custom date time value against the resource.
-          nullable: true
-        datetime2_formatted:
-          type: string
-          description: The datetime2 field in readable format, localised to UTC.
-          readOnly: true
-          format: date-time
-          examples:
-            - 09/11/2023 10:06
-          pattern: ^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}$
-          maxLength: 16
-          minLength: 16
-          nullable: true
-        datetime3:
-          type: string
-          format: date-time
-          examples:
-            - '2023-11-09T10:06:36.593+00:00'
-          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-          maxLength: 29
-          minLength: 29
-          description: A bespoke field that can be used to store any custom date time value against the resource.
-          nullable: true
-        datetime3_formatted:
-          type: string
-          description: The datetime3 field in readable format, localised to UTC.
-          readOnly: true
-          format: date-time
-          examples:
-            - 09/11/2023 10:06
-          pattern: ^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}$
-          maxLength: 16
-          minLength: 16
-          nullable: true
-        datetime4:
-          type: string
-          format: date-time
-          examples:
-            - '2023-11-09T10:06:36.593+00:00'
-          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-          maxLength: 29
-          minLength: 29
-          description: A bespoke field that can be used to store any custom date time value against the resource.
-          nullable: true
-        datetime4_formatted:
-          type: string
-          description: The datetime4 field in readable format, localised to UTC.
-          readOnly: true
-          format: date-time
-          examples:
-            - 09/11/2023 10:06
-          pattern: ^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}$
-          maxLength: 16
-          minLength: 16
-          nullable: true
-        datetime5:
-          type: string
-          format: date-time
-          examples:
-            - '2023-11-09T10:06:36.593+00:00'
-          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-          maxLength: 29
-          minLength: 29
-          description: A bespoke field that can be used to store any custom date time value against the resource.
-          nullable: true
-        datetime5_formatted:
-          type: string
-          description: The datetime5 field in readable format, localised to UTC.
-          readOnly: true
-          format: date-time
-          examples:
-            - 09/11/2023 10:06
-          pattern: ^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}$
-          maxLength: 16
-          minLength: 16
-          nullable: true
-        default:
-          type: boolean
-          default: false
-          description: |-
-            A true or false value that indicates whether this site will be the default site for new Warehouses. 
-
-            Only one Site can be set as the default at any one point.
-            If true is set for the creation or update of a Site, then this will become the default if it so not already.
-        external_system_reference1:
-          type: string
-          description: A field commonly use to associate the resource with the reference of a matching entity in an external system.
-          nullable: true
-        external_system_reference2:
-          type: string
-          description: A field commonly use to associate the resource with the reference of a matching entity in an external system.
-          nullable: true
-        external_system_reference3:
-          type: string
-          description: A field commonly use to associate the resource with the reference of a matching entity in an external system.
-          nullable: true
-        integer1:
-          type: integer
-          description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-          nullable: true
-        integer2:
-          type: integer
-          description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-          nullable: true
-        integer3:
-          type: integer
-          description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-          nullable: true
-        integer4:
-          type: integer
-          description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-          nullable: true
-        integer5:
-          type: integer
-          description: A bespoke field that can be used to store any custom numerical (integer) value against the resource.
-          nullable: true
-        string1:
-          type: string
-          description: A bespoke field that can be used to store any text against the resource.
-          nullable: true
-        string2:
-          type: string
-          description: A bespoke field that can be used to store any text against the resource.
-          nullable: true
-        string3:
-          type: string
-          description: A bespoke field that can be used to store any text against the resource.
-          nullable: true
-        string4:
-          type: string
-          description: A bespoke field that can be used to store any text against the resource.
-          nullable: true
-        string5:
-          type: string
-          description: A bespoke field that can be used to store any text against the resource.
-          nullable: true
-        created_at:
-          type: string
-          description: The date and time the resource was created in ISO-8601 format.
-          format: date-time
-          maxLength: 29
-          minLength: 29
-          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-          examples:
-            - '2023-11-09T10:06:36.593+00:00'
-          readOnly: true
-        updated_at:
-          type: string
-          description: The date and time the resource was last updated in ISO-8601 format.
-          format: date-time
-          examples:
-            - '2023-11-09T10:06:36.593+00:00'
-          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{2}:\\d{2}$
-          maxLength: 29
-          minLength: 29
-          readOnly: true
-        created_at_formatted:
-          type: string
-          readOnly: true
-          format: date-time
-          examples:
-            - 09/11/2023 10:06
-          pattern: ^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}$
-          maxLength: 16
-          minLength: 16
-          description: The date and time the resource was created in readable format, localised to UTC.
-        updated_at_formatted:
-          type: string
-          readOnly: true
-          format: date-time
-          examples:
-            - 09/11/2023 10:06
-          pattern: ^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}$
-          maxLength: 16
-          minLength: 16
-          description: The date and time the resource was last updated in readable format, localised to UTC.
-      required:
-        - id
-        - name
-        - tier
-        - code
-    Site1:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            attributes:
-              $ref: '#/components/schemas/Site'
-              description: The attributes of the Site resource.
-          required:
-            - attributes
-          description: The data object wrapper.
-      required:
-        - data
-      description: The body of the request.
-    Plant:
-      required:
-        - name
-      type: object
-      properties:
-        name:
-          description: The name of the plant
-          type: string
-        tag:
-          description: Tag to specify the type
-          type: string
-    NewPlant:
-      allOf:
-        - $ref: '#/components/schemas/Plant'
-        - required:
-            - id
-          type: object
-          properties:
-            id:
-              description: Identification number of the plant
-              type: integer
-              format: int64
-    Error:
-      required:
-        - error
-        - message
-      type: object
-      properties:
-        error:
-          type: integer
-          format: int32
-        message:
-          type: string
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
@@ -844,4 +1030,557 @@ components:
         * `$myToken` is provided in the response to a successful login
         * `$myEmail` is the email of the user who has authenticated
         You can only have one concurrent login per account, so if you login to the application via the web browser you will be required to reauthenticate.
-
+  schemas:
+    Address:
+      type: object
+      description: |
+        Base address entity that can be associated with various business objects in the warehouse
+        management system. Addresses support polymorphic relationships and automatic field validation.
+      required:
+        - id
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the address
+          example: 12345
+          readOnly: true
+        name:
+          type: string
+          description: |
+            Display name for the address, typically used for identification purposes.
+            This field is required for delivery and collection address types.
+          maxLength: 255
+          example: Main Warehouse - Dock 1
+        address_1:
+          type: string
+          description: |
+            First line of the street address. This is typically the building number and street name.
+            All address text fields automatically strip leading and trailing whitespace.
+          maxLength: 80
+          example: 123 Industrial Way
+        address_2:
+          type: string
+          description: |
+            Second line of the street address. Often used for apartment, suite, or unit numbers.
+          maxLength: 80
+          example: Unit 4B
+        address_3:
+          type: string
+          description: |
+            Third line of the street address. Used for additional address details or district information.
+          maxLength: 80
+          example: Industrial Estate
+        address_4:
+          type: string
+          description: |
+            Fourth line of the street address. Commonly used for city or town information.
+          maxLength: 80
+          example: Manchester
+        address_5:
+          type: string
+          description: |
+            Fifth line of the street address. Often used for county, state, or region information.
+          maxLength: 80
+          example: Greater Manchester
+        postcode:
+          type: string
+          description: |
+            Postal code or ZIP code for the address. Format varies by country.
+            Leading and trailing whitespace is automatically stripped.
+          maxLength: 10
+          example: M1 4ET
+        country_code:
+          type: string
+          description: |
+            ISO 3166-1 alpha-2 country code, optionally followed by subdivision code.
+            Supports formats like "US", "GB", "GB-UKM" for country with subdivision.
+          maxLength: 6
+          pattern: ^[A-Z]{2}(-[A-Z0-9]{1,3})?$
+          example: GB
+        phone_number:
+          type: string
+          description: |
+            Contact phone number for the address. Can include international dialing codes.
+            Leading and trailing whitespace is automatically stripped.
+          maxLength: 50
+          example: +44 161 123 4567
+        email_address:
+          type: string
+          format: email
+          description: |
+            Contact email address for correspondence related to this address.
+            Must be a valid email format. Leading and trailing whitespace is automatically stripped.
+          maxLength: 254
+          example: warehouse@company.com
+        code:
+          type: string
+          description: |
+            Unique code identifier for the address within the system. This field is required
+            for delivery and collection address types.
+          maxLength: 50
+          example: WH001-DOCK1
+        is_active:
+          type: boolean
+          description: |
+            Indicates whether the address is currently active and available for use.
+            Inactive addresses are typically hidden from selection lists.
+          default: true
+          example: true
+        addressable_type:
+          type: string
+          description: |
+            The type of entity this address belongs to (polymorphic relationship).
+            Common values include "Customer", "Supplier", "Warehouse".
+          example: Customer
+        addressable_id:
+          type: integer
+          format: int64
+          description: |
+            The ID of the entity this address belongs to (polymorphic relationship).
+            Used in conjunction with addressable_type.
+          example: 789
+        external_system_reference1:
+          type: string
+          description: |
+            First external system reference field for integration purposes.
+            Used to store identifiers from external systems like ERPs or e-commerce platforms.
+          example: ERP-ADDR-001
+        external_system_reference2:
+          type: string
+          description: |
+            Second external system reference field for additional integration requirements.
+          example: SHOPIFY-12345
+        external_system_reference3:
+          type: string
+          description: |
+            Third external system reference field for complex integration scenarios.
+          example: SAP-LOC-789
+        external_delivery_id:
+          type: string
+          description: |
+            External delivery system identifier used for carrier and logistics integrations.
+          example: DHL-DEL-456
+        type:
+          type: string
+          description: |
+            Single Table Inheritance (STI) type field. Used to differentiate between
+            Address, DeliveryAddress, and CollectionAddress types.
+          enum:
+            - Address
+            - DeliveryAddress
+            - CollectionAddress
+          example: DeliveryAddress
+        digest:
+          type: string
+          description: |
+            System-generated hash digest of the address content for duplicate detection
+            and change tracking purposes.
+          readOnly: true
+          example: a1b2c3d4e5f6
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the address was first created
+          readOnly: true
+          example: '2024-01-15T10:30:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the address was last modified
+          readOnly: true
+          example: '2024-01-15T14:45:00Z'
+    AddressRequest:
+      type: object
+      description: Request payload for creating or updating an address
+      required:
+        - address
+      properties:
+        address:
+          allOf:
+            - $ref: '#/components/schemas/Address'
+            - type: object
+              properties:
+                id:
+                  readOnly: false
+                  description: Only used for update operations
+                created_at:
+                  type: string
+                  readOnly: true
+                updated_at:
+                  type: string
+                  readOnly: true
+                digest:
+                  type: string
+                  readOnly: true
+    DeliveryAddress:
+      allOf:
+        - $ref: '#/components/schemas/Address'
+        - type: object
+          description: |
+            Specialized address type for customer delivery operations. Inherits all properties
+            from the base Address model with additional validation requirements.
+          required:
+            - name
+            - code
+          properties:
+            type:
+              type: string
+              enum:
+                - DeliveryAddress
+              description: STI type identifier for delivery addresses
+              example: DeliveryAddress
+            addressable_type:
+              type: string
+              enum:
+                - Customer
+              description: |
+                For delivery addresses, the addressable type must be "Customer" when specified.
+              example: Customer
+    CollectionAddress:
+      allOf:
+        - $ref: '#/components/schemas/Address'
+        - type: object
+          description: |
+            Specialized address type for supplier collection operations. Inherits all properties
+            from the base Address model with additional validation requirements.
+          required:
+            - name
+            - code
+          properties:
+            type:
+              type: string
+              enum:
+                - CollectionAddress
+              description: STI type identifier for collection addresses
+              example: CollectionAddress
+            addressable_type:
+              type: string
+              enum:
+                - Supplier
+              description: |
+                For collection addresses, the addressable type must be "Supplier" when specified.
+              example: Supplier
+    DeliveryAddressRequest:
+      type: object
+      description: Request payload for creating or updating a delivery address
+      required:
+        - delivery_address
+      properties:
+        delivery_address:
+          allOf:
+            - $ref: '#/components/schemas/DeliveryAddress'
+            - type: object
+              properties:
+                id:
+                  readOnly: false
+                  description: Only used for update operations
+                created_at:
+                  type: string
+                  readOnly: true
+                updated_at:
+                  type: string
+                  readOnly: true
+                digest:
+                  type: string
+                  readOnly: true
+    CollectionAddressRequest:
+      type: object
+      description: Request payload for creating or updating a collection address
+      required:
+        - collection_address
+      properties:
+        collection_address:
+          allOf:
+            - $ref: '#/components/schemas/CollectionAddress'
+            - type: object
+              properties:
+                id:
+                  readOnly: false
+                  description: Only used for update operations
+                created_at:
+                  type: string
+                  readOnly: true
+                updated_at:
+                  type: string
+                  readOnly: true
+                digest:
+                  type: string
+                  readOnly: true
+    AccountDeliveryAddress:
+      type: object
+      description: |
+        Association between an account and a delivery address, allowing multiple accounts
+        to share delivery destinations.
+      required:
+        - id
+        - account_id
+        - address_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the account-address association
+          readOnly: true
+          example: 456
+        account_id:
+          type: integer
+          format: int64
+          description: ID of the associated account
+          example: 123
+        address_id:
+          type: integer
+          format: int64
+          description: ID of the associated delivery address
+          example: 789
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the association was created
+          readOnly: true
+          example: '2024-01-15T10:30:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the association was last modified
+          readOnly: true
+          example: '2024-01-15T14:45:00Z'
+    AccountCollectionAddress:
+      type: object
+      description: |
+        Association between an account and a collection address, allowing multiple accounts
+        to share collection sources.
+      required:
+        - id
+        - account_id
+        - address_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the account-address association
+          readOnly: true
+          example: 456
+        account_id:
+          type: integer
+          format: int64
+          description: ID of the associated account
+          example: 123
+        address_id:
+          type: integer
+          format: int64
+          description: ID of the associated collection address
+          example: 789
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the association was created
+          readOnly: true
+          example: '2024-01-15T10:30:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the association was last modified
+          readOnly: true
+          example: '2024-01-15T14:45:00Z'
+    AccountDeliveryAddressRequest:
+      type: object
+      description: Request payload for creating an account-delivery address association
+      required:
+        - account_delivery_address
+      properties:
+        account_delivery_address:
+          type: object
+          required:
+            - account_id
+            - address_id
+          properties:
+            account_id:
+              type: integer
+              format: int64
+              description: ID of the account to associate with the delivery address
+              example: 123
+            address_id:
+              type: integer
+              format: int64
+              description: ID of the delivery address to associate with the account
+              example: 789
+    AccountCollectionAddressRequest:
+      type: object
+      description: Request payload for creating an account-collection address association
+      required:
+        - account_collection_address
+      properties:
+        account_collection_address:
+          type: object
+          required:
+            - account_id
+            - address_id
+          properties:
+            account_id:
+              type: integer
+              format: int64
+              description: ID of the account to associate with the collection address
+              example: 123
+            address_id:
+              type: integer
+              format: int64
+              description: ID of the collection address to associate with the account
+              example: 789
+    BulkDeleteRequest:
+      type: object
+      description: Request payload for bulk deletion operations
+      properties:
+        ids:
+          type: string
+          description: |
+            Comma-separated list of address IDs to delete. Used as query parameter
+            in bulk delete operations.
+          pattern: ^[0-9]+(,[0-9]+)*$
+          example: 123,456,789
+  responses:
+    SuccessResponse:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              message:
+                type: string
+                example: Operation completed successfully
+    AddressResponse:
+      description: Address response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Address'
+    DeliveryAddressResponse:
+      description: Delivery address response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeliveryAddress'
+    CollectionAddressResponse:
+      description: Collection address response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CollectionAddress'
+    AccountDeliveryAddressResponse:
+      description: Account delivery address association response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountDeliveryAddress'
+    AccountCollectionAddressResponse:
+      description: Account collection address association response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountCollectionAddress'
+    ValidationErrorResponse:
+      description: Validation error occurred
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: error
+              message:
+                type: string
+                example: Validation failed
+              errors:
+                type: object
+                description: Field-specific validation errors
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                example:
+                  name:
+                    - can't be blank
+                  country_code:
+                    - is not a valid ISO 3166-1 alpha-2 country code
+                  address_1:
+                    - is too long (maximum is 80 characters)
+    NotFoundResponse:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: error
+              message:
+                type: string
+                example: Address not found
+    UnauthorizedResponse:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: error
+              message:
+                type: string
+                example: Authentication required
+    ForbiddenResponse:
+      description: Access forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: error
+              message:
+                type: string
+                example: Access forbidden
+    InternalServerErrorResponse:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: error
+              message:
+                type: string
+                example: Internal server error occurred
+tags:
+  - name: Addresses
+    description: |
+      Address management operations. Addresses in ClarusWMS are polymorphic entities that can be
+      associated with various business objects like customers, suppliers, and accounts.
+  - name: Delivery Addresses
+    description: |
+      Delivery address management specific to customer delivery operations. These addresses are
+      used for outbound logistics and shipping destinations.
+  - name: Collection Addresses
+    description: |
+      Collection address management specific to supplier collection operations. These addresses are
+      used for inbound logistics and pickup locations.
+  - name: Account Associations
+    description: |
+      Management of associations between addresses and accounts for multi-account scenarios.
