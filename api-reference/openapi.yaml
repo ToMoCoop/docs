@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: ClarusWMS API
   description: |
@@ -1016,6 +1016,2031 @@ paths:
                         example: 2
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/products:
+    get:
+      tags:
+        - Products
+      summary: List all products
+      description: |
+        Retrieves a paginated list of products in the warehouse management system. Products represent
+        the items that can be stored, tracked, and managed within the warehouse operations.
+
+        **Query Parameters:**
+        - Supports filtering by account, product type, active status
+        - Pagination via page and per_page parameters
+        - Search functionality across product fields
+
+        **Product Context:**
+        Products are the foundation of inventory management, linking to stock records, orders,
+        and warehouse operations. Each product contains SKU information, dimensions, and business rules.
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: per_page
+          in: query
+          description: Number of products per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+            example: 25
+        - name: account_id
+          in: query
+          description: Filter products by account ID
+          schema:
+            type: integer
+            format: int64
+            example: 123
+        - name: is_active
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+            example: true
+        - name: search
+          in: query
+          description: Search across product fields (name, SKU, description)
+          schema:
+            type: string
+            example: widget
+      responses:
+        '200':
+          $ref: '#/components/responses/ProductsListResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    post:
+      tags:
+        - Products
+      summary: Create a new product
+      description: |
+        Creates a new product in the warehouse management system. Products are the core entities
+        that represent items that can be stored, tracked, and managed in warehouse operations.
+
+        **Required Fields:**
+        - `name`: Product name/title
+        - `sku`: Stock Keeping Unit identifier (must be unique within account)
+
+        **Validation Rules:**
+        - SKU must be unique within the account scope
+        - Dimensions must be positive numbers if provided
+        - Weight must be positive if provided
+        - Account must be active and accessible to user
+
+        **Business Impact:**
+        Creating a product enables inventory tracking, order processing, and warehouse operations
+        for that item. Products can immediately be used in goods-in operations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+            examples:
+              basic_product:
+                summary: Basic product creation
+                value:
+                  product:
+                    name: Premium Widget v2.0
+                    sku: WDG-PREM-001
+                    description: High-quality widget for industrial applications
+                    account_id: 123
+                    is_active: true
+                    weight: 2.5
+                    length: 10
+                    width: 8
+                    height: 5
+              detailed_product:
+                summary: Product with detailed specifications
+                value:
+                  product:
+                    name: Industrial Component Assembly
+                    sku: ICA-2024-001
+                    description: Critical component for manufacturing line
+                    account_id: 456
+                    product_type: Component
+                    barcode: '1234567890123'
+                    weight: 15.75
+                    length: 25.4
+                    width: 15.2
+                    height: 8.9
+                    is_active: true
+                    external_system_reference1: ERP-PROD-789
+                    external_system_reference2: MFG-COMP-456
+      responses:
+        '201':
+          $ref: '#/components/responses/ProductResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '422':
+          description: Validation failed - duplicate SKU or invalid data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: SKU already exists for this account
+                  errors:
+                    type: object
+                    properties:
+                      sku:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - has already been taken
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Products
+      summary: Delete multiple products
+      description: |
+        Deletes multiple products by their IDs. This is a bulk operation that removes
+        multiple product records in a single request.
+
+        **Important Constraints:**
+        - Cannot delete products that have associated stock records
+        - Cannot delete products referenced in orders or shipments
+        - Cannot delete products with active warehouse tasks
+        - All specified products must be deletable for operation to succeed
+
+        **Business Impact:**
+        Deleting products removes them from inventory management and prevents future
+        warehouse operations. Historical records may be preserved for audit purposes.
+      parameters:
+        - name: ids
+          in: query
+          required: true
+          description: Comma-separated list of product IDs to delete
+          schema:
+            type: string
+            pattern: ^[0-9]+(,[0-9]+)*$
+            example: 123,456,789
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Cannot delete products - they are in use
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot delete products - some have associated stock or orders
+                  details:
+                    type: object
+                    properties:
+                      products_with_stock:
+                        type: array
+                        items:
+                          type: integer
+                        example:
+                          - 123
+                          - 456
+                      products_with_orders:
+                        type: array
+                        items:
+                          type: integer
+                        example:
+                          - 789
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/products/{id}:
+    get:
+      tags:
+        - Products
+      summary: Get a specific product
+      description: |
+        Retrieves detailed information about a specific product by its ID. This includes
+        all product attributes, dimensions, associated account information, and current
+        inventory summary data.
+
+        **Response Includes:**
+        - Complete product details and specifications
+        - Current stock levels across all locations
+        - Recent activity summary
+        - Integration references for external systems
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the product
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          $ref: '#/components/responses/ProductResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    put:
+      tags:
+        - Products
+      summary: Update an existing product
+      description: |
+        Updates an existing product with new information. Only the fields provided in the
+        request body will be updated; other fields will remain unchanged.
+
+        **Update Rules:**
+        - SKU uniqueness is enforced within account scope
+        - Cannot change account ownership once set
+        - Dimension and weight changes affect storage calculations
+        - Updates may impact existing stock allocation algorithms
+
+        **Business Impact:**
+        Product updates affect warehouse operations, storage calculations, and may trigger
+        replenishment rule recalculations. Changes to dimensions may affect pick path optimization.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the product to update
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+            examples:
+              update_dimensions:
+                summary: Update product dimensions
+                value:
+                  product:
+                    weight: 3.2
+                    length: 12.5
+                    width: 9
+                    height: 6.5
+              update_description:
+                summary: Update product information
+                value:
+                  product:
+                    description: Updated high-performance widget with enhanced features
+                    external_system_reference1: ERP-PROD-789-V2
+              deactivate_product:
+                summary: Deactivate product
+                value:
+                  product:
+                    is_active: false
+      responses:
+        '200':
+          $ref: '#/components/responses/ProductResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '422':
+          description: Validation failed - duplicate SKU or invalid data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Validation failed
+                  errors:
+                    type: object
+                    properties:
+                      sku:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - has already been taken
+                      weight:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - must be greater than 0
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Products
+      summary: Delete a specific product
+      description: |
+        Deletes a single product by its ID. The product will only be deleted if it is not
+        currently referenced by stock records, orders, or other warehouse operations.
+
+        **Pre-deletion Checks:**
+        - Verifies no stock records exist for this product
+        - Checks for active orders or shipments referencing the product
+        - Validates no pending warehouse tasks involve this product
+        - Ensures no integration dependencies exist
+
+        **Alternative Actions:**
+        Consider deactivating the product (set is_active to false) instead of deletion
+        to maintain historical records and audit trails.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the product to delete
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Conflict - Product is currently in use
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot delete product - it has associated stock records
+                  details:
+                    type: object
+                    properties:
+                      stock_records:
+                        type: integer
+                        example: 15
+                      active_orders:
+                        type: integer
+                        example: 3
+                      pending_tasks:
+                        type: integer
+                        example: 2
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/products/export:
+    post:
+      tags:
+        - Products
+      summary: Export products data
+      description: |
+        Exports product data in various formats for external use, reporting, or integration
+        purposes. Supports filtering and format selection.
+
+        **Export Formats:**
+        - CSV for spreadsheet applications
+        - JSON for API integrations
+        - XML for legacy system compatibility
+
+        **Export Scope:**
+        - Can export all products or filtered subset
+        - Includes related data like current stock levels
+        - Respects user permissions and account access
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  enum:
+                    - csv
+                    - json
+                    - xml
+                  description: Export format
+                  example: csv
+                filters:
+                  type: object
+                  properties:
+                    account_id:
+                      type: integer
+                      description: Filter by account
+                      example: 123
+                    is_active:
+                      type: boolean
+                      description: Filter by active status
+                      example: true
+                    include_stock_levels:
+                      type: boolean
+                      description: Include current stock information
+                      example: true
+            examples:
+              csv_export:
+                summary: Export all active products to CSV
+                value:
+                  format: csv
+                  filters:
+                    is_active: true
+                    include_stock_levels: true
+              json_export:
+                summary: Export products for specific account
+                value:
+                  format: json
+                  filters:
+                    account_id: 123
+                    include_stock_levels: false
+      responses:
+        '200':
+          description: Export file generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  download_url:
+                    type: string
+                    format: uri
+                    example: https://api.clarus.ws/downloads/products_export_20240115_143022.csv
+                  expires_at:
+                    type: string
+                    format: date-time
+                    example: '2024-01-15T18:30:22Z'
+                  record_count:
+                    type: integer
+                    example: 1247
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/products/{id}/calculate_quantity:
+    post:
+      tags:
+        - Products
+      summary: Calculate product quantity across locations
+      description: |
+        Calculates total available quantity for a specific product across all warehouse
+        locations, taking into account reservations, holds, and allocation rules.
+
+        **Calculation Includes:**
+        - Available stock across all locations
+        - Reserved quantities for pending orders
+        - Stock on hold or quarantined
+        - Allocated stock for pick operations
+
+        **Use Cases:**
+        - Order fulfillment planning
+        - Inventory reporting
+        - Replenishment calculations
+        - Available-to-promise queries
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Product ID to calculate quantity for
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                warehouse_id:
+                  type: integer
+                  format: int64
+                  description: Limit calculation to specific warehouse
+                  example: 456
+                location_type:
+                  type: string
+                  enum:
+                    - pickable
+                    - bulk
+                    - all
+                  description: Filter by location type
+                  example: pickable
+                include_reserved:
+                  type: boolean
+                  description: Include reserved quantities in calculation
+                  default: false
+                  example: false
+            examples:
+              basic_calculation:
+                summary: Calculate total available quantity
+                value:
+                  include_reserved: false
+              warehouse_specific:
+                summary: Calculate for specific warehouse
+                value:
+                  warehouse_id: 456
+                  location_type: pickable
+                  include_reserved: true
+      responses:
+        '200':
+          description: Quantity calculation completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_id:
+                    type: integer
+                    format: int64
+                    example: 12345
+                  total_quantity:
+                    type: number
+                    format: decimal
+                    example: 1250
+                  available_quantity:
+                    type: number
+                    format: decimal
+                    example: 950
+                  reserved_quantity:
+                    type: number
+                    format: decimal
+                    example: 200
+                  allocated_quantity:
+                    type: number
+                    format: decimal
+                    example: 100
+                  on_hold_quantity:
+                    type: number
+                    format: decimal
+                    example: 0
+                  breakdown:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        warehouse_id:
+                          type: integer
+                          example: 456
+                        warehouse_name:
+                          type: string
+                          example: Main Warehouse
+                        quantity:
+                          type: number
+                          format: decimal
+                          example: 750
+                        location_count:
+                          type: integer
+                          example: 15
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks:
+    get:
+      tags:
+        - Stock Management
+      summary: List all stock records
+      description: |
+        Retrieves a paginated list of stock records representing physical inventory in the warehouse.
+        Stock records track specific quantities of products in specific locations with lot/batch information.
+
+        **Query Parameters:**
+        - Supports filtering by product, location, warehouse, lot information
+        - Pagination via page and per_page parameters
+        - Search functionality across related product and location data
+
+        **Stock Context:**
+        Stock records represent the actual physical inventory and are the foundation for all
+        warehouse operations including picking, receiving, transferring, and adjustments.
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: per_page
+          in: query
+          description: Number of stock records per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+            example: 25
+        - name: product_id
+          in: query
+          description: Filter by specific product
+          schema:
+            type: integer
+            format: int64
+            example: 123
+        - name: location_id
+          in: query
+          description: Filter by specific location
+          schema:
+            type: integer
+            format: int64
+            example: 456
+        - name: warehouse_id
+          in: query
+          description: Filter by warehouse
+          schema:
+            type: integer
+            format: int64
+            example: 789
+        - name: status
+          in: query
+          description: Filter by stock status
+          schema:
+            type: string
+            enum:
+              - available
+              - reserved
+              - on_hold
+              - allocated
+            example: available
+        - name: min_quantity
+          in: query
+          description: Filter by minimum quantity
+          schema:
+            type: number
+            format: decimal
+            example: 10
+      responses:
+        '200':
+          $ref: '#/components/responses/StocksListResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    post:
+      tags:
+        - Stock Management
+      summary: Create a new stock record
+      description: |
+        Creates a new stock record representing physical inventory in a specific location.
+        This typically occurs during goods receipt operations or manual adjustments.
+
+        **Required Fields:**
+        - `product_id`: The product this stock represents
+        - `location_id`: Where the stock is physically located
+        - `quantity`: The amount of stock (must be positive)
+
+        **Validation Rules:**
+        - Product and location must exist and be active
+        - Quantity must be positive
+        - Location must be capable of storing the specified product
+        - Storage unit association is optional but must be valid if provided
+
+        **Business Impact:**
+        Creating stock makes inventory available for warehouse operations including
+        order fulfillment, transfers, and adjustments.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockRequest'
+            examples:
+              basic_stock:
+                summary: Basic stock creation
+                value:
+                  stock:
+                    product_id: 123
+                    location_id: 456
+                    quantity: 100
+                    lot_number: LOT2024001
+                    expiry_date: '2025-12-31'
+              detailed_stock:
+                summary: Stock with storage unit and tracking
+                value:
+                  stock:
+                    product_id: 789
+                    location_id: 321
+                    storage_unit_id: 654
+                    quantity: 250.5
+                    lot_number: BATCH-2024-Q1-001
+                    expiry_date: '2024-06-30'
+                    received_date: '2024-01-15'
+                    supplier_reference: SUP-REF-12345
+                    notes: Temperature controlled batch
+      responses:
+        '201':
+          $ref: '#/components/responses/StockResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '422':
+          description: Validation failed - invalid product/location or negative quantity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Invalid product or location
+                  errors:
+                    type: object
+                    properties:
+                      quantity:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - must be greater than 0
+                      location:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - cannot store this product type
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/{id}:
+    get:
+      tags:
+        - Stock Management
+      summary: Get a specific stock record
+      description: |
+        Retrieves detailed information about a specific stock record including
+        product details, location information, lot tracking, and transaction history.
+
+        **Response Includes:**
+        - Complete stock details with current quantity and status
+        - Associated product and location information
+        - Lot/batch tracking and expiry information
+        - Recent transaction history and movements
+        - Storage unit association if applicable
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the stock record
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          $ref: '#/components/responses/StockResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    put:
+      tags:
+        - Stock Management
+      summary: Update an existing stock record
+      description: |
+        Updates an existing stock record. Common updates include quantity adjustments,
+        lot information changes, and status modifications.
+
+        **Update Rules:**
+        - Quantity changes are tracked as adjustments
+        - Cannot reduce quantity below allocated amounts
+        - Lot and expiry date changes require appropriate permissions
+        - Status changes follow business rules (e.g., cannot un-hold allocated stock)
+
+        **Business Impact:**
+        Stock updates affect available inventory for orders and may trigger
+        automatic allocation or replenishment processes.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the stock record to update
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockRequest'
+            examples:
+              quantity_adjustment:
+                summary: Adjust stock quantity
+                value:
+                  stock:
+                    quantity: 150
+                    adjustment_reason: Physical count correction
+                    notes: Discrepancy found during cycle count
+              update_lot_info:
+                summary: Update lot and expiry information
+                value:
+                  stock:
+                    lot_number: LOT2024002-UPDATED
+                    expiry_date: '2025-06-30'
+                    notes: Lot information corrected per supplier notification
+              location_move:
+                summary: Move stock to different location
+                value:
+                  stock:
+                    location_id: 789
+                    notes: Moved to pick face for better accessibility
+      responses:
+        '200':
+          $ref: '#/components/responses/StockResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '422':
+          description: Update validation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot reduce quantity below allocated amount
+                  errors:
+                    type: object
+                    properties:
+                      quantity:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - cannot be less than allocated quantity (75.0)
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Stock Management
+      summary: Delete a specific stock record
+      description: |
+        Deletes a single stock record. This operation removes the inventory from the system
+        and should only be used for corrections or when stock is physically removed.
+
+        **Pre-deletion Checks:**
+        - Stock must not be allocated to any orders
+        - Stock must not be reserved for operations
+        - Stock must not be on hold for quality reasons
+        - No pending tasks can reference this stock
+
+        **Alternative Actions:**
+        Consider using negative adjustments or transfers instead of deletion
+        to maintain proper audit trails for inventory movements.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the stock record to delete
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          description: Conflict - Stock is in use and cannot be deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot delete stock - it is allocated to pending orders
+                  details:
+                    type: object
+                    properties:
+                      allocated_quantity:
+                        type: number
+                        format: decimal
+                        example: 25
+                      pending_orders:
+                        type: integer
+                        example: 2
+                      active_tasks:
+                        type: integer
+                        example: 1
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/pickable:
+    get:
+      tags:
+        - Stock Management
+      summary: Get pickable stock records
+      description: |
+        Retrieves stock records that are available for picking operations. This endpoint
+        filters stock to only include inventory that can be allocated to orders.
+
+        **Pickable Criteria:**
+        - Stock status is "available" (not reserved, on hold, or allocated)
+        - Location is designated as pickable
+        - Quantity is positive
+        - Product is active and available for order fulfillment
+        - No quarantine or quality hold restrictions
+
+        **Use Cases:**
+        - Order allocation and picking optimization
+        - Available inventory reporting
+        - Pick path planning and route optimization
+      parameters:
+        - name: product_id
+          in: query
+          description: Filter by specific product
+          schema:
+            type: integer
+            format: int64
+            example: 123
+        - name: warehouse_id
+          in: query
+          description: Filter by warehouse
+          schema:
+            type: integer
+            format: int64
+            example: 789
+        - name: min_quantity
+          in: query
+          description: Minimum quantity threshold
+          schema:
+            type: number
+            format: decimal
+            example: 1
+        - name: zone_id
+          in: query
+          description: Filter by warehouse zone
+          schema:
+            type: integer
+            format: int64
+            example: 456
+      responses:
+        '200':
+          $ref: '#/components/responses/StocksListResponse'
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/export:
+    post:
+      tags:
+        - Stock Management
+      summary: Export stock data
+      description: |
+        Exports stock inventory data in various formats for reporting, analysis, or
+        integration with external systems.
+
+        **Export Options:**
+        - Include product details and location information
+        - Filter by warehouse, product, or stock status
+        - Group by product or location for summary reports
+        - Include financial valuations if configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  enum:
+                    - csv
+                    - json
+                    - xml
+                  description: Export format
+                  example: csv
+                filters:
+                  type: object
+                  properties:
+                    warehouse_id:
+                      type: integer
+                      description: Filter by warehouse
+                      example: 123
+                    product_ids:
+                      type: array
+                      items:
+                        type: integer
+                      description: Filter by specific products
+                      example:
+                        - 456
+                        - 789
+                    status:
+                      type: string
+                      enum:
+                        - available
+                        - reserved
+                        - on_hold
+                        - allocated
+                      description: Filter by stock status
+                      example: available
+                    include_product_details:
+                      type: boolean
+                      description: Include product information
+                      example: true
+                    include_location_details:
+                      type: boolean
+                      description: Include location information
+                      example: true
+      responses:
+        '200':
+          description: Export file generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  download_url:
+                    type: string
+                    format: uri
+                    example: https://api.clarus.ws/downloads/stock_export_20240115_143022.csv
+                  expires_at:
+                    type: string
+                    format: date-time
+                    example: '2024-01-15T18:30:22Z'
+                  record_count:
+                    type: integer
+                    example: 5247
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/hold:
+    post:
+      tags:
+        - Stock Management
+      summary: Put stock on hold
+      description: |
+        Places stock records on hold, preventing them from being allocated to orders
+        or used in warehouse operations. Used for quality control, investigations,
+        or when stock needs to be quarantined.
+
+        **Hold Effects:**
+        - Stock becomes unavailable for order allocation
+        - Existing allocations may need to be reassigned
+        - Stock remains physically in location but operationally restricted
+        - Hold reason and notes are tracked for audit purposes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - stock_ids
+                - reason
+              properties:
+                stock_ids:
+                  type: array
+                  items:
+                    type: integer
+                    format: int64
+                  description: Array of stock IDs to put on hold
+                  example:
+                    - 123
+                    - 456
+                    - 789
+                reason:
+                  type: string
+                  description: Reason for placing stock on hold
+                  maxLength: 255
+                  example: Quality control inspection required
+                notes:
+                  type: string
+                  description: Additional notes about the hold
+                  maxLength: 1000
+                  example: Potential contamination reported by customer
+                expiry_date:
+                  type: string
+                  format: date
+                  description: Optional expiry date for automatic hold release
+                  example: '2024-02-15'
+      responses:
+        '200':
+          description: Stock successfully placed on hold
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Stock placed on hold successfully
+                  affected_stock_count:
+                    type: integer
+                    example: 3
+                  hold_reference:
+                    type: string
+                    example: HOLD-2024-001-QC
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          description: One or more stock records not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Some stock records not found
+                  missing_stock_ids:
+                    type: array
+                    items:
+                      type: integer
+                    example:
+                      - 456
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/offhold:
+    post:
+      tags:
+        - Stock Management
+      summary: Release stock from hold
+      description: |
+        Releases stock records from hold status, making them available again for
+        warehouse operations and order allocation.
+
+        **Release Effects:**
+        - Stock becomes available for order allocation
+        - Stock can be included in picking operations
+        - Hold history is maintained for audit purposes
+        - Released stock may trigger automatic allocation to pending orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - stock_ids
+              properties:
+                stock_ids:
+                  type: array
+                  items:
+                    type: integer
+                    format: int64
+                  description: Array of stock IDs to release from hold
+                  example:
+                    - 123
+                    - 456
+                    - 789
+                release_reason:
+                  type: string
+                  description: Reason for releasing from hold
+                  maxLength: 255
+                  example: Quality inspection completed - stock approved
+                notes:
+                  type: string
+                  description: Additional notes about the release
+                  maxLength: 1000
+                  example: All quality checks passed, released for normal operations
+      responses:
+        '200':
+          description: Stock successfully released from hold
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Stock released from hold successfully
+                  affected_stock_count:
+                    type: integer
+                    example: 3
+                  auto_allocated_orders:
+                    type: integer
+                    description: Number of pending orders that were automatically allocated
+                    example: 2
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          description: One or more stock records not found or not on hold
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Some stock records not found or not on hold
+                  invalid_stock_ids:
+                    type: array
+                    items:
+                      type: integer
+                    example:
+                      - 456
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/transfer:
+    post:
+      tags:
+        - Stock Management
+      summary: Transfer multiple stock records to account
+      description: |
+        Transfers ownership of multiple stock records to a different account in a single operation.
+        This is used for inter-account transfers in multi-tenant scenarios.
+
+        **Transfer Rules:**
+        - Stock must not be allocated to orders
+        - Target account must be active and accessible
+        - Stock location must allow inter-account transfers
+        - Transfer history is maintained for audit purposes
+
+        **Business Impact:**
+        Account transfers change stock ownership and may affect billing, reporting,
+        and operational permissions for the transferred inventory.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - stock_ids
+                - target_account_id
+              properties:
+                stock_ids:
+                  type: array
+                  items:
+                    type: integer
+                    format: int64
+                  description: Array of stock IDs to transfer
+                  example:
+                    - 123
+                    - 456
+                    - 789
+                target_account_id:
+                  type: integer
+                  format: int64
+                  description: Account ID to transfer stock to
+                  example: 555
+                transfer_reason:
+                  type: string
+                  description: Reason for the transfer
+                  maxLength: 255
+                  example: Ownership transfer per contract amendment
+                notes:
+                  type: string
+                  description: Additional notes about the transfer
+                  maxLength: 1000
+                  example: Part of account consolidation project
+                effective_date:
+                  type: string
+                  format: date
+                  description: Effective date of transfer (defaults to current date)
+                  example: '2024-01-15'
+      responses:
+        '200':
+          description: Stock transfer completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Stock transfer completed successfully
+                  transfer_reference:
+                    type: string
+                    example: TXN-2024-001-ACC555
+                  transferred_stock_count:
+                    type: integer
+                    example: 3
+                  total_quantity_transferred:
+                    type: number
+                    format: decimal
+                    example: 1250.75
+                  failed_transfers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        stock_id:
+                          type: integer
+                          example: 456
+                        reason:
+                          type: string
+                          example: Stock is allocated to pending orders
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          description: Target account or some stock records not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Target account not found or inaccessible
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/{id}/move:
+    post:
+      tags:
+        - Stock Management
+      summary: Move stock to a different location
+      description: |
+        Moves a specific stock record from its current location to a new location
+        within the warehouse. This operation updates the location while maintaining
+        all other stock attributes.
+
+        **Move Rules:**
+        - Target location must be compatible with the product
+        - Target location must have sufficient capacity
+        - Stock must not be in active picking operations
+        - Move history is tracked for audit purposes
+
+        **Business Impact:**
+        Moving stock can affect pick path optimization, storage efficiency,
+        and may trigger location capacity recalculations.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Stock ID to move
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - target_location_id
+              properties:
+                target_location_id:
+                  type: integer
+                  format: int64
+                  description: ID of the location to move stock to
+                  example: 789
+                reason:
+                  type: string
+                  description: Reason for the move
+                  maxLength: 255
+                  example: Optimizing pick path efficiency
+                notes:
+                  type: string
+                  description: Additional notes about the move
+                  maxLength: 1000
+                  example: Moved to pick face for faster access during peak season
+                storage_unit_id:
+                  type: integer
+                  format: int64
+                  description: Optional storage unit to associate with the stock
+                  example: 456
+      responses:
+        '200':
+          description: Stock moved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Stock moved successfully
+                  move_reference:
+                    type: string
+                    example: MOVE-2024-001-STK12345
+                  old_location:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 321
+                      name:
+                        type: string
+                        example: A-01-01-A
+                  new_location:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 789
+                      name:
+                        type: string
+                        example: PICK-A-01-B
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          description: Stock or target location not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Target location not found or incompatible
+        '409':
+          description: Move not possible due to constraints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot move stock - location at capacity or incompatible product type
+                  details:
+                    type: object
+                    properties:
+                      constraint_type:
+                        type: string
+                        example: capacity_exceeded
+                      available_capacity:
+                        type: number
+                        format: decimal
+                        example: 0
+                      required_capacity:
+                        type: number
+                        format: decimal
+                        example: 25.5
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/{id}/transfer:
+    post:
+      tags:
+        - Stock Management
+      summary: Transfer stock to different account
+      description: |
+        Transfers a specific stock record to a different account, changing ownership
+        while maintaining the physical location and other attributes.
+
+        **Transfer Rules:**
+        - Stock must not be allocated to orders
+        - Target account must be active and accessible
+        - Transfer permissions must be granted between accounts
+        - Transfer creates audit trail for compliance
+
+        **Business Impact:**
+        Account transfers affect billing, reporting, and operational permissions
+        for the transferred inventory.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Stock ID to transfer
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - target_account_id
+              properties:
+                target_account_id:
+                  type: integer
+                  format: int64
+                  description: Account ID to transfer stock to
+                  example: 555
+                transfer_reason:
+                  type: string
+                  description: Reason for the transfer
+                  maxLength: 255
+                  example: Account consolidation
+                notes:
+                  type: string
+                  description: Additional notes about the transfer
+                  maxLength: 1000
+                  example: Transferring as part of subsidiary merger
+                effective_date:
+                  type: string
+                  format: date
+                  description: Effective date of transfer
+                  example: '2024-01-15'
+      responses:
+        '200':
+          description: Stock transferred successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Stock transferred successfully
+                  transfer_reference:
+                    type: string
+                    example: TXN-2024-001-STK12345
+                  old_account:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 123
+                      name:
+                        type: string
+                        example: Main Account
+                  new_account:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 555
+                      name:
+                        type: string
+                        example: Subsidiary Account
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          description: Stock or target account not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Target account not found or inaccessible
+        '409':
+          description: Transfer not possible - stock is allocated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot transfer stock - it is allocated to pending orders
+                  details:
+                    type: object
+                    properties:
+                      allocated_quantity:
+                        type: number
+                        format: decimal
+                        example: 50
+                      pending_orders:
+                        type: integer
+                        example: 2
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/{id}/warehouse_transfer:
+    post:
+      tags:
+        - Stock Management
+      summary: Transfer stock to different warehouse
+      description: |
+        Transfers a stock record to a location in a different warehouse. This operation
+        moves both the physical inventory and its logical representation.
+
+        **Transfer Process:**
+        - Creates transfer documentation for physical movement
+        - Updates stock location to target warehouse
+        - Maintains lot and batch tracking information
+        - Generates transfer tasks for warehouse teams
+
+        **Business Impact:**
+        Warehouse transfers affect stock availability at both source and destination
+        warehouses and may trigger automated replenishment or rebalancing processes.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Stock ID to transfer between warehouses
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - target_warehouse_id
+                - target_location_id
+              properties:
+                target_warehouse_id:
+                  type: integer
+                  format: int64
+                  description: Warehouse ID to transfer stock to
+                  example: 999
+                target_location_id:
+                  type: integer
+                  format: int64
+                  description: Specific location in target warehouse
+                  example: 888
+                transfer_reason:
+                  type: string
+                  description: Reason for the warehouse transfer
+                  maxLength: 255
+                  example: Inventory rebalancing between facilities
+                notes:
+                  type: string
+                  description: Additional transfer notes
+                  maxLength: 1000
+                  example: Moving to facility closer to major customer
+                priority:
+                  type: string
+                  enum:
+                    - low
+                    - normal
+                    - high
+                    - urgent
+                  description: Transfer priority level
+                  example: normal
+                expected_completion_date:
+                  type: string
+                  format: date
+                  description: Expected completion date for physical transfer
+                  example: '2024-01-20'
+      responses:
+        '200':
+          description: Warehouse transfer initiated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Warehouse transfer initiated successfully
+                  transfer_reference:
+                    type: string
+                    example: WH-TXN-2024-001-STK12345
+                  transfer_task_id:
+                    type: integer
+                    description: ID of the warehouse task created for this transfer
+                    example: 7890
+                  source_warehouse:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 100
+                      name:
+                        type: string
+                        example: Main Distribution Center
+                  target_warehouse:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 999
+                      name:
+                        type: string
+                        example: Regional Fulfillment Center
+                  estimated_transit_time:
+                    type: string
+                    description: Estimated time for physical transfer
+                    example: 2-3 business days
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          description: Stock, target warehouse, or location not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Target warehouse or location not found
+        '409':
+          description: Transfer not possible due to business constraints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot transfer stock - it is allocated or location incompatible
+                  details:
+                    type: object
+                    properties:
+                      constraint_type:
+                        type: string
+                        example: stock_allocated
+                      allocated_quantity:
+                        type: number
+                        format: decimal
+                        example: 25
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/v1/stocks/{id}/negative_adjustment:
+    put:
+      tags:
+        - Stock Management
+      summary: Perform negative stock adjustment
+      description: |
+        Performs a negative adjustment to stock quantity, reducing the available inventory.
+        This is used for damaged goods, shrinkage, theft, or discrepancy corrections.
+
+        **Adjustment Rules:**
+        - Cannot reduce quantity below allocated amounts
+        - Requires appropriate permissions for significant adjustments
+        - Adjustment reason must be provided for audit purposes
+        - May trigger automatic reorder if below minimum thresholds
+
+        **Business Impact:**
+        Negative adjustments reduce available inventory and may affect order fulfillment
+        capacity. Large adjustments may trigger investigation or replenishment processes.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Stock ID to adjust
+          schema:
+            type: integer
+            format: int64
+            example: 12345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - adjustment_quantity
+                - reason
+              properties:
+                adjustment_quantity:
+                  type: number
+                  format: decimal
+                  description: Quantity to reduce (positive number represents reduction)
+                  minimum: 0.01
+                  example: 25.5
+                reason:
+                  type: string
+                  description: Reason for the negative adjustment
+                  maxLength: 255
+                  example: Damaged goods identified during quality inspection
+                notes:
+                  type: string
+                  description: Additional details about the adjustment
+                  maxLength: 1000
+                  example: Water damage from roof leak in section A. Items disposed of safely.
+                reference_number:
+                  type: string
+                  description: External reference (insurance claim, incident report, etc.)
+                  maxLength: 100
+                  example: INS-CLAIM-2024-001
+                adjustment_date:
+                  type: string
+                  format: date
+                  description: Date the adjustment occurred (defaults to current date)
+                  example: '2024-01-15'
+      responses:
+        '200':
+          description: Negative adjustment completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Negative adjustment completed successfully
+                  adjustment_reference:
+                    type: string
+                    example: ADJ-NEG-2024-001-STK12345
+                  previous_quantity:
+                    type: number
+                    format: decimal
+                    example: 125.5
+                  adjustment_quantity:
+                    type: number
+                    format: decimal
+                    example: 25.5
+                  new_quantity:
+                    type: number
+                    format: decimal
+                    example: 100
+                  reorder_triggered:
+                    type: boolean
+                    description: Whether the adjustment triggered automatic reordering
+                    example: true
+                  minimum_threshold:
+                    type: number
+                    format: decimal
+                    description: Minimum stock threshold if reorder was triggered
+                    example: 50
+        '400':
+          $ref: '#/components/responses/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '422':
+          description: Adjustment validation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot adjust quantity below allocated amount
+                  errors:
+                    type: object
+                    properties:
+                      adjustment_quantity:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - would result in negative available quantity
+                  details:
+                    type: object
+                    properties:
+                      current_quantity:
+                        type: number
+                        format: decimal
+                        example: 75
+                      allocated_quantity:
+                        type: number
+                        format: decimal
+                        example: 50
+                      maximum_adjustment:
+                        type: number
+                        format: decimal
+                        example: 25
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -1032,6 +3057,7 @@ components:
         You can only have one concurrent login per account, so if you login to the application via the web browser you will be required to reauthenticate.
   schemas:
     Address:
+      $schema: https://json-schema.org/draft/2020-12/schema
       type: object
       description: |
         Base address entity that can be associated with various business objects in the warehouse
@@ -1445,6 +3471,226 @@ components:
             in bulk delete operations.
           pattern: ^[0-9]+(,[0-9]+)*$
           example: 123,456,789
+    ProductRequest:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      description: Request payload for creating or updating a product
+      required:
+        - product
+      properties:
+        product:
+          allOf:
+            - $ref: '#/components/schemas/Product'
+            - type: object
+              properties:
+                id:
+                  readOnly: false
+                  description: Only used for update operations
+                current_stock_level:
+                  readOnly: true
+                available_stock_level:
+                  readOnly: true
+                allocated_stock_level:
+                  readOnly: true
+                reserved_stock_level:
+                  readOnly: true
+                on_order_quantity:
+                  readOnly: true
+                volume:
+                  readOnly: true
+                created_at:
+                  readOnly: true
+                updated_at:
+                  readOnly: true
+                created_by_user_id:
+                  readOnly: true
+                updated_by_user_id:
+                  readOnly: true
+    StockRequest:
+      type: object
+      description: Request payload for creating or updating a stock record
+      required:
+        - stock
+      properties:
+        stock:
+          allOf:
+            - $ref: '#/components/schemas/Stock'
+            - type: object
+              properties:
+                id:
+                  readOnly: false
+                  description: Only used for update operations
+                allocated_quantity:
+                  readOnly: true
+                available_quantity:
+                  readOnly: true
+                hold_placed_at:
+                  readOnly: true
+                hold_placed_by_user_id:
+                  readOnly: true
+                last_movement_date:
+                  readOnly: true
+                created_at:
+                  readOnly: true
+                updated_at:
+                  readOnly: true
+                created_by_user_id:
+                  readOnly: true
+                updated_by_user_id:
+                  readOnly: true
+                product:
+                  readOnly: true
+                location:
+                  readOnly: true
+                storage_unit:
+                  readOnly: true
+    Product:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      description: |
+        Product entity representing items that can be stored, tracked, and managed in the warehouse
+        management system. Products are the foundation of inventory operations and define the
+        characteristics and business rules for warehouse items.
+      required:
+        - id
+        - name
+        - sku
+        - account_id
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the product
+          example: 12345
+          readOnly: true
+        name:
+          type: string
+          description: |
+            Product name or title used for identification and display purposes.
+            This field is searchable and used in order processing interfaces.
+          maxLength: 255
+          example: "Premium Industrial Widget v2.0"
+        sku:
+          type: string
+          description: |
+            Stock Keeping Unit identifier. Must be unique within the account scope.
+            Used for barcode generation, order processing, and integration with external systems.
+          maxLength: 100
+          example: "WDG-PREM-001"
+        description:
+          type: string
+          description: |
+            Detailed product description including specifications, features, and usage information.
+            Used for warehouse operations and customer communications.
+          maxLength: 2000
+          example: "High-performance industrial widget designed for heavy-duty manufacturing applications"
+        account_id:
+          type: integer
+          format: int64
+          description: |
+            ID of the account that owns this product. Products are account-scoped for
+            multi-tenant operations and billing purposes.
+          example: 123
+        is_active:
+          type: boolean
+          description: |
+            Indicates whether the product is currently active and available for warehouse
+            operations. Inactive products are excluded from new operations but maintain
+            historical data.
+          default: true
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the product was first created
+          readOnly: true
+          example: "2024-01-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the product was last modified
+          readOnly: true
+          example: "2024-01-15T14:45:00Z"
+    Stock:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      description: |
+        Stock entity representing physical inventory of products in specific warehouse locations.
+        Stock records track quantities, lot information, and status for all warehouse operations
+        including receiving, picking, transferring, and inventory management.
+      required:
+        - id
+        - product_id
+        - location_id
+        - quantity
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the stock record
+          example: 12345
+          readOnly: true
+        product_id:
+          type: integer
+          format: int64
+          description: |
+            ID of the product this stock represents. Links to the Product entity
+            for all product-related information and business rules.
+          example: 789
+        location_id:
+          type: integer
+          format: int64
+          description: |
+            ID of the warehouse location where this stock is physically stored.
+            Used for picking optimization and inventory tracking.
+          example: 456
+        quantity:
+          type: number
+          format: decimal
+          description: |
+            Current quantity of stock in the specified location. Must be positive.
+            Tracked to high precision for accurate inventory management.
+          minimum: 0
+          example: 150.75
+        status:
+          type: string
+          anyOf:
+            - const: "available"
+              title: "Available"
+              description: "Ready for normal warehouse operations"
+            - const: "reserved"
+              title: "Reserved"
+              description: "Temporarily reserved for specific operations"
+            - const: "on_hold"
+              title: "On Hold"
+              description: "Administratively held (quality, investigation, etc.)"
+            - const: "allocated"
+              title: "Allocated"
+              description: "Assigned to pending orders or tasks"
+            - const: "quarantined"
+              title: "Quarantined"
+              description: "Isolated due to quality or safety concerns"
+          description: |
+            Current status of the stock record affecting its availability for operations.
+          example: "available"
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the stock record was first created
+          readOnly: true
+          example: "2024-01-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the stock record was last modified
+          readOnly: true
+          example: "2024-01-15T14:45:00Z"
   responses:
     SuccessResponse:
       description: Successful operation
@@ -1489,6 +3735,170 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/AccountCollectionAddress'
+    ProductResponse:
+      description: Product response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Product'
+    ProductsListResponse:
+      description: List of products with pagination
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+                description: Array of product objects
+              meta:
+                type: object
+                properties:
+                  current_page:
+                    type: integer
+                    description: Current page number
+                    example: 1
+                  per_page:
+                    type: integer
+                    description: Number of items per page
+                    example: 25
+                  total_pages:
+                    type: integer
+                    description: Total number of pages
+                    example: 45
+                  total_count:
+                    type: integer
+                    description: Total number of products
+                    example: 1125
+                  next_page:
+                    type: integer
+                    nullable: true
+                    description: Next page number, null if last page
+                    example: 2
+                  prev_page:
+                    type: integer
+                    nullable: true
+                    description: Previous page number, null if first page
+                    example: null
+              links:
+                type: object
+                properties:
+                  self:
+                    type: string
+                    format: uri
+                    description: Current page URL
+                    example: /api/v1/products?page=1&per_page=25
+                  next:
+                    type: string
+                    format: uri
+                    nullable: true
+                    description: Next page URL, null if last page
+                    example: /api/v1/products?page=2&per_page=25
+                  prev:
+                    type: string
+                    format: uri
+                    nullable: true
+                    description: Previous page URL, null if first page
+                    example: null
+                  first:
+                    type: string
+                    format: uri
+                    description: First page URL
+                    example: /api/v1/products?page=1&per_page=25
+                  last:
+                    type: string
+                    format: uri
+                    description: Last page URL
+                    example: /api/v1/products?page=45&per_page=25
+    StockResponse:
+      description: Stock response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Stock'
+    StocksListResponse:
+      description: List of stock records with pagination
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stock'
+                description: Array of stock record objects
+              meta:
+                type: object
+                properties:
+                  current_page:
+                    type: integer
+                    description: Current page number
+                    example: 1
+                  per_page:
+                    type: integer
+                    description: Number of items per page
+                    example: 25
+                  total_pages:
+                    type: integer
+                    description: Total number of pages
+                    example: 210
+                  total_count:
+                    type: integer
+                    description: Total number of stock records
+                    example: 5247
+                  next_page:
+                    type: integer
+                    nullable: true
+                    description: Next page number, null if last page
+                    example: 2
+                  prev_page:
+                    type: integer
+                    nullable: true
+                    description: Previous page number, null if first page
+                    example: null
+                  total_quantity:
+                    type: number
+                    format: decimal
+                    description: Total quantity across all stock records in result set
+                    example: 125000.75
+                  total_available_quantity:
+                    type: number
+                    format: decimal
+                    description: Total available quantity across all stock records
+                    example: 98750.25
+              links:
+                type: object
+                properties:
+                  self:
+                    type: string
+                    format: uri
+                    description: Current page URL
+                    example: /api/v1/stocks?page=1&per_page=25
+                  next:
+                    type: string
+                    format: uri
+                    nullable: true
+                    description: Next page URL, null if last page
+                    example: /api/v1/stocks?page=2&per_page=25
+                  prev:
+                    type: string
+                    format: uri
+                    nullable: true
+                    description: Previous page URL, null if first page
+                    example: null
+                  first:
+                    type: string
+                    format: uri
+                    description: First page URL
+                    example: /api/v1/stocks?page=1&per_page=25
+                  last:
+                    type: string
+                    format: uri
+                    description: Last page URL
+                    example: /api/v1/stocks?page=210&per_page=25
     ValidationErrorResponse:
       description: Validation error occurred
       content:
@@ -1584,3 +3994,120 @@ tags:
   - name: Account Associations
     description: |
       Management of associations between addresses and accounts for multi-account scenarios.
+  - name: Products
+    description: |
+      Product management operations. Products are the foundation of inventory operations and define
+      the characteristics and business rules for warehouse items. Each product represents an item
+      that can be stored, tracked, and managed in warehouse operations.
+  - name: Stock Management
+    description: |
+      Stock inventory management operations. Stock records represent physical inventory of products
+      in specific warehouse locations, tracking quantities, lot information, and status for all
+      warehouse operations including receiving, picking, transferring, and inventory management.
+webhooks:
+  productUpdated:
+    post:
+      summary: Product Updated Webhook
+      description: |
+        Webhook triggered when a product is created, updated, or deleted in the system.
+        Provides real-time notifications for external systems integration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - event
+                - data
+                - timestamp
+              properties:
+                event:
+                  type: string
+                  enum:
+                    - product.created
+                    - product.updated
+                    - product.deleted
+                  description: Type of product event that occurred
+                  example: product.updated
+                data:
+                  $ref: '#/components/schemas/Product'
+                  description: The product data associated with the event
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: When the event occurred
+                  example: '2024-01-15T14:30:00Z'
+                account_id:
+                  type: integer
+                  format: int64
+                  description: Account ID where the event occurred
+                  example: 123
+      responses:
+        '200':
+          description: Webhook received successfully
+        '400':
+          description: Invalid webhook payload
+        '500':
+          description: Error processing webhook
+  stockChanged:
+    post:
+      summary: Stock Changed Webhook
+      description: |
+        Webhook triggered when stock levels change due to receiving, picking, adjustments,
+        or other inventory movements. Critical for real-time inventory synchronization.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - event
+                - data
+                - timestamp
+              properties:
+                event:
+                  type: string
+                  enum:
+                    - stock.created
+                    - stock.updated
+                    - stock.moved
+                    - stock.adjusted
+                    - stock.deleted
+                  description: Type of stock event that occurred
+                  example: stock.adjusted
+                data:
+                  $ref: '#/components/schemas/Stock'
+                  description: The stock data associated with the event
+                previous_quantity:
+                  type: number
+                  format: decimal
+                  description: Previous quantity before the change (for update events)
+                  example: 100
+                quantity_change:
+                  type: number
+                  format: decimal
+                  description: Amount of quantity change (positive or negative)
+                  example: -25.5
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: When the event occurred
+                  example: '2024-01-15T14:30:00Z'
+                account_id:
+                  type: integer
+                  format: int64
+                  description: Account ID where the event occurred
+                  example: 123
+                change_reason:
+                  type: string
+                  description: Reason for the stock change
+                  example: Physical count adjustment
+      responses:
+        '200':
+          description: Webhook received successfully
+        '400':
+          description: Invalid webhook payload
+        '500':
+          description: Error processing webhook

@@ -55,25 +55,6 @@
           {
             "group": "Operations",
             "openapi": "api-reference/openapi.yaml"
-          },
-          {
-            "group": "Endpoints",
-            "pages": [
-              {
-                "group": "Sites",
-                "pages": [
-                  "api-reference/endpoints/sites/get-all-sites",
-                  "api-reference/endpoints/sites/create"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Core Resources",
-            "pages": [
-              "api-reference/core-resources/Address",
-              "api-reference/core-resources/Site"
-            ]
           }
         ]
       }
