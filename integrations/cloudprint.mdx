@@ -1,0 +1,264 @@
+---
+title: 'Cloud Print'
+description: 'Architecture, setup, and frequently asked questions for Clarus Cloud Print'
+icon: 'print'
+---
+
+## Overview
+
+Clarus Cloud Print enables secure, remote printing from the Clarus platform to your on-premise printers. Rather than requiring complex VPN configurations or direct network access, Cloud Print uses a lightweight agent installed on your network that establishes secure outbound connections to the Clarus cloud infrastructure.
+
+This architecture allows print jobs to be securely transmitted from the Clarus platform to any printer connected to a machine running the Cloud Print agent—regardless of network topology, firewalls, or geographic location.
+
+## How It Works
+
+<Frame>
+  <img src="/images/cloudprint-architecture.svg" alt="Clarus Cloud Print Architecture" />
+</Frame>
+
+### Print Job Flow
+
+1. **Job Submission**: When a user initiates a print job in Clarus, the document is sent to the Cloud Print API
+2. **Secure Transmission**: The Cloud Print agent on your network maintains a persistent, secure connection to the Clarus cloud infrastructure
+3. **Instant Delivery**: Using event-driven WebSocket technology, print jobs are transmitted almost instantly to the agent
+4. **Local Processing**: The agent receives the print job and routes it to the appropriate printer using standard OS print drivers
+5. **Automatic Cleanup**: Once printing completes, the document is permanently deleted from the cloud—no copies are retained
+
+## Architecture Details
+
+### Connection Model
+
+The Cloud Print agent uses an **outbound-only** connection model. This means:
+
+- **No inbound firewall rules required** - The agent initiates all connections outbound
+- **No VPN or port forwarding needed** - Works through most corporate firewalls
+- **NAT-friendly** - Functions correctly behind network address translation
+- **Secure by design** - All data transmitted over encrypted HTTPS/TLS connections
+
+### Protocols and Ports
+
+| Protocol | Port | Purpose |
+|----------|------|---------|
+| HTTPS | 443 | Primary API communication and print job delivery |
+| WebSocket | 6123 | Real-time event notifications and status updates |
+
+<Note>
+All connections are outbound only. No inbound ports need to be opened on your firewall.
+</Note>
+
+### Endpoints
+
+The Cloud Print agent connects to the following endpoints for print services:
+
+- `api.printnode.com`
+- `app.printnode.com`
+- `client.printnode.com`
+- `host2b.printnode.com`
+- `lon1.printnode.com`
+- `central.printnode.com`
+
+User authentication is handled via the Clarus API at `api.clarus.ws`.
+
+If your network uses domain whitelisting, ensure these endpoints are accessible over ports 443 and 6123.
+
+## Setup and Installation
+
+### One-Time Setup
+
+The Cloud Print agent installation is a **one-time setup per machine**—not per printer or per user.
+
+<Steps>
+  <Step title="Download the Agent">
+    Download the Clarus Cloud Print agent from your Clarus subdomain.
+  </Step>
+  <Step title="Install the Agent">
+    Run the installer on a Windows, macOS, or Linux machine that has access to your printers.
+  </Step>
+  <Step title="Sign In">
+    Sign in with your Clarus credentials to authenticate the agent with your organization.
+  </Step>
+  <Step title="Automatic Printer Discovery">
+    The agent automatically discovers all printers available to the host machine. This includes local USB printers and network printers with installed drivers.
+  </Step>
+</Steps>
+
+### What Gets Discovered
+
+The Cloud Print agent discovers any printer that is:
+- Connected directly to the host machine (USB, parallel, etc.)
+- A network printer with drivers installed on the host machine
+- Accessible through the operating system's print subsystem
+
+<Info>
+Printer discovery typically completes within 3 seconds on Windows, and 3-10 seconds on macOS/Linux.
+</Info>
+
+### Multi-User Environments
+
+For servers or machines with multiple logged-in users, install the agent as a **Windows Service** rather than a desktop application. This ensures:
+- The agent runs regardless of which user is logged in
+- Consistent availability for all users
+- Automatic startup when the machine boots
+
+## System Requirements
+
+### Supported Operating Systems
+
+| Platform | Versions |
+|----------|----------|
+| Windows | Windows 10, Windows 11, Windows Server 2016+ |
+| macOS | macOS 10.14 (Mojave) and later |
+| Linux | Most distributions including Ubuntu, Debian, CentOS, RHEL, Raspbian |
+
+### Hardware Requirements
+
+The Cloud Print agent is lightweight and designed to run efficiently alongside other applications:
+
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| CPU | 1 core (any modern processor) | 2+ cores |
+| Memory | 512 MB available RAM | 1 GB available RAM |
+| Disk Space | 100 MB | 500 MB (for print job buffering) |
+
+<Note>
+The agent has minimal resource requirements. Any machine capable of running a modern web browser can run the Cloud Print agent effectively.
+</Note>
+
+### Network Requirements
+
+| Requirement | Details |
+|-------------|---------|
+| Internet Connection | Stable broadband connection |
+| Outbound Ports | 443 (HTTPS), 6123 (WebSocket) |
+| DNS Resolution | Must resolve Cloud Print service endpoints |
+
+## Printer Connectivity
+
+### From Agent to Printers
+
+Once the Cloud Print agent is installed, it communicates with printers using **standard operating system print drivers**. This means:
+
+- **No special protocols required** - The agent uses the same print pathway as any other application
+- **No LPR or Port 9100 configuration needed** - Unless your printers specifically require these protocols for driver installation
+- **Network printers** - Require standard driver installation on the agent host machine
+- **USB printers** - Work automatically when connected to the agent host
+
+<Accordion title="Network Printer Protocols">
+If your network printers require manual driver configuration, they typically use one of these protocols:
+
+| Protocol | Port | Description |
+|----------|------|-------------|
+| RAW/AppSocket/JetDirect | 9100 | Most common, fastest option |
+| LPR/LPD | 515 | Legacy protocol, widely supported |
+| IPP | 631 | Internet Printing Protocol |
+
+These are only relevant for initial printer driver setup on the agent host machine—not for Cloud Print connectivity.
+</Accordion>
+
+## Access Control and Permissions
+
+### How Printer Visibility Works
+
+Printer availability in Clarus Cloud Print is determined by two factors:
+
+**1. Agent Installation Level**
+
+The Cloud Print agent discovers printers based on the user account that installed it. Any printers visible to that local user account on the host machine will be discovered and made available.
+
+<Tip>
+For maximum printer visibility, install the Cloud Print agent using an account that has access to all required network and local printers.
+</Tip>
+
+**2. Clarus Platform Level**
+
+Once printers are discovered by the agent, they become available within Clarus. From there:
+
+- **Default Printers**: Administrators can configure default printers for different job types (e.g., documents, labels)
+- **User Selection**: End users can select which printer to use when logged into the handheld device (HHD) system
+- **Printer Switching**: Users can change their active printer at any time based on their current needs
+
+## Security
+
+### Data Protection
+
+- **Encryption in Transit**: All communications use TLS 1.2+ encryption
+- **No Data Retention**: Print jobs are permanently deleted immediately after successful printing
+- **Digitally Signed**: Agent executables are digitally signed and verified
+- **Outbound Only**: No inbound network access required, reducing attack surface
+
+### Authentication
+
+- The agent authenticates using your Clarus organizational credentials
+- API communications use secure token-based authentication
+- Credentials are never stored in plain text
+
+## Troubleshooting
+
+### Verifying Connectivity
+
+To test if the agent can reach the Cloud Print services:
+
+1. Open a web browser on the agent host machine
+2. Navigate to `https://api.printnode.com/ping`
+3. A successful response indicates connectivity is working
+
+### Connection Status Indicators
+
+| Status | Meaning |
+|--------|---------|
+| Green | Connected and ready |
+| Orange/Yellow | Connecting or reconnecting |
+| Red | Unable to connect to Clarus cloud |
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Agent shows disconnected">
+    - Verify internet connectivity on the host machine
+    - Check that ports 443 and 6123 are not blocked by firewall
+    - Ensure the Cloud Print endpoints are whitelisted if using domain filtering
+    - Run network diagnostics: `tracert api.printnode.com` (Windows) or `traceroute api.printnode.com` (macOS/Linux)
+  </Accordion>
+
+  <Accordion title="Printers not appearing">
+    - Verify printers are properly installed on the host machine
+    - Test printing from another application (Word, Acrobat) to confirm driver functionality
+    - Restart the Cloud Print agent to trigger re-discovery
+    - Allow 3-10 seconds for printer discovery to complete
+  </Accordion>
+
+  <Accordion title="Print jobs failing">
+    - Confirm the printer is online and has paper/toner
+    - Check that the printer works with other applications on the host machine
+    - Verify the print job format is supported (PDF)
+    - Review the Clarus application for error messages
+  </Accordion>
+</AccordionGroup>
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Do I need to set up each printer individually?">
+    No. The agent automatically discovers all printers available to the host machine. You only need to install the agent once per machine—all connected printers (USB and network with installed drivers) are automatically detected.
+  </Accordion>
+
+  <Accordion title="Do I need to install the agent for each user?">
+    No. The agent is installed once per machine. For multi-user environments (like terminal servers), install as a Windows Service to ensure availability for all users.
+  </Accordion>
+
+  <Accordion title="Can I control which users see which printers?">
+    Printers discovered by the agent are made available in Clarus. Administrators can set default printers for documents and labels, and end users can select their preferred printer when logged into the HHD system.
+  </Accordion>
+
+  <Accordion title="Does the agent require special firewall rules?">
+    The agent only requires outbound access on ports 443 and 6123. No inbound firewall rules or port forwarding is needed.
+  </Accordion>
+
+  <Accordion title="What happens if the internet connection drops?">
+    Print jobs are queued in Clarus until connectivity is restored. Once the agent reconnects, pending jobs are automatically delivered.
+  </Accordion>
+
+  <Accordion title="Is my print data secure?">
+    Yes. All data is encrypted in transit using TLS 1.2+, and print jobs are permanently deleted immediately after successful printing. No copies are retained in the cloud.
+  </Accordion>
+</AccordionGroup>

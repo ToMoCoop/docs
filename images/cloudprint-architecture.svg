@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <defs>
+    <linearGradient id="cloudGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F4FD"/>
+      <stop offset="100%" style="stop-color:#D0E8F9"/>
+    </linearGradient>
+    <linearGradient id="networkGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F0F7F0"/>
+      <stop offset="100%" style="stop-color:#E0EFE0"/>
+    </linearGradient>
+    <linearGradient id="agentGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8E7"/>
+      <stop offset="100%" style="stop-color:#FFEFC7"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+    <marker id="greenarrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22863A"/>
+    </marker>
+    <marker id="orangearrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#D69E2E"/>
+    </marker>
+    <marker id="grayarrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+
+  <!-- Cloud Section Background -->
+  <rect x="20" y="20" width="860" height="200" rx="15" fill="url(#cloudGradient)" stroke="#4A90D9" stroke-width="2" filter="url(#shadow)"/>
+
+  <!-- Cloud Label -->
+  <text x="450" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2C5282">CLARUS CLOUD</text>
+
+  <!-- Clarus Application Box -->
+  <rect x="60" y="80" width="160" height="100" rx="10" fill="white" stroke="#4A90D9" stroke-width="2" filter="url(#shadow)"/>
+  <text x="140" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#2C5282">Clarus</text>
+  <text x="140" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#2C5282">Application</text>
+
+  <!-- Arrow 1 -->
+  <path d="M225 130 L295 130" stroke="#4A90D9" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Cloud Print Service Box -->
+  <rect x="300" y="80" width="160" height="100" rx="10" fill="white" stroke="#4A90D9" stroke-width="2" filter="url(#shadow)"/>
+  <text x="380" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#2C5282">Cloud Print</text>
+  <text x="380" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#2C5282">Service</text>
+
+  <!-- Arrow 2 -->
+  <path d="M465 130 L535 130" stroke="#4A90D9" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Print Job Queue Box -->
+  <rect x="540" y="80" width="160" height="100" rx="10" fill="white" stroke="#4A90D9" stroke-width="2" filter="url(#shadow)"/>
+  <text x="620" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#2C5282">Print Job</text>
+  <text x="620" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#2C5282">Queue</text>
+
+  <!-- Queue Icon -->
+  <rect x="590" y="155" width="12" height="8" fill="#4A90D9" rx="2"/>
+  <rect x="605" y="155" width="12" height="8" fill="#4A90D9" rx="2"/>
+  <rect x="620" y="155" width="12" height="8" fill="#4A90D9" rx="2"/>
+  <rect x="635" y="155" width="12" height="8" fill="#4A90D9" rx="2"/>
+
+  <!-- Secure Connection Arrow (vertical) -->
+  <path d="M620 185 L620 290" stroke="#22863A" stroke-width="3" stroke-dasharray="8,4" fill="none" marker-end="url(#greenarrow)"/>
+
+  <!-- Connection Label -->
+  <rect x="640" y="220" width="120" height="45" rx="5" fill="white" stroke="#22863A" stroke-width="1"/>
+  <text x="700" y="238" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#22863A">HTTPS / WebSocket</text>
+  <text x="700" y="252" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#666">Ports 443, 6123</text>
+  <text x="700" y="262" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#888">(Outbound only)</text>
+
+  <!-- Your Network Section Background -->
+  <rect x="20" y="300" width="860" height="280" rx="15" fill="url(#networkGradient)" stroke="#22863A" stroke-width="2" filter="url(#shadow)"/>
+
+  <!-- Network Label -->
+  <text x="450" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#22543D">YOUR NETWORK</text>
+
+  <!-- Cloud Print Agent Box -->
+  <rect x="200" y="350" width="500" height="100" rx="12" fill="url(#agentGradient)" stroke="#D69E2E" stroke-width="2" filter="url(#shadow)"/>
+  <text x="450" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#744210">CLOUD PRINT AGENT</text>
+
+  <!-- Agent Internal Boxes -->
+  <rect x="220" y="390" width="130" height="45" rx="6" fill="white" stroke="#D69E2E" stroke-width="1"/>
+  <text x="285" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#744210">Secure</text>
+  <text x="285" y="423" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#744210">Connection</text>
+
+  <path d="M355 412 L380 412" stroke="#D69E2E" stroke-width="2" fill="none" marker-end="url(#orangearrow)"/>
+
+  <rect x="385" y="390" width="130" height="45" rx="6" fill="white" stroke="#D69E2E" stroke-width="1"/>
+  <text x="450" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#744210">Printer</text>
+  <text x="450" y="423" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#744210">Discovery</text>
+
+  <path d="M520 412 L545 412" stroke="#D69E2E" stroke-width="2" fill="none" marker-end="url(#orangearrow)"/>
+
+  <rect x="550" y="390" width="130" height="45" rx="6" fill="white" stroke="#D69E2E" stroke-width="1"/>
+  <text x="615" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#744210">Print Job</text>
+  <text x="615" y="423" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#744210">Processing</text>
+
+  <!-- Arrows to printers -->
+  <path d="M300 455 L150 505" stroke="#666" stroke-width="2" fill="none" marker-end="url(#grayarrow)"/>
+  <path d="M450 455 L450 505" stroke="#666" stroke-width="2" fill="none" marker-end="url(#grayarrow)"/>
+  <path d="M600 455 L750 505" stroke="#666" stroke-width="2" fill="none" marker-end="url(#grayarrow)"/>
+
+  <!-- Local Printer -->
+  <rect x="60" y="510" width="140" height="55" rx="8" fill="white" stroke="#666" stroke-width="2" filter="url(#shadow)"/>
+  <text x="130" y="535" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#333">Local Printer</text>
+  <text x="130" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">(USB / Parallel)</text>
+
+  <!-- Network Printer -->
+  <rect x="380" y="510" width="140" height="55" rx="8" fill="white" stroke="#666" stroke-width="2" filter="url(#shadow)"/>
+  <text x="450" y="535" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#333">Network Printer</text>
+  <text x="450" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">(With installed drivers)</text>
+
+  <!-- Label Printer -->
+  <rect x="700" y="510" width="140" height="55" rx="8" fill="white" stroke="#666" stroke-width="2" filter="url(#shadow)"/>
+  <text x="770" y="535" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#333">Label Printer</text>
+  <text x="770" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">(USB / Network)</text>
+
+</svg>
