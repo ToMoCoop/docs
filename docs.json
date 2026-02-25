@@ -69,7 +69,8 @@
           },
           {
             "group": "Operations",
-            "openapi": "api-reference/clarus-api.json"
+            "openapi": "api-reference/clarus-api.json",
+            "public": true
           }
         ]
       }
