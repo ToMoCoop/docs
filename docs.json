@@ -21,6 +21,7 @@
     "tabs": [
       {
         "tab": "Guides",
+        "public": true,
         "groups": [
           {
             "group": "Get Started",
@@ -54,12 +55,14 @@
         "groups": [
           {
             "group": "API Documentation",
+            "public": true,
             "pages": [
               "api-reference/introduction"
             ]
           },
           {
             "group": "Core Resources",
+            "public": true,
             "pages": [
               "api-reference/core-resources/address"
             ]
