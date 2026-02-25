@@ -62,7 +62,6 @@
           },
           {
             "group": "Core Resources",
-            "public": true,
             "pages": [
               "api-reference/core-resources/address"
             ]
