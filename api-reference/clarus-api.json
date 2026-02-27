@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "ClarusWMS API",
-    "description": "REST API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides mutation endpoints for managing warehouse operations including inventory, goods in/out, users, and integrations.\n\n**Note**: GET/list endpoints are not included as GraphQL is used for all data retrieval operations.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Obtain tokens from the auth server at `https://auth.clarus-api.com`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```",
+    "description": "REST API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides mutation endpoints for managing warehouse operations including inventory, goods in/out, users, and integrations.\n\n**Note**: GET/list endpoints are not included as GraphQL is used for all data retrieval operations.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Use the client credentials or authorization code flow to obtain an access token from `https://clarus-api.com/oauth/token`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```",
     "version": "1.0.0",
     "contact": {
       "name": "Clarus Software",
@@ -11,12 +11,8 @@
   },
   "servers": [
     {
-      "url": "https://clarus-api.com/api/v1",
+      "url": "https://clarus-api.com/api",
       "description": "Production API"
-    },
-    {
-      "url": "https://clarus-api-staging.com/api",
-      "description": "Staging API"
     }
   ],
   "security": [
@@ -32,6 +28,10 @@
     {
       "name": "Charge Lines",
       "description": "Charge line management endpoints for billing and invoicing operations"
+    },
+    {
+      "name": "Documents",
+      "description": "Document management endpoints for downloading, uploading, and transferring generated files"
     },
     {
       "name": "Goods In Receipts",
@@ -78,8 +78,16 @@
       "description": "Report query management endpoints for custom reporting and data extraction"
     },
     {
+      "name": "Reports",
+      "description": "Report management endpoints for creating report definitions, updating configurations, and generating report output as downloadable documents"
+    },
+    {
       "name": "Roles",
       "description": "Role and permission management endpoints for access control"
+    },
+    {
+      "name": "Scheduled Reports",
+      "description": "Scheduled report management endpoints for recurring report delivery via email and FTP"
     },
     {
       "name": "Shipments",
@@ -670,6 +678,211 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/documents/{id}/download": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Download a document",
+        "description": "Get a presigned S3 URL for downloading a document. The returned URL is temporary and should be used promptly.",
+        "x-mint": {
+          "content": "## Response Format\n\nThis endpoint returns **plain JSON** (not JSON:API format):\n\n```json\n{\n  \"url\": \"https://s3.amazonaws.com/bucket/path/to/file?signature=...\"\n}\n```\n\n## Access Control\n\nYou can download a document if:\n- You are the owner of the document, OR\n- You have the `DocumentsDownload` permission\n\n## Typical Workflow\n\n1. Generate a report via `POST /reports/{id}/generate` (returns a Document)\n2. Poll the document status via GraphQL until `status` is `available`\n3. Call this endpoint to get the presigned download URL\n4. Use the presigned URL to download the file"
+        },
+        "operationId": "downloadDocument",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the document to download",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Presigned download URL returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Presigned S3 URL for downloading the file"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/documents/{id}/send_to_ftp": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Send document to FTP",
+        "description": "Send a document to an FTP user asynchronously. The FTP user must have a `download` direction configured.",
+        "x-mint": {
+          "content": "## Request Format\n\nThis endpoint accepts **plain JSON** (not JSON:API format):\n\n```json\n{\n  \"ftp_user_id\": 5\n}\n```\n\n## Behavior\n\n- The document is uploaded to the FTP server asynchronously via a background job\n- The FTP user must have `download` direction (i.e., files flow from ClarusWMS to the FTP server)\n- Returns 204 No Content on success"
+        },
+        "operationId": "sendDocumentToFtp",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the document to send",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ftp_user_id"
+                ],
+                "properties": {
+                  "ftp_user_id": {
+                    "type": "integer",
+                    "description": "ID of the FTP user to send the document to. Must have download direction."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/documents/{id}/upload": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Upload file to a document",
+        "description": "Upload binary file content to an existing document record. The document must be in `queued` or `processing` status. On success, the document status changes to `available`.",
+        "x-mint": {
+          "content": "## Upload Format\n\nThis endpoint uses **binary upload** (not JSON:API format). Send the raw file content as the request body.\n\n## Required Headers\n\n| Header | Format | Example |\n|--------|--------|---------|\n| `Content-Disposition` | `attachment; filename=\"<name>\"` | `attachment; filename=\"report.csv\"` |\n| `Content-Type` | MIME type of the file | `text/csv` |\n\n## Example (cURL)\n\n```bash\ncurl -X POST https://clarus-api.com/api/documents/42/upload \\\n  -H 'Authorization: Bearer <token>' \\\n  -H 'X-Clarus-Subdomain: acme-warehouse' \\\n  -H 'Content-Disposition: attachment; filename=\"report.csv\"' \\\n  -H 'Content-Type: text/csv' \\\n  --data-binary @report.csv\n```\n\n## Status Transitions\n\n- Document must be in `queued` or `processing` status\n- After successful upload, status becomes `available`\n- If the document is already `available` or `failed`, the upload will be rejected"
+        },
+        "operationId": "uploadDocument",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the document to upload to",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "Content-Disposition",
+            "in": "header",
+            "required": true,
+            "description": "File name in the format: attachment; filename=\"report.csv\"",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "description": "Raw binary file content"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Document ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "documents"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/DocumentAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       }
@@ -3064,6 +3277,426 @@
         }
       }
     },
+    "/reports": {
+      "post": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Create a report",
+        "description": "Create a new report definition based on an existing report query. Reports define how query results are formatted and what variables are used.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Stock Level Summary\",\n      \"description\": \"Current stock levels grouped by product\",\n      \"report_type\": \"single\",\n      \"report_query_id\": 1,\n      \"report_fields\": [\n        { \"name\": \"Product Code\", \"path\": \"product.code\" },\n        { \"name\": \"Quantity\", \"path\": \"quantity\" }\n      ],\n      \"variables\": [\n        { \"name\": \"date_from\", \"value\": \"today 00:00:00\", \"prompt\": \"Date From\", \"operator\": \">=\" },\n        { \"name\": \"date_to\", \"value\": \"today 23:59:59\", \"prompt\": \"Date To\", \"operator\": \"<=\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `today 00:00:00`, `3 days ago`, `beginning of month`) which are parsed at report generation time."
+        },
+        "operationId": "createReport",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "reports"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ReportAttributes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Report ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "reports"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/ReportAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/reports/{id}": {
+      "put": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Update a report",
+        "description": "Update an existing report's attributes. Only the report owner can update it.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Updated Stock Report\",\n      \"description\": \"Updated description\",\n      \"variables\": [\n        { \"name\": \"date_from\", \"value\": \"beginning of month\", \"prompt\": \"Date From\", \"operator\": \">=\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | No | Updated report name |\n| `description` | No | Updated description |\n| `report_type` | No | Updated output type |\n| `report_fields` | No | Updated field definitions |\n| `variables` | No | Updated variable values |\n\n## Access Control\n\nOnly the report owner can update it. Returns 403 if the authenticated user is not the owner."
+        },
+        "operationId": "updateReport",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the report to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "reports"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "description": "Report attributes to update",
+                        "properties": {
+                          "description": {
+                            "type": "string",
+                            "maxLength": 500,
+                            "nullable": true,
+                            "description": "Report description"
+                          },
+                          "name": {
+                            "type": "string",
+                            "maxLength": 50,
+                            "description": "Report name"
+                          },
+                          "report_fields": {
+                            "type": "array",
+                            "description": "Array of field definitions",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "description": "Display name for the field"
+                                },
+                                "path": {
+                                  "type": "string",
+                                  "description": "Data path in query results"
+                                },
+                                "prefix": {
+                                  "type": "string",
+                                  "description": "Prefix to prepend to value"
+                                },
+                                "suffix": {
+                                  "type": "string",
+                                  "description": "Suffix to append to value"
+                                }
+                              }
+                            }
+                          },
+                          "report_query_id": {
+                            "type": "integer",
+                            "description": "ID of the report query"
+                          },
+                          "report_type": {
+                            "type": "string",
+                            "enum": [
+                              "single",
+                              "bar",
+                              "pie"
+                            ],
+                            "description": "Report output type"
+                          },
+                          "source_path": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Path to data source within query results"
+                          },
+                          "variables": {
+                            "type": "array",
+                            "description": "Variable values for the report query",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "description": "Variable name matching a query parameter"
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "description": "Variable value (supports Chronic-style dates)"
+                                },
+                                "prompt": {
+                                  "type": "string",
+                                  "description": "Display label for the variable"
+                                },
+                                "operator": {
+                                  "type": "string",
+                                  "description": "Comparison operator"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Report ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "reports"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/ReportAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Delete a report",
+        "description": "Delete a report. Only the report owner can delete it. Deleting a report may affect dashboard widgets and scheduled reports that reference it.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Only the report owner can delete it (returns 403 otherwise)\n- This action is permanent and cannot be undone\n\n## Side Effects\n\n- Dashboard widgets referencing this report will be affected\n- Scheduled reports that include this report will no longer generate it"
+        },
+        "operationId": "destroyReport",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the report to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/reports/{id}/generate": {
+      "post": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Generate report output",
+        "description": "Queue asynchronous report generation. Returns a Document record that can be polled for status and downloaded when complete.",
+        "x-mint": {
+          "content": "## Workflow\n\n1. **Call this endpoint** — returns a Document with `status: queued`\n2. **Poll the document status** via GraphQL until `status` becomes `available` (or `failed`)\n3. **Download the file** via `GET /documents/{id}/download` to get a presigned S3 URL\n4. **Use the presigned URL** to download the generated report file\n\n## Request Body (Optional)\n\nYou can optionally pass `variables` to override the report's stored variable values:\n\n```json\n{\n  \"variables\": [\n    { \"name\": \"date_from\", \"value\": \"2024-01-01 00:00:00\" },\n    { \"name\": \"date_to\", \"value\": \"2024-01-31 23:59:59\" }\n  ]\n}\n```\n\nIf no variables are provided, the report's stored variables are used. Passed variables are merged with stored variables (passed values take precedence).\n\n## Variable Values\n\nVariables support Chronic-style date parsing:\n- `today 00:00:00` — start of today\n- `3 days ago` — 3 days before now\n- `beginning of month` — first day of current month\n- `2024-01-15 09:00:00` — explicit date/time\n\n## Access Control\n\nOnly the report owner can generate it. Returns 403 if the authenticated user is not the owner."
+        },
+        "operationId": "generateReport",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the report to generate",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "variables": {
+                    "type": "array",
+                    "description": "Optional variable overrides for report generation",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Variable name matching a query parameter"
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "Variable value (supports Chronic-style dates)"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report generation queued successfully. Returns a Document record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Document ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "documents"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/DocumentAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/roles": {
       "post": {
         "tags": [
@@ -3308,6 +3941,286 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/scheduled_reports": {
+      "post": {
+        "tags": [
+          "Scheduled Reports"
+        ],
+        "summary": "Create a scheduled report",
+        "description": "Create a new scheduled report that delivers reports via email and/or FTP on a recurring schedule.",
+        "x-mint": {
+          "content": "## Request Structure\n\nScheduled reports use JSON:API format with embedded relationships:\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Weekly Stock Report\",\n      \"frequency\": \"Day\",\n      \"numbers\": [1, 3, 5],\n      \"time\": \"09:00\",\n      \"subject\": \"Weekly Stock Report\",\n      \"body\": \"Please find the weekly stock report attached.\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": [\n                { \"name\": \"date_from\", \"value\": \"today 00:00:00\" }\n              ]\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      },\n      \"scheduled-report-ftp-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"ftp_user_id\": 5\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Schedule name (max 50 chars) |\n| `frequency` | Yes | `Day` (days of the week) or `Month` (days of the month) |\n| `numbers` | Yes | Array of integers — day numbers when schedule runs |\n| `time` | Yes | Time of day to run (e.g., `09:00`) |\n| `subject` | No | Email subject line (max 256 chars) |\n| `body` | No | Email body text |\n\n## Frequency & Numbers\n\n- `Day` frequency: numbers 1-7 (1 = Monday, 7 = Sunday)\n- `Month` frequency: numbers 1-31 (day of month)\n\n## Relationships\n\nRelationship keys use **kebab-case** in the JSON:API `relationships` object:\n\n| Relationship | Description |\n|--------------|-------------|\n| `scheduled-report-reports` | Reports to generate (each with optional variable overrides) |\n| `scheduled-report-recipients` | Email recipients |\n| `scheduled-report-ftp-recipients` | FTP destinations |"
+        },
+        "operationId": "createScheduledReport",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "scheduled_reports"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ScheduledReportAttributes"
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/ScheduledReportRelationships"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Scheduled report created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Scheduled report ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "scheduled_reports"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/ScheduledReportAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/scheduled_reports/{id}": {
+      "put": {
+        "tags": [
+          "Scheduled Reports"
+        ],
+        "summary": "Update a scheduled report",
+        "description": "Update an existing scheduled report. Only the owner can update it. **Warning: updates are full replacements** — omitting a recipient or report from the update payload will delete it.",
+        "x-mint": {
+          "content": "## Important: Full Replacement\n\n**Updates are full replacements for relationships.** If you omit a recipient or report from the update, it will be **deleted**. Always include all desired recipients and reports in the update payload.\n\n## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Updated Weekly Report\",\n      \"time\": \"10:00\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": []\n            }\n          },\n          {\n            \"attributes\": {\n              \"report_id\": 2,\n              \"variables\": []\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Access Control\n\nOnly the scheduled report owner can update it. Returns 403 if the authenticated user is not the owner."
+        },
+        "operationId": "updateScheduledReport",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the scheduled report to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "scheduled_reports"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "description": "Scheduled report attributes to update",
+                        "properties": {
+                          "body": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Email body text"
+                          },
+                          "frequency": {
+                            "type": "string",
+                            "enum": [
+                              "Day",
+                              "Month"
+                            ],
+                            "description": "Schedule frequency"
+                          },
+                          "name": {
+                            "type": "string",
+                            "maxLength": 50,
+                            "description": "Schedule name"
+                          },
+                          "numbers": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer"
+                            },
+                            "description": "Day numbers when schedule runs"
+                          },
+                          "subject": {
+                            "type": "string",
+                            "maxLength": 256,
+                            "nullable": true,
+                            "description": "Email subject line"
+                          },
+                          "time": {
+                            "type": "string",
+                            "description": "Time of day to run"
+                          }
+                        }
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/ScheduledReportRelationships"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Scheduled report updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Scheduled report ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "scheduled_reports"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/ScheduledReportAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Scheduled Reports"
+        ],
+        "summary": "Delete a scheduled report",
+        "description": "Delete a scheduled report and remove its associated Sidekiq scheduled job. Only the owner can delete it.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Only the scheduled report owner can delete it (returns 403 otherwise)\n- This action is permanent and cannot be undone\n- The associated recurring Sidekiq job will be removed"
+        },
+        "operationId": "destroyScheduledReport",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the scheduled report to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -4719,10 +5632,19 @@
   "components": {
     "securitySchemes": {
       "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "OAuth 2.0 Bearer token. Obtain from https://auth.clarus-api.com"
+        "type": "oauth2",
+        "description": "OAuth 2.0 authentication. Use the client credentials or authorization code flow to obtain an access token.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://clarus-api.com/oauth/token",
+            "scopes": {}
+          },
+          "authorizationCode": {
+            "authorizationUrl": "https://clarus-api.com/oauth/authorize",
+            "tokenUrl": "https://clarus-api.com/oauth/token",
+            "scopes": {}
+          }
+        }
       }
     },
     "parameters": {
@@ -4759,6 +5681,16 @@
       },
       "NotFound": {
         "description": "The requested resource was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Access denied - you do not have permission to perform this action",
         "content": {
           "application/json": {
             "schema": {
@@ -8097,6 +9029,343 @@
           "description": "Shows current stock levels by product",
           "graphql": "query StockReport { stocks { nodes { id quantity product { code description } } } }",
           "parameters": []
+        }
+      },
+      "DocumentAttributes": {
+        "type": "object",
+        "description": "Document attributes representing a generated or uploaded file",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Document category"
+          },
+          "file_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Name of the file (populated when status is available)"
+          },
+          "file_path": {
+            "type": "string",
+            "nullable": true,
+            "description": "Storage path of the file"
+          },
+          "file_type": {
+            "type": "string",
+            "nullable": true,
+            "description": "MIME type of the file (e.g., text/csv, application/pdf)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "processing",
+              "available",
+              "failed"
+            ],
+            "description": "Current status of the document"
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "ID of the user who owns the document"
+          }
+        },
+        "example": {
+          "category": "report",
+          "file_name": null,
+          "file_path": null,
+          "file_type": null,
+          "status": "queued",
+          "user_id": 1
+        }
+      },
+      "ReportAttributes": {
+        "type": "object",
+        "description": "Report attributes defining how a report query is formatted and parameterized",
+        "required": [
+          "name",
+          "report_type",
+          "report_query_id"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true,
+            "description": "Description of what the report shows"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Report name for identification"
+          },
+          "report_fields": {
+            "type": "array",
+            "description": "Array of field definitions controlling report output columns",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Display name for the column"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "Dot-notation path to the data in query results"
+                },
+                "prefix": {
+                  "type": "string",
+                  "description": "Prefix to prepend to values"
+                },
+                "suffix": {
+                  "type": "string",
+                  "description": "Suffix to append to values"
+                }
+              }
+            }
+          },
+          "report_query_id": {
+            "type": "integer",
+            "description": "ID of the report query to execute"
+          },
+          "report_type": {
+            "type": "string",
+            "enum": [
+              "single",
+              "bar",
+              "pie"
+            ],
+            "description": "Output type: single (table), bar (bar chart), pie (pie chart)"
+          },
+          "source_path": {
+            "type": "string",
+            "nullable": true,
+            "description": "Path to the data source node within query results"
+          },
+          "variables": {
+            "type": "array",
+            "description": "Variable values passed to the report query parameters. Supports Chronic-style date values.",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "value"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Variable name matching a report query parameter"
+                },
+                "operator": {
+                  "type": "string",
+                  "description": "Comparison operator (e.g., >=, <=, =)"
+                },
+                "prompt": {
+                  "type": "string",
+                  "description": "Display label shown to users when prompting for this variable"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Variable value. Supports Chronic-style dates (e.g., today 00:00:00, beginning of month)"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "name": "Stock Level Summary",
+          "description": "Current stock levels grouped by product",
+          "report_type": "single",
+          "report_query_id": 1,
+          "source_path": "stocks.nodes",
+          "report_fields": [
+            {
+              "name": "Product Code",
+              "path": "product.code",
+              "prefix": "",
+              "suffix": ""
+            },
+            {
+              "name": "Quantity",
+              "path": "quantity",
+              "prefix": "",
+              "suffix": ""
+            }
+          ],
+          "variables": [
+            {
+              "name": "date_from",
+              "value": "today 00:00:00",
+              "prompt": "Date From",
+              "operator": ">="
+            },
+            {
+              "name": "date_to",
+              "value": "today 23:59:59",
+              "prompt": "Date To",
+              "operator": "<="
+            }
+          ]
+        }
+      },
+      "ScheduledReportAttributes": {
+        "type": "object",
+        "description": "Scheduled report attributes for recurring report delivery",
+        "required": [
+          "name",
+          "frequency",
+          "numbers",
+          "time"
+        ],
+        "properties": {
+          "body": {
+            "type": "string",
+            "nullable": true,
+            "description": "Email body text included with the scheduled report delivery"
+          },
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "Day",
+              "Month"
+            ],
+            "description": "Schedule frequency. Day = days of the week (1=Mon to 7=Sun). Month = days of the month (1-31)."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Schedule name for identification"
+          },
+          "numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Day numbers when the schedule runs. For Day frequency: 1-7 (Mon-Sun). For Month frequency: 1-31."
+          },
+          "subject": {
+            "type": "string",
+            "maxLength": 256,
+            "nullable": true,
+            "description": "Email subject line for the scheduled delivery"
+          },
+          "time": {
+            "type": "string",
+            "description": "Time of day to run the schedule (e.g., 09:00)"
+          }
+        },
+        "example": {
+          "name": "Weekly Stock Report",
+          "frequency": "Day",
+          "numbers": [1, 3, 5],
+          "time": "09:00",
+          "subject": "Weekly Stock Report",
+          "body": "Please find the weekly stock report attached."
+        }
+      },
+      "ScheduledReportRelationships": {
+        "type": "object",
+        "description": "Embedded relationships for scheduled reports. Use kebab-case keys in the JSON:API relationships object.",
+        "properties": {
+          "scheduled-report-reports": {
+            "type": "object",
+            "description": "Reports to generate on schedule",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "attributes": {
+                      "type": "object",
+                      "required": [
+                        "report_id"
+                      ],
+                      "properties": {
+                        "report_id": {
+                          "type": "integer",
+                          "description": "ID of the report to generate"
+                        },
+                        "variables": {
+                          "type": "array",
+                          "description": "Optional variable overrides for this report",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Variable name"
+                              },
+                              "value": {
+                                "type": "string",
+                                "description": "Variable value"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "scheduled-report-recipients": {
+            "type": "object",
+            "description": "Email recipients for the scheduled report",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "attributes": {
+                      "type": "object",
+                      "required": [
+                        "email_address"
+                      ],
+                      "properties": {
+                        "email_address": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Recipient email address"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Recipient display name"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "scheduled-report-ftp-recipients": {
+            "type": "object",
+            "description": "FTP destinations for the scheduled report",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "attributes": {
+                      "type": "object",
+                      "required": [
+                        "ftp_user_id"
+                      ],
+                      "properties": {
+                        "ftp_user_id": {
+                          "type": "integer",
+                          "description": "ID of the FTP user to send reports to"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
