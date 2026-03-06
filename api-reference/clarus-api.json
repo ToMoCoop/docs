@@ -26,6 +26,10 @@
       "description": "Account/customer management endpoints for 3PL client management"
     },
     {
+      "name": "Bookings",
+      "description": "Booking diary management endpoints for scheduling inbound and outbound dock appointments"
+    },
+    {
       "name": "Charge Lines",
       "description": "Charge line management endpoints for billing and invoicing operations"
     },
@@ -100,6 +104,10 @@
     {
       "name": "Storage Units",
       "description": "Storage unit management endpoints for containers like pallets, cages, and boxes"
+    },
+    {
+      "name": "Templates",
+      "description": "Template management endpoints for creating, updating, and testing Liquid HTML print templates"
     },
     {
       "name": "Users",
@@ -390,6 +398,330 @@
             "in": "path",
             "required": true,
             "description": "The unique identifier of the account to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/bookings": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Create a booking",
+        "description": "Create a new booking diary entry for scheduling an inbound or outbound dock appointment.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"bookings\",\n    \"attributes\": {\n      \"account_id\": 1,\n      \"location_id\": 10,\n      \"consignment_reference\": \"CONS-2024-001\",\n      \"direction\": \"inbound\",\n      \"hazardous\": false,\n      \"start_time\": \"2024-09-15T08:00:00Z\",\n      \"end_time\": \"2024-09-15T09:00:00Z\",\n      \"haulier\": \"DHL Express\",\n      \"intake_type\": \"full_load\",\n      \"container_number\": \"MSKU1234567\",\n      \"storage_unit_quantity\": 20,\n      \"notes\": \"Fragile goods - handle with care\"\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `account_id` | integer | Stock account ID (owner of the goods) |\n| `location_id` | integer | Dock location ID (must have `available_in_booking_diary` enabled) |\n| `consignment_reference` | string | Consignment reference number |\n| `direction` | string | One of: `inbound`, `outbound` |\n| `hazardous` | boolean | Whether the goods are hazardous |\n| `start_time` | datetime | Booking start time (ISO 8601) |\n| `end_time` | datetime | Booking end time (must be after start_time) |\n\n## Optional Fields\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `account_reference` | string | Account's own reference |\n| `booking_reference` | string | Booking reference number |\n| `container_number` | string | Container number (for container intake) |\n| `haulier` | string | Haulier/carrier name |\n| `intake_type` | string | One of: `container`, `part_load`, `full_load` |\n| `notes` | string | Free text notes |\n| `status` | string | One of: `pending`, `arrived`, `departed`, `fail_to_arrive`, `cancelled` (default: `pending`) |\n| `storage_unit_quantity` | integer | Expected number of storage units (e.g., pallets) |\n\n## Slot Availability Validation\n\nThe system validates that the requested time slot is available before creating the booking.\n\n### Opening Times Compliance\n\nThe location (or its parent warehouse) may have opening times configured. Opening hours vary by day of week, so the system checks the specific day's hours for both start and end times.\n\n**Error Response (code 295):**\n```json\n{\n  \"errors\": [\n    {\n      \"code\": 295,\n      \"symbol\": \"outside_of_opening_times\",\n      \"details\": \"Provided start time is outside of opening times\",\n      \"source\": \"start_time\"\n    }\n  ]\n}\n```\n\n### No Overlapping Bookings\n\nThe system uses time range overlap detection to ensure no other booking exists at the same location during the requested period.\n\n**Error Response (code 296):**\n```json\n{\n  \"errors\": [\n    {\n      \"code\": 296,\n      \"symbol\": \"overlapping_bookings\",\n      \"details\": \"There are overlapping bookings for the selected time slot\",\n      \"source\": \"time_slot\"\n    }\n  ]\n}\n```\n\n## Finding Available Slots Workflow\n\nTo find an available time slot before creating a booking:\n\n1. **Query eligible locations** - Find locations where `available_in_booking_diary` is true (via GraphQL)\n2. **Query existing bookings** - Retrieve bookings for the target date range and location (via GraphQL)\n3. **Calculate gaps** - Identify time gaps that fall within the location's opening hours for the target day of week\n4. **Create booking** - POST /bookings with the chosen slot"
+        },
+        "operationId": "createBooking",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "bookings"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/BookingAttributes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Booking created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Booking ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "bookings"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/BookingAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/bookings/{id}": {
+      "put": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Update a booking",
+        "description": "Update an existing booking's attributes such as times, status, or details.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"bookings\",\n    \"attributes\": {\n      \"status\": \"arrived\",\n      \"notes\": \"Driver arrived at gate 3\"\n    }\n  }\n}\n```\n\n## Key Fields\n\nAll fields are optional on update. See the create endpoint for the full field reference.\n\n## Status Transitions\n\n| From | Allowed To |\n|------|------------|\n| `pending` | `arrived`, `departed`, `fail_to_arrive`, `cancelled` |\n| `arrived` | `departed`, `cancelled` |\n| `departed` | (terminal) |\n| `fail_to_arrive` | (terminal) |\n| `cancelled` | (terminal) |\n\n**Note**: You cannot transition back to `pending` from any other status (error code 298).\n\n## Slot Re-validation\n\nChanging `start_time`, `end_time`, or `location_id` triggers slot availability re-validation (opening times compliance and overlap detection). The same validation rules as the create endpoint apply."
+        },
+        "operationId": "updateBooking",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the booking to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "bookings"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "description": "Booking attributes to update (all fields optional)",
+                        "properties": {
+                          "account_id": {
+                            "allOf": [{ "$ref": "#/components/schemas/AccountId" }],
+                            "nullable": true
+                          },
+                          "account_reference": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Account's own reference"
+                          },
+                          "booking_reference": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Booking reference number"
+                          },
+                          "consignment_reference": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Consignment reference number"
+                          },
+                          "container_number": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Container number"
+                          },
+                          "direction": {
+                            "type": "string",
+                            "enum": [
+                              "inbound",
+                              "outbound"
+                            ],
+                            "nullable": true,
+                            "description": "Direction of goods movement"
+                          },
+                          "end_time": {
+                            "type": "string",
+                            "format": "date-time",
+                            "nullable": true,
+                            "description": "Booking end time (ISO 8601)"
+                          },
+                          "haulier": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Haulier/carrier name"
+                          },
+                          "hazardous": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "description": "Whether the goods are hazardous"
+                          },
+                          "intake_type": {
+                            "type": "string",
+                            "enum": [
+                              "container",
+                              "part_load",
+                              "full_load"
+                            ],
+                            "nullable": true,
+                            "description": "Type of intake"
+                          },
+                          "location_id": {
+                            "allOf": [{ "$ref": "#/components/schemas/LocationId" }],
+                            "nullable": true
+                          },
+                          "notes": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Free text notes"
+                          },
+                          "start_time": {
+                            "type": "string",
+                            "format": "date-time",
+                            "nullable": true,
+                            "description": "Booking start time (ISO 8601)"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "pending",
+                              "arrived",
+                              "departed",
+                              "fail_to_arrive",
+                              "cancelled"
+                            ],
+                            "nullable": true,
+                            "description": "Booking status"
+                          },
+                          "storage_unit_quantity": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Expected number of storage units"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Booking updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Booking ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "bookings"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/BookingAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Delete a booking",
+        "description": "Delete a booking from the booking diary.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- The booking is permanently removed from the diary"
+        },
+        "operationId": "destroyBooking",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the booking to delete",
             "schema": {
               "type": "integer"
             }
@@ -3050,7 +3382,7 @@
         "summary": "Create a report query",
         "description": "Create a new report query definition. Report queries allow you to save GraphQL queries for repeated execution.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Daily Stock Report\",\n      \"description\": \"Shows current stock levels by product\",\n      \"graphql\": \"query StockReport { stocks { nodes { id quantity product { code description } } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouseId\", \"type\": \"ID\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | No | The GraphQL query to execute |\n| `parameters` | No | Array of parameter definitions |\n\n## Parameter Types\n\n| Type | Description |\n|------|-------------|\n| `ID` | Integer ID value |\n| `String` | Text value |\n| `Chronic` | Date/time parsed with natural language |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"graphql\": \"query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\\\"AVAILABLE\\\", \\\"ALLOCATED\\\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \\\"total_records DESC\\\") { task_type { code } total_records } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouse_id\", \"type\": \"Integer\" },\n        { \"name\": \"account_id\", \"type\": \"Integer\" },\n        { \"name\": \"created_at_from\", \"type\": \"Date\" },\n        { \"name\": \"created_at_to\", \"type\": \"Date\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | Yes | Named GraphQL query with typed parameters (never anonymous) |\n| `parameters` | No | Array of parameter definitions matching query variables |\n\n## GraphQL Query Rules\n\n- Must be a **named query** (e.g., `query getTasksToDo(...)`) — never anonymous\n- Use `$variable` syntax for parameters with GraphQL types (`ID`, `Chronic`, `String`)\n- Common query patterns: `aggregation(...)` for grouped/summarized data, `all(...) { edges { node { ... } } }` for paginated lists\n\n## Parameter Types\n\n| Type | GraphQL Type | Description |\n|------|-------------|-------------|\n| `Integer` | `ID` | Integer ID value |\n| `Date` | `Chronic` | Date/time parsed with natural language (e.g., 'start of today') |\n| `String` | `String` | Text value |"
         },
         "operationId": "createReportQuery",
         "parameters": [
@@ -3092,10 +3424,15 @@
                 "data": {
                   "type": "report_queries",
                   "attributes": {
-                    "name": "Daily Stock Report",
-                    "description": "Shows current stock levels by product",
-                    "graphql": "query StockReport { stocks { nodes { id quantity product { code description } } } }",
-                    "parameters": []
+                    "name": "Count of Tasks Left To Do",
+                    "description": "Count of Tasks Left To Do by Task Type",
+                    "graphql": "query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\"AVAILABLE\", \"ALLOCATED\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \"total_records DESC\") { task_type { code } total_records } } }",
+                    "parameters": [
+                      { "name": "warehouse_id", "type": "Integer" },
+                      { "name": "account_id", "type": "Integer" },
+                      { "name": "created_at_from", "type": "Date" },
+                      { "name": "created_at_to", "type": "Date" }
+                    ]
                   }
                 }
               }
@@ -3285,7 +3622,7 @@
         "summary": "Create a report",
         "description": "Create a new report definition based on an existing report query. Reports define how query results are formatted and what variables are used.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Stock Level Summary\",\n      \"description\": \"Current stock levels grouped by product\",\n      \"report_type\": \"single\",\n      \"report_query_id\": 1,\n      \"report_fields\": [\n        { \"name\": \"Product Code\", \"path\": \"product.code\" },\n        { \"name\": \"Quantity\", \"path\": \"quantity\" }\n      ],\n      \"variables\": [\n        { \"name\": \"date_from\", \"value\": \"today 00:00:00\", \"prompt\": \"Date From\", \"operator\": \">=\" },\n        { \"name\": \"date_to\", \"value\": \"today 23:59:59\", \"prompt\": \"Date To\", \"operator\": \"<=\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `today 00:00:00`, `3 days ago`, `beginning of month`) which are parsed at report generation time."
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"report_type\": \"bar\",\n      \"report_query_id\": 1,\n      \"source_path\": \"data.tasks.aggregation\",\n      \"report_fields\": [\n        { \"name\": \"Task Type\", \"path\": \"task_type.code\" },\n        { \"name\": \"Tasks Left To Do\", \"path\": \"total_records\" }\n      ],\n      \"variables\": [\n        { \"name\": \"created_at_from\", \"value\": \"start of today\", \"prompt\": \"true\" },\n        { \"name\": \"created_at_to\", \"value\": \"end of today\", \"prompt\": \"true\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `source_path` | No | Dot-notation path to data in GraphQL response. Must start with `data.` (e.g., `data.tasks.aggregation`, `data.stocks.all.edges`) |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## source_path\n\nThe `source_path` tells the system where to find data in the GraphQL response. It always starts with `data.` Common patterns:\n- `data.{resource}.aggregation` — for grouped/summarized results\n- `data.{resource}.all.edges` — for paginated lists (each item under `node`)\n- For paginated queries, `report_fields` paths must start with `node.` (e.g., `node.warehouse.name`)\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `start of today`, `end of today`, `start of this month`) which are parsed at report generation time. Variable names must match parameters defined in the linked report query."
         },
         "operationId": "createReport",
         "parameters": [
@@ -3434,25 +3771,29 @@
                           },
                           "report_fields": {
                             "type": "array",
-                            "description": "Array of field definitions",
+                            "description": "Array of field definitions mapping GraphQL response fields to report columns",
                             "items": {
                               "type": "object",
+                              "required": [
+                                "name",
+                                "path"
+                              ],
                               "properties": {
                                 "name": {
                                   "type": "string",
-                                  "description": "Display name for the field"
+                                  "description": "Human-readable column header displayed in the report output (e.g., 'Task Type', 'Warehouse Name')"
                                 },
                                 "path": {
                                   "type": "string",
-                                  "description": "Data path in query results"
+                                  "description": "Dot-notation path to extract the field value from each record in the GraphQL response (e.g., 'task_type.code', 'node.warehouse.name')"
                                 },
                                 "prefix": {
                                   "type": "string",
-                                  "description": "Prefix to prepend to value"
+                                  "description": "Optional string to prepend to each value"
                                 },
                                 "suffix": {
                                   "type": "string",
-                                  "description": "Suffix to append to value"
+                                  "description": "Optional string to append to each value"
                                 }
                               }
                             }
@@ -3473,7 +3814,7 @@
                           "source_path": {
                             "type": "string",
                             "nullable": true,
-                            "description": "Path to data source within query results"
+                            "description": "Dot-notation path to extract data from GraphQL response. Must start with 'data.' (e.g., 'data.tasks.aggregation', 'data.stocks.all.edges')"
                           },
                           "variables": {
                             "type": "array",
@@ -3978,7 +4319,8 @@
                     "type": "object",
                     "required": [
                       "type",
-                      "attributes"
+                      "attributes",
+                      "relationships"
                     ],
                     "properties": {
                       "type": {
@@ -3994,6 +4336,40 @@
                       "relationships": {
                         "$ref": "#/components/schemas/ScheduledReportRelationships"
                       }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "scheduled_reports",
+                  "attributes": {
+                    "name": "Daily Task Report",
+                    "frequency": "Day",
+                    "numbers": [1, 2, 3, 4, 5, 6, 7],
+                    "time": "02:00",
+                    "subject": "Daily Task Report",
+                    "body": "Please find the daily task report attached."
+                  },
+                  "relationships": {
+                    "scheduled-report-reports": {
+                      "data": [
+                        {
+                          "attributes": {
+                            "report_id": 1
+                          }
+                        }
+                      ]
+                    },
+                    "scheduled-report-recipients": {
+                      "data": [
+                        {
+                          "attributes": {
+                            "email_address": "manager@example.com",
+                            "name": "Warehouse Manager"
+                          }
+                        }
+                      ]
                     }
                   }
                 }
@@ -4081,7 +4457,8 @@
                     "type": "object",
                     "required": [
                       "type",
-                      "attributes"
+                      "attributes",
+                      "relationships"
                     ],
                     "properties": {
                       "type": {
@@ -4093,7 +4470,7 @@
                       },
                       "attributes": {
                         "type": "object",
-                        "description": "Scheduled report attributes to update",
+                        "description": "Scheduled report attributes to update. Note: reports, email recipients, and FTP recipients go in the 'relationships' object, not here.",
                         "properties": {
                           "body": {
                             "type": "string",
@@ -5047,6 +5424,406 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/templates": {
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Create a template",
+        "description": "Create a new Liquid HTML print template for generating documents such as dispatch notes, picking notes, and invoices.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"templates\",\n    \"attributes\": {\n      \"template_type_id\": 1,\n      \"name\": \"Custom Dispatch Note\",\n      \"default\": false,\n      \"print_params\": {\n        \"orientation\": \"Portrait\",\n        \"page_height\": 297,\n        \"page_width\": 210,\n        \"top\": 10,\n        \"bottom\": 10,\n        \"left\": 10,\n        \"right\": 10,\n        \"header_height\": 20,\n        \"header_spacing\": 5,\n        \"footer_height\": 15,\n        \"footer_spacing\": 5\n      }\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `template_type_id` | integer | ID of the template type (see Template Type Discovery below) |\n\n## Optional Fields\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `name` | string | Display name for the template |\n| `default` | boolean | Whether this is the default template for its type |\n| `template_header_id` | integer | ID of a template to use as header |\n| `template_footer_id` | integer | ID of a template to use as footer |\n| `print_params` | object | Print layout parameters (see below) |\n\n## Print Parameters\n\nAll dimensions are in millimeters (mm).\n\n| Parameter | Type | Description |\n|-----------|------|-------------|\n| `orientation` | string | `Portrait` or `Landscape` |\n| `page_height` | number | Page height (e.g., 297 for A4) |\n| `page_width` | number | Page width (e.g., 210 for A4) |\n| `top` | number | Top margin |\n| `bottom` | number | Bottom margin |\n| `left` | number | Left margin |\n| `right` | number | Right margin |\n| `header_height` | number | Height of the header area |\n| `header_spacing` | number | Spacing between header and body |\n| `footer_height` | number | Height of the footer area |\n| `footer_spacing` | number | Spacing between body and footer |\n\n## Template Type Discovery\n\nDefault template type codes (IDs vary per tenant but codes are consistent):\n\n| Code | Description |\n|------|-------------|\n| `dispatch_note` | Dispatch note for outbound shipments |\n| `picking_note` | Picking instructions for warehouse staff |\n| `commercial_invoice` | Commercial invoice for international shipments |\n| `invoice` | Billing invoice |\n| `put_away_note` | Put-away instructions for received goods |\n| `pre_receipt` | Pre-receipt document for expected deliveries |\n| `pre_pick_label` | Label printed before picking |\n| `storage_unit_labels` | Labels for storage units (pallets, cages, etc.) |\n| `pick_storage_unit_label` | Label for storage units created during picking |\n\nActual template type IDs can be queried via GraphQL to find the ID for a given code.\n\n## Template Types and Liquid Variables\n\nEach template type has access to different variables in Liquid templates. Top-level variables and their key nested properties:\n\n### `dispatch_note`\n- `record` - the goods out record (reference, created_at, status)\n- `lines` - goods out lines (product.code, product.description, quantity)\n- `carrier` - carrier details (name)\n- `address` - delivery address (address_1 through address_5, postcode, country_code)\n- `account` - stock account (name, code, address.*)\n- `warehouse` - warehouse (code, address.*)\n- `customer` - end customer (name, code)\n- `subdomain` - tenant info (currency.code, tax_rate.component_rate)\n- `sales_order` - linked sales order (reference)\n- `total_weight` - total weight of the shipment\n- `products` - product list with details\n\n### `picking_note`\n- `goods_out_pick_list` - pick list record (reference)\n- `tasks` - pick tasks (location, product, quantity)\n- `carrier` - carrier details\n- `address` - delivery address\n- `account` - stock account\n- `warehouse` - warehouse details\n- `customer` - end customer\n- `subdomain` - tenant info\n\n### `commercial_invoice`\n- `shipment` - shipment record (created_at)\n- `packages` - packages with dimensions.weight, stocks[].product.code/description/commodity_code/country_of_manufacture, stocks[].quantity, stocks[].dimensions.value/weight\n- `account` - stock account (name, address.*, gb_eori_number)\n- `warehouse` - warehouse (address.country_code)\n- `subdomain` - tenant info (currency.code, tax_rate.component_rate)\n- `goods_out` - outbound order (address.*)\n\n### `invoice`\n- `record` - invoice record\n- `account` - stock account\n- `company` - company details\n- `lines` - invoice lines\n\n### `put_away_note`\n- `goods_in_receipt` - receipt record\n- `goods_in_receipt_lines` - receipt lines\n- `warehouse` - warehouse details\n- `account` - stock account\n- `supplier` - supplier details\n- `carrier` - carrier details\n- `subdomain` - tenant info\n- `tasks` - put-away tasks\n\n### `pre_receipt`\n- `goods_in_receipt` - receipt record\n- `account` - stock account\n- `warehouse` - warehouse details\n- `carrier` - carrier details\n- `supplier` - supplier details\n- `inbound_good_kind` - type of inbound good\n- `location` - receiving location\n- `lines` - receipt lines\n\n### `pre_pick_label`\n- `goods_out_pick_list` - pick list record\n- `goods_out` - outbound order\n- `product` - product details\n\n### `storage_unit_labels`\n- `stocks_lines[]` - stock line records with: reference, product.code, product.description, goods_in_receipt, batch, account, location, confirmed_quantity, custom fields (boolean1-5, datetime1-5, integer1-5, string1-5)\n\n### `pick_storage_unit_label`\n- `record` - storage unit record\n- `subdomain` - tenant info (company details)\n\n## Liquid Template Syntax\n\nTemplates use [Liquid](https://shopify.github.io/liquid/) syntax:\n\n```liquid\n<h1>Dispatch Note: {{ record.reference }}</h1>\n<p>Date: {{ record.created_at | date: \"%d/%m/%Y\" }}</p>\n\n{% for line in lines %}\n  <tr>\n    <td>{{ line.product.code }}</td>\n    <td>{{ line.quantity | times: 1 }}</td>\n    <td>{{ line.price | plus: 0 }}</td>\n  </tr>\n{% endfor %}\n\n{% if carrier %}\n  <p>Carrier: {{ carrier.name }}</p>\n{% endif %}\n```\n\n## Workflow\n\n1. **Create template** - POST /templates with template_type_id and print parameters\n2. **Upload Liquid HTML** - POST /templates/{id}/attachment with your .html.liquid file\n3. **Test print** - PATCH /templates/{id}/test to generate a test PDF\n4. **Download test** - Use Documents endpoints (POST /documents/{id}/download) to retrieve the generated PDF\n5. **Set as default** - Optionally PUT /templates/{id} with `default: true`"
+        },
+        "operationId": "createTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "templates"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/TemplateAttributes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Template created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Template ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "templates"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/TemplateAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/templates/{id}": {
+      "put": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Update a template",
+        "description": "Update an existing template's attributes, print parameters, or default status.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"templates\",\n    \"attributes\": {\n      \"name\": \"Updated Dispatch Note\",\n      \"default\": true,\n      \"print_params\": {\n        \"orientation\": \"Landscape\",\n        \"page_height\": 210,\n        \"page_width\": 297\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\nAll fields are optional on update. See the create endpoint for the full field and print parameters reference.\n\n- Partial `print_params` updates are supported (only include the parameters you want to change)\n- Setting `default: true` makes this the default template for its type"
+        },
+        "operationId": "updateTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the template to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "templates"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "description": "Template attributes to update (all fields optional)",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Template display name"
+                          },
+                          "default": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "description": "Whether this is the default template for its type"
+                          },
+                          "template_type_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Template type ID"
+                          },
+                          "template_header_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Template to use as header"
+                          },
+                          "template_footer_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Template to use as footer"
+                          },
+                          "print_params": {
+                            "$ref": "#/components/schemas/TemplatePrintParams"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Template updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Template ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "templates"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/TemplateAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Delete a template",
+        "description": "Delete a template.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- The template and its attachment are permanently removed"
+        },
+        "operationId": "destroyTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the template to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/templates/{id}/attachment": {
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Upload Liquid HTML template file",
+        "description": "Upload a Liquid HTML file as the template's content. This replaces any existing attachment.",
+        "x-mint": {
+          "content": "## Binary Upload\n\nThis endpoint uses binary upload (not JSON:API). Send the file contents as the raw request body.\n\n### Required Headers\n\n| Header | Description | Example |\n|--------|-------------|--------|\n| `Content-Disposition` | Filename of the upload | `attachment; filename=\"dispatch_note.html.liquid\"` |\n| `Content-Type` | MIME type of the file | `text/html` |\n\n### cURL Example\n\n```bash\ncurl -X POST https://clarus-api.com/api/templates/42/attachment \\\n  -H \"Authorization: Bearer YOUR_TOKEN\" \\\n  -H \"X-Clarus-Subdomain: acme-warehouse\" \\\n  -H \"Content-Disposition: attachment; filename=\\\"dispatch_note.html.liquid\\\"\" \\\n  -H \"Content-Type: text/html\" \\\n  --data-binary @dispatch_note.html.liquid\n```\n\nThe uploaded file should be a valid Liquid HTML template. See the create endpoint for available Liquid variables per template type."
+        },
+        "operationId": "uploadTemplateAttachment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the template",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "description": "The Liquid HTML template file contents"
+              }
+            },
+            "text/html": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "description": "The Liquid HTML template file contents"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attachment uploaded successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/templates/{id}/test": {
+      "patch": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Trigger test print",
+        "description": "Generate a test print of the template to verify it renders correctly. Returns a document record with 'queued' status.",
+        "x-mint": {
+          "content": "## Test Print\n\nTriggers an asynchronous test print of the template. The system generates a PDF using sample data and returns a document record.\n\n### Prerequisites\n\n- The template must have a Liquid HTML attachment uploaded via POST /templates/{id}/attachment\n\n### Supported Template Types\n\n`picking_note`, `storage_unit_labels`, `pick_storage_unit_label`, `dispatch_note`, `pre_pick_label`, `invoice`, `put_away_note`, `pre_receipt`, `commercial_invoice`\n\n### Response\n\nReturns a document record with `status: \"queued\"`. The PDF is generated asynchronously.\n\n### Downloading the Result\n\nOnce the document status changes to `completed`, use the Documents endpoints to download the generated PDF:\n- `POST /documents/{id}/download` to get a download URL\n\n### Error Cases\n\n| Error | Description |\n|-------|-------------|\n| `unsupported_template_type` | The template's type is not supported for test printing |\n| `missing_template` | No Liquid HTML attachment has been uploaded |"
+        },
+        "operationId": "testPrintTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the template to test",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Test print queued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Document ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "documents"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "type": "object",
+                          "properties": {
+                            "status": {
+                              "type": "string",
+                              "enum": [
+                                "queued"
+                              ],
+                              "description": "Document generation status"
+                            },
+                            "category": {
+                              "type": "string",
+                              "description": "Document category (test_print)"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       }
@@ -7035,6 +7812,181 @@
           }
         }
       },
+      "TemplateAttributes": {
+        "type": "object",
+        "description": "Template attributes for Liquid HTML print templates",
+        "required": [
+          "template_type_id"
+        ],
+        "properties": {
+          "bottom": {
+            "type": "number",
+            "nullable": true,
+            "description": "Bottom margin in mm"
+          },
+          "default": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether this is the default template for its type"
+          },
+          "footer_height": {
+            "type": "number",
+            "nullable": true,
+            "description": "Footer area height in mm"
+          },
+          "footer_spacing": {
+            "type": "number",
+            "nullable": true,
+            "description": "Spacing between body and footer in mm"
+          },
+          "header_height": {
+            "type": "number",
+            "nullable": true,
+            "description": "Header area height in mm"
+          },
+          "header_spacing": {
+            "type": "number",
+            "nullable": true,
+            "description": "Spacing between header and body in mm"
+          },
+          "left": {
+            "type": "number",
+            "nullable": true,
+            "description": "Left margin in mm"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Template display name"
+          },
+          "orientation": {
+            "type": "string",
+            "enum": [
+              "Portrait",
+              "Landscape"
+            ],
+            "nullable": true,
+            "description": "Page orientation"
+          },
+          "page_height": {
+            "type": "number",
+            "nullable": true,
+            "description": "Page height in mm (e.g., 297 for A4 portrait)"
+          },
+          "page_width": {
+            "type": "number",
+            "nullable": true,
+            "description": "Page width in mm (e.g., 210 for A4 portrait)"
+          },
+          "right": {
+            "type": "number",
+            "nullable": true,
+            "description": "Right margin in mm"
+          },
+          "template_footer_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "ID of a template to use as footer"
+          },
+          "template_header_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "ID of a template to use as header"
+          },
+          "template_type_id": {
+            "type": "integer",
+            "description": "Template type ID (codes: dispatch_note, picking_note, commercial_invoice, invoice, put_away_note, pre_receipt, pre_pick_label, storage_unit_labels, pick_storage_unit_label)"
+          },
+          "top": {
+            "type": "number",
+            "nullable": true,
+            "description": "Top margin in mm"
+          }
+        },
+        "example": {
+          "template_type_id": 1,
+          "name": "Custom Dispatch Note",
+          "default": false,
+          "orientation": "Portrait",
+          "page_height": 297,
+          "page_width": 210,
+          "top": 10,
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "header_height": 20,
+          "header_spacing": 5,
+          "footer_height": 15,
+          "footer_spacing": 5
+        }
+      },
+      "TemplatePrintParams": {
+        "type": "object",
+        "description": "Print layout parameters for templates. All dimensions are in millimeters (mm).",
+        "properties": {
+          "bottom": {
+            "type": "number",
+            "description": "Bottom margin in mm"
+          },
+          "footer_height": {
+            "type": "number",
+            "description": "Footer area height in mm"
+          },
+          "footer_spacing": {
+            "type": "number",
+            "description": "Spacing between body and footer in mm"
+          },
+          "header_height": {
+            "type": "number",
+            "description": "Header area height in mm"
+          },
+          "header_spacing": {
+            "type": "number",
+            "description": "Spacing between header and body in mm"
+          },
+          "left": {
+            "type": "number",
+            "description": "Left margin in mm"
+          },
+          "orientation": {
+            "type": "string",
+            "enum": [
+              "Portrait",
+              "Landscape"
+            ],
+            "description": "Page orientation"
+          },
+          "page_height": {
+            "type": "number",
+            "description": "Page height in mm (e.g., 297 for A4 portrait)"
+          },
+          "page_width": {
+            "type": "number",
+            "description": "Page width in mm (e.g., 210 for A4 portrait)"
+          },
+          "right": {
+            "type": "number",
+            "description": "Right margin in mm"
+          },
+          "top": {
+            "type": "number",
+            "description": "Top margin in mm"
+          }
+        },
+        "example": {
+          "orientation": "Portrait",
+          "page_height": 297,
+          "page_width": 210,
+          "top": 10,
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "header_height": 20,
+          "header_spacing": 5,
+          "footer_height": 15,
+          "footer_spacing": 5
+        }
+      },
       "GoodsInReceiptAttributes": {
         "type": "object",
         "description": "Goods in receipt header attributes",
@@ -8503,6 +9455,120 @@
           }
         }
       },
+      "BookingAttributes": {
+        "type": "object",
+        "description": "Booking diary attributes for dock appointments",
+        "required": [
+          "account_id",
+          "consignment_reference",
+          "direction",
+          "end_time",
+          "hazardous",
+          "location_id",
+          "start_time"
+        ],
+        "properties": {
+          "account_id": {
+            "allOf": [{ "$ref": "#/components/schemas/AccountId" }],
+            "description": "Stock account ID (owner of the goods)"
+          },
+          "account_reference": {
+            "type": "string",
+            "nullable": true,
+            "description": "Account's own reference for this booking"
+          },
+          "booking_reference": {
+            "type": "string",
+            "nullable": true,
+            "description": "Booking reference number (auto-generated if not provided)"
+          },
+          "consignment_reference": {
+            "type": "string",
+            "description": "Consignment reference number"
+          },
+          "container_number": {
+            "type": "string",
+            "nullable": true,
+            "description": "Container number (for container intake type)"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "inbound",
+              "outbound"
+            ],
+            "description": "Direction of goods movement"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Booking end time (ISO 8601)"
+          },
+          "haulier": {
+            "type": "string",
+            "nullable": true,
+            "description": "Haulier/carrier name"
+          },
+          "hazardous": {
+            "type": "boolean",
+            "description": "Whether the goods are hazardous"
+          },
+          "intake_type": {
+            "type": "string",
+            "enum": [
+              "container",
+              "part_load",
+              "full_load"
+            ],
+            "nullable": true,
+            "description": "Type of intake"
+          },
+          "location_id": {
+            "allOf": [{ "$ref": "#/components/schemas/LocationId" }],
+            "description": "Dock location ID (must have available_in_booking_diary enabled)"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "description": "Free text notes"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Booking start time (ISO 8601)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "arrived",
+              "departed",
+              "fail_to_arrive",
+              "cancelled"
+            ],
+            "description": "Booking status (default: pending)"
+          },
+          "storage_unit_quantity": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Expected number of storage units (e.g., pallets)"
+          }
+        },
+        "example": {
+          "account_id": 1,
+          "consignment_reference": "CONS-2024-001",
+          "direction": "inbound",
+          "end_time": "2024-09-15T09:00:00Z",
+          "hazardous": false,
+          "location_id": 10,
+          "start_time": "2024-09-15T08:00:00Z",
+          "status": "pending",
+          "haulier": "DHL Express",
+          "intake_type": "full_load",
+          "storage_unit_quantity": 20,
+          "notes": "Fragile goods - handle with care"
+        }
+      },
       "WarehouseAttributes": {
         "type": "object",
         "description": "Warehouse attributes",
@@ -8994,7 +10060,7 @@
           },
           "graphql": {
             "type": "string",
-            "description": "The GraphQL query to execute when running this report"
+            "description": "The GraphQL query to execute. Must be a named query with typed parameters (e.g., 'query getTasksToDo($warehouse_id: ID, $created_at_from: Chronic) { ... }'). Never use anonymous queries."
           },
           "parameters": {
             "type": "array",
@@ -9014,21 +10080,26 @@
                 "type": {
                   "type": "string",
                   "enum": [
-                    "ID",
-                    "Chronic",
+                    "Integer",
+                    "Date",
                     "String"
                   ],
-                  "description": "Parameter type"
+                  "description": "Parameter type. Integer maps to GraphQL ID type, Date maps to GraphQL Chronic type (supports natural language dates)"
                 }
               }
             }
           }
         },
         "example": {
-          "name": "Daily Stock Report",
-          "description": "Shows current stock levels by product",
-          "graphql": "query StockReport { stocks { nodes { id quantity product { code description } } } }",
-          "parameters": []
+          "name": "Count of Tasks Left To Do",
+          "description": "Count of Tasks Left To Do by Task Type",
+          "graphql": "query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\"AVAILABLE\", \"ALLOCATED\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \"total_records DESC\") { task_type { code } total_records } } }",
+          "parameters": [
+            { "name": "warehouse_id", "type": "Integer" },
+            { "name": "account_id", "type": "Integer" },
+            { "name": "created_at_from", "type": "Date" },
+            { "name": "created_at_to", "type": "Date" }
+          ]
         }
       },
       "DocumentAttributes": {
@@ -9100,25 +10171,29 @@
           },
           "report_fields": {
             "type": "array",
-            "description": "Array of field definitions controlling report output columns",
+            "description": "Array of field definitions controlling report output columns. Each field maps a GraphQL response field to a named CSV/report column.",
             "items": {
               "type": "object",
+              "required": [
+                "name",
+                "path"
+              ],
               "properties": {
                 "name": {
                   "type": "string",
-                  "description": "Display name for the column"
+                  "description": "Human-readable column header displayed in the report output (e.g., 'Task Type', 'Warehouse Name', 'Quantity')"
                 },
                 "path": {
                   "type": "string",
-                  "description": "Dot-notation path to the data in query results"
+                  "description": "Dot-notation path to extract the field value from each record in the GraphQL response. For aggregation queries use the field name directly (e.g., 'task_type.code', 'total_records'). For paginated queries (source_path contains 'edges') prefix with 'node.' (e.g., 'node.warehouse.name', 'node.product.code')"
                 },
                 "prefix": {
                   "type": "string",
-                  "description": "Prefix to prepend to values"
+                  "description": "Optional string to prepend to each value in this column"
                 },
                 "suffix": {
                   "type": "string",
-                  "description": "Suffix to append to values"
+                  "description": "Optional string to append to each value in this column"
                 }
               }
             }
@@ -9139,7 +10214,7 @@
           "source_path": {
             "type": "string",
             "nullable": true,
-            "description": "Path to the data source node within query results"
+            "description": "Dot-notation path to extract data from GraphQL response. Must start with 'data.' (e.g., 'data.tasks.aggregation', 'data.stocks.all.edges'). Common patterns: 'data.{resource}.aggregation' for grouped results, 'data.{resource}.all.edges' for paginated lists"
           },
           "variables": {
             "type": "array",
@@ -9172,44 +10247,38 @@
           }
         },
         "example": {
-          "name": "Stock Level Summary",
-          "description": "Current stock levels grouped by product",
-          "report_type": "single",
+          "name": "Count of Tasks Left To Do",
+          "description": "Count of Tasks Left To Do by Task Type",
+          "report_type": "bar",
           "report_query_id": 1,
-          "source_path": "stocks.nodes",
+          "source_path": "data.tasks.aggregation",
           "report_fields": [
             {
-              "name": "Product Code",
-              "path": "product.code",
-              "prefix": "",
-              "suffix": ""
+              "name": "Task Type",
+              "path": "task_type.code"
             },
             {
-              "name": "Quantity",
-              "path": "quantity",
-              "prefix": "",
-              "suffix": ""
+              "name": "Tasks Left To Do",
+              "path": "total_records"
             }
           ],
           "variables": [
             {
-              "name": "date_from",
-              "value": "today 00:00:00",
-              "prompt": "Date From",
-              "operator": ">="
+              "name": "created_at_from",
+              "value": "start of today",
+              "prompt": "true"
             },
             {
-              "name": "date_to",
-              "value": "today 23:59:59",
-              "prompt": "Date To",
-              "operator": "<="
+              "name": "created_at_to",
+              "value": "end of today",
+              "prompt": "true"
             }
           ]
         }
       },
       "ScheduledReportAttributes": {
         "type": "object",
-        "description": "Scheduled report attributes for recurring report delivery",
+        "description": "Scheduled report attributes for recurring report delivery. Note: reports to generate, email recipients, and FTP recipients are specified in the 'relationships' object (not in attributes) — see ScheduledReportRelationships.",
         "required": [
           "name",
           "frequency",
@@ -9264,7 +10333,7 @@
       },
       "ScheduledReportRelationships": {
         "type": "object",
-        "description": "Embedded relationships for scheduled reports. Use kebab-case keys in the JSON:API relationships object.",
+        "description": "JSON:API relationships for scheduled reports. These MUST be sent in a 'relationships' object alongside 'attributes' (not nested inside attributes). Keys use kebab-case.",
         "properties": {
           "scheduled-report-reports": {
             "type": "object",
