@@ -561,7 +561,11 @@
                         "description": "Booking attributes to update (all fields optional)",
                         "properties": {
                           "account_id": {
-                            "allOf": [{ "$ref": "#/components/schemas/AccountId" }],
+                            "allOf": [
+                              {
+                                "$ref": "#/components/schemas/AccountId"
+                              }
+                            ],
                             "nullable": true
                           },
                           "account_reference": {
@@ -620,7 +624,11 @@
                             "description": "Type of intake"
                           },
                           "location_id": {
-                            "allOf": [{ "$ref": "#/components/schemas/LocationId" }],
+                            "allOf": [
+                              {
+                                "$ref": "#/components/schemas/LocationId"
+                              }
+                            ],
                             "nullable": true
                           },
                           "notes": {
@@ -748,7 +756,7 @@
         "summary": "Create a charge line",
         "description": "Create a new charge line to record a billable item. Charge lines are used for invoicing and billing operations.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity × price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity \u00d7 price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
         },
         "operationId": "createChargeLine",
         "parameters": [
@@ -1227,7 +1235,7 @@
         "summary": "Create a goods in receipt",
         "description": "Create a new goods in receipt (purchase order/ASN) to receive inventory into the warehouse. Include line items using the lines_changes array.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_in_receipts\",\n    \"attributes\": {\n      \"account_id\": 1,\n      \"warehouse_id\": 1,\n      \"reference\": \"PO-2024-001\",\n      \"expected_date_of_arrival\": \"2024-01-15T10:00:00Z\",\n      \"supplier_id\": 5,\n      \"lines_changes\": [\n        {\n          \"type\": \"ADD\",\n          \"attributes\": {\n            \"product_id\": 123,\n            \"expected_quantity\": 100,\n            \"batch_number\": \"BATCH-001\",\n            \"expiry_date\": \"2025-01-15\"\n          }\n        }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | Yes | Stock account ID (owner of incoming stock) |\n| `warehouse_id` | Yes | Destination warehouse ID |\n| `reference` | No | Your PO/ASN reference number |\n| `expected_date_of_arrival` | No | Expected delivery date (ISO 8601) |\n| `supplier_id` | No | Supplier/vendor ID |\n| `lines_changes` | No | Array of line operations (ADD/UPDATE/REMOVE) |\n\n## Line Item Operations\n\n| Operation | Description |\n|-----------|-------------|\n| `ADD` | Add a new line with `attributes` |\n| `UPDATE` | Update existing line (requires `id`) |\n| `REMOVE` | Remove line (requires `id`) |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_in_receipts\",\n    \"attributes\": {\n      \"account_id\": 1,\n      \"warehouse_id\": 1,\n      \"reference\": \"PO-2024-001\",\n      \"expected_date_of_arrival\": \"2024-01-15T10:00:00Z\",\n      \"supplier_id\": 5,\n      \"lines_changes\": [\n        {\n          \"type\": \"ADD\",\n          \"attributes\": {\n            \"product_id\": 123,\n            \"expected_quantity\": 100,\n            \"batch_number\": \"BATCH-001\",\n            \"expiry_date\": \"2025-01-15\"\n          }\n        }\n      ]\n    },\n    \"relationships\": {\n      \"address\": {\n        \"data\": {\n          \"type\": \"addresses\",\n          \"attributes\": {\n            \"name\": \"Supplier Co.\",\n            \"address_1\": \"50 Factory Road\",\n            \"address_3\": \"Birmingham\",\n            \"postcode\": \"B1 1AA\",\n            \"country_code\": \"GB\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | Yes | Stock account ID (owner of incoming stock) |\n| `warehouse_id` | Yes | Destination warehouse ID |\n| `reference` | No | Your PO/ASN reference number |\n| `expected_date_of_arrival` | No | Expected delivery date (ISO 8601) |\n| `supplier_id` | No | Supplier/vendor ID |\n| `lines_changes` | No | Array of line operations (ADD/UPDATE/REMOVE) |\n\n## Address\n\nAn optional address can be provided in `data.relationships.address` (not in `data.attributes`). See the example above for the correct JSON:API relationships structure.\n\n## Line Item Operations\n\n| Operation | Description |\n|-----------|-------------|\n| `ADD` | Add a new line with `attributes` |\n| `UPDATE` | Update existing line (requires `id`) |\n| `REMOVE` | Remove line (requires `id`) |"
         },
         "operationId": "createGoodsInReceipt",
         "parameters": [
@@ -1260,6 +1268,9 @@
                       },
                       "attributes": {
                         "$ref": "#/components/schemas/GoodsInReceiptAttributes"
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/AddressRelationship"
                       }
                     }
                   }
@@ -1282,6 +1293,20 @@
                         }
                       }
                     ]
+                  },
+                  "relationships": {
+                    "address": {
+                      "data": {
+                        "type": "addresses",
+                        "attributes": {
+                          "name": "Warehouse Receiving",
+                          "address_1": "100 Industrial Park Way",
+                          "address_3": "Manchester",
+                          "postcode": "M1 1AA",
+                          "country_code": "GB"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -1335,7 +1360,7 @@
         "summary": "Update a goods in receipt",
         "description": "Update an existing goods in receipt. Use lines_changes to add, update, or remove line items. Receipts that have started receiving may have restrictions on what can be changed.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_in_receipts\",\n    \"attributes\": {\n      \"reference\": \"PO-2024-001-REV\",\n      \"expected_date_of_arrival\": \"2024-01-20T10:00:00Z\",\n      \"lines_changes\": [\n        {\n          \"type\": \"UPDATE\",\n          \"id\": 456,\n          \"attributes\": {\n            \"expected_quantity\": 150\n          }\n        },\n        {\n          \"type\": \"REMOVE\",\n          \"id\": 789\n        }\n      ]\n    }\n  }\n}\n```\n\n## Line Item Operations\n\n| Operation | Fields Required | Description |\n|-----------|-----------------|-------------|\n| `ADD` | `attributes` | Add new line item |\n| `UPDATE` | `id`, `attributes` | Modify existing line |\n| `REMOVE` | `id` | Delete line from receipt |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_in_receipts\",\n    \"attributes\": {\n      \"reference\": \"PO-2024-001-REV\",\n      \"expected_date_of_arrival\": \"2024-01-20T10:00:00Z\",\n      \"lines_changes\": [\n        {\n          \"type\": \"UPDATE\",\n          \"id\": 456,\n          \"attributes\": {\n            \"expected_quantity\": 150\n          }\n        },\n        {\n          \"type\": \"REMOVE\",\n          \"id\": 789\n        }\n      ]\n    },\n    \"relationships\": {\n      \"address\": {\n        \"data\": {\n          \"type\": \"addresses\",\n          \"attributes\": {\n            \"name\": \"Updated Supplier\",\n            \"address_1\": \"75 New Road\",\n            \"address_3\": \"Leeds\",\n            \"postcode\": \"LS1 1AA\",\n            \"country_code\": \"GB\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Line Item Operations\n\n| Operation | Fields Required | Description |\n|-----------|-----------------|-------------|\n| `ADD` | `attributes` | Add new line item |\n| `UPDATE` | `id`, `attributes` | Modify existing line |\n| `REMOVE` | `id` | Delete line from receipt |\n\n## Address\n\nTo set or update the address, provide it in `data.relationships.address` (not in `data.attributes`)."
         },
         "operationId": "updateGoodsInReceipt",
         "parameters": [
@@ -1377,6 +1402,9 @@
                       },
                       "attributes": {
                         "$ref": "#/components/schemas/GoodsInReceiptAttributes"
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/AddressRelationship"
                       }
                     }
                   }
@@ -1487,7 +1515,11 @@
                 "$ref": "#/components/schemas/PickProcessingRequest"
               },
               "example": {
-                "ids": [1, 2, 3]
+                "ids": [
+                  1,
+                  2,
+                  3
+                ]
               }
             }
           }
@@ -1536,7 +1568,11 @@
                 "$ref": "#/components/schemas/ConsolidatedPickRequest"
               },
               "example": {
-                "ids": [1, 2, 3],
+                "ids": [
+                  1,
+                  2,
+                  3
+                ],
                 "goods_out_pick_list_attributes": {
                   "goods_out_pick_list_reference": "BATCH-2024-001",
                   "expected_date_of_dispatch": "2024-01-20T14:00:00Z",
@@ -1762,7 +1798,11 @@
                 "$ref": "#/components/schemas/ShortOrderLinesRequest"
               },
               "example": {
-                "ids": [1, 2, 3],
+                "ids": [
+                  1,
+                  2,
+                  3
+                ],
                 "description": "Stock unavailable - shipping partial order",
                 "reason_code_id": 5
               }
@@ -1790,7 +1830,7 @@
         "summary": "Create a goods out order",
         "description": "Create a new goods out order (sales order) for dispatching inventory from the warehouse.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_outs\",\n    \"attributes\": {\n      \"goods_out_type\": \"sales_order\",\n      \"account_id\": 1,\n      \"reference\": \"SO-001\",\n      \"expected_date_of_dispatch\": \"2024-01-20T10:00:00Z\",\n      \"warehouse_id\": 1,\n      \"priority\": 1,\n      \"address\": {\n        \"name\": \"John Smith\",\n        \"address_1\": \"123 Main Street\",\n        \"postcode\": \"AB1 2CD\",\n        \"country_code\": \"GB\"\n      },\n      \"lines_changes\": [\n        {\n          \"type\": \"ADD\",\n          \"attributes\": {\n            \"product_id\": 123,\n            \"order_quantity\": 10\n          }\n        }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `goods_out_type` | Yes | Type of order: sales_order, work_order, or crossdock |\n| `account_id` | Yes | Stock account ID - owner of the stock |\n| `reference` | Yes | Your order reference number |\n| `expected_date_of_dispatch` | Yes | Target dispatch date |\n| `warehouse_id` | No | Warehouse to dispatch from |\n| `address` | No | Delivery address object |\n| `lines_changes` | No | Array of line items to add |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_outs\",\n    \"attributes\": {\n      \"goods_out_type\": \"sales_order\",\n      \"account_id\": 1,\n      \"reference\": \"SO-001\",\n      \"expected_date_of_dispatch\": \"2024-01-20T10:00:00Z\",\n      \"warehouse_id\": 1,\n      \"priority\": 1,\n      \"lines_changes\": [\n        {\n          \"type\": \"ADD\",\n          \"attributes\": {\n            \"product_id\": 123,\n            \"order_quantity\": 10\n          }\n        }\n      ]\n    },\n    \"relationships\": {\n      \"address\": {\n        \"data\": {\n          \"type\": \"addresses\",\n          \"attributes\": {\n            \"name\": \"John Smith\",\n            \"address_1\": \"123 Main Street\",\n            \"postcode\": \"AB1 2CD\",\n            \"country_code\": \"GB\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `goods_out_type` | Yes | Type of order: sales_order, work_order, or crossdock |\n| `account_id` | Yes | Stock account ID - owner of the stock |\n| `reference` | Yes | Your order reference number |\n| `expected_date_of_dispatch` | Yes | Target dispatch date |\n| `warehouse_id` | No | Warehouse to dispatch from |\n| `lines_changes` | No | Array of line items to add |\n\n## Address\n\nThe delivery address must be provided in `data.relationships.address`, **not** in `data.attributes`. See the example above for the correct JSON:API relationships structure."
         },
         "operationId": "createGoodsOut",
         "parameters": [
@@ -1823,6 +1863,9 @@
                       },
                       "attributes": {
                         "$ref": "#/components/schemas/GoodsOutAttributes"
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/AddressRelationship"
                       }
                     }
                   }
@@ -1837,12 +1880,6 @@
                     "reference": "SO-001",
                     "expected_date_of_dispatch": "2024-01-20T10:00:00Z",
                     "warehouse_id": 1,
-                    "address": {
-                      "name": "John Smith",
-                      "address_1": "123 Main Street",
-                      "postcode": "AB1 2CD",
-                      "country_code": "GB"
-                    },
                     "lines_changes": [
                       {
                         "type": "ADD",
@@ -1852,6 +1889,19 @@
                         }
                       }
                     ]
+                  },
+                  "relationships": {
+                    "address": {
+                      "data": {
+                        "type": "addresses",
+                        "attributes": {
+                          "name": "John Smith",
+                          "address_1": "123 Main Street",
+                          "postcode": "AB1 2CD",
+                          "country_code": "GB"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -1899,12 +1949,12 @@
           {
             "lang": "JavaScript",
             "label": "JavaScript (fetch)",
-            "source": "const response = await fetch('https://clarus-api.com/api/v1/goods_outs', {\n  method: 'POST',\n  headers: {\n    'Authorization': 'Bearer YOUR_ACCESS_TOKEN',\n    'Content-Type': 'application/json',\n    'X-Clarus-Subdomain': 'your-subdomain'\n  },\n  body: JSON.stringify({\n    data: {\n      type: 'goods_outs',\n      attributes: {\n        goods_out_type: 'sales_order',\n        account_id: 1,\n        reference: 'SO-001',\n        expected_date_of_dispatch: '2024-01-20T10:00:00Z',\n        warehouse_id: 1,\n        priority: 1,\n        address: {\n          name: 'John Smith',\n          address_1: '123 Main Street',\n          postcode: 'AB1 2CD',\n          country_code: 'GB'\n        },\n        lines_changes: [\n          {\n            type: 'ADD',\n            attributes: {\n              product_id: 123,\n              order_quantity: 10\n            }\n          }\n        ]\n      }\n    }\n  })\n});\n\nconst goodsOut = await response.json();"
+            "source": "const response = await fetch('https://clarus-api.com/api/v1/goods_outs', {\n  method: 'POST',\n  headers: {\n    'Authorization': 'Bearer YOUR_ACCESS_TOKEN',\n    'Content-Type': 'application/json',\n    'X-Clarus-Subdomain': 'your-subdomain'\n  },\n  body: JSON.stringify({\n    data: {\n      type: 'goods_outs',\n      attributes: {\n        goods_out_type: 'sales_order',\n        account_id: 1,\n        reference: 'SO-001',\n        expected_date_of_dispatch: '2024-01-20T10:00:00Z',\n        warehouse_id: 1,\n        priority: 1,\n        lines_changes: [\n          {\n            type: 'ADD',\n            attributes: {\n              product_id: 123,\n              order_quantity: 10\n            }\n          }\n        ]\n      },\n      relationships: {\n        address: {\n          data: {\n            type: 'addresses',\n            attributes: {\n              name: 'John Smith',\n              address_1: '123 Main Street',\n              postcode: 'AB1 2CD',\n              country_code: 'GB'\n            }\n          }\n        }\n      }\n    }\n  })\n});\n\nconst goodsOut = await response.json();"
           },
           {
             "lang": "cURL",
             "label": "cURL",
-            "source": "curl -X POST 'https://clarus-api.com/api/v1/goods_outs' \\\n  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -H 'X-Clarus-Subdomain: your-subdomain' \\\n  -d '{\n    \"data\": {\n      \"type\": \"goods_outs\",\n      \"attributes\": {\n        \"goods_out_type\": \"sales_order\",\n        \"account_id\": 1,\n        \"reference\": \"SO-001\",\n        \"expected_date_of_dispatch\": \"2024-01-20T10:00:00Z\",\n        \"warehouse_id\": 1,\n        \"priority\": 1,\n        \"address\": {\n          \"name\": \"John Smith\",\n          \"address_1\": \"123 Main Street\",\n          \"postcode\": \"AB1 2CD\",\n          \"country_code\": \"GB\"\n        },\n        \"lines_changes\": [\n          {\n            \"type\": \"ADD\",\n            \"attributes\": {\n              \"product_id\": 123,\n              \"order_quantity\": 10\n            }\n          }\n        ]\n      }\n    }\n  }'"
+            "source": "curl -X POST 'https://clarus-api.com/api/v1/goods_outs' \\\n  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -H 'X-Clarus-Subdomain: your-subdomain' \\\n  -d '{\n    \"data\": {\n      \"type\": \"goods_outs\",\n      \"attributes\": {\n        \"goods_out_type\": \"sales_order\",\n        \"account_id\": 1,\n        \"reference\": \"SO-001\",\n        \"expected_date_of_dispatch\": \"2024-01-20T10:00:00Z\",\n        \"warehouse_id\": 1,\n        \"priority\": 1,\n        \"lines_changes\": [\n          {\n            \"type\": \"ADD\",\n            \"attributes\": {\n              \"product_id\": 123,\n              \"order_quantity\": 10\n            }\n          }\n        ]\n      },\n      \"relationships\": {\n        \"address\": {\n          \"data\": {\n            \"type\": \"addresses\",\n            \"attributes\": {\n              \"name\": \"John Smith\",\n              \"address_1\": \"123 Main Street\",\n              \"postcode\": \"AB1 2CD\",\n              \"country_code\": \"GB\"\n            }\n          }\n        }\n      }\n    }\n  }'"
           }
         ]
       }
@@ -1917,7 +1967,7 @@
         "summary": "Update a goods out order",
         "description": "Update an existing goods out order. Use lines_changes to add, update, or remove line items. Orders that have started picking may have restrictions on what can be changed.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_outs\",\n    \"attributes\": {\n      \"reference\": \"SO-001-REV\",\n      \"expected_date_of_dispatch\": \"2024-01-25T10:00:00Z\",\n      \"lines_changes\": [\n        {\n          \"type\": \"UPDATE\",\n          \"id\": 456,\n          \"attributes\": {\n            \"order_quantity\": 15\n          }\n        },\n        {\n          \"type\": \"REMOVE\",\n          \"id\": 789\n        }\n      ]\n    }\n  }\n}\n```\n\n## Line Item Operations\n\n| Operation | Fields Required | Description |\n|-----------|-----------------|-------------|\n| `ADD` | `attributes` | Add new line item |\n| `UPDATE` | `id`, `attributes` | Modify existing line |\n| `REMOVE` | `id` | Delete line from order |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_outs\",\n    \"attributes\": {\n      \"reference\": \"SO-001-REV\",\n      \"expected_date_of_dispatch\": \"2024-01-25T10:00:00Z\",\n      \"lines_changes\": [\n        {\n          \"type\": \"UPDATE\",\n          \"id\": 456,\n          \"attributes\": {\n            \"order_quantity\": 15\n          }\n        },\n        {\n          \"type\": \"REMOVE\",\n          \"id\": 789\n        }\n      ]\n    },\n    \"relationships\": {\n      \"address\": {\n        \"data\": {\n          \"type\": \"addresses\",\n          \"attributes\": {\n            \"name\": \"Jane Smith\",\n            \"address_1\": \"456 High Street\",\n            \"postcode\": \"AB3 4EF\",\n            \"country_code\": \"GB\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Line Item Operations\n\n| Operation | Fields Required | Description |\n|-----------|-----------------|-------------|\n| `ADD` | `attributes` | Add new line item |\n| `UPDATE` | `id`, `attributes` | Modify existing line |\n| `REMOVE` | `id` | Delete line from order |\n\n## Address\n\nTo update the delivery address, provide it in `data.relationships.address` (not in `data.attributes`)."
         },
         "operationId": "updateGoodsOut",
         "parameters": [
@@ -1960,6 +2010,9 @@
                       },
                       "attributes": {
                         "$ref": "#/components/schemas/GoodsOutAttributes"
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/AddressRelationship"
                       }
                     }
                   }
@@ -3382,7 +3435,7 @@
         "summary": "Create a report query",
         "description": "Create a new report query definition. Report queries allow you to save GraphQL queries for repeated execution.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"graphql\": \"query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\\\"AVAILABLE\\\", \\\"ALLOCATED\\\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \\\"total_records DESC\\\") { task_type { code } total_records } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouse_id\", \"type\": \"Integer\" },\n        { \"name\": \"account_id\", \"type\": \"Integer\" },\n        { \"name\": \"created_at_from\", \"type\": \"Date\" },\n        { \"name\": \"created_at_to\", \"type\": \"Date\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | Yes | Named GraphQL query with typed parameters (never anonymous) |\n| `parameters` | No | Array of parameter definitions matching query variables |\n\n## GraphQL Query Rules\n\n- Must be a **named query** (e.g., `query getTasksToDo(...)`) — never anonymous\n- Use `$variable` syntax for parameters with GraphQL types (`ID`, `Chronic`, `String`)\n- Common query patterns: `aggregation(...)` for grouped/summarized data, `all(...) { edges { node { ... } } }` for paginated lists\n\n## Parameter Types\n\n| Type | GraphQL Type | Description |\n|------|-------------|-------------|\n| `Integer` | `ID` | Integer ID value |\n| `Date` | `Chronic` | Date/time parsed with natural language (e.g., 'start of today') |\n| `String` | `String` | Text value |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"graphql\": \"query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\\\"AVAILABLE\\\", \\\"ALLOCATED\\\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \\\"total_records DESC\\\") { task_type { code } total_records } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouse_id\", \"type\": \"Integer\" },\n        { \"name\": \"account_id\", \"type\": \"Integer\" },\n        { \"name\": \"created_at_from\", \"type\": \"Date\" },\n        { \"name\": \"created_at_to\", \"type\": \"Date\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | Yes | Named GraphQL query with typed parameters (never anonymous) |\n| `parameters` | No | Array of parameter definitions matching query variables |\n\n## GraphQL Query Rules\n\n- Must be a **named query** (e.g., `query getTasksToDo(...)`) \u2014 never anonymous\n- Use `$variable` syntax for parameters with GraphQL types (`ID`, `Chronic`, `String`)\n- Common query patterns: `aggregation(...)` for grouped/summarized data, `all(...) { edges { node { ... } } }` for paginated lists\n\n## Parameter Types\n\n| Type | GraphQL Type | Description |\n|------|-------------|-------------|\n| `Integer` | `ID` | Integer ID value |\n| `Date` | `Chronic` | Date/time parsed with natural language (e.g., 'start of today') |\n| `String` | `String` | Text value |"
         },
         "operationId": "createReportQuery",
         "parameters": [
@@ -3428,10 +3481,22 @@
                     "description": "Count of Tasks Left To Do by Task Type",
                     "graphql": "query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\"AVAILABLE\", \"ALLOCATED\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \"total_records DESC\") { task_type { code } total_records } } }",
                     "parameters": [
-                      { "name": "warehouse_id", "type": "Integer" },
-                      { "name": "account_id", "type": "Integer" },
-                      { "name": "created_at_from", "type": "Date" },
-                      { "name": "created_at_to", "type": "Date" }
+                      {
+                        "name": "warehouse_id",
+                        "type": "Integer"
+                      },
+                      {
+                        "name": "account_id",
+                        "type": "Integer"
+                      },
+                      {
+                        "name": "created_at_from",
+                        "type": "Date"
+                      },
+                      {
+                        "name": "created_at_to",
+                        "type": "Date"
+                      }
                     ]
                   }
                 }
@@ -3622,7 +3687,7 @@
         "summary": "Create a report",
         "description": "Create a new report definition based on an existing report query. Reports define how query results are formatted and what variables are used.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"report_type\": \"bar\",\n      \"report_query_id\": 1,\n      \"source_path\": \"data.tasks.aggregation\",\n      \"report_fields\": [\n        { \"name\": \"Task Type\", \"path\": \"task_type.code\" },\n        { \"name\": \"Tasks Left To Do\", \"path\": \"total_records\" }\n      ],\n      \"variables\": [\n        { \"name\": \"created_at_from\", \"value\": \"start of today\", \"prompt\": \"true\" },\n        { \"name\": \"created_at_to\", \"value\": \"end of today\", \"prompt\": \"true\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `source_path` | No | Dot-notation path to data in GraphQL response. Must start with `data.` (e.g., `data.tasks.aggregation`, `data.stocks.all.edges`) |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## source_path\n\nThe `source_path` tells the system where to find data in the GraphQL response. It always starts with `data.` Common patterns:\n- `data.{resource}.aggregation` — for grouped/summarized results\n- `data.{resource}.all.edges` — for paginated lists (each item under `node`)\n- For paginated queries, `report_fields` paths must start with `node.` (e.g., `node.warehouse.name`)\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `start of today`, `end of today`, `start of this month`) which are parsed at report generation time. Variable names must match parameters defined in the linked report query."
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"report_type\": \"bar\",\n      \"report_query_id\": 1,\n      \"source_path\": \"data.tasks.aggregation\",\n      \"report_fields\": [\n        { \"name\": \"Task Type\", \"path\": \"task_type.code\" },\n        { \"name\": \"Tasks Left To Do\", \"path\": \"total_records\" }\n      ],\n      \"variables\": [\n        { \"name\": \"created_at_from\", \"value\": \"start of today\", \"prompt\": \"true\" },\n        { \"name\": \"created_at_to\", \"value\": \"end of today\", \"prompt\": \"true\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `source_path` | No | Dot-notation path to data in GraphQL response. Must start with `data.` (e.g., `data.tasks.aggregation`, `data.stocks.all.edges`) |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## source_path\n\nThe `source_path` tells the system where to find data in the GraphQL response. It always starts with `data.` Common patterns:\n- `data.{resource}.aggregation` \u2014 for grouped/summarized results\n- `data.{resource}.all.edges` \u2014 for paginated lists (each item under `node`)\n- For paginated queries, `report_fields` paths must start with `node.` (e.g., `node.warehouse.name`)\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `start of today`, `end of today`, `start of this month`) which are parsed at report generation time. Variable names must match parameters defined in the linked report query."
         },
         "operationId": "createReport",
         "parameters": [
@@ -3944,7 +4009,7 @@
         "summary": "Generate report output",
         "description": "Queue asynchronous report generation. Returns a Document record that can be polled for status and downloaded when complete.",
         "x-mint": {
-          "content": "## Workflow\n\n1. **Call this endpoint** — returns a Document with `status: queued`\n2. **Poll the document status** via GraphQL until `status` becomes `available` (or `failed`)\n3. **Download the file** via `GET /documents/{id}/download` to get a presigned S3 URL\n4. **Use the presigned URL** to download the generated report file\n\n## Request Body (Optional)\n\nYou can optionally pass `variables` to override the report's stored variable values:\n\n```json\n{\n  \"variables\": [\n    { \"name\": \"date_from\", \"value\": \"2024-01-01 00:00:00\" },\n    { \"name\": \"date_to\", \"value\": \"2024-01-31 23:59:59\" }\n  ]\n}\n```\n\nIf no variables are provided, the report's stored variables are used. Passed variables are merged with stored variables (passed values take precedence).\n\n## Variable Values\n\nVariables support Chronic-style date parsing:\n- `today 00:00:00` — start of today\n- `3 days ago` — 3 days before now\n- `beginning of month` — first day of current month\n- `2024-01-15 09:00:00` — explicit date/time\n\n## Access Control\n\nOnly the report owner can generate it. Returns 403 if the authenticated user is not the owner."
+          "content": "## Workflow\n\n1. **Call this endpoint** \u2014 returns a Document with `status: queued`\n2. **Poll the document status** via GraphQL until `status` becomes `available` (or `failed`)\n3. **Download the file** via `GET /documents/{id}/download` to get a presigned S3 URL\n4. **Use the presigned URL** to download the generated report file\n\n## Request Body (Optional)\n\nYou can optionally pass `variables` to override the report's stored variable values:\n\n```json\n{\n  \"variables\": [\n    { \"name\": \"date_from\", \"value\": \"2024-01-01 00:00:00\" },\n    { \"name\": \"date_to\", \"value\": \"2024-01-31 23:59:59\" }\n  ]\n}\n```\n\nIf no variables are provided, the report's stored variables are used. Passed variables are merged with stored variables (passed values take precedence).\n\n## Variable Values\n\nVariables support Chronic-style date parsing:\n- `today 00:00:00` \u2014 start of today\n- `3 days ago` \u2014 3 days before now\n- `beginning of month` \u2014 first day of current month\n- `2024-01-15 09:00:00` \u2014 explicit date/time\n\n## Access Control\n\nOnly the report owner can generate it. Returns 403 if the authenticated user is not the owner."
         },
         "operationId": "generateReport",
         "parameters": [
@@ -4297,7 +4362,7 @@
         "summary": "Create a scheduled report",
         "description": "Create a new scheduled report that delivers reports via email and/or FTP on a recurring schedule.",
         "x-mint": {
-          "content": "## Request Structure\n\nScheduled reports use JSON:API format with embedded relationships:\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Weekly Stock Report\",\n      \"frequency\": \"Day\",\n      \"numbers\": [1, 3, 5],\n      \"time\": \"09:00\",\n      \"subject\": \"Weekly Stock Report\",\n      \"body\": \"Please find the weekly stock report attached.\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": [\n                { \"name\": \"date_from\", \"value\": \"today 00:00:00\" }\n              ]\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      },\n      \"scheduled-report-ftp-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"ftp_user_id\": 5\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Schedule name (max 50 chars) |\n| `frequency` | Yes | `Day` (days of the week) or `Month` (days of the month) |\n| `numbers` | Yes | Array of integers — day numbers when schedule runs |\n| `time` | Yes | Time of day to run (e.g., `09:00`) |\n| `subject` | No | Email subject line (max 256 chars) |\n| `body` | No | Email body text |\n\n## Frequency & Numbers\n\n- `Day` frequency: numbers 1-7 (1 = Monday, 7 = Sunday)\n- `Month` frequency: numbers 1-31 (day of month)\n\n## Relationships\n\nRelationship keys use **kebab-case** in the JSON:API `relationships` object:\n\n| Relationship | Description |\n|--------------|-------------|\n| `scheduled-report-reports` | Reports to generate (each with optional variable overrides) |\n| `scheduled-report-recipients` | Email recipients |\n| `scheduled-report-ftp-recipients` | FTP destinations |"
+          "content": "## Request Structure\n\nScheduled reports use JSON:API format with embedded relationships:\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Weekly Stock Report\",\n      \"frequency\": \"Day\",\n      \"numbers\": [1, 3, 5],\n      \"time\": \"09:00\",\n      \"subject\": \"Weekly Stock Report\",\n      \"body\": \"Please find the weekly stock report attached.\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": [\n                { \"name\": \"date_from\", \"value\": \"today 00:00:00\" }\n              ]\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      },\n      \"scheduled-report-ftp-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"ftp_user_id\": 5\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Schedule name (max 50 chars) |\n| `frequency` | Yes | `Day` (days of the week) or `Month` (days of the month) |\n| `numbers` | Yes | Array of integers \u2014 day numbers when schedule runs |\n| `time` | Yes | Time of day to run (e.g., `09:00`) |\n| `subject` | No | Email subject line (max 256 chars) |\n| `body` | No | Email body text |\n\n## Frequency & Numbers\n\n- `Day` frequency: numbers 1-7 (1 = Monday, 7 = Sunday)\n- `Month` frequency: numbers 1-31 (day of month)\n\n## Relationships\n\nRelationship keys use **kebab-case** in the JSON:API `relationships` object:\n\n| Relationship | Description |\n|--------------|-------------|\n| `scheduled-report-reports` | Reports to generate (each with optional variable overrides) |\n| `scheduled-report-recipients` | Email recipients |\n| `scheduled-report-ftp-recipients` | FTP destinations |"
         },
         "operationId": "createScheduledReport",
         "parameters": [
@@ -4346,7 +4411,15 @@
                   "attributes": {
                     "name": "Daily Task Report",
                     "frequency": "Day",
-                    "numbers": [1, 2, 3, 4, 5, 6, 7],
+                    "numbers": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7
+                    ],
                     "time": "02:00",
                     "subject": "Daily Task Report",
                     "body": "Please find the daily task report attached."
@@ -4424,7 +4497,7 @@
           "Scheduled Reports"
         ],
         "summary": "Update a scheduled report",
-        "description": "Update an existing scheduled report. Only the owner can update it. **Warning: updates are full replacements** — omitting a recipient or report from the update payload will delete it.",
+        "description": "Update an existing scheduled report. Only the owner can update it. **Warning: updates are full replacements** \u2014 omitting a recipient or report from the update payload will delete it.",
         "x-mint": {
           "content": "## Important: Full Replacement\n\n**Updates are full replacements for relationships.** If you omit a recipient or report from the update, it will be **deleted**. Always include all desired recipients and reports in the update payload.\n\n## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Updated Weekly Report\",\n      \"time\": \"10:00\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": []\n            }\n          },\n          {\n            \"attributes\": {\n              \"report_id\": 2,\n              \"variables\": []\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Access Control\n\nOnly the scheduled report owner can update it. Returns 403 if the authenticated user is not the owner."
         },
@@ -4613,7 +4686,7 @@
         "summary": "Create a shipment",
         "description": "Create a new shipment for a goods out order. Shipments contain package information and are submitted to carriers for label generation.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"shipments\",\n    \"attributes\": {\n      \"goods_out_id\": 123,\n      \"carrier_id\": 5,\n      \"carrier_service_id\": 10,\n      \"packages_changes\": [\n        {\n          \"type\": \"ADD\",\n          \"attributes\": {\n            \"weight\": 2.5,\n            \"length\": 30,\n            \"width\": 20,\n            \"height\": 15\n          }\n        }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `goods_out_id` | Yes | Order to ship |\n| `carrier_id` | No | Carrier for delivery |\n| `carrier_service_id` | No | Service level |\n| `packages_changes` | No | Package details (ADD/UPDATE/REMOVE) |\n\n## Package Dimensions\n\nWeight in kg, dimensions in cm."
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"shipments\",\n    \"attributes\": {\n      \"goods_out_id\": 123,\n      \"carrier_id\": 5,\n      \"carrier_service_id\": 10,\n      \"packages_changes\": [\n        {\n          \"type\": \"ADD\",\n          \"attributes\": {\n            \"weight\": 2.5,\n            \"length\": 30,\n            \"width\": 20,\n            \"height\": 15\n          }\n        }\n      ]\n    },\n    \"relationships\": {\n      \"address\": {\n        \"data\": {\n          \"type\": \"addresses\",\n          \"attributes\": {\n            \"name\": \"John Smith\",\n            \"address_1\": \"123 Main Street\",\n            \"postcode\": \"AB1 2CD\",\n            \"country_code\": \"GB\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `goods_out_id` | Yes | Order to ship |\n| `carrier_id` | No | Carrier for delivery |\n| `carrier_service_id` | No | Service level |\n| `packages_changes` | No | Package details (ADD/UPDATE/REMOVE) |\n\n## Address\n\nAn optional delivery address (overrides goods out address) can be provided in `data.relationships.address`. See the example above.\n\n## Package Dimensions\n\nWeight in kg, dimensions in cm."
         },
         "operationId": "createShipment",
         "parameters": [
@@ -4647,6 +4720,9 @@
                       },
                       "attributes": {
                         "$ref": "#/components/schemas/ShipmentAttributes"
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/AddressRelationship"
                       }
                     }
                   }
@@ -4704,7 +4780,7 @@
         "summary": "Update a shipment",
         "description": "Update an existing shipment's attributes such as packages or address. Submitted shipments may have restrictions on what can be changed.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"shipments\",\n    \"attributes\": {\n      \"carrier_service_id\": 12,\n      \"packages_changes\": [\n        {\n          \"type\": \"UPDATE\",\n          \"id\": 456,\n          \"attributes\": {\n            \"weight\": 3.0\n          }\n        }\n      ]\n    }\n  }\n}\n```\n\n## Package Operations\n\n| Operation | Description |\n|-----------|-------------|\n| `ADD` | Add new package |\n| `UPDATE` | Update existing package (requires `id`) |\n| `REMOVE` | Remove package (requires `id`) |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"shipments\",\n    \"attributes\": {\n      \"carrier_service_id\": 12,\n      \"packages_changes\": [\n        {\n          \"type\": \"UPDATE\",\n          \"id\": 456,\n          \"attributes\": {\n            \"weight\": 3.0\n          }\n        }\n      ]\n    },\n    \"relationships\": {\n      \"address\": {\n        \"data\": {\n          \"type\": \"addresses\",\n          \"attributes\": {\n            \"name\": \"Jane Smith\",\n            \"address_1\": \"456 High Street\",\n            \"postcode\": \"AB3 4EF\",\n            \"country_code\": \"GB\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Package Operations\n\n| Operation | Description |\n|-----------|-------------|\n| `ADD` | Add new package |\n| `UPDATE` | Update existing package (requires `id`) |\n| `REMOVE` | Remove package (requires `id`) |\n\n## Address\n\nTo update the delivery address, provide it in `data.relationships.address` (not in `data.attributes`)."
         },
         "operationId": "updateShipment",
         "parameters": [
@@ -4747,6 +4823,9 @@
                       },
                       "attributes": {
                         "$ref": "#/components/schemas/ShipmentAttributes"
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/AddressRelationship"
                       }
                     }
                   }
@@ -6125,7 +6204,7 @@
         "summary": "Create a warehouse",
         "description": "Create a new warehouse for multi-site operations. Each warehouse has its own locations and can operate independently.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"warehouses\",\n    \"attributes\": {\n      \"code\": \"WH-NORTH\",\n      \"name\": \"North Distribution Center\",\n      \"address_1\": \"100 Industrial Park Way\",\n      \"address_3\": \"Manchester\",\n      \"postcode\": \"M1 1AA\",\n      \"country_code\": \"GB\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `code` | Yes | Unique warehouse code |\n| `name` | Yes | Warehouse display name |\n| `address_1` | No | Street address |\n| `address_3` | No | Town/city (passed to carriers) |\n| `country_code` | No | ISO country code |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"warehouses\",\n    \"attributes\": {\n      \"code\": \"WH-NORTH\",\n      \"name\": \"North Distribution Center\"\n    },\n    \"relationships\": {\n      \"address\": {\n        \"data\": {\n          \"type\": \"addresses\",\n          \"attributes\": {\n            \"address_1\": \"100 Industrial Park Way\",\n            \"address_3\": \"Manchester\",\n            \"postcode\": \"M1 1AA\",\n            \"country_code\": \"GB\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `code` | Yes | Unique warehouse code |\n| `name` | Yes | Warehouse display name |\n\n## Address\n\nThe warehouse address must be provided in `data.relationships.address`, **not** in `data.attributes`. See the example above for the correct JSON:API relationships structure."
         },
         "operationId": "createWarehouse",
         "parameters": [
@@ -6159,6 +6238,9 @@
                       },
                       "attributes": {
                         "$ref": "#/components/schemas/WarehouseAttributes"
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/AddressRelationship"
                       }
                     }
                   }
@@ -6216,7 +6298,7 @@
         "summary": "Update a warehouse",
         "description": "Update an existing warehouse's attributes such as name, code, or address.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"warehouses\",\n    \"attributes\": {\n      \"name\": \"North Distribution Center - Main\",\n      \"address_1\": \"200 Industrial Park Way\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `code` | No | Updated warehouse code |\n| `name` | No | Updated display name |\n| `address_1` | No | Updated street address |\n| `address_3` | No | Updated town/city |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"warehouses\",\n    \"attributes\": {\n      \"name\": \"North Distribution Center - Main\"\n    },\n    \"relationships\": {\n      \"address\": {\n        \"data\": {\n          \"type\": \"addresses\",\n          \"attributes\": {\n            \"address_1\": \"200 Industrial Park Way\",\n            \"address_3\": \"Manchester\",\n            \"postcode\": \"M1 1AA\",\n            \"country_code\": \"GB\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `code` | No | Updated warehouse code |\n| `name` | No | Updated display name |\n\n## Address\n\nTo update the warehouse address, provide it in `data.relationships.address` (not in `data.attributes`)."
         },
         "operationId": "updateWarehouse",
         "parameters": [
@@ -6307,16 +6389,11 @@
                             "type": "string",
                             "nullable": true,
                             "description": "Custom string field 5"
-                          },
-                          "address": {
-                            "description": "Warehouse address",
-                            "allOf": [
-                              {
-                                "$ref": "#/components/schemas/Address"
-                              }
-                            ]
                           }
                         }
+                      },
+                      "relationships": {
+                        "$ref": "#/components/schemas/AddressRelationship"
                       }
                     }
                   }
@@ -6668,7 +6745,8 @@
           "code": {
             "type": "string",
             "nullable": true,
-            "description": "Address code for reference"
+            "description": "Address code for reference. Read-only when setting addresses inline on orders/warehouses \u2014 settable only via the delivery addresses endpoint directly.",
+            "readOnly": true
           },
           "country_code": {
             "type": "string",
@@ -6759,7 +6837,11 @@
           }
         },
         "example": {
-          "ids": [1, 2, 3],
+          "ids": [
+            1,
+            2,
+            3
+          ],
           "goods_out_pick_list_attributes": {
             "goods_out_pick_list_reference": "BATCH-2024-001",
             "expected_date_of_dispatch": "2024-01-20T14:00:00Z",
@@ -6794,7 +6876,11 @@
           }
         },
         "example": {
-          "ids": [1, 2, 3]
+          "ids": [
+            1,
+            2,
+            3
+          ]
         }
       },
       "PickProcessingResponse": {
@@ -6810,7 +6896,9 @@
           }
         },
         "example": {
-          "process_references": ["abc123def456"]
+          "process_references": [
+            "abc123def456"
+          ]
         }
       },
       "PickType": {
@@ -6854,7 +6942,11 @@
           }
         },
         "example": {
-          "ids": [1, 2, 3],
+          "ids": [
+            1,
+            2,
+            3
+          ],
           "description": "Stock unavailable - shipping partial order",
           "reason_code_id": 5
         }
@@ -8512,14 +8604,6 @@
             "description": "Actual dispatch date and time",
             "example": "2024-01-20T14:30:00Z"
           },
-          "address": {
-            "description": "Delivery address",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Address"
-              }
-            ]
-          },
           "boolean1": {
             "type": "boolean",
             "nullable": true,
@@ -9150,14 +9234,6 @@
             "items": {
               "$ref": "#/components/schemas/ShipmentPackage"
             }
-          },
-          "address": {
-            "description": "Delivery address (overrides goods out address)",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Address"
-              }
-            ]
           }
         }
       },
@@ -9469,7 +9545,11 @@
         ],
         "properties": {
           "account_id": {
-            "allOf": [{ "$ref": "#/components/schemas/AccountId" }],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AccountId"
+              }
+            ],
             "description": "Stock account ID (owner of the goods)"
           },
           "account_reference": {
@@ -9524,7 +9604,11 @@
             "description": "Type of intake"
           },
           "location_id": {
-            "allOf": [{ "$ref": "#/components/schemas/LocationId" }],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LocationId"
+              }
+            ],
             "description": "Dock location ID (must have available_in_booking_diary enabled)"
           },
           "notes": {
@@ -9686,14 +9770,6 @@
             "type": "boolean",
             "nullable": true,
             "description": "Custom boolean field 5"
-          },
-          "address": {
-            "description": "Warehouse address",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Address"
-              }
-            ]
           }
         }
       },
@@ -9876,7 +9952,7 @@
             "minimum": 0,
             "nullable": true,
             "default": 0.0,
-            "description": "Unit price for this charge. Total is calculated as quantity × price."
+            "description": "Unit price for this charge. Total is calculated as quantity \u00d7 price."
           },
           "product_id": {
             "type": "integer",
@@ -10095,10 +10171,22 @@
           "description": "Count of Tasks Left To Do by Task Type",
           "graphql": "query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\"AVAILABLE\", \"ALLOCATED\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \"total_records DESC\") { task_type { code } total_records } } }",
           "parameters": [
-            { "name": "warehouse_id", "type": "Integer" },
-            { "name": "account_id", "type": "Integer" },
-            { "name": "created_at_from", "type": "Date" },
-            { "name": "created_at_to", "type": "Date" }
+            {
+              "name": "warehouse_id",
+              "type": "Integer"
+            },
+            {
+              "name": "account_id",
+              "type": "Integer"
+            },
+            {
+              "name": "created_at_from",
+              "type": "Date"
+            },
+            {
+              "name": "created_at_to",
+              "type": "Date"
+            }
           ]
         }
       },
@@ -10278,7 +10366,7 @@
       },
       "ScheduledReportAttributes": {
         "type": "object",
-        "description": "Scheduled report attributes for recurring report delivery. Note: reports to generate, email recipients, and FTP recipients are specified in the 'relationships' object (not in attributes) — see ScheduledReportRelationships.",
+        "description": "Scheduled report attributes for recurring report delivery. Note: reports to generate, email recipients, and FTP recipients are specified in the 'relationships' object (not in attributes) \u2014 see ScheduledReportRelationships.",
         "required": [
           "name",
           "frequency",
@@ -10325,7 +10413,11 @@
         "example": {
           "name": "Weekly Stock Report",
           "frequency": "Day",
-          "numbers": [1, 3, 5],
+          "numbers": [
+            1,
+            3,
+            5
+          ],
           "time": "09:00",
           "subject": "Weekly Stock Report",
           "body": "Please find the weekly stock report attached."
@@ -10430,6 +10522,33 @@
                         }
                       }
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "AddressRelationship": {
+        "type": "object",
+        "description": "Delivery address provided via JSON:API relationships format. Address fields are read from data.relationships.address, not from data.attributes.",
+        "properties": {
+          "address": {
+            "type": "object",
+            "description": "Address relationship object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "addresses"
+                    ],
+                    "description": "Resource type identifier"
+                  },
+                  "attributes": {
+                    "$ref": "#/components/schemas/Address"
                   }
                 }
               }
