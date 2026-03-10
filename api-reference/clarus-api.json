@@ -466,6 +466,15 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "data": {
+                  "type": "account_warehouses",
+                  "attributes": {
+                    "account_id": 1,
+                    "warehouse_id": 1
+                  }
+                }
               }
             }
           }
@@ -477,6 +486,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AccountWarehouseResponse"
+                },
+                "example": {
+                  "data": {
+                    "id": "1",
+                    "type": "account_warehouses",
+                    "relationships": {
+                      "account": {
+                        "data": {
+                          "id": "1",
+                          "type": "accounts"
+                        }
+                      },
+                      "warehouse": {
+                        "data": {
+                          "id": "1",
+                          "type": "warehouses"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -545,6 +574,15 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "data": {
+                  "type": "account_warehouses",
+                  "attributes": {
+                    "account_id": 2,
+                    "warehouse_id": 3
+                  }
+                }
               }
             }
           }
@@ -556,6 +594,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AccountWarehouseResponse"
+                },
+                "example": {
+                  "data": {
+                    "id": "1",
+                    "type": "account_warehouses",
+                    "relationships": {
+                      "account": {
+                        "data": {
+                          "id": "2",
+                          "type": "accounts"
+                        }
+                      },
+                      "warehouse": {
+                        "data": {
+                          "id": "3",
+                          "type": "warehouses"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
