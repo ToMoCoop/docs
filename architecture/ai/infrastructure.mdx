@@ -25,10 +25,10 @@ All AI services authenticate against the same **Cognito user pool** — an exist
 | | |
 |---|---|
 | **Role** | OAuth 2.1 identity provider for all AI services |
-| **Key config** | User pool in eu-west-2, PKCE support, `openid` + `claruswms/full` scopes |
+| **Key config** | PKCE support, `openid` + `claruswms/full` scopes |
 | **Connects to** | CloudFront (via origin), all gateways and runtime (JWT validation) |
 
-The user pool lives in **eu-west-2** while all AI infrastructure is in **us-east-1**. This cross-region setup is intentional — the pool existed before the AI layer was built, and centralizing identity management outweighs the latency cost on token operations.
+The AI infrastructure runs in **us-east-1** because several required services (Bedrock AgentCore, MCP gateway support) are not yet available in eu-west-2, our preferred region. The Cognito user pool remains in eu-west-2 as a shared organisational resource — the cross-region latency on token operations is negligible.
 
 <Warning>
 **JWT `client_id` vs `aud` gotcha**: Cognito access tokens set the application client ID in the `client_id` claim, **not** in the `aud` claim. All JWT validation in the AI layer uses `client_id` accordingly. If you're integrating a new service, validate against `client_id` — checking `aud` will silently fail.

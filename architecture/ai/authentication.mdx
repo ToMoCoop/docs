@@ -224,7 +224,7 @@ Each access pattern has its own authentication flow. Use the tabs below to explo
 
 ## Key Authentication Details
 
-- **Cognito region**: User pools in **eu-west-2**, infrastructure in **us-east-1**
+- **Region**: AI infrastructure in **us-east-1** (service availability); Cognito user pool in **eu-west-2** (shared organisational resource)
 - **JWT claim**: Validation uses `client_id` claim (not `aud`) — this is Cognito access token behavior
 - **OAuth scopes**: `openid`, `claruswms/full`
 - **PKCE**: S256 method required for authorization code flow

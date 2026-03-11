@@ -9,7 +9,7 @@ ClarusWMS extends its warehouse management platform with an AI layer built on **
 - **External MCP clients** like Claude Desktop or ChatGPT connect through a public MCP gateway to query warehouse data — think of it as a read-only API for AI assistants.
 - **The Clarus frontend AI application** uses an internal Strands-based Python agent runtime with full tool access through a private gateway — this powers the embedded chat experience with richer capabilities like CSV exports and file analysis.
 
-Authentication flows through an existing **Cognito user pool** in eu-west-2, while a **CloudFront distribution** provides a unified custom domain with path-based routing and Lambda@Edge functions that bridge Cognito's OAuth implementation with the MCP protocol's requirements.
+Authentication flows through an existing **Cognito user pool**, while a **CloudFront distribution** provides a unified custom domain with path-based routing and Lambda@Edge functions that bridge Cognito's OAuth implementation with the MCP protocol's requirements. The AI infrastructure runs in **us-east-1** as several required services aren't yet available in our preferred eu-west-2 region.
 
 <Note>
 The AI infrastructure spans two repositories: **ClarusWMS_Agents** contains all application code (Lambdas, agent runtime, tool schemas), while **ClarusWMS_OPS** contains the Terraform infrastructure definitions.
@@ -19,92 +19,11 @@ The AI infrastructure spans two repositories: **ClarusWMS_Agents** contains all 
 
 When a request arrives — whether from an external MCP client or the frontend app — it enters through Route53 DNS and hits CloudFront, which routes it to the appropriate backend based on the URL path. Here's how all the pieces connect:
 
-```mermaid
-flowchart TD
-    subgraph External["External Clients"]
-        claude([Claude Desktop])
-        chatgpt([ChatGPT])
-        other_mcp([Other MCP Clients])
-    end
+<Frame>
+  <img src="/images/ai-architecture-overview.svg" alt="ClarusWMS AI Architecture — High-Level Overview" zoom />
+</Frame>
 
-    subgraph Frontend["Clarus Frontend"]
-        webapp(AI Web Application)
-    end
-
-    subgraph Platform["Agents Platform"]
-        cf{{CloudFront Distribution}}
-        r53(Route53 DNS)
-        edge_oauth[/Lambda@Edge: OAuth Metadata/]
-        edge_rewrite[/Lambda@Edge: Response Rewrite/]
-        edge_agent[/Lambda@Edge: Agent Request Rewrite/]
-        edge_authorize[/Lambda@Edge: Authorize Rewrite/]
-        cf_func[/CF Function: Tenant Extractor/]
-    end
-
-    subgraph Cognito["Authentication"]
-        cognito[(Cognito User Pool<br/>eu-west-2)]
-    end
-
-    subgraph AgentCore["AWS Bedrock AgentCore"]
-        public_gw(Public MCP Gateway)
-        private_gw(Private MCP Gateway)
-        runtime(Agent Runtime<br/>Strands Python / HTTP)
-    end
-
-    subgraph Tools["MCP Tool Layer"]
-        interceptor(Interceptor Lambda)
-        api_lambda(API Lambda<br/>clarus-mcp-api)
-        utils_lambda(Utils Lambda<br/>clarus-mcp-utils)
-        token_cache[(DynamoDB<br/>Token Cache)]
-    end
-
-    subgraph Backend["Backend Services"]
-        graphql(GraphQL Replica API)
-        rest(REST API)
-        agents_bucket[(S3: Agents Bucket<br/>schemas, code, sessions)]
-        generated_bucket[(S3: Generated Files<br/>CSVs, 7-day TTL)]
-    end
-
-    %% External client flow
-    claude & chatgpt & other_mcp --> r53
-    webapp --> r53
-    r53 --> cf
-
-    %% CloudFront routing
-    cf -->|/mcp/*| cf_func --> public_gw
-    cf -->|/mcp-internal/*| private_gw
-    cf -->|/agent/*| edge_agent --> runtime
-    cf -->|/.well-known/*| edge_oauth
-    cf -->|/oauth2/authorize| edge_authorize --> cognito
-    cf -->|/oauth2/*| cognito
-    cf -->|/oauth2/register| edge_oauth
-
-    %% Response rewriting
-    public_gw -.->|origin-response| edge_rewrite
-    private_gw -.->|origin-response| edge_rewrite
-
-    %% Gateway to tools
-    public_gw --> interceptor --> token_cache
-    public_gw --> api_lambda
-    private_gw --> interceptor
-    private_gw --> api_lambda
-    private_gw --> utils_lambda
-
-    %% Runtime connects to private gateway as MCP client
-    runtime -->|MCP client connection| private_gw
-
-    %% Tool backends
-    api_lambda --> graphql
-    api_lambda --> rest
-    api_lambda --> agents_bucket
-    api_lambda --> token_cache
-    utils_lambda --> generated_bucket
-    utils_lambda --> agents_bucket
-    utils_lambda --> token_cache
-
-    %% Session storage
-    runtime --> agents_bucket
-```
+<sub>Click the diagram to zoom and pan. <a href="/images/ai-architecture-overview.svg" download="claruswms-ai-architecture.svg">Download SVG</a> · <a href="/images/ai-architecture-overview.drawio" download="ai-architecture-overview.drawio">Download draw.io source</a></sub>
 
 ## AWS Account Architecture
 
@@ -147,7 +66,7 @@ flowchart TD
     Main -.->|OrganizationAtlantisAccountAccessRole| Dev & Staging & Prod
 ```
 
-The pipeline and build accounts are **shared infrastructure** used by all ClarusWMS services — they're not AI-specific. Terraform state is stored in S3 in eu-west-2 with DynamoDB locking.
+The pipeline and build accounts are **shared infrastructure** used by all ClarusWMS services — they're not AI-specific.
 
 ## Explore the Architecture
 
