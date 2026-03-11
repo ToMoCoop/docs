@@ -147,7 +147,7 @@ Each access pattern has its own authentication flow. Use the tabs below to explo
     | `Authorization` | `Bearer <access_token>` | Cognito JWT |
     | `X-Amzn-Bedrock-AgentCore-Runtime-Session-Id` | UUID v4 | Session identifier |
     | `X-Clarus-Subdomain` | Tenant subdomain | Tenant routing (application-level) |
-    | `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` | Tenant subdomain | Tenant routing (Agent Core convention) |
+    | `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` | Tenant subdomain | Tenant routing (forwarded to Agent Core runtime) |
 
     **Event type mapping (Agent Core → Client):**
 

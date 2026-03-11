@@ -25,6 +25,63 @@ When a request arrives — whether from an external MCP client or the frontend a
 
 <sub>Click the diagram to zoom and pan. <a href="/images/ai-architecture-overview.svg" download="claruswms-ai-architecture.svg">Download SVG</a> · <a href="/images/ai-architecture-overview.drawio" download="ai-architecture-overview.drawio">Download draw.io source</a></sub>
 
+## How a Request Flows
+
+Both access paths — external MCP clients and the frontend app — share the same CloudFront distribution and authenticate with Cognito JWTs, but they diverge at routing. CloudFront's [path-based behaviors](#cloudfront-routing-table) send `/mcp*` traffic to the public gateway and `/agent*` traffic to the Bedrock data plane, while the private gateway is only reachable from the agent runtime internally.
+
+<Tabs>
+  <Tab title="External MCP Client">
+    **Scenario**: Claude Desktop queries stock levels for a warehouse tenant.
+
+    <Steps>
+      <Step title="Authenticate via OAuth">
+        The MCP client runs a PKCE authorization code flow against [Cognito](/architecture/ai/authentication) — discovering endpoints via `/.well-known/openid-configuration`, registering via Dynamic Client Registration, and exchanging an authorization code for a JWT access token.
+      </Step>
+      <Step title="Send MCP request to CloudFront">
+        The client sends a request to `/mcp/<tenant>`. A [CloudFront Function](/architecture/ai/authentication#multi-tenant-routing) extracts the tenant segment from the URL path, rewrites the URL, and sets the `X-Clarus-Subdomain` header.
+      </Step>
+      <Step title="Public MCP Gateway validates and routes">
+        The [public gateway](/architecture/ai/gateways#public-mcp-gateway) validates the JWT's `client_id` claim against its allowed clients list. The [MCP Interceptor](/architecture/ai/infrastructure#mcp-interceptor) caches the token in DynamoDB keyed by `requestId`, then the gateway invokes the API Lambda.
+      </Step>
+      <Step title="API Lambda executes the tool">
+        The [API Lambda](/architecture/ai/tools#api-lambda-clarus-mcp-api) retrieves the cached JWT from DynamoDB and executes the requested tool. Not all tools call the WMS backend — discovery and schema inspection tools like `api_discover`, `graphql_details`, and `rest_details` resolve from cached schemas in S3. Execution tools like `graphql_query` and `rest_query` do call the backend, using the user's own token for authorization.
+      </Step>
+      <Step title="Response returns through CloudFront">
+        The tool result flows back through the gateway. [Lambda@Edge](/architecture/ai/infrastructure) rewrites any `WWW-Authenticate` headers to reference the custom domain rather than the raw gateway domain.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Frontend App User">
+    **Scenario**: A user asks "Show me today's picking performance and export it as CSV."
+
+    <Steps>
+      <Step title="User already authenticated">
+        The user holds a Cognito JWT — obtained via [NextAuth](/architecture/ai/authentication) in standalone mode or from the parent app via [postMessage](/architecture/ai/frontend#embedded-mode-iframe-postmessage-protocol) in embedded mode.
+      </Step>
+      <Step title="Message sent to Agent Runtime">
+        The frontend's [SSE bridge](/architecture/ai/frontend#api-routes-reference) (`POST /api/chat`) forwards the message to `/agent/invocations` through CloudFront. A [Lambda@Edge function](/architecture/ai/runtime#entry-point-flow) rewrites the path to the Bedrock data plane's internal format and signs the request with SigV4.
+      </Step>
+      <Step title="Agent reasons and calls tools">
+        The [Strands agent](/architecture/ai/runtime) receives the message, decides it needs two tools — a GraphQL query for picking data and a CSV export — and makes MCP tool calls to the [private gateway](/architecture/ai/gateways#private-mcp-gateway), forwarding the user's JWT.
+      </Step>
+      <Step title="Private MCP Gateway dispatches">
+        The [private gateway](/architecture/ai/gateways#private-mcp-gateway) validates the JWT and routes each tool call to the correct Lambda target. The [MCP Interceptor](/architecture/ai/infrastructure#mcp-interceptor) caches the token for each request, just as with the public path.
+      </Step>
+      <Step title="Tool Lambdas call WMS backend">
+        The [API Lambda](/architecture/ai/tools#api-lambda-clarus-mcp-api) queries picking performance via GraphQL (storing the result as an NDJSON dataset in S3), then the [Utils Lambda](/architecture/ai/tools#utils-lambda-clarus-mcp-utils) generates a CSV from that dataset and returns a presigned S3 download URL.
+      </Step>
+      <Step title="Streaming response reaches user">
+        Results stream back through the agent runtime → CloudFront → [SSE bridge](/architecture/ai/frontend#sse-client-protocol) → browser. The frontend renders the picking data as text and the CSV as a [download card](/architecture/ai/frontend#file-download-cards) with a live expiry countdown.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Info>
+  **Auth propagation**: In both paths, the user's Cognito JWT flows end-to-end from client to WMS backend — there are no service accounts or shared credentials in the request path. The [Token Forwarding](/architecture/ai/authentication) mechanism (Interceptor → DynamoDB → Lambda) bridges the gap where MCP gateways validate but don't forward the token. See the [Authentication](/architecture/ai/authentication) page for the full detail.
+</Info>
+
 ## AWS Account Architecture
 
 Each environment runs in a **dedicated AWS account**. A shared Pipelines account triggers builds via CodePipeline V2, and CodeBuild deploys cross-account using IAM roles. Terraform manages resources in each account via an organization-level access role.

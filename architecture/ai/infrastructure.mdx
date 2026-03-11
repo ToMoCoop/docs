@@ -72,16 +72,7 @@ Here's the flow: when a request arrives at a gateway, the interceptor fires firs
 
 ### Subdomain Extraction
 
-The interceptor checks six header name variants in order when looking for the tenant subdomain:
-
-1. `subdomain`
-2. `Subdomain`
-3. `X-Clarus-Subdomain`
-4. `x-clarus-subdomain`
-5. `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain`
-6. `x-amzn-bedrock-agentcore-runtime-custom-subdomain`
-
-If none are present, `subdomain` is `null` in the cached item.
+The interceptor looks for the tenant subdomain in the `X-Clarus-Subdomain` header. It also checks several case and naming variants for compatibility with different upstream components, but `X-Clarus-Subdomain` is the canonical form used throughout the stack. If no subdomain header is present, `subdomain` is `null` in the cached item.
 
 ### Error Handling
 
