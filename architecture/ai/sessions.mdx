@@ -1,0 +1,162 @@
+---
+title: 'Sessions & Memory'
+description: 'How conversation state persists in S3, semantic summarization manages context growth, and the warmup system reduces cold starts'
+icon: 'database'
+---
+
+Every AI conversation in ClarusWMS is backed by a session. The frontend creates sessions, the agent runtime persists them in S3, and a hybrid memory system ensures the agent can recall context even from long conversations. This page walks through the full lifecycle.
+
+## Session Contract
+
+The frontend and runtime share responsibility for session management through a simple contract:
+
+| Responsibility | Owner | How |
+|---|---|---|
+| Generate session ID (UUID v4) | Frontend | `POST /api/session` or client-side fallback |
+| Provide session ID with every request | Frontend | `X-Amzn-Bedrock-AgentCore-Runtime-Session-Id` header |
+| Persist conversation state | Runtime | Auto-save to S3 after every event |
+| Restore state on cold start | Runtime | Auto-load from S3 when session ID matches |
+| Expire old sessions | S3 lifecycle | 1-day TTL on `agent-sessions/` prefix |
+
+The runtime **never** generates session IDs. Same session ID = continued conversation; new session ID = fresh conversation.
+
+## S3 Persistence
+
+Conversation state is persisted in the unified agents bucket:
+
+- **Bucket**: `claruswms-{prefix}-agents`
+- **Prefix**: `agent-sessions/`
+- **Key format**: `agent-sessions/{session_id}`
+- **TTL**: 1-day expiration via S3 lifecycle rule
+
+The `S3SessionManager` (as of March 2026) handles low-level persistence. It auto-persists the full conversation state to S3 after every agent event and auto-restores on cold start when the same session ID is provided. The session ID comes from the Bedrock AgentCore context, falling back to `"default"` if unavailable.
+
+## Hybrid Memory Architecture
+
+The agent uses a two-tier memory system that balances conversation context limits with long-term recall. When conversations grow long, older messages are summarized and indexed — but they're not lost. A semantic search retrieves relevant context from those summaries on every new message.
+
+```mermaid
+flowchart TD
+    subgraph Request["Incoming Request"]
+        msg[User Message]
+    end
+
+    subgraph Memory["SemanticMemoryHook"]
+        search[Semantic Search]
+        enrich[Prepend Relevant Context<br/>max 2000 chars]
+    end
+
+    subgraph Agent["Strands Agent"]
+        converse[Model Conversation]
+        tools[Tool Execution]
+    end
+
+    subgraph Persistence["Session Persistence"]
+        s3mgr[S3SessionManager<br/>Auto-persist per event]
+        s3[(S3: agent-sessions/)]
+    end
+
+    subgraph Compaction["Context Management"]
+        check{Messages > 40?}
+        summarize[Summarize oldest 30%<br/>Preserve recent 10]
+        index[Update Semantic Index]
+        state[Store in agent.state]
+    end
+
+    msg --> search -->|retrieve historical context| enrich --> converse
+    converse --> tools --> converse
+    converse --> s3mgr --> s3
+
+    converse --> check
+    check -->|Yes| summarize --> index & state
+    check -->|No| converse
+    index -.->|embeddings| search
+```
+
+### Tier 1 — Session Persistence
+
+Every agent event triggers an automatic save of the full conversation state to S3. On cold start (or container recycle), the session is restored transparently. This provides durable persistence within the 1-day S3 lifecycle TTL.
+
+### Tier 2 — Semantic Recall
+
+When conversation history exceeds 40 messages, the conversation manager archives approximately 30% of older messages while preserving the 10 most recent verbatim. Archived content is:
+
+- **Summarized** and stored in the agent's state dictionary
+- **Embedded** using Bedrock Titan embeddings and indexed in a local numpy-backed vector store
+
+On each new user message, the semantic memory hook searches the vector index for relevant historical context and prepends up to 2000 characters of matching content above the user's message. This allows the agent to recall relevant details from earlier in the conversation even after those messages have been compacted.
+
+### Configuration (as of March 2026)
+
+| Parameter | Value | Description |
+|---|---|---|
+| `max_messages` | 40 | Trigger summarization when exceeded |
+| `preserve_recent_messages` | 10 | Always keep the latest N messages |
+| `summary_ratio` | 0.3 | Archive ~30% of messages per compaction |
+| `min_messages_for_summary` | 5 | Minimum messages before summarization is allowed |
+| `semantic_search_top_k` | 3 | Number of historical matches to retrieve |
+| `max_context_length` | 2000 | Max characters of prepended historical context |
+
+## Frontend Session Lifecycle
+
+The frontend manages sessions through a set of API routes and provides session IDs to Agent Core with each request:
+
+- **Session creation**: `POST /api/session` generates a UUID v4 server-side and stores it in an in-memory Map keyed by user ID
+- **Session listing**: `GET /api/session` returns all sessions for the authenticated user, sorted by last activity
+- **Session switching**: Client-side state update — selects a different session ID for subsequent chat requests
+- **Session deletion**: `DELETE /api/session/[id]` removes from the in-memory store; if the current session is deleted, a new one is automatically created
+- **New conversation**: "New Chat" creates a fresh session via POST and clears local message state
+- **Fallback**: If server-side session creation fails, a local UUID v4 is generated client-side
+
+## Warmup Flow
+
+Cold starts can add noticeable latency to the first message in a conversation. The warmup system mitigates this by pre-invoking the Lambda container and warming MCP connections before the user sends their first message.
+
+```mermaid
+sequenceDiagram
+    participant User as User Browser
+    participant App as Frontend App
+    participant API as Next.js API Routes
+    participant AC as Agent Core
+
+    User->>App: Page load
+    App->>API: POST /api/session
+    API-->>App: { id: "uuid-v4", createdAt, lastMessageAt }
+    App->>App: Session ready (but no subdomain yet)
+
+    Note over App: Warmup blocked — waiting for organization
+
+    User->>App: Select organization from picker
+    App->>App: Set subdomain cookie + state
+
+    Note over App: Both session + subdomain available → warmup fires
+
+    App->>API: POST /api/warmup { sessionId }
+    API->>AC: Lightweight invocation<br/>(primes Lambda + MCP connections)
+    AC-->>API: Warmup response
+    API-->>App: 200 OK
+
+    Note over App: Chat ready — user can send first message
+
+    User->>App: Type and send message
+    App->>API: POST /api/chat { message, sessionId }
+    API->>AC: Agent invocation (warm Lambda)
+    AC-->>API: Streaming response
+    API-->>App: SSE stream
+```
+
+Key details about the warmup flow:
+
+- **Endpoint**: `POST /api/warmup` with `{ sessionId }`
+- **Dependency chain**: Warmup only fires when **both** a session ID and an organization (subdomain) are available
+- **Re-trigger**: If the user switches organizations, warmup re-fires for the new combination
+- **Same Lambda instance**: Uses the real session ID so the same Lambda container handles subsequent chat requests
+
+## Runtime Lifecycle
+
+The agent runtime container has two timeouts that affect session behavior:
+
+- **Idle timeout**: 15 minutes — container sleeps after inactivity, requiring a cold start on the next request
+- **Max lifetime**: 8 hours — container recycled regardless of activity
+
+When a container recycles, the in-memory caches (MCP connections and agent instances) are lost, but conversation state is preserved in S3. The next request triggers a cold start that restores the session from S3 and re-establishes MCP connections.

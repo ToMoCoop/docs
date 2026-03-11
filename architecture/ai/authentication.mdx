@@ -1,0 +1,235 @@
+---
+title: 'Authentication & Multi-Tenant Routing'
+description: 'OAuth flows for external MCP clients and the frontend app, plus multi-tenant routing via URL path extraction'
+icon: 'shield-halved'
+---
+
+Authentication in the AI layer serves two distinct client types — external MCP clients and the frontend application — while multi-tenant routing ensures every request is scoped to the correct warehouse tenant.
+
+## Multi-Tenant Routing
+
+ClarusWMS is a multi-tenant platform. When an AI request arrives, the system needs to know which tenant's data to query. The tenant extraction mechanism enables this through a single MCP gateway:
+
+<Steps>
+  <Step title="CloudFront Function intercepts the request">
+    A lightweight CloudFront Function intercepts requests to `/mcp/<tenant>/*`
+  </Step>
+  <Step title="Tenant extracted from URL path">
+    The tenant identifier is extracted from the URL — for example, `/mcp/acme/` yields tenant `acme`
+  </Step>
+  <Step title="URL rewritten">
+    The URL is rewritten to `/mcp/` (stripping the tenant segment)
+  </Step>
+  <Step title="Subdomain header set">
+    An `X-Clarus-Subdomain: acme` header is set on the request
+  </Step>
+  <Step title="Header flows through the stack">
+    The header flows through CloudFront → Gateway → Interceptor → Lambda
+  </Step>
+  <Step title="Lambda scopes API calls">
+    The target Lambda uses `X-Clarus-Subdomain` to scope all WMS API calls to that tenant
+  </Step>
+</Steps>
+
+Direct access without the tenant in the path is also supported when `X-Clarus-Subdomain` is provided as a header directly — this is how the frontend app works.
+
+## Authentication Flows
+
+Each access pattern has its own authentication flow. Use the tabs below to explore each one:
+
+<Tabs>
+  <Tab title="External MCP Client OAuth">
+    When an external MCP client like Claude Desktop connects, it goes through a standard OAuth 2.1 flow with some MCP-specific adaptations:
+
+    ```mermaid
+    sequenceDiagram
+        participant Client as MCP Client<br/>(Claude Desktop)
+        participant CF as CloudFront<br/>(custom domain)
+        participant Edge as Lambda@Edge<br/>(OAuth Metadata)
+        participant Cognito as Cognito<br/>(eu-west-2)
+        participant GW as Public MCP<br/>Gateway
+
+        Client->>CF: GET /.well-known/oauth-protected-resource
+        CF->>Edge: origin-request
+        Edge-->>Client: resource metadata (auth server URL, scopes)
+
+        Client->>CF: GET /.well-known/openid-configuration
+        CF->>Edge: origin-request
+        Edge-->>Client: OIDC discovery document
+
+        Client->>CF: POST /oauth2/register (DCR)
+        CF->>Edge: origin-request
+        Edge-->>Client: client_id (from pre-configured external MCP client ID)
+
+        Client->>CF: GET /oauth2/authorize<br/>?client_id=...&code_challenge=xxx<br/>&code_challenge_method=S256<br/>&scope=openid+claruswms/full
+        CF->>Edge: viewer-request (strips resource param)
+        CF->>Cognito: Authorize (without resource param)
+        Cognito-->>Client: Authorization code (via redirect)
+
+        Client->>CF: POST /oauth2/token<br/>?code=xxx&code_verifier=xxx
+        CF->>Cognito: Token exchange
+        Cognito-->>Client: access_token (JWT)
+
+        Client->>CF: POST /mcp/<tenant>/mcp<br/>Authorization: Bearer <token>
+        CF->>GW: (tenant extracted, header set)
+        GW->>GW: Validate JWT (client_id claim ∈ allowed_clients)
+        GW-->>Client: MCP response
+    ```
+
+    The Lambda@Edge OAuth Metadata function synthesizes the OIDC discovery document and handles Dynamic Client Registration (DCR) — returning a pre-configured client ID rather than actually creating one in Cognito. The Authorize Rewrite strips the RFC 8707 `resource` parameter since Cognito doesn't support it.
+  </Tab>
+
+  <Tab title="Frontend via Agent Runtime">
+    The frontend app authenticates via Cognito and then calls the agent runtime through CloudFront. The runtime forwards the user's token to the private MCP gateway for tool calls:
+
+    ```mermaid
+    sequenceDiagram
+        participant User as User Browser
+        participant App as Frontend App
+        participant Cognito as Cognito<br/>(eu-west-2)
+        participant CF as CloudFront
+        participant Edge as Lambda@Edge<br/>(Agent Rewrite)
+        participant RT as Agent Runtime<br/>(HTTP Server)
+        participant PGW as Private MCP<br/>Gateway
+
+        User->>App: Login
+        App->>Cognito: OAuth PKCE flow
+        Cognito-->>App: access_token (JWT)
+
+        App->>CF: POST /agent/invocations<br/>Authorization: Bearer <token><br/>X-...-Custom-Subdomain: <tenant>
+        CF->>Edge: origin-request
+        Edge->>Edge: Rewrite path to<br/>/runtimes/{encoded_arn}/invocations?qualifier=DEFAULT
+        Edge->>RT: Bedrock data plane invocation<br/>(SigV4 signed)
+        RT->>RT: Validate JWT (client_id ∈ allowed_clients)
+        RT->>RT: Extract Authorization header
+        RT->>PGW: MCP tool calls<br/>(forwards user token)
+        PGW->>PGW: Validate JWT
+        PGW-->>RT: Tool results
+        RT-->>CF: Streaming response
+        CF-->>App: Streaming response
+    ```
+
+    The Agent Request Rewrite Lambda@Edge function translates the friendly `/agent/*` path into the Bedrock data plane's internal format. The runtime validates the JWT independently, then reuses the same token when making MCP tool calls through the private gateway.
+  </Tab>
+
+  <Tab title="SSE Bridge">
+    The frontend doesn't connect to Agent Core directly. A Next.js API route (`POST /api/chat`) acts as a server-side orchestration layer:
+
+    ```mermaid
+    sequenceDiagram
+        participant Browser as User Browser
+        participant Next as Next.js /api/chat
+        participant AC as Agent Core<br/>(via CloudFront)
+
+        Browser->>Next: POST /api/chat<br/>{message, sessionId, files?, subdomain?}
+        Next->>Next: Resolve auth token<br/>(NextAuth session or Bearer header)
+        Next->>Next: Resolve subdomain<br/>(request body or cookie)
+        Next->>AC: POST /agent/invocations<br/>Authorization: Bearer <token><br/>X-...-Session-Id: <sessionId><br/>X-...-Custom-Subdomain: <tenant>
+
+        loop Streaming response
+            AC-->>Next: SSE: contentBlockStart, contentBlockDelta,<br/>messageStop, message (raw Agent Core format)
+            Next-->>Browser: SSE: chunk, tool_call, tool_result,<br/>done, error (simplified client format)
+        end
+
+        loop Every 15 seconds
+            Next-->>Browser: SSE: : keep-alive (comment ping)
+        end
+
+        Note over Next,AC: On 401 + JSON-RPC -32001:<br/>auto-refresh token and retry (standalone)<br/>or notify parent of expiry (embedded)
+    ```
+
+    The SSE bridge serves multiple purposes: auth token management (auto-refresh on 401), dual auth support (NextAuth vs Bearer header), subdomain resolution (cookie vs request body), session tracking, keep-alive pings every 15 seconds, and stream re-serialization from Agent Core's raw format to a simplified client protocol.
+
+    **Headers forwarded to Agent Core:**
+
+    | Header | Value | Purpose |
+    |--------|-------|---------|
+    | `Authorization` | `Bearer <access_token>` | Cognito JWT |
+    | `X-Amzn-Bedrock-AgentCore-Runtime-Session-Id` | UUID v4 | Session identifier |
+    | `X-Clarus-Subdomain` | Tenant subdomain | Tenant routing (application-level) |
+    | `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` | Tenant subdomain | Tenant routing (Agent Core convention) |
+
+    **Event type mapping (Agent Core → Client):**
+
+    | Agent Core Event | Client SSE Event | Description |
+    |---|---|---|
+    | `contentBlockDelta.delta.text` | `chunk` | Streamed text fragment |
+    | `contentBlockStart.start.toolUse` | `tool_call` | Tool invocation started |
+    | `message` (role=user, toolResult) | `tool_result` | Tool execution completed |
+    | `messageStop` (stopReason=end_turn) | `done` | Response complete |
+    | HTTP error / stream error | `error` | Error with optional `tokenExpired` flag |
+  </Tab>
+
+  <Tab title="Token Forwarding">
+    Since MCP gateways validate JWTs but don't forward them to target Lambdas, the interceptor bridges this gap using DynamoDB:
+
+    ```mermaid
+    sequenceDiagram
+        participant Client as Client
+        participant GW as MCP Gateway
+        participant INT as Interceptor<br/>Lambda
+        participant DDB as DynamoDB<br/>(Token Cache)
+        participant Target as Target Lambda<br/>(API/Utils)
+        participant API as Clarus WMS API
+
+        Client->>GW: MCP request + Bearer token
+        GW->>GW: Validate JWT
+        GW->>INT: REQUEST interception<br/>(requestId + headers)
+        INT->>DDB: PutItem<br/>key=requestId<br/>token=Bearer xxx<br/>expiresAt=now+60s
+        INT-->>GW: Continue
+
+        GW->>Target: Invoke Lambda<br/>(requestId in context)
+        Target->>DDB: GetItem(requestId)
+        DDB-->>Target: Bearer token
+        Target->>API: GraphQL/REST call<br/>Authorization: Bearer xxx
+        API-->>Target: Response
+        Target-->>GW: MCP tool result
+        GW-->>Client: Response
+
+        Note over DDB: Token auto-expires<br/>after 60s TTL
+    ```
+
+    The 60-second TTL ensures tokens don't linger in DynamoDB. The interceptor always returns a passthrough response — a failed cache write never blocks the request.
+  </Tab>
+
+  <Tab title="Dual Auth Decision">
+    The SSE bridge supports two authentication modes. When a request arrives, it checks for an `Authorization` header to determine the mode:
+
+    ```mermaid
+    flowchart TD
+        req["/api/chat request arrives"]
+        check{"Authorization header<br/>present?"}
+        embedded["Embedded mode:<br/>Extract token from header<br/>Decode JWT for userId"]
+        normal["Standalone mode:<br/>Call auth() for NextAuth session<br/>Extract accessToken from session"]
+        expired{"Token expired?<br/>(401 + JSON-RPC -32001)"}
+        refresh_embedded["Send tokenExpired event<br/>to browser (parent notified<br/>via postMessage)"]
+        refresh_normal["Call auth() again to<br/>trigger JWT callback refresh<br/>Retry Agent Core request"]
+        invoke["Invoke Agent Core<br/>with resolved token"]
+
+        req --> check
+        check -->|Yes| embedded
+        check -->|No| normal
+        embedded --> invoke
+        normal --> invoke
+        invoke --> expired
+        expired -->|Yes, embedded| refresh_embedded
+        expired -->|Yes, standalone| refresh_normal
+        expired -->|No| stream["Stream response to client"]
+    ```
+
+    - **Standalone mode** uses NextAuth v5 with Cognito OAuth. Tokens are stored in an encrypted session cookie and auto-refresh when within 5 minutes of expiry.
+    - **Embedded mode** receives tokens from the parent app via `postMessage`. The JWT is decoded server-side for the `sub` claim but not verified — Agent Core validates it.
+  </Tab>
+</Tabs>
+
+## Key Authentication Details
+
+- **Cognito region**: User pools in **eu-west-2**, infrastructure in **us-east-1**
+- **JWT claim**: Validation uses `client_id` claim (not `aud`) — this is Cognito access token behavior
+- **OAuth scopes**: `openid`, `claruswms/full`
+- **PKCE**: S256 method required for authorization code flow
+- **Public gateway**: Restricted to external MCP client IDs only
+- **Private gateway**: Broader allowed clients (frontend app, service accounts, external clients)
+- **Agent runtime**: Own allowed clients list, same OAuth discovery URL
+- **RFC 8707**: `resource` parameter stripped by Lambda@Edge because Cognito doesn't support it
+- **WWW-Authenticate rewrite**: Lambda@Edge rewrites response headers to use custom domain instead of raw Bedrock gateway domain

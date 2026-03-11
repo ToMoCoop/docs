@@ -1,0 +1,104 @@
+---
+title: 'AI Deployment Pipelines'
+description: 'CI/CD pipelines for the AI Lambda tools, agent runtime, interceptor, and schema deployments'
+icon: 'pipe-section'
+---
+
+All AI application code lives in the **ClarusWMS_Agents** GitHub repository. Five separate pipelines handle different components, triggered by file path filters on the `main` branch.
+
+## Source Directories
+
+| Directory | Produces | Description |
+|---|---|---|
+| `clarus-mcp-api/` | `clarus-mcp-api.zip` | API Lambda — GraphQL/REST operations against the WMS |
+| `clarus-mcp-utils/` | `clarus-mcp-utils.zip` | Utils Lambda — CSV generation, internal utilities |
+| `mcp-interceptor/` | `mcp-interceptor.zip` | Interceptor Lambda — JWT token caching |
+| `agent-runtime/` | `clarus_agent/deployment.zip` | Agent runtime — Strands Python agent |
+| `api-parser/` | Schema files | GraphQL/REST schema parsing scripts |
+| `scripts/generators/generate-tool-schema-api.mjs` | `clarus-mcp-api-tools.json` | Tool schema for API Lambda |
+| `scripts/generators/generate-tool-schema-utils.mjs` | `clarus-mcp-utils-tools.json` | Tool schema for Utils Lambda |
+
+## Pipeline Architecture
+
+Each pipeline follows the same pattern: source change triggers a build in the shared Build account, which deploys to staging, waits for manual approval, then deploys to production.
+
+```mermaid
+flowchart TD
+    subgraph Source["GitHub: ClarusWMS_Agents"]
+        code[Source Code]
+    end
+
+    subgraph Pipelines["CodePipeline V2 (Pipelines Account)"]
+        p1(agents-gateway-tools-api)
+        p2(agents-gateway-tool-utils)
+        p3(agents-interceptor)
+        p4(agents-agent-runtime)
+        p5(agents-schemas)
+    end
+
+    subgraph Build["CodeBuild (Build Account)"]
+        b1[Build & Package]
+    end
+
+    subgraph Staging["Staging Account"]
+        s3_staging[(S3 Agents Bucket)]
+        lambda_staging[Lambda Update]
+        target_staging[Gateway Target Sync]
+        runtime_staging[Runtime Update]
+    end
+
+    subgraph Approval
+        approve{Manual Approval}
+    end
+
+    subgraph Production["Production Account"]
+        s3_prod[(S3 Agents Bucket)]
+        lambda_prod[Lambda Update]
+        target_prod[Gateway Target Sync]
+        runtime_prod[Runtime Update]
+    end
+
+    code -->|Push to main| Pipelines
+    p1 & p2 & p3 & p4 & p5 --> b1
+    b1 --> s3_staging --> lambda_staging --> target_staging
+    b1 --> s3_staging --> runtime_staging
+    target_staging & runtime_staging --> approve
+    approve --> s3_prod --> lambda_prod --> target_prod
+    approve --> s3_prod --> runtime_prod
+```
+
+## Pipeline Triggers
+
+Each pipeline watches specific file paths on the `main` branch:
+
+| Pipeline | Trigger paths |
+|---|---|
+| `agents-gateway-tools-api` | `clarus-mcp-api/**`, `buildspecs/gateway-tool-api-*`, `generate-tool-schema-api.mjs` |
+| `agents-gateway-tool-utils` | `clarus-mcp-utils/**`, `buildspecs/gateway-tool-utils-*`, `generate-tool-schema-utils.mjs` |
+| `agents-interceptor` | `mcp-interceptor/**`, `buildspecs/interceptor-*` |
+| `agents-agent-runtime` | `agent-runtime/**`, `buildspecs/agent-runtime-*` |
+| `agents-schemas` | `api-parser/**`, `buildspecs/schemas-*` |
+
+## Deployment Steps (Lambda Tools)
+
+<Steps>
+  <Step title="Build & Package">
+    CodeBuild produces a zip artifact from the source directory.
+  </Step>
+  <Step title="Deploy to S3">
+    The zip is deployed to the S3 agents bucket in the target account via a cross-account IAM role.
+  </Step>
+  <Step title="Update Lambda">
+    Lambda function code is updated using the new zip from S3.
+  </Step>
+  <Step title="Publish & Alias">
+    A new Lambda version is published and the `live` alias is updated to point to it.
+  </Step>
+  <Step title="Sync Gateway Targets">
+    The tool schema is regenerated and the gateway target configuration is updated to reflect any tool changes.
+  </Step>
+</Steps>
+
+<Note>
+The pipeline and build accounts are **shared infrastructure** used by all ClarusWMS services. They are not AI-specific — the same CodePipeline and CodeBuild setup handles deployments for other services as well.
+</Note>

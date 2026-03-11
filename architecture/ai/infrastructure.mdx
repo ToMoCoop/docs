@@ -1,0 +1,90 @@
+---
+title: 'Infrastructure Components'
+description: 'CloudFront distribution, Cognito authentication, Lambda@Edge functions, and the MCP Interceptor'
+icon: 'server'
+---
+
+This page covers the foundational infrastructure that every request passes through before reaching the AI layer. These components handle routing, authentication, edge processing, and token management.
+
+## CloudFront Distribution
+
+CloudFront is the single entry point for all AI services. Every request — whether from an external MCP client, the frontend app, or an OAuth flow — arrives at the same custom domain and gets routed to the right backend based on its URL path.
+
+| | |
+|---|---|
+| **Role** | Unified entry point for all AI services under custom domain |
+| **Key config** | Path-based routing to 4 origins (Cognito, public gateway, private gateway, agent runtime data plane) |
+| **Connects to** | MCP gateways, Bedrock AgentCore data plane, Cognito |
+
+CloudFront provides TLS termination, custom domain support, and Lambda@Edge integration. It evaluates cache behaviors in order — more specific path patterns like `/oauth2/authorize` take precedence over broader ones like `/oauth2/*`. See the [CloudFront Routing Table](/architecture/ai/overview#cloudfront-routing-table) on the overview page for the full routing matrix.
+
+## Cognito Authentication
+
+All AI services authenticate against the same **Cognito user pool** — an existing organizational pool shared with other ClarusWMS services.
+
+| | |
+|---|---|
+| **Role** | OAuth 2.1 identity provider for all AI services |
+| **Key config** | User pool in eu-west-2, PKCE support, `openid` + `claruswms/full` scopes |
+| **Connects to** | CloudFront (via origin), all gateways and runtime (JWT validation) |
+
+The user pool lives in **eu-west-2** while all AI infrastructure is in **us-east-1**. This cross-region setup is intentional — the pool existed before the AI layer was built, and centralizing identity management outweighs the latency cost on token operations.
+
+<Warning>
+**JWT `client_id` vs `aud` gotcha**: Cognito access tokens set the application client ID in the `client_id` claim, **not** in the `aud` claim. All JWT validation in the AI layer uses `client_id` accordingly. If you're integrating a new service, validate against `client_id` — checking `aud` will silently fail.
+</Warning>
+
+## Lambda@Edge Functions
+
+Five edge functions handle request/response transformation at CloudFront. Four are Lambda@Edge functions (running at edge locations); one is a CloudFront Function (lighter weight, runs at every edge POP).
+
+| Function | Event | What it does |
+|---|---|---|
+| **OAuth Metadata** | origin-request | Serves `/.well-known/openid-configuration` and `/.well-known/oauth-protected-resource`. Handles `/oauth2/register` dynamic client registration. |
+| **MCP Response Rewrite** | origin-response | Rewrites `WWW-Authenticate` headers to use the custom domain instead of the raw gateway domain |
+| **OAuth Authorize Rewrite** | viewer-request | Strips the RFC 8707 `resource` parameter from `/oauth2/authorize` — Cognito doesn't support it |
+| **Agent Request Rewrite** | origin-request | Rewrites `/agent/*` paths to the Bedrock data plane format: `/runtimes/{encoded_arn}/invocations?qualifier=DEFAULT` |
+| **Tenant Extractor** | viewer-request | CloudFront Function (not Lambda@Edge) — extracts tenant from `/mcp/<tenant>` path and sets the `X-Clarus-Subdomain` header |
+
+The OAuth Metadata function is the most complex — it synthesizes OIDC discovery documents on the fly, pointing clients to the correct Cognito endpoints while presenting the custom domain as the issuer. The Tenant Extractor is the lightest — it's a CloudFront Function rather than a Lambda@Edge because it only does string manipulation and needs to run at every POP with minimal latency.
+
+## MCP Interceptor
+
+The interceptor is a shared Lambda that fires on every request to either MCP gateway, **before** the request reaches the target tool Lambda. Its job is to bridge a gap in the Bedrock AgentCore architecture: gateways validate JWTs but don't forward them to target Lambdas. The interceptor solves this by caching the token in DynamoDB so the tool Lambda can retrieve it.
+
+| | |
+|---|---|
+| **Role** | Shared JWT token caching for all MCP gateways |
+| **Key config** | REQUEST interception point, DynamoDB cache with 60s TTL |
+| **Connects to** | DynamoDB token cache table |
+
+Here's the flow: when a request arrives at a gateway, the interceptor fires first, extracts the JWT from the Authorization header, and writes it to DynamoDB keyed by `requestId`. The target Lambda then retrieves the token using the same `requestId` to authenticate against backend Clarus APIs.
+
+### DynamoDB Token Cache Item
+
+| Field | Type | Description |
+|---|---|---|
+| `requestId` | String (PK) | Bedrock AgentCore request ID, used as cache key |
+| `token` | String | Full JWT bearer token |
+| `expiresAt` | Number | Unix timestamp (seconds), `now + 60` |
+| `createdAt` | String | ISO 8601 timestamp |
+| `subdomain` | String (optional) | Tenant subdomain, only present if found in headers |
+
+### Subdomain Extraction
+
+The interceptor checks six header name variants in order when looking for the tenant subdomain:
+
+1. `subdomain`
+2. `Subdomain`
+3. `X-Clarus-Subdomain`
+4. `x-clarus-subdomain`
+5. `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain`
+6. `x-amzn-bedrock-agentcore-runtime-custom-subdomain`
+
+If none are present, `subdomain` is `null` in the cached item.
+
+### Error Handling
+
+The interceptor is designed to **never block requests**. All errors during token caching are caught and logged, but the interceptor always returns a passthrough response. A failed cache write means the target Lambda won't find the token in DynamoDB, but the request still reaches it — the Lambda handles the missing-token case rather than the interceptor rejecting the request.
+
+For audit trails, tokens are logged as `first 20 chars...last 20 chars`. Tokens shorter than 40 characters log as `[invalid]`.

@@ -51,6 +51,31 @@
         ]
       },
       {
+        "tab": "Architecture",
+        "groups": [
+          {
+            "group": "AI Architecture",
+            "pages": [
+              "architecture/ai/overview",
+              "architecture/ai/infrastructure",
+              "architecture/ai/gateways",
+              "architecture/ai/runtime",
+              "architecture/ai/authentication",
+              "architecture/ai/tools",
+              "architecture/ai/sessions",
+              "architecture/ai/frontend"
+            ]
+          },
+          {
+            "group": "Deployment",
+            "pages": [
+              "architecture/deployment/index",
+              "architecture/deployment/ai-pipelines"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "groups": [
           {

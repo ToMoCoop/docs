@@ -1,0 +1,105 @@
+---
+title: 'Gateway Architecture'
+description: "Why ClarusWMS uses dual MCP gateways and how they route requests to tool Lambdas"
+icon: 'split'
+---
+
+ClarusWMS runs **two separate MCP gateways** — a public one for external AI clients and a private one for the internal agent runtime. This isn't accidental complexity; it's a deliberate security and cost boundary. This page explains why and how they work.
+
+## The Two Gateways
+
+### Public MCP Gateway
+
+The public gateway is the external-facing endpoint that third-party MCP clients like Claude Desktop and ChatGPT connect to.
+
+| | |
+|---|---|
+| **Role** | External-facing MCP protocol endpoint for third-party AI clients |
+| **Key config** | CUSTOM_JWT auth, MCP protocol, single target (API Lambda only) |
+| **Connects to** | API Lambda, Interceptor Lambda |
+
+This gateway is deliberately restricted to **API tools only**. External clients can discover schemas, run GraphQL queries, and call REST endpoints — but they cannot access utility tools like CSV generation. The allowed client IDs are limited to registered external MCP client IDs.
+
+### Private MCP Gateway
+
+The private gateway is the internal tool access point used exclusively by the agent runtime.
+
+| | |
+|---|---|
+| **Role** | Internal tool access point for the agent runtime |
+| **Key config** | CUSTOM_JWT auth, MCP protocol, two targets (API Lambda + Utils Lambda) |
+| **Connects to** | API Lambda, Utils Lambda, Interceptor Lambda |
+
+The private gateway has a broader allowed clients list including frontend app client IDs and service accounts. It exposes **two gateway targets**:
+
+1. **Utils target** — Utils Lambda with the `clarus-mcp-utils-tools.json` schema
+2. **API target** — API Lambda with the `clarus-mcp-api-tools.json` schema
+
+This means the agent runtime connects to a single gateway and gets access to all tools — it doesn't need to know which Lambda backs which tool.
+
+## Why Two Gateways?
+
+```mermaid
+flowchart LR
+    subgraph Clients["External Clients"]
+        mcp_client([MCP Clients])
+    end
+
+    subgraph Runtime["Agent Runtime"]
+        agent(Strands Python Agent)
+    end
+
+    subgraph Public["Public Gateway"]
+        pub_gw{{Public MCP Gateway}}
+        pub_target_api[Target: API]
+    end
+
+    subgraph Private["Private Gateway"]
+        priv_gw{{Private MCP Gateway}}
+        priv_target_api[Target: API]
+        priv_target_utils[Target: Utils]
+    end
+
+    subgraph Lambdas["Tool Lambdas"]
+        api_lambda(API Lambda<br/>GraphQL + REST)
+        utils_lambda(Utils Lambda<br/>CSV Generation, etc.)
+    end
+
+    mcp_client --> pub_gw
+    pub_gw --> pub_target_api --> api_lambda
+
+    agent -->|Single MCP connection| priv_gw
+    priv_gw --> priv_target_api --> api_lambda
+    priv_gw --> priv_target_utils --> utils_lambda
+
+    style pub_gw fill:#ff9900,color:#000
+    style priv_gw fill:#ff9900,color:#000
+    style utils_lambda fill:#228b22,color:#fff
+```
+
+The dual gateway architecture creates a clear boundary along three dimensions:
+
+| Concern | Public Gateway | Private Gateway |
+|---|---|---|
+| **Consumers** | External MCP clients (Claude Desktop, etc.) | Agent runtime only |
+| **Tool access** | API tools only | API + Utils tools |
+| **Security** | Restricted client IDs | Broader client IDs |
+| **Cost control** | No access to resource-intensive Utils | Full access |
+| **Connection** | Direct from client | Via agent runtime |
+
+The key insight is **cost and security control**. External clients connecting through the public gateway cannot trigger resource-intensive operations like CSV generation over large datasets. Those capabilities are reserved for the internal agent runtime, which has its own rate limiting and safety guards.
+
+Both gateways share the same **MCP Interceptor** — every request, regardless of which gateway it enters, goes through the same token caching mechanism before reaching the target Lambda. See [Infrastructure Components](/architecture/ai/infrastructure#mcp-interceptor) for details on how the interceptor works.
+
+## Request Flow
+
+When an MCP request arrives at either gateway, the flow is the same:
+
+1. **Gateway validates the JWT** — checks the `client_id` claim against the allowed clients list
+2. **Interceptor fires** — caches the JWT token in DynamoDB keyed by `requestId`
+3. **Gateway invokes the target Lambda** — passes the `requestId` in the Lambda context
+4. **Lambda retrieves the token** — fetches the cached JWT from DynamoDB using the `requestId`
+5. **Lambda executes the tool** — uses the JWT to authenticate against the Clarus WMS backend APIs
+6. **Response flows back** — through the gateway, with Lambda@Edge rewriting any `WWW-Authenticate` headers to use the custom domain
+
+For the full token forwarding sequence, see the [Token Forwarding diagram](/architecture/ai/authentication) on the authentication page.

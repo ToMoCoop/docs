@@ -1,0 +1,170 @@
+---
+title: 'Agent Runtime'
+description: 'The Strands-based Python agent that powers AI conversations, including caching, streaming, and memory architecture'
+icon: 'microchip'
+---
+
+The agent runtime is where AI conversations actually happen. It's a serverless Python application running on AWS Bedrock AgentCore that receives user messages, orchestrates tool calls, and streams responses back to the frontend.
+
+<Tip>
+**The runtime has a dual nature**: From the outside, it's an HTTP server that the frontend calls via the Bedrock AgentCore data plane. But internally, it acts as an **MCP client** connecting to the private gateway to use tools. The frontend never speaks MCP directly — it sends HTTP requests to the runtime, which translates them into MCP tool calls through the private gateway.
+</Tip>
+
+## Configuration
+
+| | |
+|---|---|
+| **Role** | Serverless Python agent executing AI conversations |
+| **Key config** | Python 3.13, Strands framework, HTTP server protocol, 15-min idle / 8-hour max lifetime |
+| **Connects to** | Private MCP gateway (as MCP client), S3 (session storage) |
+
+The runtime uses a Claude Sonnet model with streaming enabled, extended thinking, and a system prompt that encodes WMS domain knowledge — entity terminology, schema-first tool workflows, pagination patterns, and error recovery strategies.
+
+**Environment variables injected:**
+- `MCP_GATEWAY_URL` — Private MCP gateway URL
+- `SESSION_BUCKET` — S3 bucket for conversation state persistence
+- `FRONTEND_DOMAIN` — Allowed frontend domain for CORS
+
+**Headers passed through:** `Authorization`, `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain`
+
+## Entry Point Flow
+
+When the frontend sends a message, here's what happens inside the runtime:
+
+```mermaid
+sequenceDiagram
+    participant FE as Frontend
+    participant DP as Bedrock Data Plane
+    participant App as BedrockAgentCoreApp
+    participant Handler as agent_invocation()
+    participant Cache as Two-Layer Cache
+    participant Agent as Strands Agent
+    participant GW as Private MCP Gateway
+
+    FE->>DP: POST /agent/invocations
+    DP->>App: HTTP request
+    App->>Handler: payload + context
+
+    Handler->>Handler: Extract auth header + subdomain
+    Handler->>Handler: Get session_id from context
+    Handler->>Handler: Validate files (if present)
+
+    Handler->>Cache: get_or_create_agent(session_id, auth, subdomain)
+    alt MCP cache miss
+        Cache->>GW: Create MCP client connection (~3s)
+        Cache-->>Cache: Store in _mcp_cache[hash(auth:subdomain)]
+    end
+    alt Agent cache miss
+        Cache->>Cache: Create Agent with S3SessionManager
+        Cache->>Cache: Restore conversation from S3
+        Cache-->>Cache: Store in _agent_cache[session_id]
+    end
+    Cache-->>Handler: Agent instance
+
+    Handler->>Agent: stream_async(message)
+    loop For each streaming event
+        Agent->>GW: MCP tool calls (as needed)
+        GW-->>Agent: Tool results
+        Agent-->>Handler: Streaming event
+        Handler->>Handler: Strip invocation_state keys
+        Handler-->>FE: Yield event
+    end
+```
+
+**Request payload format:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `prompt` | String | Yes | User message text |
+| `files` | Array | No | File attachments (base64-encoded) |
+| `warmup` | Boolean | No | If `true`, primes caches without running agent logic |
+
+## Two-Layer Caching
+
+The runtime uses two caches to minimize cold start overhead (as of March 2026):
+
+| Cache Layer | Key | Contents | Cost | Lifetime |
+|---|---|---|---|---|
+| **MCP cache** | SHA256 hash of `auth_header:subdomain` (16 chars) | MCP clients + tool definitions | ~3s to create | Persistent per auth identity |
+| **Agent cache** | `session_id` from context | Agent instance + observability tracker | ~0.5ms lookup | Per session, auto-restores from S3 |
+
+The MCP cache is the expensive one — creating a new MCP client connection takes about 3 seconds. By caching per auth identity, subsequent requests from the same user reuse the existing connection. The agent cache is fast but depends on the container staying warm.
+
+## Streaming Architecture
+
+The runtime streams events from Bedrock through the Strands framework to the frontend. Each event passes through several processing stages before reaching the client:
+
+```mermaid
+flowchart LR
+    subgraph Bedrock["Bedrock Converse Stream"]
+        raw[Raw Model Events]
+    end
+
+    subgraph Agent["Strands Agent"]
+        proc[Event Processing]
+        cb[Callback Handler]
+    end
+
+    subgraph Runtime["agent.py invoke()"]
+        strip[Strip invocation_state]
+        classify[Classify Event Type]
+        monitor[Size Monitoring]
+    end
+
+    subgraph Frontend["Frontend"]
+        render[Render Response]
+    end
+
+    raw --> proc --> cb --> strip --> classify --> monitor -->|yield| render
+```
+
+1. **Bedrock converse-stream** produces raw model events (text deltas, tool use, reasoning)
+2. **Strands Agent** processes events, fires callback handlers, and manages tool execution
+3. **Runtime handler** strips heavy `invocation_state` keys and classifies each event for monitoring
+4. **Event yield** sends the lightweight event to the frontend via the HTTP streaming response
+
+**Stream size optimization**: The Strands framework merges the full agent invocation state (~350KB) into every streaming event. The runtime strips 10 keys from `invocation_state` before yielding, reducing a typical 6-tool invocation from ~83MB to ~116KB — a 99.86% reduction.
+
+<Accordion title="Stream Event Types">
+| Type | Description |
+|---|---|
+| `text_stream` | Streamed text content (the agent's response) |
+| `reasoning_stream` | Extended thinking output |
+| `tool_use_stream` | Tool invocation events |
+| `tool_stream` | Tool execution and result events |
+| `message_event` | Message completion markers |
+| `agent_result` | Final agent result |
+| `lifecycle` | Initialization and start events |
+| `raw_chunk` | Low-level Bedrock content blocks |
+
+Stream breakdown is logged at the end of each invocation with format `{type}={count}evts/{bytes}B` for monitoring throughput and identifying anomalies.
+</Accordion>
+
+## Safety Guards
+
+<Warning>
+The runtime enforces two hard limits to prevent runaway behavior:
+
+- **`MAX_TOOL_CALLS=25`** — stops the agent event loop if tool calls exceed this limit, preventing infinite loops. A user-friendly message is returned.
+- **`STREAM_EVENT_TIMEOUT=90s`** — max wait for a single streaming event from Bedrock. If exceeded, a timeout error is raised and the invocation is marked incomplete.
+</Warning>
+
+## Error Handling
+
+Runtime errors are handled per-event with escalating severity:
+
+- **Tool call limit exceeded** (`MAX_TOOL_CALLS=25`): Agent loop stopped, user-friendly message returned
+- **Stream timeout** (90s): Raises `TimeoutError` with explanation, invocation marked incomplete
+- **Client disconnect** (`GeneratorExit`): Logged as abandoned, cleanup runs
+- **Runtime shutdown** (`CancelledError`): Graceful cleanup with signal logging
+- **Unhandled exceptions**: Caught at top level, logged with full traceback, error response yielded
+
+## Warmup Mode
+
+The runtime accepts `{"warmup": true}` payloads that prime the Bedrock model cache and MCP connections without executing full agent logic. This returns immediately with a success response. The warmup system is covered in detail on the [Sessions & Memory](/architecture/ai/sessions#warmup-flow) page.
+
+## Lifecycle
+
+- **Idle timeout**: 15 minutes — runtime container sleeps after inactivity, cold start on next request
+- **Max lifetime**: 8 hours — container recycled regardless of activity
+- **First request after idle**: May have higher latency due to cold start. Use the warmup endpoint to mitigate this.

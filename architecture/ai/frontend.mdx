@@ -1,0 +1,192 @@
+---
+title: 'Frontend Integration'
+description: 'Integrating with the AI frontend app — embedding via iframe, file uploads, rich response rendering, and the SSE streaming protocol'
+icon: 'browser'
+---
+
+The AI frontend is a Next.js application that can run standalone (as its own web app) or embedded as an iframe inside the main ClarusWMS platform. This page covers the integration patterns you'll need to understand when working with either mode.
+
+## Tenant Context & Organization Selection
+
+How the frontend knows which tenant to query depends on the mode:
+
+- **Standalone mode**: After login, the user selects their organization from a picker UI. The selected subdomain is stored in a server-side cookie and persists across page reloads.
+- **Embedded mode**: The parent application provides the subdomain via the `CLARUSWMS_AI_INIT` postMessage during initialization.
+
+The subdomain is sent to Agent Core as two headers with every request:
+- `X-Clarus-Subdomain` — application-level tenant identifier
+- `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` — Agent Core convention for custom headers forwarded to the runtime
+
+Resolution order in `/api/chat`: request body `subdomain` field (embedded mode) → server-side cookie (standalone mode).
+
+## Embedded Mode (iframe postMessage Protocol)
+
+The frontend can be embedded as an iframe in the main ClarusWMS application by loading it with `?embedded=true` in the URL. Communication between parent and iframe uses a structured postMessage protocol.
+
+### Message Types (Parent → iframe)
+
+| Message Type | Payload | Purpose |
+|---|---|---|
+| `CLARUSWMS_AI_INIT` | `{ token, subdomain }` | Initialize with auth token and tenant |
+| `CLARUSWMS_AI_TOKEN_UPDATE` | `{ token }` | Refresh the auth token |
+
+### Message Types (iframe → Parent)
+
+| Message Type | Payload | Purpose |
+|---|---|---|
+| `CLARUSWMS_AI_READY` | None | iframe loaded and ready for initialization |
+| `CLARUSWMS_AI_INIT_ACK` | `{ success, error? }` | Acknowledgement of INIT message |
+| `CLARUSWMS_AI_TOKEN_EXPIRED` | None | Agent Core rejected token, needs refresh |
+
+### Handshake Flow
+
+```mermaid
+sequenceDiagram
+    participant Parent as Parent App<br/>(ClarusWMS)
+    participant Iframe as AI Frontend<br/>(iframe)
+    participant API as Next.js API
+
+    Parent->>Iframe: Load iframe with ?embedded=true
+
+    Iframe->>Parent: CLARUSWMS_AI_READY<br/>(targetOrigin: *)
+
+    Parent->>Iframe: CLARUSWMS_AI_INIT<br/>{ token, subdomain }
+    Iframe->>Iframe: Validate origin against<br/>NEXT_PUBLIC_ALLOWED_PARENT_ORIGINS<br/>(supports wildcards: *.clarus.ws)
+    Iframe->>Iframe: Store token + subdomain
+    Iframe->>Parent: CLARUSWMS_AI_INIT_ACK<br/>{ success: true }
+
+    Note over Iframe: Initialized — chat ready
+
+    Iframe->>API: POST /api/chat<br/>Authorization: Bearer <token><br/>{ subdomain: "acme" }
+    API-->>Iframe: SSE stream
+
+    Note over Parent,Iframe: Token refresh cycle
+
+    Iframe->>Parent: CLARUSWMS_AI_TOKEN_EXPIRED
+    Parent->>Parent: Refresh Cognito token
+    Parent->>Iframe: CLARUSWMS_AI_TOKEN_UPDATE<br/>{ token: "new-token" }
+```
+
+**Origin validation**: Allowed origins are configured via `NEXT_PUBLIC_ALLOWED_PARENT_ORIGINS` (comma-separated, supports wildcard patterns like `*.clarus.ws`). Messages from unrecognized origins are silently rejected.
+
+## File Upload
+
+Files are attached to chat messages as base64-encoded JSON objects in the request body:
+
+```typescript
+interface FileUpload {
+  name: string;   // Original filename
+  type: string;   // MIME type
+  data: string;   // Base64-encoded content (no data URL prefix)
+}
+```
+
+### Supported File Types (as of March 2026)
+
+| Category | MIME Types | Max Size |
+|---|---|---|
+| Images | `image/png`, `image/jpeg`, `image/gif`, `image/webp` | 3 MB |
+| Documents | `application/pdf`, `text/csv`, `text/plain`, `text/markdown`, `text/html` | 10 MB |
+| Office docs | `.docx`, `.xlsx`, `.xls`, `.doc` | 10 MB |
+
+**Maximum files per request**: 10
+
+### Processing Flow
+
+<Steps>
+  <Step title="Validation">
+    Each file's MIME type is checked against the supported types. File size is validated against the category limit (3MB for images, 10MB for documents).
+  </Step>
+  <Step title="Decoding">
+    Base64 data is decoded to raw bytes.
+  </Step>
+  <Step title="Name sanitization">
+    Filenames are sanitized for the Bedrock API — dots and extensions are stripped, special characters replaced, and names truncated.
+  </Step>
+  <Step title="Content block construction">
+    Images become Bedrock `image` content blocks. Documents become `document` content blocks.
+  </Step>
+  <Step title="Message assembly">
+    File content blocks are combined with the user's text prompt into a single multimodal message.
+  </Step>
+</Steps>
+
+Typical use cases include uploading product images for SKU/barcode identification, invoices and delivery manifests for data extraction, and spreadsheets for inventory reconciliation.
+
+## Rich Response Rendering
+
+The frontend renders AI responses as Markdown with two custom code fence languages that trigger specialized rendering:
+
+### Charts
+
+The agent produces ` ```chart ` code blocks containing a JSON chart definition:
+
+```typescript
+interface ChartData {
+  type: 'bar' | 'line' | 'pie' | 'area';
+  title: string;
+  data: Array<{ name: string; value: number }>;
+  xAxisKey: string;    // Default: "name"
+  dataKeys: string[];  // Default: ["value"]
+}
+```
+
+Charts are rendered with Recharts (dynamically imported, no SSR). While the JSON is still streaming, a skeleton placeholder is shown.
+
+### File Download Cards
+
+The agent produces ` ```csv-file ` code blocks containing file metadata with a presigned URL:
+
+```typescript
+interface FileMetadata {
+  url: string;       // S3 presigned URL
+  filename: string;  // Display name
+  size: number;      // Bytes
+  rowCount: number;  // Data rows
+  expiresIn: number; // Seconds until URL expires
+}
+```
+
+The download card shows file metadata, a live countdown timer for URL expiry, and a download button. Expired links are visually indicated and the download button is disabled.
+
+## API Routes Reference
+
+| Route | Method | Auth | Purpose |
+|---|---|---|---|
+| `/api/chat` | POST | NextAuth or Bearer | SSE bridge to Agent Core |
+| `/api/session` | GET | NextAuth | List all sessions for the authenticated user |
+| `/api/session` | POST | NextAuth | Create a new session |
+| `/api/session/[id]` | DELETE | NextAuth | Delete a specific session |
+| `/api/warmup` | POST | NextAuth | Pre-invoke Lambda + MCP warmup |
+| `/api/health` | GET | None | Health check endpoint (Docker) |
+| `/api/auth/*` | Various | None | NextAuth routes (Cognito OAuth callback, sign-in, sign-out) |
+
+## SSE Client Protocol
+
+The frontend receives a stream of Server-Sent Events from the `/api/chat` endpoint. Each event has a `type` field:
+
+```typescript
+interface StreamEvent {
+  type: 'chunk' | 'tool_call' | 'tool_result' | 'done' | 'error';
+  content?: string;          // For chunk events
+  toolName?: string;         // For tool_call events
+  toolArgs?: object;         // For tool_call events
+  toolUseId?: string;        // For tool_call events
+  reasoningText?: string;    // Model's reasoning text
+  toolResult?: object;       // For tool_result events
+  error?: string;            // For error events
+  tokenExpired?: boolean;    // True when token needs refresh
+}
+```
+
+<Accordion title="Raw Agent Core Event Mapping">
+The SSE bridge parses raw Agent Core events and maps them to the simplified client protocol:
+
+- `{"event":{"contentBlockDelta":{"delta":{"text":"..."}}}}` → `chunk`
+- `{"event":{"contentBlockStart":{"start":{"toolUse":{...}}}}}` → `tool_call`
+- `{"event":{"contentBlockDelta":{"delta":{"toolUse":{"input":"..."}}}}}` → accumulated server-side
+- `{"message":{"role":"user","content":[{"toolResult":{...}}]}}` → `tool_result`
+- `{"event":{"messageStop":{"stopReason":"end_turn"}}}` → `done`
+
+The bridge also sends keep-alive comment pings every 15 seconds to prevent proxy/load balancer timeouts.
+</Accordion>

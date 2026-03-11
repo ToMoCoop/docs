@@ -1,0 +1,21 @@
+---
+title: 'Deployment Overview'
+description: 'How ClarusWMS services are built, tested, and deployed across environments'
+icon: 'rocket'
+---
+
+ClarusWMS uses a **multi-account AWS deployment model** where each environment (develop, staging, production) runs in a dedicated AWS account. A shared Pipelines account orchestrates builds via CodePipeline V2, and CodeBuild deploys cross-account using IAM roles.
+
+This section documents the deployment pipelines and processes for ClarusWMS services. The pipeline and build infrastructure is **shared across all services** — it's not AI-specific.
+
+<Note>
+Infrastructure is managed via Terraform in the **ClarusWMS_OPS** repository. Application code lives in service-specific repositories like **ClarusWMS_Agents**.
+</Note>
+
+## Deployment Pipelines
+
+<CardGroup cols={1}>
+  <Card title="AI Deployment Pipelines" icon="brain-circuit" href="/architecture/deployment/ai-pipelines">
+    CI/CD pipelines for the AI Lambda tools, agent runtime, interceptor, and schema deployments
+  </Card>
+</CardGroup>
