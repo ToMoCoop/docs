@@ -2469,9 +2469,9 @@
           "Goods In Receipts"
         ],
         "summary": "Receive a goods in receipt",
-        "description": "Trigger the receiving process for a goods in receipt. The receipt must be in PENDING status with at least one line item. This marks the receipt as received and creates stock records for the received goods.",
+        "description": "Trigger the receiving process for a goods in receipt. The receipt must be in PENDING status with at least one line item. This changes the receipt status to RCV and creates receive tasks for each line item. Stock records are not created until individual receive tasks are completed.",
         "x-mint": {
-          "content": "## Behavior\n\n- Receipt must be in PENDING status\n- Receipt must have at least one line item\n- Creates stock records for received goods\n- Returns the updated receipt with received status\n\n## No Request Body Required\n\nThe receipt ID is provided in the URL path. No request body is needed."
+          "content": "## Behavior\n\n- Receipt must be in PENDING status\n- Receipt must have at least one line item\n- Changes receipt status from PENDING to RCV\n- Creates AVAILABLE receive tasks for each line item (one per line for loose items, one per storage unit for containerised items)\n- Stock records are NOT created at this stage — they are created when individual receive tasks are completed via the receive tasks endpoint\n- Returns the updated receipt with RCV status\n\n## No Request Body Required\n\nThe receipt ID is provided in the URL path. No request body is needed."
         },
         "operationId": "receiveGoodsInReceipt",
         "parameters": [
