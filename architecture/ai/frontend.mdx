@@ -13,10 +13,6 @@ How the frontend knows which tenant to query depends on the mode:
 - **Standalone mode**: After login, the user selects their organization from a picker UI. The selected subdomain is stored in a server-side cookie and persists across page reloads.
 - **Embedded mode**: The parent application provides the subdomain via the `CLARUSWMS_AI_INIT` postMessage during initialization.
 
-The subdomain is sent to AgentCore with every request as `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` — this is the only custom header format that AgentCore will pass through to the runtime (configured via `requestHeaderAllowlist`). The SSE bridge also sends `X-Clarus-Subdomain` for consistency, though only the Bedrock-prefixed header reaches the runtime.
-
-Resolution order in `/api/chat`: request body `subdomain` field (embedded mode) → server-side cookie (standalone mode).
-
 ## Embedded Mode (iframe postMessage Protocol)
 
 The frontend can be embedded as an iframe in the main ClarusWMS application by loading it with `?embedded=true` in the URL. Communication between parent and iframe uses a structured postMessage protocol.
@@ -38,32 +34,11 @@ The frontend can be embedded as an iframe in the main ClarusWMS application by l
 
 ### Handshake Flow
 
-```mermaid
-sequenceDiagram
-    participant Parent as Parent App<br/>(ClarusWMS)
-    participant Iframe as AI Frontend<br/>(iframe)
-    participant API as Next.js API
+<Frame>
+  <img src="/images/iframe-handshake-flow.drawio.svg" alt="iframe postMessage handshake sequence showing READY, INIT, ACK, chat request, and token refresh cycle between parent app, iframe, and Next.js API" zoom />
+</Frame>
 
-    Parent->>Iframe: Load iframe with ?embedded=true
-
-    Iframe->>Parent: CLARUSWMS_AI_READY<br/>(targetOrigin: *)
-
-    Parent->>Iframe: CLARUSWMS_AI_INIT<br/>{ token, subdomain }
-    Iframe->>Iframe: Validate origin against<br/>NEXT_PUBLIC_ALLOWED_PARENT_ORIGINS<br/>(supports wildcards: *.clarus.ws)
-    Iframe->>Iframe: Store token + subdomain
-    Iframe->>Parent: CLARUSWMS_AI_INIT_ACK<br/>{ success: true }
-
-    Note over Iframe: Initialized — chat ready
-
-    Iframe->>API: POST /api/chat<br/>Authorization: Bearer <token><br/>{ subdomain: "acme" }
-    API-->>Iframe: SSE stream
-
-    Note over Parent,Iframe: Token refresh cycle
-
-    Iframe->>Parent: CLARUSWMS_AI_TOKEN_EXPIRED
-    Parent->>Parent: Refresh Cognito token
-    Parent->>Iframe: CLARUSWMS_AI_TOKEN_UPDATE<br/>{ token: "new-token" }
-```
+<sub><a href="/images/iframe-handshake-flow.drawio.svg" download="iframe-handshake-flow.drawio.svg">Download SVG</a> · <a href="/images/iframe-handshake-flow.drawio" download="iframe-handshake-flow.drawio">Download draw.io source</a></sub>
 
 **Origin validation**: Allowed origins are configured via `NEXT_PUBLIC_ALLOWED_PARENT_ORIGINS` (comma-separated, supports wildcard patterns like `*.clarus.ws`). Messages from unrecognized origins are silently rejected.
 

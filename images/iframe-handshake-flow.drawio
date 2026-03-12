@@ -1,0 +1,107 @@
+<mxfile host="app.diagrams.net" agent="Claude Code" version="29.6.1">
+  <diagram id="diagram-1" name="Handshake Flow">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="600" pageHeight="650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="p_parent" value="Parent App&lt;br&gt;(ClarusWMS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="30" y="14" width="120" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="p_iframe" value="AI Frontend&lt;br&gt;(iframe)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="230" y="14" width="120" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="p_api" value="Next.js API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="430" y="20" width="120" height="36" as="geometry" />
+        </mxCell>
+
+        <mxCell id="l_parent" value="" style="fillColor=none;strokeColor=#bbb;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="89" y="68" width="2" height="572" as="geometry" />
+        </mxCell>
+        <mxCell id="l_iframe" value="" style="fillColor=none;strokeColor=#bbb;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="289" y="68" width="2" height="572" as="geometry" />
+        </mxCell>
+        <mxCell id="l_api" value="" style="fillColor=none;strokeColor=#bbb;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="489" y="68" width="2" height="572" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a_pa_90" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="88" y="93" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_if_90" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="93" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="a_if_120" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="123" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_pa_120" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="88" y="123" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="a_pa_155" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="88" y="158" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_if_155" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="158" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_if_185" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="188" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_if_210" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="213" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_if_235" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="238" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_if_260" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="263" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_pa_260" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="88" y="263" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="m1" value="Load iframe with ?embedded=true" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_pa_90" target="a_if_90" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" value="CLARUSWMS_AI_READY (targetOrigin: *)" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_if_120" target="a_pa_120" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" value="CLARUSWMS_AI_INIT { token, subdomain }" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_pa_155" target="a_if_155" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s1" value="Validate origin against ALLOWED_PARENT_ORIGINS (supports wildcards: *.clarus.ws)" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" source="a_if_185" target="a_if_210" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="380" y="190" /><mxPoint x="380" y="215" /></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s2" value="Store token + subdomain" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" source="a_if_210" target="a_if_235" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="380" y="215" /><mxPoint x="380" y="240" /></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m4" value="CLARUSWMS_AI_INIT_ACK { success: true }" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_if_260" target="a_pa_260" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note1" value="Initialized — chat ready" style="shape=note;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;fontColor=#232F3E;whiteSpace=wrap;html=1;size=14;align=left;spacingLeft=6;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="220" y="290" width="160" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a_if_340" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="343" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_ap_340" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="488" y="343" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_ap_365" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="488" y="368" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_if_365" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="368" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="m5" value="POST /api/chat + Bearer token { subdomain: &quot;acme&quot; }" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_if_340" target="a_ap_340" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m6" value="SSE stream" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_ap_365" target="a_if_365" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note2" value="Token refresh cycle" style="shape=note;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;fontColor=#232F3E;whiteSpace=wrap;html=1;size=14;align=left;spacingLeft=6;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="120" y="400" width="140" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a_if_450" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="453" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_pa_450" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="88" y="453" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_pa_480" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="88" y="483" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_pa_505" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="88" y="508" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_pa_530" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="88" y="533" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_if_530" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="288" y="533" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="m7" value="CLARUSWMS_AI_TOKEN_EXPIRED" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_if_450" target="a_pa_450" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" value="Refresh Cognito token" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" source="a_pa_480" target="a_pa_505" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="50" y="485" /><mxPoint x="50" y="510" /></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m8" value="CLARUSWMS_AI_TOKEN_UPDATE { token: &quot;new-token&quot; }" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_pa_530" target="a_if_530" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
