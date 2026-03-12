@@ -198,13 +198,13 @@ Each access pattern has its own authentication flow. Use the tabs below to explo
     ```mermaid
     flowchart TD
         req["/api/chat request arrives"]
-        check{"Authorization header<br/>present?"}
-        embedded["Embedded mode:<br/>Extract token from header<br/>Decode JWT for userId"]
-        normal["Standalone mode:<br/>Call auth() for NextAuth session<br/>Extract accessToken from session"]
-        expired{"Token expired?<br/>(401 + JSON-RPC -32001)"}
-        refresh_embedded["Send tokenExpired event<br/>to browser (parent notified<br/>via postMessage)"]
-        refresh_normal["Call auth() again to<br/>trigger JWT callback refresh<br/>Retry Agent Core request"]
-        invoke["Invoke Agent Core<br/>with resolved token"]
+        check{Authorization header present?}
+        embedded["Embedded mode: Extract token from header, decode JWT for userId"]
+        normal["Standalone mode: Call auth for NextAuth session, extract accessToken"]
+        expired{Token expired? 401 + JSON-RPC -32001}
+        refresh_embedded["Send tokenExpired event to browser, parent notified via postMessage"]
+        refresh_normal["Call auth again to trigger JWT callback refresh, retry Agent Core request"]
+        invoke["Invoke Agent Core with resolved token"]
 
         req --> check
         check -->|Yes| embedded
