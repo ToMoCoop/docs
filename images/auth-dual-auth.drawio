@@ -1,0 +1,75 @@
+<mxfile host="app.diagrams.net" agent="Claude Code" version="29.6.1">
+  <diagram id="diagram-1" name="Dual Auth Decision">
+    <mxGraphModel dx="900" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="780" pageHeight="620" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="req" value="/api/chat request arrives" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="280" y="30" width="220" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="check" value="Authorization&lt;br&gt;header present?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="310" y="110" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="embedded" value="&lt;b&gt;Embedded mode&lt;/b&gt;&lt;br&gt;Extract token from header,&lt;br&gt;decode JWT for userId" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="80" y="230" width="200" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="normal" value="&lt;b&gt;Standalone mode&lt;/b&gt;&lt;br&gt;Call auth() for NextAuth session,&lt;br&gt;extract accessToken" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="500" y="230" width="210" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="invoke" value="Invoke Agent Core with resolved token" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="270" y="330" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="expired" value="Token expired?&lt;br&gt;401 + JSON-RPC -32001" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="295" y="410" width="190" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="refresh_embedded" value="Send &lt;b&gt;tokenExpired&lt;/b&gt; event&lt;br&gt;to browser; parent notified&lt;br&gt;via postMessage" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="40" y="540" width="210" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="refresh_normal" value="Call auth() again to trigger&lt;br&gt;JWT callback refresh,&lt;br&gt;retry Agent Core request" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="540" y="540" width="200" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="stream" value="Stream response to client" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="310" y="550" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="req" target="check" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="Yes" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;fontSize=10;fontColor=#232F3E;labelBackgroundColor=default;" edge="1" source="check" target="embedded" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="No" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;fontSize=10;fontColor=#232F3E;labelBackgroundColor=default;" edge="1" source="check" target="normal" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="embedded" target="invoke" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="normal" target="invoke" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="invoke" target="expired" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="Yes, embedded" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;fontSize=10;fontColor=#232F3E;labelBackgroundColor=default;" edge="1" source="expired" target="refresh_embedded" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="Yes, standalone" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;fontSize=10;fontColor=#232F3E;labelBackgroundColor=default;" edge="1" source="expired" target="refresh_normal" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" value="No" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;fontSize=10;fontColor=#232F3E;labelBackgroundColor=default;" edge="1" source="expired" target="stream" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

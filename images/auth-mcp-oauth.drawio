@@ -1,0 +1,156 @@
+<mxfile host="app.diagrams.net" agent="Claude Code" version="29.6.1">
+  <diagram id="diagram-1" name="External MCP Client OAuth">
+    <mxGraphModel dx="1100" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="760" pageHeight="720" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="p_client" value="MCP Client&lt;br&gt;(Claude Desktop)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="15" y="14" width="120" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="p_cf" value="CloudFront&lt;br&gt;(custom domain)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="165" y="14" width="120" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="p_edge" value="Lambda@Edge&lt;br&gt;(OAuth Metadata)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="315" y="14" width="120" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="p_cognito" value="Cognito&lt;br&gt;(eu-west-2)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="465" y="14" width="120" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="p_gw" value="Public MCP&lt;br&gt;Gateway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="615" y="14" width="120" height="48" as="geometry" />
+        </mxCell>
+
+        <mxCell id="l_client" value="" style="fillColor=none;strokeColor=#bbb;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="74" y="68" width="2" height="642" as="geometry" />
+        </mxCell>
+        <mxCell id="l_cf" value="" style="fillColor=none;strokeColor=#bbb;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="224" y="68" width="2" height="642" as="geometry" />
+        </mxCell>
+        <mxCell id="l_edge" value="" style="fillColor=none;strokeColor=#bbb;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="374" y="68" width="2" height="642" as="geometry" />
+        </mxCell>
+        <mxCell id="l_cognito" value="" style="fillColor=none;strokeColor=#bbb;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="524" y="68" width="2" height="642" as="geometry" />
+        </mxCell>
+        <mxCell id="l_gw" value="" style="fillColor=none;strokeColor=#bbb;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="674" y="68" width="2" height="642" as="geometry" />
+        </mxCell>
+
+<mxCell id="a_cl_95" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="98" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_95" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="98" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_ed_110" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="373" y="113" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_110" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="113" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cl_125" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="128" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_ed_125" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="373" y="128" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cl_145" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="148" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_145" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="148" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_160" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="163" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_ed_160" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="373" y="163" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="m1" value="GET /.well-known/oauth-protected-resource" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cl_95" target="a_cf_95" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" value="origin-request" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cf_110" target="a_ed_110" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" value="Resource metadata (auth server URL, scopes)" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_ed_125" target="a_cl_125" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" value="GET /.well-known/openid-configuration" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cl_145" target="a_cf_145" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m5" value="origin-request" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cf_160" target="a_ed_160" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a_cl_175" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="178" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_ed_175" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="373" y="178" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="m5b" value="OIDC discovery document" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_ed_175" target="a_cl_175" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+<mxCell id="a_cl_215" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="218" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_215" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="218" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_235" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="238" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_ed_235" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="373" y="238" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_ed_255" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="373" y="258" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cl_255" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="258" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="m6" value="POST /oauth2/register (DCR)" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cl_215" target="a_cf_215" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m7" value="origin-request" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cf_235" target="a_ed_235" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m8" value="client_id (pre-configured)" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_ed_255" target="a_cl_255" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+<mxCell id="a_cl_310" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="313" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_310" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="313" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_330" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="333" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_ed_330" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="373" y="333" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_350" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="353" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cg_350" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="523" y="353" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cg_375" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="523" y="378" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cl_375" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="378" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="m9" value="GET /oauth2/authorize?client_id=...&amp;amp;code_challenge=xxx&amp;amp;scope=openid+claruswms/full" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cl_310" target="a_cf_310" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m10" value="viewer-request (strips resource param)" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cf_330" target="a_ed_330" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m11" value="Authorize (without resource param)" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cf_350" target="a_cg_350" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m12" value="Authorization code (via redirect)" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cg_375" target="a_cl_375" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+<mxCell id="a_cl_445" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="448" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_445" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="448" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_465" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="468" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cg_465" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="523" y="468" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cg_488" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="523" y="491" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cl_488" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="491" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="m13" value="POST /oauth2/token?code=xxx&amp;amp;code_verifier=xxx" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cl_445" target="a_cf_445" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m14" value="Token exchange" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cf_465" target="a_cg_465" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m15" value="access_token (JWT)" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cg_488" target="a_cl_488" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+<mxCell id="a_cl_540" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="543" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_540" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="543" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cf_560" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="223" y="563" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_gw_560" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="673" y="563" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_gw_580" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="673" y="583" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_gw_600" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="673" y="603" width="4" height="4" as="geometry" /></mxCell>
+        <mxCell id="a_cl_600" value="" style="shape=ellipse;fillColor=none;strokeColor=none;fontSize=0;" vertex="1" parent="1"><mxGeometry x="73" y="603" width="4" height="4" as="geometry" /></mxCell>
+
+        <mxCell id="m16" value="POST /mcp/&lt;tenant&gt; + Bearer token" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cl_540" target="a_cf_540" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m17" value="Tenant extracted, header set" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_cf_560" target="a_gw_560" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m18" value="Validate JWT (client_id ∈ allowed_clients)" style="html=1;strokeColor=#232F3E;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;edgeStyle=orthogonalEdgeStyle;rounded=1;" edge="1" source="a_gw_580" target="a_gw_600" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="730" y="585" /><mxPoint x="730" y="605" /></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m19" value="MCP response" style="html=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;endArrow=block;endFill=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;verticalAlign=bottom;" edge="1" source="a_gw_600" target="a_cl_600" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
