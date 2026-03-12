@@ -35,8 +35,16 @@
       "description": "Booking diary management endpoints for scheduling inbound and outbound dock appointments"
     },
     {
-      "name": "Charge Lines",
-      "description": "Charge line management endpoints for billing and invoicing operations"
+      "name": "Charging: Baskets",
+      "description": "Charge basket endpoints for collecting and invoicing billable charges against accounts. Each account has one open basket at a time that accumulates charge lines from warehouse operations. Use these endpoints to manage basket lifecycle and generate invoices."
+    },
+    {
+      "name": "Charging: Configuration",
+      "description": "Charge configuration endpoints for managing charge cards, charge prices, and charge windows. Charge cards define billing profiles assigned to accounts. Charge prices define pricing rules within a card. Charge windows define recurring billing schedules."
+    },
+    {
+      "name": "Charging: Lines",
+      "description": "Charge line management endpoints for individual billable line items within charge baskets. Charge lines are typically created automatically by warehouse operations but can also be created and managed manually."
     },
     {
       "name": "Documents",
@@ -1364,7 +1372,7 @@
     "/graphql#ListChargeLines": {
       "post": {
         "tags": [
-          "Charge Lines"
+          "Charging: Lines"
         ],
         "summary": "List charge lines",
         "description": "Retrieve charge lines using GraphQL. Supports filtering by charge type, code, date range, and associated records.",
@@ -1493,7 +1501,7 @@
     "/api/charge_lines": {
       "post": {
         "tags": [
-          "Charge Lines"
+          "Charging: Lines"
         ],
         "summary": "Create a charge line",
         "description": "Create a new charge line to record a billable item. Charge lines are used for invoicing and billing operations.",
@@ -1587,7 +1595,7 @@
       },
       "delete": {
         "tags": [
-          "Charge Lines"
+          "Charging: Lines"
         ],
         "summary": "Delete multiple charge lines",
         "description": "Delete multiple charge lines by providing a comma-separated list of IDs.",
@@ -1623,7 +1631,7 @@
     "/api/charge_lines/{id}": {
       "patch": {
         "tags": [
-          "Charge Lines"
+          "Charging: Lines"
         ],
         "summary": "Update a charge line",
         "description": "Update an existing charge line's attributes.",
@@ -1718,7 +1726,7 @@
       },
       "delete": {
         "tags": [
-          "Charge Lines"
+          "Charging: Lines"
         ],
         "summary": "Delete a charge line",
         "description": "Delete a single charge line.",
@@ -1732,6 +1740,1328 @@
             "in": "path",
             "required": true,
             "description": "The unique identifier of the charge line to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/graphql#ListChargeBaskets": {
+      "post": {
+        "tags": [
+          "Charging: Baskets"
+        ],
+        "summary": "List charge baskets",
+        "description": "Retrieve charge baskets using GraphQL. Supports filtering by status, invoice status, date range, and associated account.",
+        "operationId": "listChargeBaskets",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ChargeBasketFilterType) {\n  charge_baskets {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          status\n          invoice_status\n          start_at\n          end_at\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"status\": {\n      \"eq\": \"OPEN\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Charge basket ID |\n| `status` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Basket status (OPEN/CLOSED) |\n| `invoice_status` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Invoice status |\n| `start_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | Basket start date |\n| `end_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | Basket end date |\n| `account_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Associated account |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ChargeBasketFilterType) { charge_baskets { all(filter: $filter) { edges { node { id status invoice_status start_at end_at } } } } }",
+                "variables": {
+                  "filter": {
+                    "status": {
+                      "eq": "OPEN"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "charge_baskets": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Charge Baskets record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "charge_baskets": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "status": "OPEN",
+                              "invoice_status": "not_invoiced",
+                              "start_at": "2026-03-01T00:00:00Z",
+                              "end_at": null
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/charge_baskets": {
+      "post": {
+        "tags": [
+          "Charging: Baskets"
+        ],
+        "summary": "Create a charge basket",
+        "description": "Create a new charge basket for collecting billable charges against an account.",
+        "operationId": "createChargeBasket",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_baskets"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargeBasketCreateAttributes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "charge_baskets",
+                  "attributes": {
+                    "account_id": 1,
+                    "charge_card_id": 1,
+                    "start_at": "2026-03-01T00:00:00Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge Basket created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeBasketResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_baskets\",\n    \"attributes\": {\n      \"account_id\": 1,\n      \"charge_card_id\": 1,\n      \"start_at\": \"2026-03-01T00:00:00Z\"\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `account_id` | Account to associate the basket with |\n| `charge_card_id` | Charge card (billing profile) to use |\n| `start_at` | Start date/time for the billing period |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `end_at` | End date/time for the billing period |\n| `status` | Basket status: OPEN or CLOSED (defaults to OPEN) |\n\n## Important Notes\n\n- Each account typically has one open basket at a time\n- The `invoice_status` field is system-managed and cannot be set via the API"
+        }
+      }
+    },
+    "/api/charge_baskets/{id}": {
+      "patch": {
+        "tags": [
+          "Charging: Baskets"
+        ],
+        "summary": "Update a charge basket",
+        "description": "Update an existing charge basket's attributes.",
+        "operationId": "updateChargeBasket",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge basket to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_baskets"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargeBasketCreateAttributes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge Basket updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeBasketResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_baskets\",\n    \"attributes\": {\n      \"status\": \"CLOSED\",\n      \"end_at\": \"2026-03-31T23:59:59Z\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `status` | No | Update basket status (OPEN/CLOSED) |\n| `end_at` | No | Set or update the billing period end date |\n| `start_at` | No | Update the billing period start date |"
+        }
+      },
+      "delete": {
+        "tags": [
+          "Charging: Baskets"
+        ],
+        "summary": "Delete a charge basket",
+        "description": "Delete a single charge basket. Baskets with invoiced charge lines cannot be deleted.",
+        "operationId": "destroyChargeBasket",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge basket to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/charge_baskets/generate_invoice": {
+      "post": {
+        "tags": [
+          "Charging: Baskets"
+        ],
+        "summary": "Generate invoice from charge baskets",
+        "description": "Creates one AR document (invoice) per account from the selected charge baskets' line items. All documents are created with status 'draft'.",
+        "operationId": "generateInvoiceFromChargeBaskets",
+        "x-mint": {
+          "content": "## Behavior\n\n- Creates one AR document (invoice) per account from the charge basket line items\n- All documents are created with status 'draft'\n- The request body is flat JSON (not JSON:API format)\n- Returns an array of created AR documents\n\n## Important Notes\n\n- `invoice_status` on charge baskets is automatically recalculated after invoice generation\n- Baskets must be in CLOSED status before generating invoices"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of charge basket IDs to generate invoices from",
+                    "minItems": 1
+                  }
+                }
+              },
+              "example": {
+                "ids": [
+                  1,
+                  2,
+                  3
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invoices generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArDocumentResponse"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": "1",
+                      "type": "ar_documents",
+                      "attributes": {
+                        "document_date": "2026-03-12",
+                        "document_due_date": "2026-04-12",
+                        "document_number": "INV-001",
+                        "document_type": "invoice",
+                        "id": 1,
+                        "reference": null,
+                        "tax_status": "tax_exclusive"
+                      },
+                      "relationships": {
+                        "account": {
+                          "data": {
+                            "id": "1",
+                            "type": "accounts"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/graphql#ListChargeCards": {
+      "post": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "List charge cards",
+        "description": "Retrieve charge cards using GraphQL. Supports filtering by code, name, and active status.",
+        "operationId": "listChargeCards",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ChargeCardFilterType) {\n  charge_cards {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          description\n          active\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"active\": {\n      \"eq\": true\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Charge card ID |\n| `active` | BooleanInputType | `eq` | Whether the charge card is active |\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge card code |\n| `description` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Description |\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge card name |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n### Charge Configuration Hierarchy\n\n- **Charge Card** → Contains multiple **Charge Prices** (pricing rules)\n- **Charge Card** → Assigned to **Accounts** (via Account settings)\n- **Charge Prices** → Define rates per unit of measure and charge type\n- **Charge Windows** → Define recurring billing schedules (independent of cards)\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ChargeCardFilterType) { charge_cards { all(filter: $filter) { edges { node { id code name description active } } } } }",
+                "variables": {
+                  "filter": {
+                    "active": {
+                      "eq": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "charge_cards": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Charge Cards record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "charge_cards": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "code": "STANDARD",
+                              "name": "Standard Card",
+                              "description": "Standard billing profile",
+                              "active": true
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/charge_cards": {
+      "post": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "Create a charge card",
+        "description": "Create a new charge card billing profile.",
+        "operationId": "createChargeCard",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_cards"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargeCardCreateAttributes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "charge_cards",
+                  "attributes": {
+                    "code": "STANDARD",
+                    "name": "Standard Card"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge Card created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeCardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_cards\",\n    \"attributes\": {\n      \"code\": \"STANDARD\",\n      \"name\": \"Standard Card\",\n      \"description\": \"Standard billing profile\"\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `code` | Unique code for the charge card (1-30 chars) |\n| `name` | Display name for the charge card (max 50 chars) |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `active` | Whether the charge card is active (defaults to true) |\n| `description` | Description of the billing profile |"
+        }
+      }
+    },
+    "/api/charge_cards/{id}": {
+      "patch": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "Update a charge card",
+        "description": "Update an existing charge card's attributes.",
+        "operationId": "updateChargeCard",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge card to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_cards"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargeCardCreateAttributes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge Card updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeCardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_cards\",\n    \"attributes\": {\n      \"name\": \"Updated Card Name\",\n      \"active\": false\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `code` | No | Update the charge card code |\n| `name` | No | Update the display name |\n| `active` | No | Enable or disable the charge card |\n| `description` | No | Update the description |"
+        }
+      },
+      "delete": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "Delete a charge card",
+        "description": "Delete a single charge card. Charge cards with associated charge prices or accounts cannot be deleted.",
+        "operationId": "destroyChargeCard",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge card to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/graphql#ListChargePrices": {
+      "post": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "List charge prices",
+        "description": "Retrieve charge prices using GraphQL. Supports filtering by charge type, code, name, and associated charge card.",
+        "operationId": "listChargePrices",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ChargePriceFilterType) {\n  charge_prices {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          charge_type\n          subtype\n          unit_of_measure\n          quantity\n          price\n          auto_charge\n          description\n          nominal_code\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"charge_type\": {\n      \"eq\": \"PICK\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Charge price ID |\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge price code |\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge price name |\n| `charge_type` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Type of charge |\n| `charge_card_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Associated charge card |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n### PICK-Only Conditions\n\nThe following fields are only applicable when `charge_type` is `PICK`. They allow you to define specific pricing rules for different picking scenarios:\n\n| Field | Description |\n|-------|-------------|\n| `subtype` | Pick subtype: FULL, PART, PICKFACE, or DEMAND_PICKFACE |\n| `carrier_id` | Specific carrier for carrier-based pick pricing |\n| `carrier_service_id` | Specific carrier service level |\n| `order_type_id` | Specific order type for order-type-based pricing |\n\n### Unit of Measure Values\n\nThe `unit_of_measure` field supports 21 values across several categories. See charge configuration documentation for detailed descriptions of each.\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ChargePriceFilterType) { charge_prices { all(filter: $filter) { edges { node { id code name charge_type subtype unit_of_measure quantity price auto_charge description nominal_code } } } } }",
+                "variables": {
+                  "filter": {
+                    "charge_type": {
+                      "eq": "PICK"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "charge_prices": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Charge Prices record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "charge_prices": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "code": "PICK-STD",
+                              "name": "Standard Pick",
+                              "charge_type": "PICK",
+                              "subtype": null,
+                              "unit_of_measure": "item",
+                              "quantity": 1,
+                              "price": 0.5,
+                              "auto_charge": true,
+                              "description": null,
+                              "nominal_code": null
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/charge_prices": {
+      "post": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "Create a charge price",
+        "description": "Create a new charge price rule within a charge card.",
+        "operationId": "createChargePrice",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_prices"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargePriceCreateAttributes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "charge_prices",
+                  "attributes": {
+                    "charge_card_id": 1,
+                    "charge_type": "PICK",
+                    "code": "PICK-STD",
+                    "name": "Standard Pick",
+                    "price": 0.5,
+                    "quantity": 1,
+                    "unit_of_measure": "item"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge Price created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargePriceResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_prices\",\n    \"attributes\": {\n      \"charge_card_id\": 1,\n      \"charge_type\": \"PICK\",\n      \"code\": \"PICK-STD\",\n      \"name\": \"Standard Pick\",\n      \"price\": 0.50,\n      \"quantity\": 1,\n      \"unit_of_measure\": \"item\"\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_card_id` | Charge card this price belongs to |\n| `code` | Unique code for the charge price (max 50 chars) |\n| `name` | Display name (max 50 chars) |\n| `charge_type` | One of: RENTAL, RECEIPT, PICK, SUNDRY |\n| `unit_of_measure` | Unit of measure for billing calculation |\n| `quantity` | Quantity threshold or multiplier |\n| `price` | Unit price |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `auto_charge` | Whether charges are created automatically |\n| `description` | Additional description |\n| `nominal_code` | Accounting nominal code |\n| `subtype` | PICK only: FULL, PART, PICKFACE, or DEMAND_PICKFACE |\n| `carrier_id` | PICK only: Specific carrier for pricing |\n| `carrier_service_id` | PICK only: Specific carrier service |\n| `order_type_id` | PICK only: Specific order type |\n| `location_group_id` | Location group for pricing scope |\n| `product_group_id` | Product group for pricing scope |\n| `storage_unit_type_id` | Storage unit type for pricing scope |"
+        }
+      }
+    },
+    "/api/charge_prices/{id}": {
+      "patch": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "Update a charge price",
+        "description": "Update an existing charge price's attributes.",
+        "operationId": "updateChargePrice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge price to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_prices"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargePriceCreateAttributes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge Price updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargePriceResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_prices\",\n    \"attributes\": {\n      \"price\": 0.75,\n      \"auto_charge\": true\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `price` | No | Update the unit price |\n| `quantity` | No | Update the quantity |\n| `auto_charge` | No | Enable or disable auto-charging |\n| `code` | No | Update the charge price code |\n| `name` | No | Update the display name |"
+        }
+      },
+      "delete": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "Delete a charge price",
+        "description": "Delete a single charge price. Charge prices referenced by existing charge lines cannot be deleted.",
+        "operationId": "destroyChargePrice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge price to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/graphql#ListChargeWindows": {
+      "post": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "List charge windows",
+        "description": "Retrieve charge windows using GraphQL. Supports filtering by name and frequency.",
+        "operationId": "listChargeWindows",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ChargeWindowFilterType) {\n  charge_windows {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          frequency\n          numbers\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"frequency\": {\n      \"eq\": \"Day\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Charge window ID |\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Window name |\n| `frequency` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Frequency type (Day/Month) |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n### Numbers Field\n\nThe `numbers` array defines which days or dates the billing window applies to:\n\n- **Day frequency**: Numbers 0-6 where 0=Sunday, 1=Monday, ..., 6=Saturday\n- **Month frequency**: Numbers 1-31 for day of month\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ChargeWindowFilterType) { charge_windows { all(filter: $filter) { edges { node { id name frequency numbers } } } } }",
+                "variables": {
+                  "filter": {
+                    "frequency": {
+                      "eq": "Day"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "charge_windows": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Charge Windows record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "charge_windows": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "name": "Weekly Monday",
+                              "frequency": "Day",
+                              "numbers": [
+                                1
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/charge_windows": {
+      "post": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "Create a charge window",
+        "description": "Create a new charge window for defining recurring billing schedules.",
+        "operationId": "createChargeWindow",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_windows"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargeWindowCreateAttributes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "charge_windows",
+                  "attributes": {
+                    "frequency": "Day",
+                    "name": "Weekly Monday",
+                    "numbers": [
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge Window created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeWindowResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_windows\",\n    \"attributes\": {\n      \"frequency\": \"Day\",\n      \"name\": \"Weekly Monday\",\n      \"numbers\": [1]\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `frequency` | Frequency type: Day or Month |\n| `numbers` | Array of day/date numbers for the schedule |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `name` | Display name for the charge window |\n\n## Numbers Field Values\n\n- **Day frequency**: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday\n- **Month frequency**: 1-31 for day of month"
+        }
+      }
+    },
+    "/api/charge_windows/{id}": {
+      "patch": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "Update a charge window",
+        "description": "Update an existing charge window's attributes.",
+        "operationId": "updateChargeWindow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge window to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_windows"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargeWindowCreateAttributes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge Window updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeWindowResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_windows\",\n    \"attributes\": {\n      \"name\": \"Updated Window\",\n      \"numbers\": [1, 3, 5]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `frequency` | No | Update frequency type (Day/Month) |\n| `name` | No | Update the display name |\n| `numbers` | No | Update the day/date numbers |"
+        }
+      },
+      "delete": {
+        "tags": [
+          "Charging: Configuration"
+        ],
+        "summary": "Delete a charge window",
+        "description": "Delete a single charge window.",
+        "operationId": "destroyChargeWindow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge window to delete",
             "schema": {
               "type": "integer"
             }
@@ -9150,7 +10480,11 @@
                 }
               },
               "example": {
-                "ids": [1, 2, 3],
+                "ids": [
+                  1,
+                  2,
+                  3
+                ],
                 "user_id": 5
               }
             }
@@ -9298,7 +10632,11 @@
                 }
               },
               "example": {
-                "ids": [1, 2, 3]
+                "ids": [
+                  1,
+                  2,
+                  3
+                ]
               }
             }
           }
@@ -11471,6 +12809,759 @@
             "type": "integer",
             "nullable": true,
             "description": "Associated storage unit. Recommended for RENTAL charges."
+          }
+        }
+      },
+      "ArDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "ar_documents"
+                  ]
+                },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "document_date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "document_due_date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "document_number": {
+                      "type": "string"
+                    },
+                    "document_type": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "integer"
+                    },
+                    "reference": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "tax_status": {
+                      "type": "string",
+                      "enum": [
+                        "tax_exclusive",
+                        "tax_inclusive",
+                        "no_tax"
+                      ]
+                    }
+                  }
+                },
+                "relationships": {
+                  "type": "object",
+                  "properties": {
+                    "account": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "accounts"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "data": [
+            {
+              "id": "1",
+              "type": "ar_documents",
+              "attributes": {
+                "document_date": "2026-03-12",
+                "document_due_date": "2026-04-12",
+                "document_number": "INV-001",
+                "document_type": "invoice",
+                "id": 1,
+                "reference": null,
+                "tax_status": "tax_exclusive"
+              },
+              "relationships": {
+                "account": {
+                  "data": {
+                    "id": "1",
+                    "type": "accounts"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "ChargeBasketAttributes": {
+        "type": "object",
+        "properties": {
+          "end_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer"
+          },
+          "invoice_status": {
+            "type": "string",
+            "enum": [
+              "not_invoiced",
+              "part_invoiced",
+              "fully_invoiced"
+            ]
+          },
+          "start_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "CLOSED"
+            ]
+          }
+        },
+        "example": {
+          "end_at": null,
+          "id": 1,
+          "invoice_status": "not_invoiced",
+          "start_at": "2026-03-01T00:00:00Z",
+          "status": "OPEN"
+        }
+      },
+      "ChargeBasketCreateAttributes": {
+        "type": "object",
+        "required": [
+          "account_id",
+          "charge_card_id",
+          "start_at"
+        ],
+        "properties": {
+          "account_id": {
+            "type": "integer",
+            "description": "Account to associate the basket with."
+          },
+          "charge_card_id": {
+            "type": "integer",
+            "description": "Charge card (billing profile) to use."
+          },
+          "end_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "End date/time for the billing period."
+          },
+          "start_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start date/time for the billing period."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "CLOSED"
+            ],
+            "description": "Basket status. Defaults to OPEN."
+          }
+        },
+        "example": {
+          "account_id": 1,
+          "charge_card_id": 1,
+          "start_at": "2026-03-01T00:00:00Z"
+        }
+      },
+      "ChargeBasketResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "charge_baskets"
+                ]
+              },
+              "attributes": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ChargeBasketAttributes"
+                  }
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "properties": {
+                  "account": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "accounts"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "charge_card": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "charge_cards"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ChargeCardAttributes": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "active": true,
+          "code": "STANDARD",
+          "description": "Standard billing profile",
+          "id": 1,
+          "name": "Standard Card"
+        }
+      },
+      "ChargeCardCreateAttributes": {
+        "type": "object",
+        "required": [
+          "code",
+          "name"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Whether the charge card is active. Defaults to true."
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30,
+            "description": "Unique code for the charge card."
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Description of the billing profile."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Display name for the charge card."
+          }
+        },
+        "example": {
+          "code": "STANDARD",
+          "name": "Standard Card"
+        }
+      },
+      "ChargeCardResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "charge_cards"
+                ]
+              },
+              "attributes": {
+                "$ref": "#/components/schemas/ChargeCardAttributes"
+              }
+            }
+          }
+        },
+        "example": {
+          "data": {
+            "id": "1",
+            "type": "charge_cards",
+            "attributes": {
+              "active": true,
+              "code": "STANDARD",
+              "description": "Standard billing profile",
+              "id": 1,
+              "name": "Standard Card"
+            }
+          }
+        }
+      },
+      "ChargePriceAttributes": {
+        "type": "object",
+        "properties": {
+          "auto_charge": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "charge_type": {
+            "type": "string",
+            "enum": [
+              "RENTAL",
+              "RECEIPT",
+              "PICK",
+              "SUNDRY"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nominal_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "subtype": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "FULL",
+              "PART",
+              "PICKFACE",
+              "DEMAND_PICKFACE"
+            ]
+          },
+          "unit_of_measure": {
+            "type": "string",
+            "enum": [
+              "goods_in_receipt_completed",
+              "goods_in_receipt_started",
+              "goods_out_completed",
+              "goods_out_created",
+              "goods_out_pick_list_completed",
+              "goods_out_pick_list_created",
+              "item",
+              "item_product_cube",
+              "item_product_cubic_metre",
+              "item_product_height",
+              "item_product_length",
+              "item_product_value",
+              "item_product_weight",
+              "item_product_width",
+              "item_stock_cubic",
+              "pick_case",
+              "pick_inner",
+              "pick_outer",
+              "pick_unit",
+              "storage_unit",
+              "storage_unit_to",
+              "unique_product"
+            ]
+          }
+        },
+        "example": {
+          "auto_charge": true,
+          "charge_type": "PICK",
+          "code": "PICK-STD",
+          "description": null,
+          "id": 1,
+          "name": "Standard Pick",
+          "nominal_code": null,
+          "price": 0.5,
+          "quantity": 1,
+          "unit_of_measure": "item"
+        }
+      },
+      "ChargePriceCreateAttributes": {
+        "type": "object",
+        "required": [
+          "charge_card_id",
+          "code",
+          "name",
+          "charge_type",
+          "unit_of_measure",
+          "quantity",
+          "price"
+        ],
+        "properties": {
+          "auto_charge": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether charges are created automatically."
+          },
+          "carrier_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Specific carrier for PICK pricing."
+          },
+          "carrier_service_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Specific carrier service for PICK pricing."
+          },
+          "charge_card_id": {
+            "type": "integer",
+            "description": "Charge card this price belongs to."
+          },
+          "charge_type": {
+            "type": "string",
+            "enum": [
+              "RENTAL",
+              "RECEIPT",
+              "PICK",
+              "SUNDRY"
+            ],
+            "description": "Type of charge."
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Unique code for the charge price."
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Additional description."
+          },
+          "location_group_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Location group for pricing scope."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Display name for the charge price."
+          },
+          "nominal_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "Accounting nominal code."
+          },
+          "order_type_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Specific order type for PICK pricing."
+          },
+          "price": {
+            "type": "number",
+            "description": "Unit price."
+          },
+          "product_group_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Product group for pricing scope."
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantity threshold or multiplier."
+          },
+          "storage_unit_type_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Storage unit type for pricing scope."
+          },
+          "subtype": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "FULL",
+              "PART",
+              "PICKFACE",
+              "DEMAND_PICKFACE"
+            ],
+            "description": "Pick subtype. Only applicable for PICK charge type."
+          },
+          "unit_of_measure": {
+            "type": "string",
+            "enum": [
+              "goods_in_receipt_completed",
+              "goods_in_receipt_started",
+              "goods_out_completed",
+              "goods_out_created",
+              "goods_out_pick_list_completed",
+              "goods_out_pick_list_created",
+              "item",
+              "item_product_cube",
+              "item_product_cubic_metre",
+              "item_product_height",
+              "item_product_length",
+              "item_product_value",
+              "item_product_weight",
+              "item_product_width",
+              "item_stock_cubic",
+              "pick_case",
+              "pick_inner",
+              "pick_outer",
+              "pick_unit",
+              "storage_unit",
+              "storage_unit_to",
+              "unique_product"
+            ],
+            "description": "Unit of measure for billing calculation."
+          }
+        },
+        "example": {
+          "charge_card_id": 1,
+          "charge_type": "PICK",
+          "code": "PICK-STD",
+          "name": "Standard Pick",
+          "price": 0.5,
+          "quantity": 1,
+          "unit_of_measure": "item"
+        }
+      },
+      "ChargePriceResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "charge_prices"
+                ]
+              },
+              "attributes": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ChargePriceAttributes"
+                  }
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "properties": {
+                  "charge_card": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "charge_cards"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "storage_unit_type": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "storage_unit_types"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ChargeWindowAttributes": {
+        "type": "object",
+        "properties": {
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "Day",
+              "Month"
+            ]
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        },
+        "example": {
+          "frequency": "Day",
+          "id": 1,
+          "name": "Weekly Monday",
+          "numbers": [
+            1
+          ]
+        }
+      },
+      "ChargeWindowCreateAttributes": {
+        "type": "object",
+        "required": [
+          "frequency",
+          "numbers"
+        ],
+        "properties": {
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "Day",
+              "Month"
+            ],
+            "description": "Frequency type for the billing window."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the charge window."
+          },
+          "numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Array of day/date numbers for the schedule."
+          }
+        },
+        "example": {
+          "frequency": "Day",
+          "name": "Weekly Monday",
+          "numbers": [
+            1
+          ]
+        }
+      },
+      "ChargeWindowResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "charge_windows"
+                ]
+              },
+              "attributes": {
+                "$ref": "#/components/schemas/ChargeWindowAttributes"
+              }
+            }
+          }
+        },
+        "example": {
+          "data": {
+            "id": "1",
+            "type": "charge_windows",
+            "attributes": {
+              "frequency": "Day",
+              "id": 1,
+              "name": "Weekly Monday",
+              "numbers": [
+                1
+              ]
+            }
           }
         }
       },
@@ -15166,7 +17257,10 @@
               "type": "string"
             },
             "description": "Array of serial number strings",
-            "example": ["SN-001", "SN-002"]
+            "example": [
+              "SN-001",
+              "SN-002"
+            ]
           },
           "start_at": {
             "type": "string",
@@ -15554,7 +17648,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["accounts"],
+                            "enum": [
+                              "accounts"
+                            ],
                             "example": "accounts"
                           }
                         }
@@ -15574,7 +17670,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["goods_outs"],
+                            "enum": [
+                              "goods_outs"
+                            ],
                             "example": "goods_outs"
                           }
                         }
@@ -15593,7 +17691,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["goods_out_lines"]
+                            "enum": [
+                              "goods_out_lines"
+                            ]
                           }
                         }
                       }
@@ -15611,7 +17711,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["goods_out_pick_lists"]
+                            "enum": [
+                              "goods_out_pick_lists"
+                            ]
                           }
                         }
                       }
@@ -15629,7 +17731,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["inbound_goods"]
+                            "enum": [
+                              "inbound_goods"
+                            ]
                           }
                         }
                       }
@@ -15647,7 +17751,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["inbound_items"]
+                            "enum": [
+                              "inbound_items"
+                            ]
                           }
                         }
                       }
@@ -15665,7 +17771,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["users"]
+                            "enum": [
+                              "users"
+                            ]
                           }
                         }
                       }
@@ -15684,7 +17792,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["locations"],
+                            "enum": [
+                              "locations"
+                            ],
                             "example": "locations"
                           }
                         }
@@ -15704,7 +17814,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["locations"],
+                            "enum": [
+                              "locations"
+                            ],
                             "example": "locations"
                           }
                         }
@@ -15724,7 +17836,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["products"],
+                            "enum": [
+                              "products"
+                            ],
                             "example": "products"
                           }
                         }
@@ -15743,7 +17857,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["stocks"]
+                            "enum": [
+                              "stocks"
+                            ]
                           }
                         }
                       }
@@ -15761,7 +17877,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["storage_units"]
+                            "enum": [
+                              "storage_units"
+                            ]
                           }
                         }
                       }
@@ -15779,7 +17897,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["storage_units"]
+                            "enum": [
+                              "storage_units"
+                            ]
                           }
                         }
                       }
@@ -15798,7 +17918,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["task_types"],
+                            "enum": [
+                              "task_types"
+                            ],
                             "example": "task_types"
                           }
                         }
@@ -15817,7 +17939,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["users"]
+                            "enum": [
+                              "users"
+                            ]
                           }
                         }
                       }
@@ -15836,7 +17960,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["users"],
+                            "enum": [
+                              "users"
+                            ],
                             "example": "users"
                           }
                         }
@@ -15856,7 +17982,9 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["warehouses"],
+                            "enum": [
+                              "warehouses"
+                            ],
                             "example": "warehouses"
                           }
                         }
