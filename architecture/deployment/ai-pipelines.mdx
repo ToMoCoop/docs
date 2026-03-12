@@ -1,12 +1,16 @@
 ---
 title: 'AI Deployment Pipelines'
-description: 'CI/CD pipelines for the AI Lambda tools, agent runtime, interceptor, and schema deployments'
+description: 'CI/CD pipelines for the AI Lambda tools, agent runtime, interceptor, schema deployments, and the AI frontend app'
 icon: 'pipe-section'
 ---
 
-All AI application code lives in the **ClarusWMS_Agents** GitHub repository. Five separate pipelines handle different components, triggered by file path filters on the `main` branch.
+AI deployments span two repositories. The **ClarusWMS_Agents** repo contains Lambda tools, the agent runtime, interceptor, and schema parsers — deployed via five path-filtered pipelines. The **ClarusWMS_AI** repo contains the Next.js frontend app, deployed as a Docker container on ECS via its own pipeline.
 
-## Source Directories
+## Agent Pipelines
+
+All agent code lives in the **ClarusWMS_Agents** repository. Five separate pipelines handle different components, triggered by file path filters on the `main` branch.
+
+### Source Directories
 
 | Directory | Produces | Description |
 |---|---|---|
@@ -18,7 +22,7 @@ All AI application code lives in the **ClarusWMS_Agents** GitHub repository. Fiv
 | `scripts/generators/generate-tool-schema-api.mjs` | `clarus-mcp-api-tools.json` | Tool schema for API Lambda |
 | `scripts/generators/generate-tool-schema-utils.mjs` | `clarus-mcp-utils-tools.json` | Tool schema for Utils Lambda |
 
-## Pipeline Architecture
+### Pipeline Architecture
 
 Each pipeline follows the same pattern: source change triggers a build in the shared Build account, which deploys to staging, waits for manual approval, then deploys to production.
 
@@ -28,7 +32,7 @@ Each pipeline follows the same pattern: source change triggers a build in the sh
 
 <sub><a href="/images/ai-pipeline-architecture.drawio.svg" download="ai-pipeline-architecture.drawio.svg">Download SVG</a> · <a href="/images/ai-pipeline-architecture.drawio" download="ai-pipeline-architecture.drawio">Download draw.io source</a></sub>
 
-## Pipeline Triggers
+### Pipeline Triggers
 
 Each pipeline watches specific file paths on the `main` branch:
 
@@ -40,7 +44,7 @@ Each pipeline watches specific file paths on the `main` branch:
 | `agents-agent-runtime` | `agent-runtime/**`, `buildspecs/agent-runtime-*` |
 | `agents-schemas` | `api-parser/**`, `buildspecs/schemas-*` |
 
-## Deployment Steps (Lambda Tools)
+### Deployment Steps
 
 <Steps>
   <Step title="Build & Package">
@@ -63,3 +67,63 @@ Each pipeline watches specific file paths on the `main` branch:
 <Note>
 The pipeline and build accounts are **shared infrastructure** used by all ClarusWMS services. They are not AI-specific — the same CodePipeline and CodeBuild setup handles deployments for other services as well.
 </Note>
+
+## Frontend App Pipeline
+
+The AI frontend (Next.js) is deployed as a Docker container on ECS from the **ClarusWMS_AI** repository, separate from the Lambda pipelines above.
+
+<Frame>
+  <img src="/images/ai-frontend-pipeline.drawio.svg" alt="AI frontend app deployment pipeline showing GitHub source flowing through CodeBuild ARM64 Docker build to ECR, with image tag promotion through staging and production ECS deployments" zoom />
+</Frame>
+
+<sub><a href="/images/ai-frontend-pipeline.drawio.svg" download="ai-frontend-pipeline.drawio.svg">Download SVG</a> · <a href="/images/ai-frontend-pipeline.drawio" download="ai-frontend-pipeline.drawio">Download draw.io source</a></sub>
+
+### Pipeline Stages
+
+<Steps>
+  <Step title="Source">
+    ClarusWMS_AI `main` branch via CodeStar Connection triggers the pipeline.
+  </Step>
+  <Step title="Build">
+    ARM64 Docker build in the build account. CodeBuild project `ai-app-build` uses the `amazonlinux2-aarch64-standard:3.0` image with privileged mode enabled. Pushes to ECR `claruswms-ai:latest`. 15-minute timeout.
+  </Step>
+  <Step title="Tag Staging">
+    ECR manifest re-tag from `latest` to `staging` using `batch-get-image` + `put-image` — no Docker pull required. Outputs `imagedefinitions.json` for the deploy action.
+  </Step>
+  <Step title="Deploy Staging">
+    CodePipeline ECS deploy action using `imagedefinitions.json`. Cross-account deployment via `PipelinesAccountDeployRole`.
+  </Step>
+  <Step title="Manual Approval">
+    Deployment pauses for manual approval before promoting to production.
+  </Step>
+  <Step title="Tag Production">
+    ECR manifest re-tag from `latest` to `production` using the same manifest copy technique.
+  </Step>
+  <Step title="Deploy Production">
+    ECS deploy to the production account.
+  </Step>
+</Steps>
+
+### Image Promotion Model
+
+A single Docker build produces one image. Rather than rebuilding for each environment, the image is promoted via ECR tag manipulation:
+
+1. **Build** pushes `claruswms-ai:latest`
+2. **Staging** re-tags the manifest as `staging` (no rebuild, no pull)
+3. **Production** re-tags the same manifest as `production`
+
+This guarantees identical image content across all environments — the image digest never changes.
+
+### Key Configuration
+
+| Setting | Value |
+|---|---|
+| Pipeline | `ai-app` (CodePipeline V2) |
+| Execution mode | SUPERSEDED (new pushes cancel in-progress runs) |
+| Build project | `ai-app-build` |
+| Build image | `amazonlinux2-aarch64-standard:3.0` (ARM64, privileged) |
+| ECR repository | `claruswms-ai` |
+| Artifacts | S3 with KMS encryption, 30-day lifecycle |
+| Build timeout | 15 minutes |
+| Docker Hub credentials | SSM Parameter Store (avoids rate limits) |
+| Caching | Docker layer cache + source cache |
