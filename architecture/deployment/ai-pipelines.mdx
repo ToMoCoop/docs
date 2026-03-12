@@ -22,50 +22,11 @@ All AI application code lives in the **ClarusWMS_Agents** GitHub repository. Fiv
 
 Each pipeline follows the same pattern: source change triggers a build in the shared Build account, which deploys to staging, waits for manual approval, then deploys to production.
 
-```mermaid
-flowchart TD
-    subgraph Source["GitHub: ClarusWMS_Agents"]
-        code[Source Code]
-    end
+<Frame>
+  <img src="/images/ai-pipeline-architecture.drawio.svg" alt="AI deployment pipeline architecture showing GitHub source flowing through CodePipeline V2 and CodeBuild to staging and production accounts with S3, Lambda, and gateway target sync" zoom />
+</Frame>
 
-    subgraph Pipelines["CodePipeline V2 (Pipelines Account)"]
-        p1(agents-gateway-tools-api)
-        p2(agents-gateway-tool-utils)
-        p3(agents-interceptor)
-        p4(agents-agent-runtime)
-        p5(agents-schemas)
-    end
-
-    subgraph Build["CodeBuild (Build Account)"]
-        b1[Build & Package]
-    end
-
-    subgraph Staging["Staging Account"]
-        s3_staging[(S3 Agents Bucket)]
-        lambda_staging[Lambda Update]
-        target_staging[Gateway Target Sync]
-        runtime_staging[Runtime Update]
-    end
-
-    subgraph Approval
-        approve{Manual Approval}
-    end
-
-    subgraph Production["Production Account"]
-        s3_prod[(S3 Agents Bucket)]
-        lambda_prod[Lambda Update]
-        target_prod[Gateway Target Sync]
-        runtime_prod[Runtime Update]
-    end
-
-    code -->|Push to main| Pipelines
-    p1 & p2 & p3 & p4 & p5 --> b1
-    b1 --> s3_staging --> lambda_staging --> target_staging
-    b1 --> s3_staging --> runtime_staging
-    target_staging & runtime_staging --> approve
-    approve --> s3_prod --> lambda_prod --> target_prod
-    approve --> s3_prod --> runtime_prod
-```
+<sub><a href="/images/ai-pipeline-architecture.drawio.svg" download="ai-pipeline-architecture.drawio.svg">Download SVG</a> · <a href="/images/ai-pipeline-architecture.drawio" download="ai-pipeline-architecture.drawio">Download draw.io source</a></sub>
 
 ## Pipeline Triggers
 
