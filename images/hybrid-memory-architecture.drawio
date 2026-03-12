@@ -1,0 +1,120 @@
+<mxfile host="app.diagrams.net" agent="Claude Code" version="29.6.1">
+  <diagram id="diagram-1" name="Hybrid Memory Architecture">
+    <mxGraphModel dx="1000" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="820" pageHeight="580" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="msg" value="User Message" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="20" y="30" width="130" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="search" value="Semantic Search" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="20" y="120" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="search_label" value="SemanticMemoryHook" style="text;html=1;fontSize=9;fontStyle=1;fontColor=#9673a6;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="20" y="100" width="140" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="enrich" value="Prepend relevant context&lt;br&gt;(max 2000 chars)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="20" y="190" width="130" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="converse" value="Model Conversation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="250" y="155" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="converse_label" value="Strands Agent" style="text;html=1;fontSize=9;fontStyle=1;fontColor=#82b366;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="250" y="135" width="100" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tools" value="Tool Execution" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="250" y="230" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3mgr" value="S3SessionManager&lt;br&gt;Auto-persist per event" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="250" y="330" width="150" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="s3mgr_label" value="Session Persistence" style="text;html=1;fontSize=9;fontStyle=1;fontColor=#d6b656;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="250" y="310" width="120" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3" value="S3: agent-sessions/" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontColor=#232F3E;size=10;" vertex="1" parent="1">
+          <mxGeometry x="275" y="420" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="check" value="Messages&lt;br&gt;&amp;gt; 40?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="510" y="140" width="100" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="check_label" value="Context Management" style="text;html=1;fontSize=9;fontStyle=1;fontColor=#b85450;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="490" y="120" width="130" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="summarize" value="Summarize oldest 30%&lt;br&gt;Preserve recent 10" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="620" y="250" width="160" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="index" value="Update Semantic&lt;br&gt;Index" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="500" y="370" width="120" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="state" value="Store in&lt;br&gt;agent.state" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="670" y="370" width="110" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_msg_search" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="msg" target="search" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_search_enrich" value="Retrieve historical context" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;" edge="1" source="search" target="enrich" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_enrich_converse" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="enrich" target="converse" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_converse_tools" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="converse" target="tools" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_tools_converse" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="tools" target="converse" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="220" y="250" /><mxPoint x="220" y="175" /></Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_converse_s3mgr" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="converse" target="s3mgr" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_s3mgr_s3" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="s3mgr" target="s3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_converse_check" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="converse" target="check" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_check_no" value="No" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;" edge="1" source="check" target="converse" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" x="0" y="-10" />
+            <Array as="points"><mxPoint x="560" y="100" /><mxPoint x="325" y="100" /></Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_check_summarize" value="Yes" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;" edge="1" source="check" target="summarize" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_summarize_index" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="summarize" target="index" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_summarize_state" value="" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;" edge="1" source="summarize" target="state" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_index_search" value="Embeddings" style="endArrow=block;endFill=1;strokeColor=#232F3E;strokeWidth=1;dashed=1;dashPattern=4 3;fontSize=9;fontColor=#232F3E;labelBackgroundColor=default;" edge="1" source="index" target="search" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="300" y="500" /><mxPoint x="85" y="500" /></Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

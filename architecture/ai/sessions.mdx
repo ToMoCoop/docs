@@ -35,43 +35,11 @@ The `S3SessionManager` (as of March 2026) handles low-level persistence. It auto
 
 The agent uses a two-tier memory system that balances conversation context limits with long-term recall. When conversations grow long, older messages are summarized and indexed — but they're not lost. A semantic search retrieves relevant context from those summaries on every new message.
 
-```mermaid
-flowchart TD
-    subgraph Request["Incoming Request"]
-        msg[User Message]
-    end
+<Frame>
+  <img src="/images/hybrid-memory-architecture.drawio.svg" alt="Hybrid memory architecture flowchart showing user message flowing through semantic search, model conversation, session persistence to S3, and context management with summarization and semantic indexing" zoom />
+</Frame>
 
-    subgraph Memory["SemanticMemoryHook"]
-        search[Semantic Search]
-        enrich[Prepend Relevant Context<br/>max 2000 chars]
-    end
-
-    subgraph Agent["Strands Agent"]
-        converse[Model Conversation]
-        tools[Tool Execution]
-    end
-
-    subgraph Persistence["Session Persistence"]
-        s3mgr[S3SessionManager<br/>Auto-persist per event]
-        s3[(S3: agent-sessions/)]
-    end
-
-    subgraph Compaction["Context Management"]
-        check{Messages > 40?}
-        summarize[Summarize oldest 30%<br/>Preserve recent 10]
-        index[Update Semantic Index]
-        state[Store in agent.state]
-    end
-
-    msg --> search -->|retrieve historical context| enrich --> converse
-    converse --> tools --> converse
-    converse --> s3mgr --> s3
-
-    converse --> check
-    check -->|Yes| summarize --> index & state
-    check -->|No| converse
-    index -.->|embeddings| search
-```
+<sub><a href="/images/hybrid-memory-architecture.drawio.svg" download="hybrid-memory-architecture.drawio.svg">Download SVG</a> · <a href="/images/hybrid-memory-architecture.drawio" download="hybrid-memory-architecture.drawio">Download draw.io source</a></sub>
 
 ### Tier 1 — Session Persistence
 
