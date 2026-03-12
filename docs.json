@@ -1,13 +1,13 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "ClarusWMS",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#1D4763",
+    "light": "#6B9DC2",
+    "dark": "#B1C5DE"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.png",
   "api": {
     "playground": {
       "display": "interactive"
@@ -24,29 +24,12 @@
         "public": true,
         "groups": [
           {
-            "group": "Get Started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
+            "group": "Overview",
+            "pages": ["index"]
           },
           {
             "group": "Integrations",
-            "pages": [
-              "integrations/cloudprint"
-            ]
-          },
-          {
-            "group": "Essentials",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
-            ]
+            "pages": ["integrations/cloudprint"]
           }
         ]
       },
@@ -81,15 +64,11 @@
           {
             "group": "API Documentation",
             "public": true,
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "pages": ["api-reference/introduction"]
           },
           {
             "group": "Core Resources",
-            "pages": [
-              "api-reference/core-resources/address"
-            ]
+            "pages": ["api-reference/core-resources/address"]
           },
           {
             "group": "Operations",
@@ -98,49 +77,23 @@
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Support",
+      "href": "https://support.claruswms.com"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "linkedin": "https://uk.linkedin.com/company/claruswms",
+      "youtube": "https://www.youtube.com/@claruswms"
     }
   }
 }
