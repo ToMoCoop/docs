@@ -30,10 +30,6 @@ All AI services authenticate against the same **Cognito user pool** — an exist
 
 The AI infrastructure runs in **us-east-1** because several required services (Bedrock AgentCore, MCP gateway support) are not yet available in eu-west-2, our preferred region. The Cognito user pool remains in eu-west-2 as a shared organisational resource — the cross-region latency on token operations is negligible.
 
-<Warning>
-**JWT `client_id` vs `aud` gotcha**: Cognito access tokens set the application client ID in the `client_id` claim, **not** in the `aud` claim. All JWT validation in the AI layer uses `client_id` accordingly. If you're integrating a new service, validate against `client_id` — checking `aud` will silently fail.
-</Warning>
-
 ## Lambda@Edge Functions
 
 Five edge functions handle request/response transformation at CloudFront. Four are Lambda@Edge functions (running at edge locations); one is a CloudFront Function (lighter weight, runs at every edge POP).

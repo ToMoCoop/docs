@@ -86,42 +86,11 @@ Both access paths — external MCP clients and the frontend app — share the sa
 
 Each environment runs in a **dedicated AWS account**. A shared Pipelines account triggers builds via CodePipeline V2, and CodeBuild deploys cross-account using IAM roles. Terraform manages resources in each account via an organization-level access role.
 
-```mermaid
-flowchart TD
-    subgraph Main["Main Account"]
-        org(Organization Management)
-    end
+<Frame>
+  <img src="/images/aws-account-architecture.svg" alt="ClarusWMS AWS Account Architecture — CI/CD pipeline and multi-account deployment" zoom />
+</Frame>
 
-    subgraph Pipelines["Pipelines Account"]
-        cp(CodePipeline V2)
-        cs(CodeStar Connection<br/>to GitHub)
-    end
-
-    subgraph BuildAccount["Build Account"]
-        cb(CodeBuild Projects)
-        artifacts[(Artifact Bucket)]
-    end
-
-    subgraph Dev["Develop Account"]
-        dev_infra(AI Infrastructure<br/>agents-develop)
-    end
-
-    subgraph Staging["Staging Account"]
-        stg_infra(AI Infrastructure<br/>agents-staging)
-    end
-
-    subgraph Prod["Production Account"]
-        prod_infra(AI Infrastructure<br/>agents-production)
-    end
-
-    cs -->|Source| cp
-    cp -->|Cross-account role| cb
-    cb -->|PipelinesAccountDeployRole| dev_infra
-    cb -->|PipelinesAccountDeployRole| stg_infra
-    cb -->|PipelinesAccountDeployRole| prod_infra
-
-    Main -.->|OrganizationAtlantisAccountAccessRole| Dev & Staging & Prod
-```
+<sub><a href="/images/aws-account-architecture.svg" download="aws-account-architecture.svg">Download SVG</a> · <a href="/images/aws-account-architecture.drawio" download="aws-account-architecture.drawio">Download draw.io source</a></sub>
 
 The pipeline and build accounts are **shared infrastructure** used by all ClarusWMS services — they're not AI-specific.
 

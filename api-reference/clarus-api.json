@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "ClarusWMS API",
-    "description": "REST API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides mutation endpoints for managing warehouse operations including inventory, goods in/out, users, and integrations.\n\n**Note**: GET/list endpoints are not included as GraphQL is used for all data retrieval operations.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Use the client credentials or authorization code flow to obtain an access token from `https://clarus-api.com/oauth/token`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```",
+    "description": "REST and GraphQL API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides REST mutation endpoints (POST, PUT, DELETE) for managing warehouse operations and GraphQL list endpoints for data retrieval.\n\n**REST mutations** are available at `/api/*` paths.\n\n**GraphQL queries** are available at `/graphql` — each resource has a documented list query.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Use the client credentials or authorization code flow to obtain an access token from `https://clarus-api.com/oauth/token`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll REST mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```\n\n## GraphQL Queries\n\nAll data retrieval uses GraphQL at `POST /graphql`. Send a JSON body with `query` and optional `variables`:\n\n```json\n{\n  \"query\": \"query($code: String) { accounts { all(code: $code) { edges { node { id code name } } } } }\",\n  \"variables\": { \"code\": \"ACME\" }\n}\n```",
     "version": "1.0.0",
     "contact": {
       "name": "Clarus Software",
@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://clarus-api.com/api",
+      "url": "https://clarus-api.com",
       "description": "Production API"
     }
   ],
@@ -123,7 +123,7 @@
     }
   ],
   "paths": {
-    "/accounts": {
+    "/api/accounts": {
       "post": {
         "tags": [
           "Accounts"
@@ -214,7 +214,7 @@
         }
       }
     },
-    "/accounts/{id}": {
+    "/api/accounts/{id}": {
       "put": {
         "tags": [
           "Accounts"
@@ -420,7 +420,7 @@
         }
       }
     },
-    "/account_warehouses": {
+    "/api/account_warehouses": {
       "post": {
         "tags": [
           "Account Warehouses"
@@ -519,7 +519,7 @@
         }
       }
     },
-    "/account_warehouses/{id}": {
+    "/api/account_warehouses/{id}": {
       "put": {
         "tags": [
           "Account Warehouses"
@@ -666,7 +666,7 @@
         }
       }
     },
-    "/bookings": {
+    "/api/bookings": {
       "post": {
         "tags": [
           "Bookings"
@@ -757,7 +757,7 @@
         }
       }
     },
-    "/bookings/{id}": {
+    "/api/bookings/{id}": {
       "put": {
         "tags": [
           "Bookings"
@@ -998,7 +998,7 @@
         }
       }
     },
-    "/charge_lines": {
+    "/api/charge_lines": {
       "post": {
         "tags": [
           "Charge Lines"
@@ -1006,7 +1006,7 @@
         "summary": "Create a charge line",
         "description": "Create a new charge line to record a billable item. Charge lines are used for invoicing and billing operations.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity \u00d7 price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity × price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
         },
         "operationId": "createChargeLine",
         "parameters": [
@@ -1136,7 +1136,7 @@
         }
       }
     },
-    "/charge_lines/{id}": {
+    "/api/charge_lines/{id}": {
       "put": {
         "tags": [
           "Charge Lines"
@@ -1272,7 +1272,7 @@
         }
       }
     },
-    "/documents/{id}/download": {
+    "/api/documents/{id}/download": {
       "get": {
         "tags": [
           "Documents"
@@ -1327,7 +1327,7 @@
         }
       }
     },
-    "/documents/{id}/send_to_ftp": {
+    "/api/documents/{id}/send_to_ftp": {
       "post": {
         "tags": [
           "Documents"
@@ -1387,7 +1387,7 @@
         }
       }
     },
-    "/documents/{id}/upload": {
+    "/api/documents/{id}/upload": {
       "post": {
         "tags": [
           "Documents"
@@ -1477,7 +1477,7 @@
         }
       }
     },
-    "/goods_in_receipts": {
+    "/api/goods_in_receipts": {
       "post": {
         "tags": [
           "Goods In Receipts"
@@ -1604,7 +1604,7 @@
         }
       }
     },
-    "/goods_in_receipts/{id}": {
+    "/api/goods_in_receipts/{id}": {
       "put": {
         "tags": [
           "Goods In Receipts"
@@ -1743,7 +1743,7 @@
         }
       }
     },
-    "/goods_out_processes/process_picks_async": {
+    "/api/goods_out_processes/process_picks_async": {
       "post": {
         "tags": [
           "Goods Out: Pick Lists"
@@ -1796,7 +1796,7 @@
         }
       }
     },
-    "/goods_out_processes/process_and_consolidate_picks": {
+    "/api/goods_out_processes/process_and_consolidate_picks": {
       "post": {
         "tags": [
           "Goods Out: Pick Lists"
@@ -1854,7 +1854,7 @@
         }
       }
     },
-    "/goods_out_pick_lists/{id}": {
+    "/api/goods_out_pick_lists/{id}": {
       "put": {
         "tags": [
           "Goods Out: Pick Lists"
@@ -2026,7 +2026,7 @@
         }
       }
     },
-    "/goods_out_processes/short_order_lines": {
+    "/api/goods_out_processes/short_order_lines": {
       "post": {
         "tags": [
           "Goods Out: Processing"
@@ -2074,7 +2074,7 @@
         }
       }
     },
-    "/goods_outs": {
+    "/api/goods_outs": {
       "post": {
         "tags": [
           "Goods Out: Orders"
@@ -2213,7 +2213,7 @@
         ]
       }
     },
-    "/goods_outs/{id}": {
+    "/api/goods_outs/{id}": {
       "put": {
         "tags": [
           "Goods Out: Orders"
@@ -2355,7 +2355,7 @@
         }
       }
     },
-    "/goods_outs/{id}/cancel": {
+    "/api/goods_outs/{id}/cancel": {
       "post": {
         "tags": [
           "Goods Out: Orders"
@@ -2403,7 +2403,7 @@
         }
       }
     },
-    "/groups/{group_id}/product_groups": {
+    "/api/groups/{group_id}/product_groups": {
       "post": {
         "tags": [
           "Groups"
@@ -2531,7 +2531,7 @@
         }
       }
     },
-    "/groups/{group_id}/product_group": {
+    "/api/groups/{group_id}/product_group": {
       "delete": {
         "tags": [
           "Groups"
@@ -2578,7 +2578,7 @@
         }
       }
     },
-    "/integrations": {
+    "/api/integrations": {
       "post": {
         "tags": [
           "Integrations"
@@ -2669,7 +2669,7 @@
         }
       }
     },
-    "/integrations/{id}": {
+    "/api/integrations/{id}": {
       "put": {
         "tags": [
           "Integrations"
@@ -2852,7 +2852,7 @@
         }
       }
     },
-    "/integrations/{id}/synchronize": {
+    "/api/integrations/{id}/synchronize": {
       "post": {
         "tags": [
           "Integrations"
@@ -2900,7 +2900,7 @@
         }
       }
     },
-    "/loads": {
+    "/api/loads": {
       "post": {
         "tags": [
           "Loads"
@@ -2991,7 +2991,7 @@
         }
       }
     },
-    "/loads/{id}": {
+    "/api/loads/{id}": {
       "put": {
         "tags": [
           "Loads"
@@ -3130,7 +3130,7 @@
         }
       }
     },
-    "/locations": {
+    "/api/locations": {
       "post": {
         "tags": [
           "Locations"
@@ -3218,7 +3218,7 @@
         }
       }
     },
-    "/locations/{id}": {
+    "/api/locations/{id}": {
       "put": {
         "tags": [
           "Locations"
@@ -3354,7 +3354,7 @@
         }
       }
     },
-    "/products": {
+    "/api/products": {
       "post": {
         "tags": [
           "Products"
@@ -3501,7 +3501,7 @@
         }
       }
     },
-    "/products/{id}": {
+    "/api/products/{id}": {
       "put": {
         "tags": [
           "Products"
@@ -3637,7 +3637,7 @@
         }
       }
     },
-    "/goods_out_processes/trigger_replenishment": {
+    "/api/goods_out_processes/trigger_replenishment": {
       "post": {
         "tags": [
           "Replenishment"
@@ -3681,7 +3681,7 @@
         }
       }
     },
-    "/report_queries": {
+    "/api/report_queries": {
       "post": {
         "tags": [
           "Report Queries"
@@ -3689,7 +3689,7 @@
         "summary": "Create a report query",
         "description": "Create a new report query definition. Report queries allow you to save GraphQL queries for repeated execution.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"graphql\": \"query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\\\"AVAILABLE\\\", \\\"ALLOCATED\\\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \\\"total_records DESC\\\") { task_type { code } total_records } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouse_id\", \"type\": \"Integer\" },\n        { \"name\": \"account_id\", \"type\": \"Integer\" },\n        { \"name\": \"created_at_from\", \"type\": \"Date\" },\n        { \"name\": \"created_at_to\", \"type\": \"Date\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | Yes | Named GraphQL query with typed parameters (never anonymous) |\n| `parameters` | No | Array of parameter definitions matching query variables |\n\n## GraphQL Query Rules\n\n- Must be a **named query** (e.g., `query getTasksToDo(...)`) \u2014 never anonymous\n- Use `$variable` syntax for parameters with GraphQL types (`ID`, `Chronic`, `String`)\n- Common query patterns: `aggregation(...)` for grouped/summarized data, `all(...) { edges { node { ... } } }` for paginated lists\n\n## Parameter Types\n\n| Type | GraphQL Type | Description |\n|------|-------------|-------------|\n| `Integer` | `ID` | Integer ID value |\n| `Date` | `Chronic` | Date/time parsed with natural language (e.g., 'start of today') |\n| `String` | `String` | Text value |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"graphql\": \"query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\\\"AVAILABLE\\\", \\\"ALLOCATED\\\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \\\"total_records DESC\\\") { task_type { code } total_records } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouse_id\", \"type\": \"Integer\" },\n        { \"name\": \"account_id\", \"type\": \"Integer\" },\n        { \"name\": \"created_at_from\", \"type\": \"Date\" },\n        { \"name\": \"created_at_to\", \"type\": \"Date\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | Yes | Named GraphQL query with typed parameters (never anonymous) |\n| `parameters` | No | Array of parameter definitions matching query variables |\n\n## GraphQL Query Rules\n\n- Must be a **named query** (e.g., `query getTasksToDo(...)`) — never anonymous\n- Use `$variable` syntax for parameters with GraphQL types (`ID`, `Chronic`, `String`)\n- Common query patterns: `aggregation(...)` for grouped/summarized data, `all(...) { edges { node { ... } } }` for paginated lists\n\n## Parameter Types\n\n| Type | GraphQL Type | Description |\n|------|-------------|-------------|\n| `Integer` | `ID` | Integer ID value |\n| `Date` | `Chronic` | Date/time parsed with natural language (e.g., 'start of today') |\n| `String` | `String` | Text value |"
         },
         "operationId": "createReportQuery",
         "parameters": [
@@ -3797,7 +3797,7 @@
         }
       }
     },
-    "/report_queries/{id}": {
+    "/api/report_queries/{id}": {
       "put": {
         "tags": [
           "Report Queries"
@@ -3933,7 +3933,7 @@
         }
       }
     },
-    "/reports": {
+    "/api/reports": {
       "post": {
         "tags": [
           "Reports"
@@ -3941,7 +3941,7 @@
         "summary": "Create a report",
         "description": "Create a new report definition based on an existing report query. Reports define how query results are formatted and what variables are used.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"report_type\": \"bar\",\n      \"report_query_id\": 1,\n      \"source_path\": \"data.tasks.aggregation\",\n      \"report_fields\": [\n        { \"name\": \"Task Type\", \"path\": \"task_type.code\" },\n        { \"name\": \"Tasks Left To Do\", \"path\": \"total_records\" }\n      ],\n      \"variables\": [\n        { \"name\": \"created_at_from\", \"value\": \"start of today\", \"prompt\": \"true\" },\n        { \"name\": \"created_at_to\", \"value\": \"end of today\", \"prompt\": \"true\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `source_path` | No | Dot-notation path to data in GraphQL response. Must start with `data.` (e.g., `data.tasks.aggregation`, `data.stocks.all.edges`) |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## source_path\n\nThe `source_path` tells the system where to find data in the GraphQL response. It always starts with `data.` Common patterns:\n- `data.{resource}.aggregation` \u2014 for grouped/summarized results\n- `data.{resource}.all.edges` \u2014 for paginated lists (each item under `node`)\n- For paginated queries, `report_fields` paths must start with `node.` (e.g., `node.warehouse.name`)\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `start of today`, `end of today`, `start of this month`) which are parsed at report generation time. Variable names must match parameters defined in the linked report query."
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"report_type\": \"bar\",\n      \"report_query_id\": 1,\n      \"source_path\": \"data.tasks.aggregation\",\n      \"report_fields\": [\n        { \"name\": \"Task Type\", \"path\": \"task_type.code\" },\n        { \"name\": \"Tasks Left To Do\", \"path\": \"total_records\" }\n      ],\n      \"variables\": [\n        { \"name\": \"created_at_from\", \"value\": \"start of today\", \"prompt\": \"true\" },\n        { \"name\": \"created_at_to\", \"value\": \"end of today\", \"prompt\": \"true\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `source_path` | No | Dot-notation path to data in GraphQL response. Must start with `data.` (e.g., `data.tasks.aggregation`, `data.stocks.all.edges`) |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## source_path\n\nThe `source_path` tells the system where to find data in the GraphQL response. It always starts with `data.` Common patterns:\n- `data.{resource}.aggregation` — for grouped/summarized results\n- `data.{resource}.all.edges` — for paginated lists (each item under `node`)\n- For paginated queries, `report_fields` paths must start with `node.` (e.g., `node.warehouse.name`)\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `start of today`, `end of today`, `start of this month`) which are parsed at report generation time. Variable names must match parameters defined in the linked report query."
         },
         "operationId": "createReport",
         "parameters": [
@@ -4024,7 +4024,7 @@
         }
       }
     },
-    "/reports/{id}": {
+    "/api/reports/{id}": {
       "put": {
         "tags": [
           "Reports"
@@ -4255,7 +4255,7 @@
         }
       }
     },
-    "/reports/{id}/generate": {
+    "/api/reports/{id}/generate": {
       "post": {
         "tags": [
           "Reports"
@@ -4263,7 +4263,7 @@
         "summary": "Generate report output",
         "description": "Queue asynchronous report generation. Returns a Document record that can be polled for status and downloaded when complete.",
         "x-mint": {
-          "content": "## Workflow\n\n1. **Call this endpoint** \u2014 returns a Document with `status: queued`\n2. **Poll the document status** via GraphQL until `status` becomes `available` (or `failed`)\n3. **Download the file** via `GET /documents/{id}/download` to get a presigned S3 URL\n4. **Use the presigned URL** to download the generated report file\n\n## Request Body (Optional)\n\nYou can optionally pass `variables` to override the report's stored variable values:\n\n```json\n{\n  \"variables\": [\n    { \"name\": \"date_from\", \"value\": \"2024-01-01 00:00:00\" },\n    { \"name\": \"date_to\", \"value\": \"2024-01-31 23:59:59\" }\n  ]\n}\n```\n\nIf no variables are provided, the report's stored variables are used. Passed variables are merged with stored variables (passed values take precedence).\n\n## Variable Values\n\nVariables support Chronic-style date parsing:\n- `today 00:00:00` \u2014 start of today\n- `3 days ago` \u2014 3 days before now\n- `beginning of month` \u2014 first day of current month\n- `2024-01-15 09:00:00` \u2014 explicit date/time\n\n## Access Control\n\nOnly the report owner can generate it. Returns 403 if the authenticated user is not the owner."
+          "content": "## Workflow\n\n1. **Call this endpoint** — returns a Document with `status: queued`\n2. **Poll the document status** via GraphQL until `status` becomes `available` (or `failed`)\n3. **Download the file** via `GET /documents/{id}/download` to get a presigned S3 URL\n4. **Use the presigned URL** to download the generated report file\n\n## Request Body (Optional)\n\nYou can optionally pass `variables` to override the report's stored variable values:\n\n```json\n{\n  \"variables\": [\n    { \"name\": \"date_from\", \"value\": \"2024-01-01 00:00:00\" },\n    { \"name\": \"date_to\", \"value\": \"2024-01-31 23:59:59\" }\n  ]\n}\n```\n\nIf no variables are provided, the report's stored variables are used. Passed variables are merged with stored variables (passed values take precedence).\n\n## Variable Values\n\nVariables support Chronic-style date parsing:\n- `today 00:00:00` — start of today\n- `3 days ago` — 3 days before now\n- `beginning of month` — first day of current month\n- `2024-01-15 09:00:00` — explicit date/time\n\n## Access Control\n\nOnly the report owner can generate it. Returns 403 if the authenticated user is not the owner."
         },
         "operationId": "generateReport",
         "parameters": [
@@ -4357,7 +4357,7 @@
         }
       }
     },
-    "/roles": {
+    "/api/roles": {
       "post": {
         "tags": [
           "Roles"
@@ -4448,7 +4448,7 @@
         }
       }
     },
-    "/roles/{id}": {
+    "/api/roles/{id}": {
       "put": {
         "tags": [
           "Roles"
@@ -4608,7 +4608,7 @@
         }
       }
     },
-    "/scheduled_reports": {
+    "/api/scheduled_reports": {
       "post": {
         "tags": [
           "Scheduled Reports"
@@ -4616,7 +4616,7 @@
         "summary": "Create a scheduled report",
         "description": "Create a new scheduled report that delivers reports via email and/or FTP on a recurring schedule.",
         "x-mint": {
-          "content": "## Request Structure\n\nScheduled reports use JSON:API format with embedded relationships:\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Weekly Stock Report\",\n      \"frequency\": \"Day\",\n      \"numbers\": [1, 3, 5],\n      \"time\": \"09:00\",\n      \"subject\": \"Weekly Stock Report\",\n      \"body\": \"Please find the weekly stock report attached.\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": [\n                { \"name\": \"date_from\", \"value\": \"today 00:00:00\" }\n              ]\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      },\n      \"scheduled-report-ftp-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"ftp_user_id\": 5\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Schedule name (max 50 chars) |\n| `frequency` | Yes | `Day` (days of the week) or `Month` (days of the month) |\n| `numbers` | Yes | Array of integers \u2014 day numbers when schedule runs |\n| `time` | Yes | Time of day to run (e.g., `09:00`) |\n| `subject` | No | Email subject line (max 256 chars) |\n| `body` | No | Email body text |\n\n## Frequency & Numbers\n\n- `Day` frequency: numbers 1-7 (1 = Monday, 7 = Sunday)\n- `Month` frequency: numbers 1-31 (day of month)\n\n## Relationships\n\nRelationship keys use **kebab-case** in the JSON:API `relationships` object:\n\n| Relationship | Description |\n|--------------|-------------|\n| `scheduled-report-reports` | Reports to generate (each with optional variable overrides) |\n| `scheduled-report-recipients` | Email recipients |\n| `scheduled-report-ftp-recipients` | FTP destinations |"
+          "content": "## Request Structure\n\nScheduled reports use JSON:API format with embedded relationships:\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Weekly Stock Report\",\n      \"frequency\": \"Day\",\n      \"numbers\": [1, 3, 5],\n      \"time\": \"09:00\",\n      \"subject\": \"Weekly Stock Report\",\n      \"body\": \"Please find the weekly stock report attached.\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": [\n                { \"name\": \"date_from\", \"value\": \"today 00:00:00\" }\n              ]\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      },\n      \"scheduled-report-ftp-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"ftp_user_id\": 5\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Schedule name (max 50 chars) |\n| `frequency` | Yes | `Day` (days of the week) or `Month` (days of the month) |\n| `numbers` | Yes | Array of integers — day numbers when schedule runs |\n| `time` | Yes | Time of day to run (e.g., `09:00`) |\n| `subject` | No | Email subject line (max 256 chars) |\n| `body` | No | Email body text |\n\n## Frequency & Numbers\n\n- `Day` frequency: numbers 1-7 (1 = Monday, 7 = Sunday)\n- `Month` frequency: numbers 1-31 (day of month)\n\n## Relationships\n\nRelationship keys use **kebab-case** in the JSON:API `relationships` object:\n\n| Relationship | Description |\n|--------------|-------------|\n| `scheduled-report-reports` | Reports to generate (each with optional variable overrides) |\n| `scheduled-report-recipients` | Email recipients |\n| `scheduled-report-ftp-recipients` | FTP destinations |"
         },
         "operationId": "createScheduledReport",
         "parameters": [
@@ -4745,13 +4745,13 @@
         }
       }
     },
-    "/scheduled_reports/{id}": {
+    "/api/scheduled_reports/{id}": {
       "put": {
         "tags": [
           "Scheduled Reports"
         ],
         "summary": "Update a scheduled report",
-        "description": "Update an existing scheduled report. Only the owner can update it. **Warning: updates are full replacements** \u2014 omitting a recipient or report from the update payload will delete it.",
+        "description": "Update an existing scheduled report. Only the owner can update it. **Warning: updates are full replacements** — omitting a recipient or report from the update payload will delete it.",
         "x-mint": {
           "content": "## Important: Full Replacement\n\n**Updates are full replacements for relationships.** If you omit a recipient or report from the update, it will be **deleted**. Always include all desired recipients and reports in the update payload.\n\n## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Updated Weekly Report\",\n      \"time\": \"10:00\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": []\n            }\n          },\n          {\n            \"attributes\": {\n              \"report_id\": 2,\n              \"variables\": []\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Access Control\n\nOnly the scheduled report owner can update it. Returns 403 if the authenticated user is not the owner."
         },
@@ -4932,7 +4932,7 @@
         }
       }
     },
-    "/shipments": {
+    "/api/shipments": {
       "post": {
         "tags": [
           "Shipments"
@@ -5026,7 +5026,7 @@
         }
       }
     },
-    "/shipments/{id}": {
+    "/api/shipments/{id}": {
       "put": {
         "tags": [
           "Shipments"
@@ -5168,7 +5168,7 @@
         }
       }
     },
-    "/shipments/{id}/submit": {
+    "/api/shipments/{id}/submit": {
       "post": {
         "tags": [
           "Shipments"
@@ -5216,7 +5216,7 @@
         }
       }
     },
-    "/shipments/{id}/cancel": {
+    "/api/shipments/{id}/cancel": {
       "post": {
         "tags": [
           "Shipments"
@@ -5264,7 +5264,7 @@
         }
       }
     },
-    "/stocks/hold": {
+    "/api/stocks/hold": {
       "post": {
         "tags": [
           "Stocks"
@@ -5318,7 +5318,7 @@
         }
       }
     },
-    "/stocks/offhold": {
+    "/api/stocks/offhold": {
       "post": {
         "tags": [
           "Stocks"
@@ -5372,7 +5372,7 @@
         }
       }
     },
-    "/stocks/{id}/move": {
+    "/api/stocks/{id}/move": {
       "post": {
         "tags": [
           "Stocks"
@@ -5427,7 +5427,7 @@
         }
       }
     },
-    "/stocks/{id}/transfer": {
+    "/api/stocks/{id}/transfer": {
       "post": {
         "tags": [
           "Stocks"
@@ -5482,7 +5482,7 @@
         }
       }
     },
-    "/stocks/{id}/negative_adjustment": {
+    "/api/stocks/{id}/negative_adjustment": {
       "post": {
         "tags": [
           "Stocks"
@@ -5537,7 +5537,7 @@
         }
       }
     },
-    "/storage_units": {
+    "/api/storage_units": {
       "post": {
         "tags": [
           "Storage Units"
@@ -5625,7 +5625,7 @@
         }
       }
     },
-    "/storage_units/{id}": {
+    "/api/storage_units/{id}": {
       "put": {
         "tags": [
           "Storage Units"
@@ -5761,7 +5761,7 @@
         }
       }
     },
-    "/templates": {
+    "/api/templates": {
       "post": {
         "tags": [
           "Templates"
@@ -5852,7 +5852,7 @@
         }
       }
     },
-    "/templates/{id}": {
+    "/api/templates/{id}": {
       "put": {
         "tags": [
           "Templates"
@@ -6022,7 +6022,7 @@
         }
       }
     },
-    "/templates/{id}/attachment": {
+    "/api/templates/{id}/attachment": {
       "post": {
         "tags": [
           "Templates"
@@ -6079,7 +6079,7 @@
         }
       }
     },
-    "/templates/{id}/test": {
+    "/api/templates/{id}/test": {
       "patch": {
         "tags": [
           "Templates"
@@ -6161,7 +6161,7 @@
         }
       }
     },
-    "/users": {
+    "/api/users": {
       "post": {
         "tags": [
           "Users"
@@ -6252,7 +6252,7 @@
         }
       }
     },
-    "/users/{id}": {
+    "/api/users/{id}": {
       "put": {
         "tags": [
           "Users"
@@ -6450,7 +6450,7 @@
         }
       }
     },
-    "/warehouses": {
+    "/api/warehouses": {
       "post": {
         "tags": [
           "Warehouses"
@@ -6544,7 +6544,7 @@
         }
       }
     },
-    "/warehouses/{id}": {
+    "/api/warehouses/{id}": {
       "put": {
         "tags": [
           "Warehouses"
@@ -6732,6 +6732,2980 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/graphql#ListAccounts": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "List accounts",
+        "description": "Retrieve accounts using GraphQL. Supports filtering, sorting, and pagination via relay-style connections.",
+        "operationId": "listAccounts",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: AccountFilterType) {\n  accounts {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          email\n          is_active\n          external_system_reference1\n          vat_number\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"code\": {\n      \"ilike\": \"ACME\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Account code |\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Account name |\n| `warehouse_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Accounts associated with a warehouse |\n| `is_short_pickable` | BooleanInputType | `eq` | Filter by short pickable setting |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: AccountFilterType) { accounts { all(filter: $filter) { edges { node { id code name email is_active external_system_reference1 vat_number } } } } }",
+                "variables": {
+                  "filter": {
+                    "code": {
+                      "ilike": "ACME"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "accounts": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Accounts record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "accounts": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "code": "ACME",
+                              "name": "Acme Corporation",
+                              "email": "warehouse@acme.com",
+                              "is_active": true,
+                              "external_system_reference1": null,
+                              "vat_number": null
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListAccountWarehouses": {
+      "post": {
+        "tags": [
+          "Account Warehouses"
+        ],
+        "summary": "List account warehouses",
+        "description": "Retrieve account-warehouse associations using GraphQL. Shows which accounts can operate in which warehouses.",
+        "operationId": "listAccountWarehouses",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: AccountWarehouseFilterType) {\n  account_warehouses {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          account_id\n          warehouse_id\n          account {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"account_id\": {\n      \"eq\": \"1\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `account_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by account ID |\n| `warehouse_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by warehouse ID |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: AccountWarehouseFilterType) { account_warehouses { all(filter: $filter) { edges { node { id account_id warehouse_id account { id code name } warehouse { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "account_id": {
+                      "eq": "1"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "account_warehouses": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Account Warehouses record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "account_warehouses": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "account_id": 1,
+                              "account": {
+                                "id": "1",
+                                "code": "ACME",
+                                "name": "Acme Corporation"
+                              },
+                              "warehouse_id": 1,
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListBookings": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "List bookings",
+        "description": "Retrieve dock bookings using GraphQL. Supports filtering by status, direction, account, and date range.",
+        "operationId": "listBookings",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: BookingFilterType) {\n  bookings {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          booking_reference\n          account_reference\n          status\n          direction\n          start_time\n          end_time\n          haulier\n          notes\n          account {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"status\": {\n      \"eq\": \"confirmed\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `booking_reference` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Booking reference |\n| `status` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Booking status |\n| `direction` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Direction (inbound/outbound) |\n| `account_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by account ID |\n| `start_time` | DatetimeInputType | `eq`, `from`, `to`, `between` | Filter by start time |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: BookingFilterType) { bookings { all(filter: $filter) { edges { node { id booking_reference account_reference status direction start_time end_time haulier notes account { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "status": {
+                      "eq": "confirmed"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "bookings": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Bookings record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "bookings": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "booking_reference": "BK-001",
+                              "account_reference": "PO-12345",
+                              "status": "confirmed",
+                              "direction": "inbound",
+                              "start_time": "2026-03-10T09:00:00Z",
+                              "end_time": "2026-03-10T10:00:00Z",
+                              "haulier": "Express Logistics",
+                              "notes": null,
+                              "account": {
+                                "id": "1",
+                                "code": "ACME",
+                                "name": "Acme Corporation"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListChargeLines": {
+      "post": {
+        "tags": [
+          "Charge Lines"
+        ],
+        "summary": "List charge lines",
+        "description": "Retrieve charge lines using GraphQL. Supports filtering by charge type, code, date range, and associated records.",
+        "operationId": "listChargeLines",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ChargeLineFilterType) {\n  charge_lines {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          charge_type\n          quantity\n          price\n          total\n          unit_of_measure\n          description\n          created_at\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"charge_type\": {\n      \"eq\": \"picking\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge line code |\n| `charge_type` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Type of charge |\n| `goods_in_receipt_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by goods in receipt |\n| `goods_out_order_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by goods out order |\n| `created_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | Filter by creation date |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ChargeLineFilterType) { charge_lines { all(filter: $filter) { edges { node { id code name charge_type quantity price total unit_of_measure description created_at } } } } }",
+                "variables": {
+                  "filter": {
+                    "charge_type": {
+                      "eq": "picking"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "charge_lines": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Charge Lines record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "charge_lines": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "code": "PICK-001",
+                              "name": "Picking Charge",
+                              "charge_type": "picking",
+                              "quantity": 10,
+                              "price": 1.5,
+                              "total": 15.0,
+                              "unit_of_measure": "unit",
+                              "description": "Standard picking charge",
+                              "created_at": "2026-03-10T08:00:00Z"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListDocuments": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "List documents",
+        "description": "Retrieve generated documents using GraphQL. Supports filtering by category, status, and file type.",
+        "operationId": "listDocuments",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: DocumentFilterType) {\n  documents {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          file_name\n          file_type\n          category\n          status\n          created_at\n          updated_at\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"category\": {\n      \"eq\": \"report\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `file_name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Document file name |\n| `category` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Document category |\n| `status` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Document status |\n| `file_type` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | File type (e.g. pdf, csv) |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: DocumentFilterType) { documents { all(filter: $filter) { edges { node { id file_name file_type category status created_at updated_at } } } } }",
+                "variables": {
+                  "filter": {
+                    "category": {
+                      "eq": "report"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "documents": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Documents record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "documents": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "file_name": "stock-report-2026-03.pdf",
+                              "file_type": "pdf",
+                              "category": "report",
+                              "status": "completed",
+                              "created_at": "2026-03-10T08:00:00Z",
+                              "updated_at": "2026-03-10T08:01:00Z"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListGoodsInReceipts": {
+      "post": {
+        "tags": [
+          "Goods In Receipts"
+        ],
+        "summary": "List goods in receipts",
+        "description": "Retrieve inbound receipts using GraphQL. Supports filtering by reference, status, account, warehouse, and date ranges.",
+        "operationId": "listGoodsInReceipts",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: InboundGoodFilterType) {\n  goods_in_receipts {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          reference\n          status\n          receipt_type\n          expected_date_of_receipt\n          actual_date_of_receipt\n          notes\n          account {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"status\": {\n      \"eq\": \"receiving\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `reference` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Receipt reference |\n| `status` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Receipt status (e.g. draft, receiving, completed) |\n| `account_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by account ID |\n| `warehouse_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by warehouse ID |\n| `expected_date_of_receipt` | DatetimeInputType | `eq`, `from`, `to`, `between` | Expected receipt date |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: InboundGoodFilterType) { goods_in_receipts { all(filter: $filter) { edges { node { id reference status receipt_type expected_date_of_receipt actual_date_of_receipt notes account { id code name } warehouse { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "status": {
+                      "eq": "receiving"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "goods_in_receipts": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Goods In Receipts record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "goods_in_receipts": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "reference": "GIR-001",
+                              "status": "receiving",
+                              "receipt_type": "standard",
+                              "expected_date_of_receipt": "2026-03-10",
+                              "actual_date_of_receipt": null,
+                              "notes": null,
+                              "account": {
+                                "id": "1",
+                                "code": "ACME",
+                                "name": "Acme Corporation"
+                              },
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListGoodsOuts": {
+      "post": {
+        "tags": [
+          "Goods Out: Orders"
+        ],
+        "summary": "List goods out orders",
+        "description": "Retrieve outbound orders using GraphQL. Supports extensive filtering by reference, status, account, warehouse, carrier, dates, and custom fields.",
+        "operationId": "listGoodsOuts",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: GoodsOutsFilterType) {\n  goods_outs {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          reference\n          priority\n          expected_date_of_dispatch\n          delivery_notes\n          order_notes\n          goods_out_status {\n            id\n            code\n            name\n          }\n          account {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n          carrier {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"goods_out_status_code\": {\n      \"eq\": \"PENDING\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `reference` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Order reference |\n| `goods_out_status_code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Status code (DRAFT, PENDING, PICK, ALLOCATED, COMPLETED) |\n| `account_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by account ID |\n| `warehouse_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by warehouse ID |\n| `carrier_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by carrier ID |\n| `expected_date_of_dispatch` | DatetimeInputType | `eq`, `from`, `to`, `between` | Expected dispatch date |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: GoodsOutsFilterType) { goods_outs { all(filter: $filter) { edges { node { id reference priority expected_date_of_dispatch delivery_notes order_notes goods_out_status { id code name } account { id code name } warehouse { id code name } carrier { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "goods_out_status_code": {
+                      "eq": "PENDING"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "goods_outs": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Goods Out: Orders record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "goods_outs": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "reference": "SO-001",
+                              "priority": 1,
+                              "expected_date_of_dispatch": "2026-03-11",
+                              "delivery_notes": null,
+                              "order_notes": null,
+                              "goods_out_status": {
+                                "id": "2",
+                                "code": "PENDING",
+                                "name": "Pending"
+                              },
+                              "account": {
+                                "id": "1",
+                                "code": "ACME",
+                                "name": "Acme Corporation"
+                              },
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              },
+                              "carrier": {
+                                "id": "1",
+                                "code": "DPD",
+                                "name": "DPD"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListGoodsOutPickLists": {
+      "post": {
+        "tags": [
+          "Goods Out: Pick Lists"
+        ],
+        "summary": "List goods out pick lists",
+        "description": "Retrieve pick lists using GraphQL. Supports filtering by reference, status, account, warehouse, and pick type.",
+        "operationId": "listGoodsOutPickLists",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: GoodsOutPickListsFilterType) {\n  goods_out_pick_lists {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          reference\n          pick_reference\n          pick_type\n          load_reference\n          goods_out_status {\n            id\n            code\n            name\n          }\n          account {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"pick_tasks_count\": {\n      \"gteq\": 1\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `pick_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of pick tasks |\n| `completed_pick_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of completed pick tasks |\n| `loading_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of loading tasks |\n| `completed_loading_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of completed loading tasks |\n| `dispatch_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of dispatch tasks |\n| `completed_dispatch_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of completed dispatch tasks |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: GoodsOutPickListsFilterType) { goods_out_pick_lists { all(filter: $filter) { edges { node { id reference pick_reference pick_type load_reference goods_out_status { id code name } account { id code name } warehouse { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "pick_tasks_count": {
+                      "gteq": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "goods_out_pick_lists": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Goods Out: Pick Lists record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "goods_out_pick_lists": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "reference": "PL-001",
+                              "pick_reference": "PICK-001",
+                              "pick_type": "single",
+                              "load_reference": null,
+                              "goods_out_status": {
+                                "id": "3",
+                                "code": "PICK",
+                                "name": "Picking"
+                              },
+                              "account": {
+                                "id": "1",
+                                "code": "ACME",
+                                "name": "Acme Corporation"
+                              },
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListGroups": {
+      "post": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "List groups",
+        "description": "Retrieve groups using GraphQL. Groups organize products and locations for filtering and operational rules.",
+        "operationId": "listGroups",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: GroupFilterType) {\n  groups {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          is_active\n          use_for_products\n          use_for_locations\n          created_at\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"name\": {\n      \"ilike\": \"hazardous\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Group name |\n| `is_active` | BooleanInputType | `eq` | Filter by active status |\n| `use_for_products` | BooleanInputType | `eq` | Groups used for products |\n| `use_for_locations` | BooleanInputType | `eq` | Groups used for locations |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: GroupFilterType) { groups { all(filter: $filter) { edges { node { id name is_active use_for_products use_for_locations created_at } } } } }",
+                "variables": {
+                  "filter": {
+                    "name": {
+                      "ilike": "hazardous"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "groups": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Groups record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "groups": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "name": "Hazardous",
+                              "is_active": true,
+                              "use_for_products": true,
+                              "use_for_locations": false,
+                              "created_at": "2026-01-15T10:00:00Z"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListIntegrations": {
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "summary": "List integrations",
+        "description": "Retrieve third-party integrations using GraphQL. Supports filtering by name, provider, type, and status.",
+        "operationId": "listIntegrations",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: IntegrationFilterType) {\n  integrations {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          integration_provider\n          integration_type\n          status\n          enabled\n          created_at\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"integration_provider\": {\n      \"eq\": \"shopify\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Integration name |\n| `integration_provider` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Provider (e.g. shopify, brightpearl) |\n| `integration_type` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Integration type |\n| `enabled` | BooleanInputType | `eq` | Filter by enabled status |\n| `status` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Integration status |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: IntegrationFilterType) { integrations { all(filter: $filter) { edges { node { id name integration_provider integration_type status enabled created_at } } } } }",
+                "variables": {
+                  "filter": {
+                    "integration_provider": {
+                      "eq": "shopify"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "integrations": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Integrations record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "integrations": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "name": "Shopify Store",
+                              "integration_provider": "shopify",
+                              "integration_type": "ecommerce",
+                              "status": "active",
+                              "enabled": true,
+                              "created_at": "2026-01-10T12:00:00Z"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListLoads": {
+      "post": {
+        "tags": [
+          "Loads"
+        ],
+        "summary": "List loads",
+        "description": "Retrieve loads using GraphQL. Supports filtering by reference, status, carrier, warehouse, and date ranges.",
+        "operationId": "listLoads",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: LoadFilterType) {\n  loads {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          reference\n          status\n          expected_storage_unit_quantity\n          number_of_storage_units_loaded\n          load_by\n          carrier {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"status\": {\n      \"eq\": \"open\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `reference` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Load reference |\n| `status` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Load status (open, closed, dispatched, cancelled) |\n| `carrier_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by carrier ID |\n| `warehouse_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by warehouse ID |\n| `load_by` | DatetimeInputType | `eq`, `from`, `to`, `between` | Load by date |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: LoadFilterType) { loads { all(filter: $filter) { edges { node { id reference status expected_storage_unit_quantity number_of_storage_units_loaded load_by carrier { id code name } warehouse { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "status": {
+                      "eq": "open"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "loads": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Loads record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "loads": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "reference": "LD-001",
+                              "status": "open",
+                              "expected_storage_unit_quantity": 10,
+                              "number_of_storage_units_loaded": 3,
+                              "load_by": "2026-03-11T16:00:00Z",
+                              "carrier": {
+                                "id": "1",
+                                "code": "DPD",
+                                "name": "DPD"
+                              },
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListLocations": {
+      "post": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "List locations",
+        "description": "Retrieve warehouse locations using GraphQL. Supports filtering by code, type, zone, and warehouse.",
+        "operationId": "listLocations",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: LocationsFilterType) {\n  locations {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          description\n          active\n          is_pickface\n          zone\n          aisle\n          row\n          column\n          slot\n          walk_sequence\n          warehouse {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"code\": {\n      \"ilike\": \"A-01\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Location code |\n| `active` | BooleanInputType | `eq` | Filter by active status |\n| `is_pickface` | BooleanInputType | `eq` | Filter pickface locations |\n| `zone` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Location zone |\n| `warehouse_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by warehouse ID |\n| `location_type_code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Location type code |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: LocationsFilterType) { locations { all(filter: $filter) { edges { node { id code description active is_pickface zone aisle row column slot walk_sequence warehouse { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "code": {
+                      "ilike": "A-01"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "locations": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Locations record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "locations": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "code": "A-01-01-01",
+                              "description": "Aisle A, Row 1, Column 1, Slot 1",
+                              "active": true,
+                              "is_pickface": false,
+                              "zone": "A",
+                              "aisle": "01",
+                              "row": "01",
+                              "column": "01",
+                              "slot": "01",
+                              "walk_sequence": 1,
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListProducts": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "List products",
+        "description": "Retrieve products using GraphQL. Supports filtering by code, barcode, description, account, and product type.\n\n**Note on `all_codes` filter:** Use this only when you have a code/barcode value and don't know which field it belongs to. It searches across `code`, `barcode`, `case_barcode`, `inner_barcode`, and `outer_barcode` using exact matching.",
+        "operationId": "listProducts",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ProductsFilterType) {\n  products {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          barcode\n          description\n          long_description\n          product_type\n          units_per_case\n          shelf_life_min\n          shelf_life_max\n          commodity_code\n          country_of_manufacture\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"code\": {\n      \"ilike\": \"SKU-001\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Product code |\n| `barcode` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Product barcode |\n| `all_codes` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Search across all code/barcode fields (exact match) |\n| `description` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Product description |\n| `account_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by account ID |\n| `product_type` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Product type |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ProductsFilterType) { products { all(filter: $filter) { edges { node { id code barcode description long_description product_type units_per_case shelf_life_min shelf_life_max commodity_code country_of_manufacture } } } } }",
+                "variables": {
+                  "filter": {
+                    "code": {
+                      "ilike": "SKU-001"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "products": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Products record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "products": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "code": "SKU-001",
+                              "barcode": "5012345678901",
+                              "description": "Widget Blue Large",
+                              "long_description": "Blue large widget for industrial use",
+                              "product_type": "standard",
+                              "units_per_case": 12,
+                              "shelf_life_min": null,
+                              "shelf_life_max": null,
+                              "commodity_code": "8471300000",
+                              "country_of_manufacture": "GB"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListReportQueries": {
+      "post": {
+        "tags": [
+          "Report Queries"
+        ],
+        "summary": "List report queries",
+        "description": "Retrieve report queries using GraphQL. Report queries define the data sources available for reports.",
+        "operationId": "listReportQueries",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ReportQueryFilterType) {\n  report_queries {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          description\n          graphql\n          created_at\n          updated_at\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"name\": {\n      \"ilike\": \"stock\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Report query name |\n| `description` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Report query description |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ReportQueryFilterType) { report_queries { all(filter: $filter) { edges { node { id name description graphql created_at updated_at } } } } }",
+                "variables": {
+                  "filter": {
+                    "name": {
+                      "ilike": "stock"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "report_queries": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Report Queries record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "report_queries": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "name": "Stock Balance Report",
+                              "description": "Shows current stock balances by location",
+                              "graphql": "query { stock_balances { all { edges { node { id } } } } }",
+                              "created_at": "2026-01-10T10:00:00Z",
+                              "updated_at": "2026-01-10T10:00:00Z"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListReports": {
+      "post": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "List reports",
+        "description": "Retrieve report definitions using GraphQL. Supports filtering by name, type, and associated report query.",
+        "operationId": "listReports",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ReportFilterType) {\n  reports {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          description\n          report_type\n          source_path\n          generic\n          uuid\n          report_query {\n            id\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"report_type\": {\n      \"eq\": \"table\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Report name |\n| `report_type` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Report type (e.g. table, chart) |\n| `report_query_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by report query ID |\n| `generic` | BooleanInputType | `eq` | Filter generic/custom reports |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ReportFilterType) { reports { all(filter: $filter) { edges { node { id name description report_type source_path generic uuid report_query { id name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "report_type": {
+                      "eq": "table"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "reports": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Reports record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "reports": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "name": "Stock Summary",
+                              "description": "Summary of current stock levels",
+                              "report_type": "table",
+                              "source_path": "data.stock_balances.all",
+                              "generic": true,
+                              "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                              "report_query": {
+                                "id": "1",
+                                "name": "Stock Balance Report"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListRoles": {
+      "post": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "List roles",
+        "description": "Retrieve roles using GraphQL. Roles define permission sets for user access control.",
+        "operationId": "listRoles",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: RoleFilterType) {\n  roles {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          role_type\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"name\": {\n      \"ilike\": \"admin\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Role name |\n| `role_type` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Role type |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: RoleFilterType) { roles { all(filter: $filter) { edges { node { id name role_type } } } } }",
+                "variables": {
+                  "filter": {
+                    "name": {
+                      "ilike": "admin"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "roles": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Roles record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "roles": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "name": "Administrator",
+                              "role_type": "admin"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListScheduledReports": {
+      "post": {
+        "tags": [
+          "Scheduled Reports"
+        ],
+        "summary": "List scheduled reports",
+        "description": "Retrieve scheduled report configurations using GraphQL. Supports filtering by name and frequency.",
+        "operationId": "listScheduledReports",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ScheduledReportFilterType) {\n  scheduled_reports {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          frequency\n          subject\n          body\n          time\n          numbers\n          created_at\n          updated_at\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"name\": {\n      \"ilike\": \"daily\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Scheduled report name |\n| `frequency` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Frequency (e.g. daily, weekly, monthly) |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ScheduledReportFilterType) { scheduled_reports { all(filter: $filter) { edges { node { id name frequency subject body time numbers created_at updated_at } } } } }",
+                "variables": {
+                  "filter": {
+                    "name": {
+                      "ilike": "daily"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "scheduled_reports": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Scheduled Reports record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "scheduled_reports": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "name": "Daily Stock Summary",
+                              "frequency": "daily",
+                              "subject": "Daily Stock Report",
+                              "body": "Please find attached the daily stock summary.",
+                              "time": "08:00",
+                              "numbers": "1,2,3,4,5",
+                              "created_at": "2026-01-10T10:00:00Z",
+                              "updated_at": "2026-01-10T10:00:00Z"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListShipments": {
+      "post": {
+        "tags": [
+          "Shipments"
+        ],
+        "summary": "List shipments",
+        "description": "Retrieve shipments using GraphQL. Supports filtering by reference, status, carrier, and warehouse.",
+        "operationId": "listShipments",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ShipmentFilterType) {\n  shipments {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          reference\n          name\n          status\n          delivery_notes\n          collection_datetime\n          label_filename\n          packages_count\n          carrier {\n            id\n            code\n            name\n          }\n          carrier_service {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"status\": {\n      \"eq\": \"dispatched\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `reference` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Shipment reference |\n| `status` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Shipment status |\n| `carrier_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by carrier ID |\n| `warehouse_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by warehouse ID |\n| `goods_out_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by goods out order ID |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ShipmentFilterType) { shipments { all(filter: $filter) { edges { node { id reference name status delivery_notes collection_datetime label_filename packages_count carrier { id code name } carrier_service { id code name } warehouse { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "status": {
+                      "eq": "dispatched"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "shipments": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Shipments record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "shipments": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "reference": "SH-001",
+                              "name": "Shipment to Customer A",
+                              "status": "dispatched",
+                              "delivery_notes": null,
+                              "collection_datetime": "2026-03-10T14:00:00Z",
+                              "label_filename": "label-SH-001.pdf",
+                              "packages_count": 2,
+                              "carrier": {
+                                "id": "1",
+                                "code": "DPD",
+                                "name": "DPD"
+                              },
+                              "carrier_service": {
+                                "id": "1",
+                                "code": "NEXT",
+                                "name": "Next Day"
+                              },
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListStorageUnits": {
+      "post": {
+        "tags": [
+          "Storage Units"
+        ],
+        "summary": "List storage units",
+        "description": "Retrieve storage units (pallets, cages, boxes) using GraphQL. Supports filtering by reference, type, warehouse, and dispatch status.",
+        "operationId": "listStorageUnits",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: StorageUnitFilterType) {\n  storage_units {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          reference\n          active\n          dispatched\n          dispatched_at\n          created_at\n          storage_unit_type {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"reference\": {\n      \"ilike\": \"PLT-001\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `reference` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Storage unit reference/barcode |\n| `active` | BooleanInputType | `eq` | Filter by active status |\n| `dispatched` | BooleanInputType | `eq` | Filter dispatched/undispatched units |\n| `storage_unit_type_code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Storage unit type code |\n| `warehouse_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by warehouse ID |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: StorageUnitFilterType) { storage_units { all(filter: $filter) { edges { node { id reference active dispatched dispatched_at created_at storage_unit_type { id code name } warehouse { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "reference": {
+                      "ilike": "PLT-001"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "storage_units": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Storage Units record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "storage_units": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "reference": "PLT-001",
+                              "active": true,
+                              "dispatched": false,
+                              "dispatched_at": null,
+                              "created_at": "2026-03-10T08:00:00Z",
+                              "storage_unit_type": {
+                                "id": "1",
+                                "code": "PLT",
+                                "name": "Pallet"
+                              },
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListTemplates": {
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "List templates",
+        "description": "Retrieve print templates using GraphQL. Supports filtering by name, type, and default status.",
+        "operationId": "listTemplates",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: TemplateFilterType) {\n  templates {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          default\n          path\n          template_type {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"name\": {\n      \"ilike\": \"delivery\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Template name |\n| `template_type_code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Template type code |\n| `default` | BooleanInputType | `eq` | Filter default templates |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: TemplateFilterType) { templates { all(filter: $filter) { edges { node { id name default path template_type { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "name": {
+                      "ilike": "delivery"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "templates": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Templates record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "templates": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "name": "Delivery Note",
+                              "default": true,
+                              "path": "delivery_note.liquid",
+                              "template_type": {
+                                "id": "1",
+                                "code": "DN",
+                                "name": "Delivery Note"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListUsers": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "List users",
+        "description": "Retrieve users for the current subdomain using GraphQL. Returns subdomain-user associations with nested user details.",
+        "operationId": "listUsers",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: SubdomainUserFilterType) {\n  subdomain_users {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          user {\n            id\n            email\n            first_name\n            last_name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"user_email\": {\n      \"ilike\": \"john\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `user_email` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | User email |\n| `user_name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | User name |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: SubdomainUserFilterType) { subdomain_users { all(filter: $filter) { edges { node { id user { id email first_name last_name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "user_email": {
+                      "ilike": "john"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "subdomain_users": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Users record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "subdomain_users": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "user": {
+                                "id": "1",
+                                "email": "john@acme.com",
+                                "first_name": "John",
+                                "last_name": "Smith"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/graphql#ListWarehouses": {
+      "post": {
+        "tags": [
+          "Warehouses"
+        ],
+        "summary": "List warehouses",
+        "description": "Retrieve warehouses using GraphQL. Supports filtering by code, name, and site.",
+        "operationId": "listWarehouses",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: WarehouseFilterType) {\n  warehouses {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          consolidate_pick_enabled\n          loading_validation_setting\n          opening_times_enabled\n          address {\n            address_1\n            address_2\n            address_3\n            address_4\n            postcode\n            country_code\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"code\": {\n      \"ilike\": \"WH1\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Warehouse code |\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Warehouse name |\n| `site_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by site ID |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Clarus-Subdomain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: WarehouseFilterType) { warehouses { all(filter: $filter) { edges { node { id code name consolidate_pick_enabled loading_validation_setting opening_times_enabled address { address_1 address_2 address_3 address_4 postcode country_code } } } } } }",
+                "variables": {
+                  "filter": {
+                    "code": {
+                      "ilike": "WH1"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "warehouses": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Warehouses record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "warehouses": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "code": "WH1",
+                              "name": "Main Warehouse",
+                              "consolidate_pick_enabled": false,
+                              "loading_validation_setting": "none",
+                              "opening_times_enabled": false,
+                              "address": {
+                                "address_1": "123 Warehouse Lane",
+                                "address_2": null,
+                                "address_3": "Manchester",
+                                "address_4": "Greater Manchester",
+                                "postcode": "M1 1AA",
+                                "country_code": "GB"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           }
         }
       }
@@ -6999,7 +9973,7 @@
           "code": {
             "type": "string",
             "nullable": true,
-            "description": "Address code for reference. Read-only when setting addresses inline on orders/warehouses \u2014 settable only via the delivery addresses endpoint directly.",
+            "description": "Address code for reference. Read-only when setting addresses inline on orders/warehouses — settable only via the delivery addresses endpoint directly.",
             "readOnly": true
           },
           "country_code": {
@@ -10290,7 +13264,7 @@
             "minimum": 0,
             "nullable": true,
             "default": 0.0,
-            "description": "Unit price for this charge. Total is calculated as quantity \u00d7 price."
+            "description": "Unit price for this charge. Total is calculated as quantity × price."
           },
           "product_id": {
             "type": "integer",
@@ -10704,7 +13678,7 @@
       },
       "ScheduledReportAttributes": {
         "type": "object",
-        "description": "Scheduled report attributes for recurring report delivery. Note: reports to generate, email recipients, and FTP recipients are specified in the 'relationships' object (not in attributes) \u2014 see ScheduledReportRelationships.",
+        "description": "Scheduled report attributes for recurring report delivery. Note: reports to generate, email recipients, and FTP recipients are specified in the 'relationships' object (not in attributes) — see ScheduledReportRelationships.",
         "required": [
           "name",
           "frequency",
