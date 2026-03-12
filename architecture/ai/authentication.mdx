@@ -70,15 +70,6 @@ There are two access patterns into the AI layer — pick the one relevant to you
     | `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` | Tenant subdomain | Tenant routing — the only custom header format AgentCore passes through to the runtime |
     | `X-Clarus-Subdomain` | Tenant subdomain | Tenant routing — sent for consistency, though only the Bedrock-prefixed header reaches the runtime |
 
-    **Event type mapping (Agent Core → Client):**
-
-    | Agent Core Event | Client SSE Event | Description |
-    |---|---|---|
-    | `contentBlockDelta.delta.text` | `chunk` | Streamed text fragment |
-    | `contentBlockStart.start.toolUse` | `tool_call` | Tool invocation started |
-    | `message` (role=user, toolResult) | `tool_result` | Tool execution completed |
-    | `messageStop` (stopReason=end_turn) | `done` | Response complete |
-    | HTTP error / stream error | `error` | Error with optional `tokenExpired` flag |
   </Tab>
 </Tabs>
 

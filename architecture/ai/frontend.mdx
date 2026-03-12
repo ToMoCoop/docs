@@ -180,11 +180,14 @@ interface StreamEvent {
 <Accordion title="Raw Agent Core Event Mapping">
 The SSE bridge parses raw Agent Core events and maps them to the simplified client protocol:
 
-- `{"event":{"contentBlockDelta":{"delta":{"text":"..."}}}}` → `chunk`
-- `{"event":{"contentBlockStart":{"start":{"toolUse":{...}}}}}` → `tool_call`
-- `{"event":{"contentBlockDelta":{"delta":{"toolUse":{"input":"..."}}}}}` → accumulated server-side
-- `{"message":{"role":"user","content":[{"toolResult":{...}}]}}` → `tool_result`
-- `{"event":{"messageStop":{"stopReason":"end_turn"}}}` → `done`
+| Agent Core Event | Client SSE Event | Description |
+|---|---|---|
+| `contentBlockDelta.delta.text` | `chunk` | Streamed text fragment |
+| `contentBlockStart.start.toolUse` | `tool_call` | Tool invocation started |
+| `contentBlockDelta.delta.toolUse.input` | _(accumulated server-side)_ | Tool input built up across deltas |
+| `message` (role=user, toolResult) | `tool_result` | Tool execution completed |
+| `messageStop` (stopReason=end_turn) | `done` | Response complete |
+| HTTP error / stream error | `error` | Error with optional `tokenExpired` flag |
 
 The bridge also sends keep-alive comment pings every 15 seconds to prevent proxy/load balancer timeouts.
 </Accordion>
