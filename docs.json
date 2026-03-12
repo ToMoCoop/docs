@@ -35,6 +35,7 @@
       },
       {
         "tab": "Architecture",
+        "public": true,
         "groups": [
           {
             "group": "AI Architecture",
