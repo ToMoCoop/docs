@@ -92,35 +92,94 @@ The frontend renders AI responses as Markdown with two custom code fence languag
 
 ### Charts
 
-The agent produces ` ```chart ` code blocks containing a JSON chart definition:
+The agent produces ` ```chart ` code blocks containing a JSON chart definition. The frontend detects these fenced blocks and renders them as interactive charts using Recharts (dynamically imported, no SSR). While the JSON is still streaming, a skeleton placeholder is shown.
 
-```typescript
-interface ChartData {
-  type: 'bar' | 'line' | 'pie' | 'area';
-  title: string;
-  data: Array<{ name: string; value: number }>;
-  xAxisKey: string;    // Default: "name"
-  dataKeys: string[];  // Default: ["value"]
-}
-```
+<Tabs>
+  <Tab title="Interface">
+    ```typescript
+    interface ChartData {
+      type: 'bar' | 'line' | 'pie' | 'area';
+      title: string;
+      data: Array<{ name: string; value: number }>;
+      xAxisKey: string;    // Default: "name"
+      dataKeys: string[];  // Default: ["value"]
+    }
+    ```
+  </Tab>
+  <Tab title="Example — Bar Chart">
+    This is what the agent actually produces in its response. The triple-backtick ` ```chart ` fence triggers the renderer:
 
-Charts are rendered with Recharts (dynamically imported, no SSR). While the JSON is still streaming, a skeleton placeholder is shown.
+    ````markdown
+    ```chart
+    {
+      "type": "bar",
+      "title": "Orders by Warehouse — Last 7 Days",
+      "data": [
+        { "name": "Manchester", "value": 1240 },
+        { "name": "Birmingham", "value": 893 },
+        { "name": "Bristol", "value": 567 },
+        { "name": "Leeds", "value": 421 }
+      ],
+      "xAxisKey": "name",
+      "dataKeys": ["value"]
+    }
+    ```
+    ````
+  </Tab>
+  <Tab title="Example — Multi-Series Line">
+    Multiple data keys produce a multi-series chart with one line per key:
+
+    ````markdown
+    ```chart
+    {
+      "type": "line",
+      "title": "Pick Rate vs Error Rate (Weekly)",
+      "data": [
+        { "name": "W1", "picks": 3200, "errors": 45 },
+        { "name": "W2", "picks": 3450, "errors": 38 },
+        { "name": "W3", "picks": 2980, "errors": 52 },
+        { "name": "W4", "picks": 3600, "errors": 31 }
+      ],
+      "xAxisKey": "name",
+      "dataKeys": ["picks", "errors"]
+    }
+    ```
+    ````
+  </Tab>
+</Tabs>
 
 ### File Download Cards
 
-The agent produces ` ```csv-file ` code blocks containing file metadata with a presigned URL:
+The agent produces ` ```csv-file ` code blocks containing file metadata with a presigned S3 URL. The frontend renders these as download cards with file metadata, a live countdown timer for URL expiry, and a download button. Expired links are visually indicated and the download button is disabled.
 
-```typescript
-interface FileMetadata {
-  url: string;       // S3 presigned URL
-  filename: string;  // Display name
-  size: number;      // Bytes
-  rowCount: number;  // Data rows
-  expiresIn: number; // Seconds until URL expires
-}
-```
+<Tabs>
+  <Tab title="Interface">
+    ```typescript
+    interface FileMetadata {
+      url: string;       // S3 presigned URL
+      filename: string;  // Display name
+      size: number;      // Bytes
+      rowCount: number;  // Data rows
+      expiresIn: number; // Seconds until URL expires
+    }
+    ```
+  </Tab>
+  <Tab title="Example">
+    This is what the agent produces after a `create_csv_file` tool call completes. The ` ```csv-file ` fence triggers the download card renderer:
 
-The download card shows file metadata, a live countdown timer for URL expiry, and a download button. Expired links are visually indicated and the download button is disabled.
+    ````markdown
+    ```csv-file
+    {
+      "url": "https://claruswms-prod-agents.s3.eu-west-2.amazonaws.com/generated/abc123.csv?X-Amz-Expires=3600&...",
+      "filename": "orders-manchester-2026-03-12.csv",
+      "size": 24576,
+      "rowCount": 342,
+      "expiresIn": 3600
+    }
+    ```
+    ````
+  </Tab>
+</Tabs>
 
 ## API Routes Reference
 
