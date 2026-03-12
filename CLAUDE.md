@@ -15,7 +15,8 @@ architecture/       # Architecture documentation (MDX)
   deployment/      # CI/CD and deployment pages
 api-reference/     # API docs and OpenAPI spec
 essentials/        # Mintlify framework guide pages
-images/            # Diagrams (.drawio, .drawio.svg) and static images
+images/            # Static images
+  diagrams/        # Draw.io sources (.drawio) and SVG exports (.drawio.svg)
 integrations/      # Integration guides
 snippets/          # Reusable MDX snippets
 ```
@@ -44,10 +45,10 @@ Every draw.io diagram follows this pattern in MDX:
 
 ```mdx
 <Frame>
-  <img src="/images/diagram-name.drawio.svg" alt="Descriptive alt text" zoom />
+  <img src="/images/diagrams/diagram-name.drawio.svg" alt="Descriptive alt text" zoom />
 </Frame>
 
-<sub><a href="/images/diagram-name.drawio.svg" download="diagram-name.drawio.svg">Download SVG</a> · <a href="/images/diagram-name.drawio" download="diagram-name.drawio">Download draw.io source</a></sub>
+<sub><a href="/images/diagrams/diagram-name.drawio.svg" download="diagram-name.drawio.svg">Download SVG</a> · <a href="/images/diagrams/diagram-name.drawio" download="diagram-name.drawio">Download draw.io source</a></sub>
 ```
 
 ### File Naming
@@ -85,7 +86,7 @@ For sequence/flow diagrams (not architecture diagrams):
 ### Exporting
 
 ```bash
-/Applications/draw.io.app/Contents/MacOS/draw.io --export --format svg --output images/name.drawio.svg images/name.drawio
+/Applications/draw.io.app/Contents/MacOS/draw.io --export --format svg --output images/diagrams/name.drawio.svg images/diagrams/name.drawio
 ```
 
 The CLI sometimes reports "Error: Export failed" even on success — verify by checking the output file timestamp and content.

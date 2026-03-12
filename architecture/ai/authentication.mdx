@@ -42,10 +42,10 @@ There are two access patterns into the AI layer — pick the one relevant to you
     When an external MCP client like Claude Desktop connects, it goes through a standard OAuth 2.1 flow with some MCP-specific adaptations:
 
     <Frame>
-      <img src="/images/auth-mcp-oauth.drawio.svg" alt="External MCP Client OAuth sequence diagram showing discovery, DCR, authorization, token exchange, and MCP request phases" zoom />
+      <img src="/images/diagrams/auth-mcp-oauth.drawio.svg" alt="External MCP Client OAuth sequence diagram showing discovery, DCR, authorization, token exchange, and MCP request phases" zoom />
     </Frame>
 
-    <sub><a href="/images/auth-mcp-oauth.drawio.svg" download="auth-mcp-oauth.drawio.svg">Download SVG</a> · <a href="/images/auth-mcp-oauth.drawio" download="auth-mcp-oauth.drawio">Download draw.io source</a></sub>
+    <sub><a href="/images/diagrams/auth-mcp-oauth.drawio.svg" download="auth-mcp-oauth.drawio.svg">Download SVG</a> · <a href="/images/diagrams/auth-mcp-oauth.drawio" download="auth-mcp-oauth.drawio">Download draw.io source</a></sub>
 
     The Lambda@Edge OAuth Metadata function synthesizes the OIDC discovery document and handles Dynamic Client Registration (DCR) — returning a pre-configured client ID rather than actually creating one in Cognito. The Authorize Rewrite strips the RFC 8707 `resource` parameter since Cognito doesn't support it.
   </Tab>
@@ -54,10 +54,10 @@ There are two access patterns into the AI layer — pick the one relevant to you
     The frontend doesn't connect to Agent Core directly. A Next.js API route (`POST /api/chat`) acts as a server-side SSE bridge that handles auth token management, subdomain resolution, and stream re-serialization before forwarding requests through CloudFront to the agent runtime:
 
     <Frame>
-      <img src="/images/auth-frontend-flow.drawio.svg" alt="Frontend app authentication flow from browser through Next.js SSE bridge, CloudFront, Lambda@Edge, Agent Runtime, to Private MCP Gateway" zoom />
+      <img src="/images/diagrams/auth-frontend-flow.drawio.svg" alt="Frontend app authentication flow from browser through Next.js SSE bridge, CloudFront, Lambda@Edge, Agent Runtime, to Private MCP Gateway" zoom />
     </Frame>
 
-    <sub><a href="/images/auth-frontend-flow.drawio.svg" download="auth-frontend-flow.drawio.svg">Download SVG</a> · <a href="/images/auth-frontend-flow.drawio" download="auth-frontend-flow.drawio">Download draw.io source</a></sub>
+    <sub><a href="/images/diagrams/auth-frontend-flow.drawio.svg" download="auth-frontend-flow.drawio.svg">Download SVG</a> · <a href="/images/diagrams/auth-frontend-flow.drawio" download="auth-frontend-flow.drawio">Download draw.io source</a></sub>
 
     The SSE bridge serves multiple purposes: auth token management (auto-refresh on 401), dual auth support (NextAuth vs Bearer header), subdomain resolution (cookie vs request body), session tracking, keep-alive pings every 15 seconds, and stream re-serialization from Agent Core's raw format to a simplified client protocol. The Lambda@Edge function translates the friendly `/agent/*` path into the Bedrock data plane's internal format, and the runtime validates the JWT independently before reusing the same token for MCP tool calls through the private gateway.
 
@@ -79,10 +79,10 @@ There are two access patterns into the AI layer — pick the one relevant to you
   Since MCP gateways validate JWTs but don't forward them to target Lambdas, the interceptor bridges this gap using DynamoDB:
 
   <Frame>
-    <img src="/images/auth-token-forwarding.drawio.svg" alt="Token forwarding sequence diagram showing interceptor caching bearer token in DynamoDB with 60s TTL" zoom />
+    <img src="/images/diagrams/auth-token-forwarding.drawio.svg" alt="Token forwarding sequence diagram showing interceptor caching bearer token in DynamoDB with 60s TTL" zoom />
   </Frame>
 
-  <sub><a href="/images/auth-token-forwarding.drawio.svg" download="auth-token-forwarding.drawio.svg">Download SVG</a> · <a href="/images/auth-token-forwarding.drawio" download="auth-token-forwarding.drawio">Download draw.io source</a></sub>
+  <sub><a href="/images/diagrams/auth-token-forwarding.drawio.svg" download="auth-token-forwarding.drawio.svg">Download SVG</a> · <a href="/images/diagrams/auth-token-forwarding.drawio" download="auth-token-forwarding.drawio">Download draw.io source</a></sub>
 
   The 60-second TTL ensures tokens don't linger in DynamoDB. The interceptor always returns a passthrough response — a failed cache write never blocks the request.
 </Accordion>
@@ -91,10 +91,10 @@ There are two access patterns into the AI layer — pick the one relevant to you
   The SSE bridge supports two authentication modes. When a request arrives, it checks for an `Authorization` header to determine the mode:
 
   <Frame>
-    <img src="/images/auth-dual-auth.drawio.svg" alt="Dual auth decision flowchart showing standalone vs embedded mode branching and token refresh paths" zoom />
+    <img src="/images/diagrams/auth-dual-auth.drawio.svg" alt="Dual auth decision flowchart showing standalone vs embedded mode branching and token refresh paths" zoom />
   </Frame>
 
-  <sub><a href="/images/auth-dual-auth.drawio.svg" download="auth-dual-auth.drawio.svg">Download SVG</a> · <a href="/images/auth-dual-auth.drawio" download="auth-dual-auth.drawio">Download draw.io source</a></sub>
+  <sub><a href="/images/diagrams/auth-dual-auth.drawio.svg" download="auth-dual-auth.drawio.svg">Download SVG</a> · <a href="/images/diagrams/auth-dual-auth.drawio" download="auth-dual-auth.drawio">Download draw.io source</a></sub>
 
   - **Standalone mode** uses NextAuth v5 with Cognito OAuth. Tokens are stored in an encrypted session cookie and auto-refresh when within 5 minutes of expiry.
   - **Embedded mode** receives tokens from the parent app via `postMessage`. The JWT is decoded server-side for the `sub` claim but not verified — Agent Core validates it.

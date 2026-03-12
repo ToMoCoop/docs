@@ -36,10 +36,10 @@ The `S3SessionManager` (as of March 2026) handles low-level persistence. It auto
 The agent uses a two-tier memory system that balances conversation context limits with long-term recall. When conversations grow long, older messages are summarized and indexed — but they're not lost. A semantic search retrieves relevant context from those summaries on every new message.
 
 <Frame>
-  <img src="/images/hybrid-memory-architecture.drawio.svg" alt="Hybrid memory architecture flowchart showing user message flowing through semantic search, model conversation, session persistence to S3, and context management with summarization and semantic indexing" zoom />
+  <img src="/images/diagrams/hybrid-memory-architecture.drawio.svg" alt="Hybrid memory architecture flowchart showing user message flowing through semantic search, model conversation, session persistence to S3, and context management with summarization and semantic indexing" zoom />
 </Frame>
 
-<sub><a href="/images/hybrid-memory-architecture.drawio.svg" download="hybrid-memory-architecture.drawio.svg">Download SVG</a> · <a href="/images/hybrid-memory-architecture.drawio" download="hybrid-memory-architecture.drawio">Download draw.io source</a></sub>
+<sub><a href="/images/diagrams/hybrid-memory-architecture.drawio.svg" download="hybrid-memory-architecture.drawio.svg">Download SVG</a> · <a href="/images/diagrams/hybrid-memory-architecture.drawio" download="hybrid-memory-architecture.drawio">Download draw.io source</a></sub>
 
 ### Tier 1 — Session Persistence
 
@@ -81,10 +81,10 @@ The frontend manages sessions through a set of API routes and provides session I
 Cold starts can add noticeable latency to the first message in a conversation. The warmup system mitigates this by pre-invoking the Lambda container and warming MCP connections before the user sends their first message.
 
 <Frame>
-  <img src="/images/warmup-flow.drawio.svg" alt="Warmup flow sequence diagram showing page load, session creation, organization selection triggering warmup, then first chat message hitting a warm Lambda" zoom />
+  <img src="/images/diagrams/warmup-flow.drawio.svg" alt="Warmup flow sequence diagram showing page load, session creation, organization selection triggering warmup, then first chat message hitting a warm Lambda" zoom />
 </Frame>
 
-<sub><a href="/images/warmup-flow.drawio.svg" download="warmup-flow.drawio.svg">Download SVG</a> · <a href="/images/warmup-flow.drawio" download="warmup-flow.drawio">Download draw.io source</a></sub>
+<sub><a href="/images/diagrams/warmup-flow.drawio.svg" download="warmup-flow.drawio.svg">Download SVG</a> · <a href="/images/diagrams/warmup-flow.drawio" download="warmup-flow.drawio">Download draw.io source</a></sub>
 
 Key details about the warmup flow:
 

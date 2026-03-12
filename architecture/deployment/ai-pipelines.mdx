@@ -27,10 +27,10 @@ All agent code lives in the **ClarusWMS_Agents** repository. Five separate pipel
 Each pipeline follows the same pattern: source change triggers a build in the shared Build account, which deploys to staging, waits for manual approval, then deploys to production.
 
 <Frame>
-  <img src="/images/ai-pipeline-architecture.drawio.svg" alt="AI deployment pipeline architecture showing GitHub source flowing through CodePipeline V2 and CodeBuild to staging and production accounts with S3, Lambda, and gateway target sync" zoom />
+  <img src="/images/diagrams/ai-pipeline-architecture.drawio.svg" alt="AI deployment pipeline architecture showing GitHub source flowing through CodePipeline V2 and CodeBuild to staging and production accounts with S3, Lambda, and gateway target sync" zoom />
 </Frame>
 
-<sub><a href="/images/ai-pipeline-architecture.drawio.svg" download="ai-pipeline-architecture.drawio.svg">Download SVG</a> · <a href="/images/ai-pipeline-architecture.drawio" download="ai-pipeline-architecture.drawio">Download draw.io source</a></sub>
+<sub><a href="/images/diagrams/ai-pipeline-architecture.drawio.svg" download="ai-pipeline-architecture.drawio.svg">Download SVG</a> · <a href="/images/diagrams/ai-pipeline-architecture.drawio" download="ai-pipeline-architecture.drawio">Download draw.io source</a></sub>
 
 ### Pipeline Triggers
 
@@ -73,10 +73,10 @@ The pipeline and build accounts are **shared infrastructure** used by all Clarus
 The AI frontend (Next.js) is deployed as a Docker container on ECS from the **ClarusWMS_AI** repository, separate from the Lambda pipelines above.
 
 <Frame>
-  <img src="/images/ai-frontend-pipeline.drawio.svg" alt="AI frontend app deployment pipeline showing GitHub source flowing through CodeBuild ARM64 Docker build to ECR, with image tag promotion through staging and production ECS deployments" zoom />
+  <img src="/images/diagrams/ai-frontend-pipeline.drawio.svg" alt="AI frontend app deployment pipeline showing GitHub source flowing through CodeBuild ARM64 Docker build to ECR, with image tag promotion through staging and production ECS deployments" zoom />
 </Frame>
 
-<sub><a href="/images/ai-frontend-pipeline.drawio.svg" download="ai-frontend-pipeline.drawio.svg">Download SVG</a> · <a href="/images/ai-frontend-pipeline.drawio" download="ai-frontend-pipeline.drawio">Download draw.io source</a></sub>
+<sub><a href="/images/diagrams/ai-frontend-pipeline.drawio.svg" download="ai-frontend-pipeline.drawio.svg">Download SVG</a> · <a href="/images/diagrams/ai-frontend-pipeline.drawio" download="ai-frontend-pipeline.drawio">Download draw.io source</a></sub>
 
 ### Pipeline Stages
 

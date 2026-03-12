@@ -35,10 +35,10 @@ The frontend can be embedded as an iframe in the main ClarusWMS application by l
 ### Handshake Flow
 
 <Frame>
-  <img src="/images/iframe-handshake-flow.drawio.svg" alt="iframe postMessage handshake sequence showing READY, INIT, ACK, chat request, and token refresh cycle between parent app, iframe, and Next.js API" zoom />
+  <img src="/images/diagrams/iframe-handshake-flow.drawio.svg" alt="iframe postMessage handshake sequence showing READY, INIT, ACK, chat request, and token refresh cycle between parent app, iframe, and Next.js API" zoom />
 </Frame>
 
-<sub><a href="/images/iframe-handshake-flow.drawio.svg" download="iframe-handshake-flow.drawio.svg">Download SVG</a> · <a href="/images/iframe-handshake-flow.drawio" download="iframe-handshake-flow.drawio">Download draw.io source</a></sub>
+<sub><a href="/images/diagrams/iframe-handshake-flow.drawio.svg" download="iframe-handshake-flow.drawio.svg">Download SVG</a> · <a href="/images/diagrams/iframe-handshake-flow.drawio" download="iframe-handshake-flow.drawio">Download draw.io source</a></sub>
 
 **Origin validation**: Allowed origins are configured via `NEXT_PUBLIC_ALLOWED_PARENT_ORIGINS` (comma-separated, supports wildcard patterns like `*.clarus.ws`). Messages from unrecognized origins are silently rejected.
 
