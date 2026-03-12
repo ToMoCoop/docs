@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "ClarusWMS API",
-    "description": "REST and GraphQL API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides REST mutation endpoints (POST, PATCH, DELETE) for managing warehouse operations and GraphQL list endpoints for data retrieval.\n\n**REST mutations** are available at `/api/*` paths.\n\n**GraphQL queries** are available at `/graphql` \u2014 each resource has a documented list query.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Use the client credentials or authorization code flow to obtain an access token from `https://clarus-api.com/oauth/token`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll REST mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```\n\n## GraphQL Queries\n\nAll data retrieval uses GraphQL at `POST /graphql`. Send a JSON body with `query` and optional `variables`:\n\n```json\n{\n  \"query\": \"query($code: String) { accounts { all(code: $code) { edges { node { id code name } } } } }\",\n  \"variables\": { \"code\": \"ACME\" }\n}\n```",
+    "description": "REST and GraphQL API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides REST mutation endpoints (POST, PATCH, DELETE) for managing warehouse operations and GraphQL list endpoints for data retrieval.\n\n**REST mutations** are available at `/api/*` paths.\n\n**GraphQL queries** are available at `/graphql` — each resource has a documented list query.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Use the client credentials or authorization code flow to obtain an access token from `https://clarus-api.com/oauth/token`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll REST mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```\n\n## GraphQL Queries\n\nAll data retrieval uses GraphQL at `POST /graphql`. Send a JSON body with `query` and optional `variables`:\n\n```json\n{\n  \"query\": \"query($code: String) { accounts { all(code: $code) { edges { node { id code name } } } } }\",\n  \"variables\": { \"code\": \"ACME\" }\n}\n```",
     "version": "1.0.0",
     "contact": {
       "name": "Clarus Software",
@@ -75,12 +75,8 @@
       "description": "Location management endpoints for warehouse storage locations"
     },
     {
-      "name": "Pickface Products",
-      "description": "Pickface product assignment endpoints for managing product-to-pickface-location mappings used in replenishment workflows"
-    },
-    {
       "name": "Products",
-      "description": "Product management endpoints for creating, updating, and deleting products in the warehouse catalog.\n\n## GraphQL Filtering Guide\n\nProducts support individual code/barcode filters: `code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`. Each supports operators: `eq`, `ilike`, `in`, `like`, `between`. When multiple individual filters are used together, they are AND'd (all conditions must match).\n\n### The `all_codes` filter\n\n`all_codes` is a **specialized cross-field search** that ORs across all 5 code fields (`code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`) in a single query. It performs exact matching (IN operator), not partial/ILIKE matching.\n\n**When to use `all_codes`:** Only when you have a code or barcode value and don't know which field it belongs to \u2014 e.g., a user scans a barcode that could be a unit barcode, case barcode, inner barcode, or outer barcode.\n\n**When NOT to use `all_codes`:** When you know which specific code field to search. Use the individual filter instead for better performance and precision."
+      "description": "Product management endpoints for creating, updating, and deleting products in the warehouse catalog.\n\n## GraphQL Filtering Guide\n\nProducts support individual code/barcode filters: `code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`. Each supports operators: `eq`, `ilike`, `in`, `like`, `between`. When multiple individual filters are used together, they are AND'd (all conditions must match).\n\n### The `all_codes` filter\n\n`all_codes` is a **specialized cross-field search** that ORs across all 5 code fields (`code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`) in a single query. It performs exact matching (IN operator), not partial/ILIKE matching.\n\n**When to use `all_codes`:** Only when you have a code or barcode value and don't know which field it belongs to — e.g., a user scans a barcode that could be a unit barcode, case barcode, inner barcode, or outer barcode.\n\n**When NOT to use `all_codes`:** When you know which specific code field to search. Use the individual filter instead for better performance and precision."
     },
     {
       "name": "Replenishment",
@@ -266,7 +262,7 @@
           "Account Warehouses"
         ],
         "summary": "Create an account-warehouse association",
-        "description": "Links an account to a warehouse, allowing the account to operate in that warehouse. The `account_id` + `warehouse_id` combination must be unique \u2014 duplicates return 422. A nested route alternative exists at `/accounts/{account_id}/warehouses`.",
+        "description": "Links an account to a warehouse, allowing the account to operate in that warehouse. The `account_id` + `warehouse_id` combination must be unique — duplicates return 422. A nested route alternative exists at `/accounts/{account_id}/warehouses`.",
         "x-mint": {
           "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"account_warehouses\",\n    \"attributes\": {\n      \"account_id\": 1,\n      \"warehouse_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | Yes | The stock account to associate |\n| `warehouse_id` | Yes | The warehouse to associate |"
         },
@@ -360,7 +356,7 @@
           "Account Warehouses"
         ],
         "summary": "Update an account-warehouse association",
-        "description": "Update which account or warehouse is linked. Both `account_id` and `warehouse_id` are required. The combination must be unique \u2014 duplicates return 422. A nested route alternative exists at `/accounts/{account_id}/warehouses/{id}`.",
+        "description": "Update which account or warehouse is linked. Both `account_id` and `warehouse_id` are required. The combination must be unique — duplicates return 422. A nested route alternative exists at `/accounts/{account_id}/warehouses/{id}`.",
         "x-mint": {
           "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"account_warehouses\",\n    \"attributes\": {\n      \"account_id\": 2,\n      \"warehouse_id\": 3\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | Yes | The stock account to associate |\n| `warehouse_id` | Yes | The warehouse to associate |"
         },
@@ -1498,7 +1494,7 @@
         "summary": "Create a charge line",
         "description": "Create a new charge line to record a billable item. Charge lines are used for invoicing and billing operations.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity \u00d7 price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity × price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
         },
         "operationId": "createChargeLine",
         "requestBody": {
@@ -2735,412 +2731,6 @@
         }
       }
     },
-    "/graphql#ListGoodsOutPickLists": {
-      "post": {
-        "tags": [
-          "Goods Out: Pick Lists"
-        ],
-        "summary": "List goods out pick lists",
-        "description": "Retrieve pick lists using GraphQL. Supports filtering by reference, status, account, warehouse, and pick type.",
-        "operationId": "listGoodsOutPickLists",
-        "x-mint": {
-          "content": "## Query Structure\n\n```graphql\nquery($filter: GoodsOutPickListsFilterType) {\n  goods_out_pick_lists {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          reference\n          pick_reference\n          pick_type\n          load_reference\n          goods_out_status {\n            id\n            code\n            name\n          }\n          account {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"pick_tasks_count\": {\n      \"gteq\": 1\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `pick_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of pick tasks |\n| `completed_pick_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of completed pick tasks |\n| `loading_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of loading tasks |\n| `completed_loading_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of completed loading tasks |\n| `dispatch_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of dispatch tasks |\n| `completed_dispatch_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of completed dispatch tasks |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "query"
-                ],
-                "properties": {
-                  "query": {
-                    "type": "string",
-                    "description": "GraphQL query string",
-                    "format": "textarea"
-                  },
-                  "variables": {
-                    "type": "object",
-                    "description": "Query variables including the filter object",
-                    "properties": {
-                      "filter": {
-                        "type": "object",
-                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "query": "query($filter: GoodsOutPickListsFilterType) { goods_out_pick_lists { all(filter: $filter) { edges { node { id reference pick_reference pick_type load_reference goods_out_status { id code name } account { id code name } warehouse { id code name } } } } } }",
-                "variables": {
-                  "filter": {
-                    "pick_tasks_count": {
-                      "gteq": 1
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful GraphQL response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "description": "Query result data",
-                      "properties": {
-                        "goods_out_pick_lists": {
-                          "type": "object",
-                          "properties": {
-                            "all": {
-                              "type": "object",
-                              "properties": {
-                                "edges": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "object",
-                                    "properties": {
-                                      "node": {
-                                        "type": "object",
-                                        "description": "A Goods Out: Pick Lists record"
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      },
-                      "description": "GraphQL errors, if any"
-                    }
-                  }
-                },
-                "example": {
-                  "data": {
-                    "goods_out_pick_lists": {
-                      "all": {
-                        "edges": [
-                          {
-                            "node": {
-                              "id": "1",
-                              "reference": "PL-001",
-                              "pick_reference": "PICK-001",
-                              "pick_type": "single",
-                              "load_reference": null,
-                              "goods_out_status": {
-                                "id": "3",
-                                "code": "PICK",
-                                "name": "Picking"
-                              },
-                              "account": {
-                                "id": "1",
-                                "code": "ACME",
-                                "name": "Acme Corporation"
-                              },
-                              "warehouse": {
-                                "id": "1",
-                                "code": "WH1",
-                                "name": "Main Warehouse"
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        }
-      }
-    },
-    "/api/goods_out_pick_lists/{id}": {
-      "patch": {
-        "tags": [
-          "Goods Out: Pick Lists"
-        ],
-        "summary": "Update a pick list",
-        "description": "Update an existing pick list's attributes such as its reference.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_out_pick_lists\",\n    \"attributes\": {\n      \"reference\": \"PL-2024-001-REV\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `reference` | No | Updated pick list reference |"
-        },
-        "operationId": "updateGoodsOutPickList",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the pick list to update",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "type": "object",
-                    "required": [
-                      "type",
-                      "attributes"
-                    ],
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "goods_out_pick_lists"
-                        ],
-                        "description": "Resource type identifier"
-                      },
-                      "attributes": {
-                        "type": "object",
-                        "description": "Pick list attributes to update",
-                        "properties": {
-                          "reference": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Pick list reference"
-                          },
-                          "string1": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Custom string field 1"
-                          },
-                          "string2": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Custom string field 2"
-                          },
-                          "string3": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Custom string field 3"
-                          },
-                          "string4": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Custom string field 4"
-                          },
-                          "string5": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Custom string field 5"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Pick list updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "description": "Pick list ID"
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "goods_out_pick_lists"
-                          ],
-                          "description": "Resource type"
-                        },
-                        "attributes": {
-                          "$ref": "#/components/schemas/GoodsOutPickListAttributes"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Goods Out: Pick Lists"
-        ],
-        "summary": "Delete a pick list",
-        "description": "Delete a pick list. This does not delete the associated goods out orders.",
-        "x-mint": {
-          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Does not delete associated goods out orders\n- Pick lists in progress may not be deletable"
-        },
-        "operationId": "destroyGoodsOutPickList",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the pick list to delete",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/NoContent"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
-      }
-    },
-    "/api/goods_out_processes/process_and_consolidate_picks": {
-      "post": {
-        "tags": [
-          "Goods Out: Pick Lists"
-        ],
-        "summary": "Process and consolidate picks",
-        "description": "Process multiple goods out orders into a single consolidated pick list. All orders must have the same pick_type (standard or tote). Crossdock orders are always processed separately.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [101, 102, 103],\n  \"goods_out_pick_list_attributes\": {\n    \"goods_out_pick_list_reference\": \"BATCH-2024-001\",\n    \"expected_date_of_dispatch\": \"2024-01-20T14:00:00Z\",\n    \"goods_out_bay_id\": 42\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of goods out order IDs to consolidate |\n| `goods_out_pick_list_attributes` | No | Optional attributes for the created pick list |\n| `goods_out_pick_list_reference` | No | Custom reference for the consolidated pick list |\n| `expected_date_of_dispatch` | No | Target dispatch date for the pick list |\n| `goods_out_bay_id` | No | Staging location ID (must be location_type: GOBAY) |\n\n## Prerequisites\n\n- Orders must be in PENDING or ALLOCATED status\n- All orders must have the same `pick_type` (standard or tote)\n\n## Behavior\n\n- Returns process_references for tracking pick list generation\n- Merges multiple orders into a single consolidated pick list\n- Crossdock orders are always processed separately (not consolidated)\n- Sales orders and work orders can be consolidated together if same pick_type\n\n## Tracking Status\n\nPoll for completion via GraphQL:\n\n```graphql\nquery {\n  pickProcessingRequests(filter: { process_reference: { eq: \"abc123def456\" } }) {\n    edges {\n      node {\n        id\n        status\n        process_reference\n        message\n      }\n    }\n  }\n}\n```\n\nStatus values: `pending`, `completed`, `failed`\n\n## Error Codes\n\n| Code | Symbol | Description |\n|------|--------|-------------|\n| 36 | empty_ids_provided | No order IDs provided |\n| 37 | invalid_ids_provided | Some IDs do not exist |\n| 39 | not_enough_stocks_for_picking | Insufficient stock available |\n| 59 | goods_out_already_allocated | Order already processed |\n| 318 | goods_outs_with_different_pick_types_cannot_be_consolidated | Mixed pick types in batch |"
-        },
-        "operationId": "processAndConsolidatePicks",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ConsolidatedPickRequest"
-              },
-              "example": {
-                "ids": [
-                  1,
-                  2,
-                  3
-                ],
-                "goods_out_pick_list_attributes": {
-                  "goods_out_pick_list_reference": "BATCH-2024-001",
-                  "expected_date_of_dispatch": "2024-01-20T14:00:00Z",
-                  "goods_out_bay_id": 42
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Pick processing queued successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PickProcessingResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/goods_out_processes/process_picks_async": {
-      "post": {
-        "tags": [
-          "Goods Out: Pick Lists"
-        ],
-        "summary": "Process picks asynchronously",
-        "description": "Queue goods out orders for asynchronous pick list generation. This is the preferred method for processing orders as it runs in the background without blocking. Each order gets its own pick list unless using the consolidation endpoint.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [101, 102, 103]\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of goods out order IDs to process |\n\n## Prerequisites\n\n- Orders must be in PENDING or ALLOCATED status\n- Account/warehouse permissions must allow pick processing\n\n## Behavior\n\n- Returns process_references for tracking pick list generation\n- Each order gets its own pick list (use `/process_and_consolidate_picks` to merge)\n- Orders are grouped by warehouse\n- Crossdock orders are processed separately from sales orders\n- Pick type can be `standard` (traditional picking) or `tote` (container-based batch picking)\n\n## Tracking Status\n\nPoll for completion via GraphQL:\n\n```graphql\nquery {\n  pickProcessingRequests(filter: { process_reference: { eq: \"abc123def456\" } }) {\n    edges {\n      node {\n        id\n        status\n        process_reference\n        message\n        created_at\n        updated_at\n      }\n    }\n  }\n}\n```\n\nStatus values: `pending`, `completed`, `failed`\n\n## Error Codes\n\n| Code | Symbol | Description |\n|------|--------|-------------|\n| 36 | empty_ids_provided | No order IDs provided |\n| 37 | invalid_ids_provided | Some IDs do not exist |\n| 39 | not_enough_stocks_for_picking | Insufficient stock available |\n| 59 | goods_out_already_allocated | Order already processed |"
-        },
-        "operationId": "processPicksAsync",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PickProcessingRequest"
-              },
-              "example": {
-                "ids": [
-                  1,
-                  2,
-                  3
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Pick processing queued successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PickProcessingResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
     "/graphql#ListGoodsOuts": {
       "post": {
         "tags": [
@@ -3601,6 +3191,455 @@
         }
       }
     },
+    "/graphql#ListGoodsOutPickLists": {
+      "post": {
+        "tags": [
+          "Goods Out: Pick Lists"
+        ],
+        "summary": "List goods out pick lists",
+        "description": "Retrieve pick lists using GraphQL. Supports filtering by reference, status, account, warehouse, and pick type.",
+        "operationId": "listGoodsOutPickLists",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: GoodsOutPickListsFilterType) {\n  goods_out_pick_lists {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          reference\n          pick_reference\n          pick_type\n          load_reference\n          goods_out_status {\n            id\n            code\n            name\n          }\n          account {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"pick_tasks_count\": {\n      \"gteq\": 1\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `pick_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of pick tasks |\n| `completed_pick_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of completed pick tasks |\n| `loading_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of loading tasks |\n| `completed_loading_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of completed loading tasks |\n| `dispatch_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of dispatch tasks |\n| `completed_dispatch_tasks_count` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Number of completed dispatch tasks |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: GoodsOutPickListsFilterType) { goods_out_pick_lists { all(filter: $filter) { edges { node { id reference pick_reference pick_type load_reference goods_out_status { id code name } account { id code name } warehouse { id code name } } } } } }",
+                "variables": {
+                  "filter": {
+                    "pick_tasks_count": {
+                      "gteq": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "goods_out_pick_lists": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Goods Out: Pick Lists record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "goods_out_pick_lists": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "reference": "PL-001",
+                              "pick_reference": "PICK-001",
+                              "pick_type": "single",
+                              "load_reference": null,
+                              "goods_out_status": {
+                                "id": "3",
+                                "code": "PICK",
+                                "name": "Picking"
+                              },
+                              "account": {
+                                "id": "1",
+                                "code": "ACME",
+                                "name": "Acme Corporation"
+                              },
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/goods_out_pick_lists/{id}": {
+      "patch": {
+        "tags": [
+          "Goods Out: Pick Lists"
+        ],
+        "summary": "Update a pick list",
+        "description": "Update an existing pick list's attributes such as its reference.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"goods_out_pick_lists\",\n    \"attributes\": {\n      \"reference\": \"PL-2024-001-REV\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `reference` | No | Updated pick list reference |"
+        },
+        "operationId": "updateGoodsOutPickList",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the pick list to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "goods_out_pick_lists"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "description": "Pick list attributes to update",
+                        "properties": {
+                          "reference": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Pick list reference"
+                          },
+                          "string1": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Custom string field 1"
+                          },
+                          "string2": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Custom string field 2"
+                          },
+                          "string3": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Custom string field 3"
+                          },
+                          "string4": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Custom string field 4"
+                          },
+                          "string5": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Custom string field 5"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pick list updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Pick list ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "goods_out_pick_lists"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/GoodsOutPickListAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Goods Out: Pick Lists"
+        ],
+        "summary": "Delete a pick list",
+        "description": "Delete a pick list. This does not delete the associated goods out orders.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Does not delete associated goods out orders\n- Pick lists in progress may not be deletable"
+        },
+        "operationId": "destroyGoodsOutPickList",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the pick list to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/goods_out_processes/process_and_consolidate_picks": {
+      "post": {
+        "tags": [
+          "Goods Out: Pick Lists"
+        ],
+        "summary": "Process and consolidate picks",
+        "description": "Process multiple goods out orders into a single consolidated pick list. All orders must have the same pick_type (standard or tote). Crossdock orders are always processed separately.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [101, 102, 103],\n  \"goods_out_pick_list_attributes\": {\n    \"goods_out_pick_list_reference\": \"BATCH-2024-001\",\n    \"expected_date_of_dispatch\": \"2024-01-20T14:00:00Z\",\n    \"goods_out_bay_id\": 42\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of goods out order IDs to consolidate |\n| `goods_out_pick_list_attributes` | No | Optional attributes for the created pick list |\n| `goods_out_pick_list_reference` | No | Custom reference for the consolidated pick list |\n| `expected_date_of_dispatch` | No | Target dispatch date for the pick list |\n| `goods_out_bay_id` | No | Staging location ID (must be location_type: GOBAY) |\n\n## Prerequisites\n\n- Orders must be in PENDING or ALLOCATED status\n- All orders must have the same `pick_type` (standard or tote)\n\n## Behavior\n\n- Returns process_references for tracking pick list generation\n- Merges multiple orders into a single consolidated pick list\n- Crossdock orders are always processed separately (not consolidated)\n- Sales orders and work orders can be consolidated together if same pick_type\n\n## Tracking Status\n\nPoll for completion via GraphQL:\n\n```graphql\nquery {\n  pickProcessingRequests(filter: { process_reference: { eq: \"abc123def456\" } }) {\n    edges {\n      node {\n        id\n        status\n        process_reference\n        message\n      }\n    }\n  }\n}\n```\n\nStatus values: `pending`, `completed`, `failed`\n\n## Error Codes\n\n| Code | Symbol | Description |\n|------|--------|-------------|\n| 36 | empty_ids_provided | No order IDs provided |\n| 37 | invalid_ids_provided | Some IDs do not exist |\n| 39 | not_enough_stocks_for_picking | Insufficient stock available |\n| 59 | goods_out_already_allocated | Order already processed |\n| 318 | goods_outs_with_different_pick_types_cannot_be_consolidated | Mixed pick types in batch |"
+        },
+        "operationId": "processAndConsolidatePicks",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsolidatedPickRequest"
+              },
+              "example": {
+                "ids": [
+                  1,
+                  2,
+                  3
+                ],
+                "goods_out_pick_list_attributes": {
+                  "goods_out_pick_list_reference": "BATCH-2024-001",
+                  "expected_date_of_dispatch": "2024-01-20T14:00:00Z",
+                  "goods_out_bay_id": 42
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pick processing queued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickProcessingResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/goods_out_processes/process_picks_async": {
+      "post": {
+        "tags": [
+          "Goods Out: Pick Lists"
+        ],
+        "summary": "Process picks asynchronously",
+        "description": "Queue goods out orders for asynchronous pick list generation. This is the preferred method for processing orders as it runs in the background without blocking. Each order gets its own pick list unless using the consolidation endpoint.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [101, 102, 103]\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of goods out order IDs to process |\n\n## Prerequisites\n\n- Orders must be in PENDING or ALLOCATED status\n- Account/warehouse permissions must allow pick processing\n\n## Behavior\n\n- Returns process_references for tracking pick list generation\n- Each order gets its own pick list (use `/process_and_consolidate_picks` to merge)\n- Orders are grouped by warehouse\n- Crossdock orders are processed separately from sales orders\n- Pick type can be `standard` (traditional picking) or `tote` (container-based batch picking)\n\n## Tracking Status\n\nPoll for completion via GraphQL:\n\n```graphql\nquery {\n  pickProcessingRequests(filter: { process_reference: { eq: \"abc123def456\" } }) {\n    edges {\n      node {\n        id\n        status\n        process_reference\n        message\n        created_at\n        updated_at\n      }\n    }\n  }\n}\n```\n\nStatus values: `pending`, `completed`, `failed`\n\n## Error Codes\n\n| Code | Symbol | Description |\n|------|--------|-------------|\n| 36 | empty_ids_provided | No order IDs provided |\n| 37 | invalid_ids_provided | Some IDs do not exist |\n| 39 | not_enough_stocks_for_picking | Insufficient stock available |\n| 59 | goods_out_already_allocated | Order already processed |"
+        },
+        "operationId": "processPicksAsync",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PickProcessingRequest"
+              },
+              "example": {
+                "ids": [
+                  1,
+                  2,
+                  3
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pick processing queued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickProcessingResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/goods_out_processes/short_order_lines": {
+      "post": {
+        "tags": [
+          "Goods Out: Processing"
+        ],
+        "summary": "Short order lines",
+        "description": "Process partially allocated orders by marking unallocated lines as short. Used when stock is insufficient and orders need to ship with available quantities.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [101, 102, 103],\n  \"description\": \"Stock unavailable - shipping partial order\",\n  \"reason_code_id\": 5\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of goods out order IDs to short |\n| `description` | Yes | Free text reason for shorting (audit trail) |\n| `reason_code_id` | No | Reference to configurable ReasonCode lookup table |\n\n## Prerequisites\n\n- Account must have `is_short_pickable: true`\n- Orders should be in PART_ALLOCATED status\n\n## Behavior\n\n- Marks unallocated order line quantities as short\n- Allows orders to proceed with partial fulfillment\n- Records reason in audit trail for compliance\n- Can use reason_code_id for standardized reasons (configurable per tenant)\n\n## Error Codes\n\n| Code | Symbol | Description |\n|------|--------|-------------|\n| 36 | empty_ids_provided | No order IDs provided |\n| 37 | invalid_ids_provided | Some IDs do not exist |"
+        },
+        "operationId": "shortOrderLines",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShortOrderLinesRequest"
+              },
+              "example": {
+                "ids": [
+                  1,
+                  2,
+                  3
+                ],
+                "description": "Stock unavailable - shipping partial order",
+                "reason_code_id": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Order lines shorted successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
     "/graphql#ListGroups": {
       "post": {
         "tags": [
@@ -3726,50 +3765,6 @@
         }
       }
     },
-    "/api/groups/{group_id}/product_group": {
-      "delete": {
-        "tags": [
-          "Groups"
-        ],
-        "summary": "Remove a product from a group",
-        "description": "Delete a product group association, removing a product from a group.",
-        "x-mint": {
-          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Removes product from group without deleting the product\n- Pass `product_id` as query parameter"
-        },
-        "operationId": "destroyProductGroup",
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the group",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "product_id",
-            "in": "query",
-            "required": true,
-            "description": "The ID of the product to remove from the group",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/NoContent"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
-      }
-    },
     "/api/groups/{group_id}/product_groups": {
       "post": {
         "tags": [
@@ -3891,6 +3886,50 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/groups/{group_id}/product_group": {
+      "delete": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Remove a product from a group",
+        "description": "Delete a product group association, removing a product from a group.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Removes product from group without deleting the product\n- Pass `product_id` as query parameter"
+        },
+        "operationId": "destroyProductGroup",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the group",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": true,
+            "description": "The ID of the product to remove from the group",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -5430,6 +5469,149 @@
         }
       }
     },
+    "/api/pickface_products": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Create a pickface product assignment",
+        "description": "Assign a product to a pickface location for replenishment. Exactly one of `location_id` or `location_group_id` must be provided to specify where the product will be picked from.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"pickface_products\",\n    \"attributes\": {\n      \"product_id\": 123,\n      \"location_id\": 456,\n      \"replenishment_type\": \"continuous\",\n      \"trigger_min\": 10,\n      \"trigger_max\": 100,\n      \"priority\": 1,\n      \"full_storage_units_only\": false\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `product_id` | Yes | The product to assign to a pickface |\n| `location_id` | Conditional | Pickface location ID (exactly one of location_id or location_group_id required) |\n| `location_group_id` | Conditional | Location group ID (exactly one of location_id or location_group_id required) |\n| `replenishment_type` | No | Type of replenishment: `continuous`, `demand`, or `order_volume` |\n| `trigger_min` | No | Minimum stock level that triggers replenishment (>= 0) |\n| `trigger_max` | No | Maximum stock level for replenishment target (>= 0) |\n| `priority` | No | Replenishment priority (>= 0, lower number = higher priority) |\n| `full_storage_units_only` | No | Whether to replenish only with full storage units |"
+        },
+        "operationId": "createPickfaceProduct",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "pickface_products"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/PickfaceProductAttributes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "pickface_products",
+                  "attributes": {
+                    "product_id": 123,
+                    "location_id": 456,
+                    "replenishment_type": "continuous",
+                    "trigger_min": 10,
+                    "trigger_max": 100,
+                    "priority": 1,
+                    "full_storage_units_only": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pickface product assignment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickfaceProductResponse"
+                },
+                "example": {
+                  "data": {
+                    "id": 1,
+                    "type": "pickface_products",
+                    "attributes": {
+                      "trigger_min": 10,
+                      "trigger_max": 100,
+                      "priority": 1,
+                      "full_storage_units_only": false
+                    },
+                    "relationships": {
+                      "product": {
+                        "data": {
+                          "id": 123,
+                          "type": "products"
+                        }
+                      },
+                      "location": {
+                        "data": {
+                          "id": 456,
+                          "type": "locations"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/goods_out_processes/trigger_replenishment": {
+      "post": {
+        "tags": [
+          "Replenishment"
+        ],
+        "summary": "Trigger replenishment",
+        "description": "Trigger a replenishment process for a specific product at a location. Used to restock pick faces from bulk storage.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"account_id\": 1,\n  \"location_id\": 42,\n  \"product_id\": 123\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | Yes | Stock account ID |\n| `location_id` | Yes | Pickface location ID to replenish |\n| `product_id` | Yes | Product ID to replenish |\n\n## Behavior\n\n- Initiates replenishment from bulk storage to the specified pickface location\n- Creates replenishment tasks for warehouse operators\n- Used to maintain stock levels in picking areas"
+        },
+        "operationId": "triggerReplenishment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerReplenishmentRequest"
+              },
+              "example": {
+                "account_id": 1,
+                "location_id": 42,
+                "product_id": 123
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Replenishment triggered successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
     "/graphql#ListReportQueries": {
       "post": {
         "tags": [
@@ -5563,7 +5745,7 @@
         "summary": "Create a report query",
         "description": "Create a new report query definition. Report queries allow you to save GraphQL queries for repeated execution.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"graphql\": \"query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\\\"AVAILABLE\\\", \\\"ALLOCATED\\\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \\\"total_records DESC\\\") { task_type { code } total_records } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouse_id\", \"type\": \"Integer\" },\n        { \"name\": \"account_id\", \"type\": \"Integer\" },\n        { \"name\": \"created_at_from\", \"type\": \"Date\" },\n        { \"name\": \"created_at_to\", \"type\": \"Date\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | Yes | Named GraphQL query with typed parameters (never anonymous) |\n| `parameters` | No | Array of parameter definitions matching query variables |\n\n## GraphQL Query Rules\n\n- Must be a **named query** (e.g., `query getTasksToDo(...)`) \u2014 never anonymous\n- Use `$variable` syntax for parameters with GraphQL types (`ID`, `Chronic`, `String`)\n- Common query patterns: `aggregation(...)` for grouped/summarized data, `all(...) { edges { node { ... } } }` for paginated lists\n\n## Parameter Types\n\n| Type | GraphQL Type | Description |\n|------|-------------|-------------|\n| `Integer` | `ID` | Integer ID value |\n| `Date` | `Chronic` | Date/time parsed with natural language (e.g., 'start of today') |\n| `String` | `String` | Text value |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"graphql\": \"query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\\\"AVAILABLE\\\", \\\"ALLOCATED\\\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \\\"total_records DESC\\\") { task_type { code } total_records } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouse_id\", \"type\": \"Integer\" },\n        { \"name\": \"account_id\", \"type\": \"Integer\" },\n        { \"name\": \"created_at_from\", \"type\": \"Date\" },\n        { \"name\": \"created_at_to\", \"type\": \"Date\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | Yes | Named GraphQL query with typed parameters (never anonymous) |\n| `parameters` | No | Array of parameter definitions matching query variables |\n\n## GraphQL Query Rules\n\n- Must be a **named query** (e.g., `query getTasksToDo(...)`) — never anonymous\n- Use `$variable` syntax for parameters with GraphQL types (`ID`, `Chronic`, `String`)\n- Common query patterns: `aggregation(...)` for grouped/summarized data, `all(...) { edges { node { ... } } }` for paginated lists\n\n## Parameter Types\n\n| Type | GraphQL Type | Description |\n|------|-------------|-------------|\n| `Integer` | `ID` | Integer ID value |\n| `Date` | `Chronic` | Date/time parsed with natural language (e.g., 'start of today') |\n| `String` | `String` | Text value |"
         },
         "operationId": "createReportQuery",
         "requestBody": {
@@ -5934,7 +6116,7 @@
         "summary": "Create a report",
         "description": "Create a new report definition based on an existing report query. Reports define how query results are formatted and what variables are used.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"report_type\": \"bar\",\n      \"report_query_id\": 1,\n      \"source_path\": \"data.tasks.aggregation\",\n      \"report_fields\": [\n        { \"name\": \"Task Type\", \"path\": \"task_type.code\" },\n        { \"name\": \"Tasks Left To Do\", \"path\": \"total_records\" }\n      ],\n      \"variables\": [\n        { \"name\": \"created_at_from\", \"value\": \"start of today\", \"prompt\": \"true\" },\n        { \"name\": \"created_at_to\", \"value\": \"end of today\", \"prompt\": \"true\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `source_path` | No | Dot-notation path to data in GraphQL response. Must start with `data.` (e.g., `data.tasks.aggregation`, `data.stocks.all.edges`) |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## source_path\n\nThe `source_path` tells the system where to find data in the GraphQL response. It always starts with `data.` Common patterns:\n- `data.{resource}.aggregation` \u2014 for grouped/summarized results\n- `data.{resource}.all.edges` \u2014 for paginated lists (each item under `node`)\n- For paginated queries, `report_fields` paths must start with `node.` (e.g., `node.warehouse.name`)\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `start of today`, `end of today`, `start of this month`) which are parsed at report generation time. Variable names must match parameters defined in the linked report query."
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"report_type\": \"bar\",\n      \"report_query_id\": 1,\n      \"source_path\": \"data.tasks.aggregation\",\n      \"report_fields\": [\n        { \"name\": \"Task Type\", \"path\": \"task_type.code\" },\n        { \"name\": \"Tasks Left To Do\", \"path\": \"total_records\" }\n      ],\n      \"variables\": [\n        { \"name\": \"created_at_from\", \"value\": \"start of today\", \"prompt\": \"true\" },\n        { \"name\": \"created_at_to\", \"value\": \"end of today\", \"prompt\": \"true\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `source_path` | No | Dot-notation path to data in GraphQL response. Must start with `data.` (e.g., `data.tasks.aggregation`, `data.stocks.all.edges`) |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## source_path\n\nThe `source_path` tells the system where to find data in the GraphQL response. It always starts with `data.` Common patterns:\n- `data.{resource}.aggregation` — for grouped/summarized results\n- `data.{resource}.all.edges` — for paginated lists (each item under `node`)\n- For paginated queries, `report_fields` paths must start with `node.` (e.g., `node.warehouse.name`)\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `start of today`, `end of today`, `start of this month`) which are parsed at report generation time. Variable names must match parameters defined in the linked report query."
         },
         "operationId": "createReport",
         "requestBody": {
@@ -6245,7 +6427,7 @@
         "summary": "Generate report output",
         "description": "Queue asynchronous report generation. Returns a Document record that can be polled for status and downloaded when complete.",
         "x-mint": {
-          "content": "## Workflow\n\n1. **Call this endpoint** \u2014 returns a Document with `status: queued`\n2. **Poll the document status** via GraphQL until `status` becomes `available` (or `failed`)\n3. **Download the file** via `GET /documents/{id}/download` to get a presigned S3 URL\n4. **Use the presigned URL** to download the generated report file\n\n## Request Body (Optional)\n\nYou can optionally pass `variables` to override the report's stored variable values:\n\n```json\n{\n  \"variables\": [\n    { \"name\": \"date_from\", \"value\": \"2024-01-01 00:00:00\" },\n    { \"name\": \"date_to\", \"value\": \"2024-01-31 23:59:59\" }\n  ]\n}\n```\n\nIf no variables are provided, the report's stored variables are used. Passed variables are merged with stored variables (passed values take precedence).\n\n## Variable Values\n\nVariables support Chronic-style date parsing:\n- `today 00:00:00` \u2014 start of today\n- `3 days ago` \u2014 3 days before now\n- `beginning of month` \u2014 first day of current month\n- `2024-01-15 09:00:00` \u2014 explicit date/time\n\n## Access Control\n\nOnly the report owner can generate it. Returns 403 if the authenticated user is not the owner."
+          "content": "## Workflow\n\n1. **Call this endpoint** — returns a Document with `status: queued`\n2. **Poll the document status** via GraphQL until `status` becomes `available` (or `failed`)\n3. **Download the file** via `GET /documents/{id}/download` to get a presigned S3 URL\n4. **Use the presigned URL** to download the generated report file\n\n## Request Body (Optional)\n\nYou can optionally pass `variables` to override the report's stored variable values:\n\n```json\n{\n  \"variables\": [\n    { \"name\": \"date_from\", \"value\": \"2024-01-01 00:00:00\" },\n    { \"name\": \"date_to\", \"value\": \"2024-01-31 23:59:59\" }\n  ]\n}\n```\n\nIf no variables are provided, the report's stored variables are used. Passed variables are merged with stored variables (passed values take precedence).\n\n## Variable Values\n\nVariables support Chronic-style date parsing:\n- `today 00:00:00` — start of today\n- `3 days ago` — 3 days before now\n- `beginning of month` — first day of current month\n- `2024-01-15 09:00:00` — explicit date/time\n\n## Access Control\n\nOnly the report owner can generate it. Returns 403 if the authenticated user is not the owner."
         },
         "operationId": "generateReport",
         "parameters": [
@@ -6834,7 +7016,7 @@
         "summary": "Create a scheduled report",
         "description": "Create a new scheduled report that delivers reports via email and/or FTP on a recurring schedule.",
         "x-mint": {
-          "content": "## Request Structure\n\nScheduled reports use JSON:API format with embedded relationships:\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Weekly Stock Report\",\n      \"frequency\": \"Day\",\n      \"numbers\": [1, 3, 5],\n      \"time\": \"09:00\",\n      \"subject\": \"Weekly Stock Report\",\n      \"body\": \"Please find the weekly stock report attached.\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": [\n                { \"name\": \"date_from\", \"value\": \"today 00:00:00\" }\n              ]\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      },\n      \"scheduled-report-ftp-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"ftp_user_id\": 5\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Schedule name (max 50 chars) |\n| `frequency` | Yes | `Day` (days of the week) or `Month` (days of the month) |\n| `numbers` | Yes | Array of integers \u2014 day numbers when schedule runs |\n| `time` | Yes | Time of day to run (e.g., `09:00`) |\n| `subject` | No | Email subject line (max 256 chars) |\n| `body` | No | Email body text |\n\n## Frequency & Numbers\n\n- `Day` frequency: numbers 1-7 (1 = Monday, 7 = Sunday)\n- `Month` frequency: numbers 1-31 (day of month)\n\n## Relationships\n\nRelationship keys use **kebab-case** in the JSON:API `relationships` object:\n\n| Relationship | Description |\n|--------------|-------------|\n| `scheduled-report-reports` | Reports to generate (each with optional variable overrides) |\n| `scheduled-report-recipients` | Email recipients |\n| `scheduled-report-ftp-recipients` | FTP destinations |"
+          "content": "## Request Structure\n\nScheduled reports use JSON:API format with embedded relationships:\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Weekly Stock Report\",\n      \"frequency\": \"Day\",\n      \"numbers\": [1, 3, 5],\n      \"time\": \"09:00\",\n      \"subject\": \"Weekly Stock Report\",\n      \"body\": \"Please find the weekly stock report attached.\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": [\n                { \"name\": \"date_from\", \"value\": \"today 00:00:00\" }\n              ]\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      },\n      \"scheduled-report-ftp-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"ftp_user_id\": 5\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Schedule name (max 50 chars) |\n| `frequency` | Yes | `Day` (days of the week) or `Month` (days of the month) |\n| `numbers` | Yes | Array of integers — day numbers when schedule runs |\n| `time` | Yes | Time of day to run (e.g., `09:00`) |\n| `subject` | No | Email subject line (max 256 chars) |\n| `body` | No | Email body text |\n\n## Frequency & Numbers\n\n- `Day` frequency: numbers 1-7 (1 = Monday, 7 = Sunday)\n- `Month` frequency: numbers 1-31 (day of month)\n\n## Relationships\n\nRelationship keys use **kebab-case** in the JSON:API `relationships` object:\n\n| Relationship | Description |\n|--------------|-------------|\n| `scheduled-report-reports` | Reports to generate (each with optional variable overrides) |\n| `scheduled-report-recipients` | Email recipients |\n| `scheduled-report-ftp-recipients` | FTP destinations |"
         },
         "operationId": "createScheduledReport",
         "requestBody": {
@@ -6964,7 +7146,7 @@
           "Scheduled Reports"
         ],
         "summary": "Update a scheduled report",
-        "description": "Update an existing scheduled report. Only the owner can update it. **Warning: updates are full replacements** \u2014 omitting a recipient or report from the update payload will delete it.",
+        "description": "Update an existing scheduled report. Only the owner can update it. **Warning: updates are full replacements** — omitting a recipient or report from the update payload will delete it.",
         "x-mint": {
           "content": "## Important: Full Replacement\n\n**Updates are full replacements for relationships.** If you omit a recipient or report from the update, it will be **deleted**. Always include all desired recipients and reports in the update payload.\n\n## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Updated Weekly Report\",\n      \"time\": \"10:00\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": []\n            }\n          },\n          {\n            \"attributes\": {\n              \"report_id\": 2,\n              \"variables\": []\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Access Control\n\nOnly the scheduled report owner can update it. Returns 403 if the authenticated user is not the owner."
         },
@@ -7589,6 +7771,260 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stocks/hold": {
+      "post": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Place stocks on hold",
+        "description": "Place one or more stock records on hold, preventing them from being allocated to orders. Held stock remains at its location but is excluded from available inventory calculations.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [123, 456],\n  \"description\": \"Quality check required\",\n  \"reason_code_id\": 1\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of stock IDs to place on hold |\n| `description` | Yes | Reason for placing stock on hold |\n| `reason_code_id` | No | Reason code ID for audit trail |"
+        },
+        "operationId": "holdStocks",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockHoldRequest"
+              },
+              "example": {
+                "ids": [
+                  123,
+                  456
+                ],
+                "description": "Quality check required",
+                "reason_code_id": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stocks placed on hold successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stocks/offhold": {
+      "post": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Remove stocks from hold",
+        "description": "Release one or more stock records from hold, making them available for allocation to orders again.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [123, 456],\n  \"description\": \"Quality check passed\",\n  \"reason_code_id\": 1\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of stock IDs to release from hold |\n| `description` | Yes | Reason for releasing stock from hold |\n| `reason_code_id` | No | Reason code ID for audit trail |"
+        },
+        "operationId": "offholdStocks",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockOffholdRequest"
+              },
+              "example": {
+                "ids": [
+                  123,
+                  456
+                ],
+                "description": "Quality check passed",
+                "reason_code_id": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stocks removed from hold successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stocks/{id}/move": {
+      "post": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Move stock to another location",
+        "description": "Move a quantity of stock from its current location to a different location within the same warehouse. Creates a transfer transaction for audit purposes.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 100,\n      \"to_location_id\": 456,\n      \"reason_code_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to move (must be > 0 and <= available) |\n| `to_location_id` | Yes | Destination location ID within the warehouse |\n| `reason_code_id` | No | Reason code for audit trail |"
+        },
+        "operationId": "moveStock",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the stock record to move",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockMoveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stock moved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stocks/{id}/negative_adjustment": {
+      "post": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Perform negative stock adjustment",
+        "description": "Reduce the quantity of stock at a location. Use this for stock corrections, write-offs, or recording damaged/lost inventory.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 10,\n      \"reason_code_id\": 2\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to reduce (must be > 0 and <= available) |\n| `reason_code_id` | No | Reason code for audit trail (e.g., damaged, expired) |"
+        },
+        "operationId": "negativeAdjustmentStock",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the stock record to adjust",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockNegativeAdjustmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stock adjusted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stocks/{id}/transfer": {
+      "post": {
+        "tags": [
+          "Stocks"
+        ],
+        "summary": "Transfer stock to another account",
+        "description": "Transfer ownership of a quantity of stock from one account (customer) to another. The stock remains at the same location but changes ownership.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 100,\n      \"to_account_id\": 789,\n      \"reason_code_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to transfer (must be > 0 and <= available) |\n| `to_account_id` | Yes | Destination stock account ID (the new owner) |\n| `reason_code_id` | No | Reason code for audit trail |"
+        },
+        "operationId": "transferStock",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the stock record to transfer",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockTransferRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stock transferred successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
@@ -9392,446 +9828,6 @@
           }
         }
       }
-    },
-    "/api/goods_out_processes/short_order_lines": {
-      "post": {
-        "tags": [
-          "Goods Out: Processing"
-        ],
-        "summary": "Short order lines",
-        "description": "Process partially allocated orders by marking unallocated lines as short. Used when stock is insufficient and orders need to ship with available quantities.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [101, 102, 103],\n  \"description\": \"Stock unavailable - shipping partial order\",\n  \"reason_code_id\": 5\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of goods out order IDs to short |\n| `description` | Yes | Free text reason for shorting (audit trail) |\n| `reason_code_id` | No | Reference to configurable ReasonCode lookup table |\n\n## Prerequisites\n\n- Account must have `is_short_pickable: true`\n- Orders should be in PART_ALLOCATED status\n\n## Behavior\n\n- Marks unallocated order line quantities as short\n- Allows orders to proceed with partial fulfillment\n- Records reason in audit trail for compliance\n- Can use reason_code_id for standardized reasons (configurable per tenant)\n\n## Error Codes\n\n| Code | Symbol | Description |\n|------|--------|-------------|\n| 36 | empty_ids_provided | No order IDs provided |\n| 37 | invalid_ids_provided | Some IDs do not exist |"
-        },
-        "operationId": "shortOrderLines",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ShortOrderLinesRequest"
-              },
-              "example": {
-                "ids": [
-                  1,
-                  2,
-                  3
-                ],
-                "description": "Stock unavailable - shipping partial order",
-                "reason_code_id": 5
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Order lines shorted successfully"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/goods_out_processes/trigger_replenishment": {
-      "post": {
-        "tags": [
-          "Replenishment"
-        ],
-        "summary": "Trigger replenishment",
-        "description": "Trigger a replenishment process for a specific product at a location. Used to restock pick faces from bulk storage.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"account_id\": 1,\n  \"location_id\": 42,\n  \"product_id\": 123\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | Yes | Stock account ID |\n| `location_id` | Yes | Pickface location ID to replenish |\n| `product_id` | Yes | Product ID to replenish |\n\n## Behavior\n\n- Initiates replenishment from bulk storage to the specified pickface location\n- Creates replenishment tasks for warehouse operators\n- Used to maintain stock levels in picking areas"
-        },
-        "operationId": "triggerReplenishment",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TriggerReplenishmentRequest"
-              },
-              "example": {
-                "account_id": 1,
-                "location_id": 42,
-                "product_id": 123
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Replenishment triggered successfully"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/pickface_products": {
-      "post": {
-        "tags": [
-          "Pickface Products"
-        ],
-        "summary": "Create a pickface product assignment",
-        "description": "Assign a product to a pickface location for replenishment. Exactly one of `location_id` or `location_group_id` must be provided to specify where the product will be picked from.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"pickface_products\",\n    \"attributes\": {\n      \"product_id\": 123,\n      \"location_id\": 456,\n      \"replenishment_type\": \"continuous\",\n      \"trigger_min\": 10,\n      \"trigger_max\": 100,\n      \"priority\": 1,\n      \"full_storage_units_only\": false\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `product_id` | Yes | The product to assign to a pickface |\n| `location_id` | Conditional | Pickface location ID (exactly one of location_id or location_group_id required) |\n| `location_group_id` | Conditional | Location group ID (exactly one of location_id or location_group_id required) |\n| `replenishment_type` | No | Type of replenishment: `continuous`, `demand`, or `order_volume` |\n| `trigger_min` | No | Minimum stock level that triggers replenishment (>= 0) |\n| `trigger_max` | No | Maximum stock level for replenishment target (>= 0) |\n| `priority` | No | Replenishment priority (>= 0, lower number = higher priority) |\n| `full_storage_units_only` | No | Whether to replenish only with full storage units |"
-        },
-        "operationId": "createPickfaceProduct",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "type": "object",
-                    "required": [
-                      "type",
-                      "attributes"
-                    ],
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "pickface_products"
-                        ]
-                      },
-                      "attributes": {
-                        "$ref": "#/components/schemas/PickfaceProductAttributes"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "data": {
-                  "type": "pickface_products",
-                  "attributes": {
-                    "product_id": 123,
-                    "location_id": 456,
-                    "replenishment_type": "continuous",
-                    "trigger_min": 10,
-                    "trigger_max": 100,
-                    "priority": 1,
-                    "full_storage_units_only": false
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Pickface product assignment created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PickfaceProductResponse"
-                },
-                "example": {
-                  "data": {
-                    "id": 1,
-                    "type": "pickface_products",
-                    "attributes": {
-                      "trigger_min": 10,
-                      "trigger_max": 100,
-                      "priority": 1,
-                      "full_storage_units_only": false
-                    },
-                    "relationships": {
-                      "product": {
-                        "data": {
-                          "id": 123,
-                          "type": "products"
-                        }
-                      },
-                      "location": {
-                        "data": {
-                          "id": 456,
-                          "type": "locations"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/stocks/hold": {
-      "post": {
-        "tags": [
-          "Stocks"
-        ],
-        "summary": "Place stocks on hold",
-        "description": "Place one or more stock records on hold, preventing them from being allocated to orders. Held stock remains at its location but is excluded from available inventory calculations.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [123, 456],\n  \"description\": \"Quality check required\",\n  \"reason_code_id\": 1\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of stock IDs to place on hold |\n| `description` | Yes | Reason for placing stock on hold |\n| `reason_code_id` | No | Reason code ID for audit trail |"
-        },
-        "operationId": "holdStocks",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StockHoldRequest"
-              },
-              "example": {
-                "ids": [
-                  123,
-                  456
-                ],
-                "description": "Quality check required",
-                "reason_code_id": 1
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Stocks placed on hold successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/stocks/offhold": {
-      "post": {
-        "tags": [
-          "Stocks"
-        ],
-        "summary": "Remove stocks from hold",
-        "description": "Release one or more stock records from hold, making them available for allocation to orders again.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [123, 456],\n  \"description\": \"Quality check passed\",\n  \"reason_code_id\": 1\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of stock IDs to release from hold |\n| `description` | Yes | Reason for releasing stock from hold |\n| `reason_code_id` | No | Reason code ID for audit trail |"
-        },
-        "operationId": "offholdStocks",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StockOffholdRequest"
-              },
-              "example": {
-                "ids": [
-                  123,
-                  456
-                ],
-                "description": "Quality check passed",
-                "reason_code_id": 1
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Stocks removed from hold successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/stocks/{id}/move": {
-      "post": {
-        "tags": [
-          "Stocks"
-        ],
-        "summary": "Move stock to another location",
-        "description": "Move a quantity of stock from its current location to a different location within the same warehouse. Creates a transfer transaction for audit purposes.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 100,\n      \"to_location_id\": 456,\n      \"reason_code_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to move (must be > 0 and <= available) |\n| `to_location_id` | Yes | Destination location ID within the warehouse |\n| `reason_code_id` | No | Reason code for audit trail |"
-        },
-        "operationId": "moveStock",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the stock record to move",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StockMoveRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Stock moved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/stocks/{id}/negative_adjustment": {
-      "post": {
-        "tags": [
-          "Stocks"
-        ],
-        "summary": "Perform negative stock adjustment",
-        "description": "Reduce the quantity of stock at a location. Use this for stock corrections, write-offs, or recording damaged/lost inventory.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 10,\n      \"reason_code_id\": 2\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to reduce (must be > 0 and <= available) |\n| `reason_code_id` | No | Reason code for audit trail (e.g., damaged, expired) |"
-        },
-        "operationId": "negativeAdjustmentStock",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the stock record to adjust",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StockNegativeAdjustmentRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Stock adjusted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/stocks/{id}/transfer": {
-      "post": {
-        "tags": [
-          "Stocks"
-        ],
-        "summary": "Transfer stock to another account",
-        "description": "Transfer ownership of a quantity of stock from one account (customer) to another. The stock remains at the same location but changes ownership.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 100,\n      \"to_account_id\": 789,\n      \"reason_code_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to transfer (must be > 0 and <= available) |\n| `to_account_id` | Yes | Destination stock account ID (the new owner) |\n| `reason_code_id` | No | Reason code for audit trail |"
-        },
-        "operationId": "transferStock",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the stock record to transfer",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StockTransferRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Stock transferred successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
     }
   },
   "components": {
@@ -10220,7 +10216,7 @@
           "code": {
             "type": "string",
             "nullable": true,
-            "description": "Address code for reference. Read-only when setting addresses inline on orders/warehouses \u2014 settable only via the delivery addresses endpoint directly.",
+            "description": "Address code for reference. Read-only when setting addresses inline on orders/warehouses — settable only via the delivery addresses endpoint directly.",
             "readOnly": true
           },
           "country_code": {
@@ -10555,7 +10551,7 @@
             "minimum": 0,
             "nullable": true,
             "default": 0.0,
-            "description": "Unit price for this charge. Total is calculated as quantity \u00d7 price."
+            "description": "Unit price for this charge. Total is calculated as quantity × price."
           },
           "product_id": {
             "type": "integer",
@@ -13171,7 +13167,7 @@
       },
       "ScheduledReportAttributes": {
         "type": "object",
-        "description": "Scheduled report attributes for recurring report delivery. Note: reports to generate, email recipients, and FTP recipients are specified in the 'relationships' object (not in attributes) \u2014 see ScheduledReportRelationships.",
+        "description": "Scheduled report attributes for recurring report delivery. Note: reports to generate, email recipients, and FTP recipients are specified in the 'relationships' object (not in attributes) — see ScheduledReportRelationships.",
         "required": [
           "name",
           "frequency",
