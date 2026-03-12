@@ -31,45 +31,11 @@ The runtime uses a Claude Sonnet model with streaming enabled, extended thinking
 
 When the frontend sends a message, here's what happens inside the runtime:
 
-```mermaid
-sequenceDiagram
-    participant FE as Frontend
-    participant DP as Bedrock Data Plane
-    participant App as BedrockAgentCoreApp
-    participant Handler as agent_invocation()
-    participant Cache as Two-Layer Cache
-    participant Agent as Strands Agent
-    participant GW as Private MCP Gateway
+<Frame>
+  <img src="/images/runtime-entry-flow.drawio.svg" alt="Agent Runtime Entry Point Flow — request ingress, cache resolution, and streaming execution" zoom />
+</Frame>
 
-    FE->>DP: POST /agent/invocations
-    DP->>App: HTTP request
-    App->>Handler: payload + context
-
-    Handler->>Handler: Extract auth header + subdomain
-    Handler->>Handler: Get session_id from context
-    Handler->>Handler: Validate files (if present)
-
-    Handler->>Cache: get_or_create_agent(session_id, auth, subdomain)
-    alt MCP cache miss
-        Cache->>GW: Create MCP client connection (~3s)
-        Cache-->>Cache: Store in _mcp_cache[hash(auth:subdomain)]
-    end
-    alt Agent cache miss
-        Cache->>Cache: Create Agent with S3SessionManager
-        Cache->>Cache: Restore conversation from S3
-        Cache-->>Cache: Store in _agent_cache[session_id]
-    end
-    Cache-->>Handler: Agent instance
-
-    Handler->>Agent: stream_async(message)
-    loop For each streaming event
-        Agent->>GW: MCP tool calls (as needed)
-        GW-->>Agent: Tool results
-        Agent-->>Handler: Streaming event
-        Handler->>Handler: Strip invocation_state keys
-        Handler-->>FE: Yield event
-    end
-```
+<sub><a href="/images/runtime-entry-flow.drawio.svg" download="runtime-entry-flow.drawio.svg">Download SVG</a> · <a href="/images/runtime-entry-flow.drawio" download="runtime-entry-flow.drawio">Download draw.io source</a></sub>
 
 **Request payload format:**
 

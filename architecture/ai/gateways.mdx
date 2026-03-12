@@ -39,43 +39,11 @@ This means the agent runtime connects to a single gateway and gets access to all
 
 ## Why Two Gateways?
 
-```mermaid
-flowchart LR
-    subgraph Clients["External Clients"]
-        mcp_client([MCP Clients])
-    end
+<Frame>
+  <img src="/images/gateway-architecture.drawio.svg" alt="ClarusWMS Dual MCP Gateway Architecture — Public and Private gateway routing to Tool Lambdas" zoom />
+</Frame>
 
-    subgraph Runtime["Agent Runtime"]
-        agent(Strands Python Agent)
-    end
-
-    subgraph Public["Public Gateway"]
-        pub_gw{{Public MCP Gateway}}
-        pub_target_api[Target: API]
-    end
-
-    subgraph Private["Private Gateway"]
-        priv_gw{{Private MCP Gateway}}
-        priv_target_api[Target: API]
-        priv_target_utils[Target: Utils]
-    end
-
-    subgraph Lambdas["Tool Lambdas"]
-        api_lambda(API Lambda<br/>GraphQL + REST)
-        utils_lambda(Utils Lambda<br/>CSV Generation, etc.)
-    end
-
-    mcp_client --> pub_gw
-    pub_gw --> pub_target_api --> api_lambda
-
-    agent -->|Single MCP connection| priv_gw
-    priv_gw --> priv_target_api --> api_lambda
-    priv_gw --> priv_target_utils --> utils_lambda
-
-    style pub_gw fill:#ff9900,color:#000
-    style priv_gw fill:#ff9900,color:#000
-    style utils_lambda fill:#228b22,color:#fff
-```
+<sub><a href="/images/gateway-architecture.drawio.svg" download="gateway-architecture.drawio.svg">Download SVG</a> · <a href="/images/gateway-architecture.drawio" download="gateway-architecture.drawio">Download draw.io source</a></sub>
 
 The dual gateway architecture creates a clear boundary along three dimensions:
 
