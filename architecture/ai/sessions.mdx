@@ -80,38 +80,11 @@ The frontend manages sessions through a set of API routes and provides session I
 
 Cold starts can add noticeable latency to the first message in a conversation. The warmup system mitigates this by pre-invoking the Lambda container and warming MCP connections before the user sends their first message.
 
-```mermaid
-sequenceDiagram
-    participant User as User Browser
-    participant App as Frontend App
-    participant API as Next.js API Routes
-    participant AC as Agent Core
+<Frame>
+  <img src="/images/warmup-flow.drawio.svg" alt="Warmup flow sequence diagram showing page load, session creation, organization selection triggering warmup, then first chat message hitting a warm Lambda" zoom />
+</Frame>
 
-    User->>App: Page load
-    App->>API: POST /api/session
-    API-->>App: { id: "uuid-v4", createdAt, lastMessageAt }
-    App->>App: Session ready (but no subdomain yet)
-
-    Note over App: Warmup blocked — waiting for organization
-
-    User->>App: Select organization from picker
-    App->>App: Set subdomain cookie + state
-
-    Note over App: Both session + subdomain available → warmup fires
-
-    App->>API: POST /api/warmup { sessionId }
-    API->>AC: Lightweight invocation<br/>(primes Lambda + MCP connections)
-    AC-->>API: Warmup response
-    API-->>App: 200 OK
-
-    Note over App: Chat ready — user can send first message
-
-    User->>App: Type and send message
-    App->>API: POST /api/chat { message, sessionId }
-    API->>AC: Agent invocation (warm Lambda)
-    AC-->>API: Streaming response
-    API-->>App: SSE stream
-```
+<sub><a href="/images/warmup-flow.drawio.svg" download="warmup-flow.drawio.svg">Download SVG</a> · <a href="/images/warmup-flow.drawio" download="warmup-flow.drawio">Download draw.io source</a></sub>
 
 Key details about the warmup flow:
 
