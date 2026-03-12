@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "ClarusWMS API",
-    "description": "REST and GraphQL API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides REST mutation endpoints (POST, PUT, DELETE) for managing warehouse operations and GraphQL list endpoints for data retrieval.\n\n**REST mutations** are available at `/api/*` paths.\n\n**GraphQL queries** are available at `/graphql` \u2014 each resource has a documented list query.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Use the client credentials or authorization code flow to obtain an access token from `https://clarus-api.com/oauth/token`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll REST mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```\n\n## GraphQL Queries\n\nAll data retrieval uses GraphQL at `POST /graphql`. Send a JSON body with `query` and optional `variables`:\n\n```json\n{\n  \"query\": \"query($code: String) { accounts { all(code: $code) { edges { node { id code name } } } } }\",\n  \"variables\": { \"code\": \"ACME\" }\n}\n```",
+    "description": "REST and GraphQL API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides REST mutation endpoints (POST, PATCH, DELETE) for managing warehouse operations and GraphQL list endpoints for data retrieval.\n\n**REST mutations** are available at `/api/*` paths.\n\n**GraphQL queries** are available at `/graphql` \u2014 each resource has a documented list query.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Use the client credentials or authorization code flow to obtain an access token from `https://clarus-api.com/oauth/token`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll REST mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```\n\n## GraphQL Queries\n\nAll data retrieval uses GraphQL at `POST /graphql`. Send a JSON body with `query` and optional `variables`:\n\n```json\n{\n  \"query\": \"query($code: String) { accounts { all(code: $code) { edges { node { id code name } } } } }\",\n  \"variables\": { \"code\": \"ACME\" }\n}\n```",
     "version": "1.0.0",
     "contact": {
       "name": "Clarus Software",
@@ -355,7 +355,7 @@
       }
     },
     "/api/account_warehouses/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Account Warehouses"
         ],
@@ -708,7 +708,7 @@
       }
     },
     "/api/accounts/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Accounts"
         ],
@@ -1127,7 +1127,7 @@
       }
     },
     "/api/bookings/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Bookings"
         ],
@@ -1621,7 +1621,7 @@
       }
     },
     "/api/charge_lines/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Charge Lines"
         ],
@@ -2331,7 +2331,7 @@
       }
     },
     "/api/goods_in_receipts/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Goods In Receipts"
         ],
@@ -2875,7 +2875,7 @@
       }
     },
     "/api/goods_out_pick_lists/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Goods Out: Pick Lists"
         ],
@@ -3421,7 +3421,7 @@
       }
     },
     "/api/goods_outs/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Goods Out: Orders"
         ],
@@ -4108,7 +4108,7 @@
       }
     },
     "/api/integrations/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Integrations"
         ],
@@ -4551,7 +4551,7 @@
       }
     },
     "/api/loads/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Loads"
         ],
@@ -4902,7 +4902,7 @@
       }
     },
     "/api/locations/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Locations"
         ],
@@ -5301,7 +5301,7 @@
       }
     },
     "/api/products/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Products"
         ],
@@ -5667,7 +5667,7 @@
       }
     },
     "/api/report_queries/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Report Queries"
         ],
@@ -6013,7 +6013,7 @@
       }
     },
     "/api/reports/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Reports"
         ],
@@ -6545,7 +6545,7 @@
       }
     },
     "/api/roles/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Roles"
         ],
@@ -6959,7 +6959,7 @@
       }
     },
     "/api/scheduled_reports/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Scheduled Reports"
         ],
@@ -7371,7 +7371,7 @@
       }
     },
     "/api/shipments/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Shipments"
         ],
@@ -7815,7 +7815,7 @@
       }
     },
     "/api/storage_units/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Storage Units"
         ],
@@ -8206,7 +8206,7 @@
         "summary": "Create a template",
         "description": "Create a new Liquid HTML print template for generating documents such as dispatch notes, picking notes, and invoices.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"templates\",\n    \"attributes\": {\n      \"template_type_id\": 1,\n      \"name\": \"Custom Dispatch Note\",\n      \"default\": false,\n      \"print_params\": {\n        \"orientation\": \"Portrait\",\n        \"page_height\": 297,\n        \"page_width\": 210,\n        \"top\": 10,\n        \"bottom\": 10,\n        \"left\": 10,\n        \"right\": 10,\n        \"header_height\": 20,\n        \"header_spacing\": 5,\n        \"footer_height\": 15,\n        \"footer_spacing\": 5\n      }\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `template_type_id` | integer | ID of the template type (see Template Type Discovery below) |\n\n## Optional Fields\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `name` | string | Display name for the template |\n| `default` | boolean | Whether this is the default template for its type |\n| `template_header_id` | integer | ID of a template to use as header |\n| `template_footer_id` | integer | ID of a template to use as footer |\n| `print_params` | object | Print layout parameters (see below) |\n\n## Print Parameters\n\nAll dimensions are in millimeters (mm).\n\n| Parameter | Type | Description |\n|-----------|------|-------------|\n| `orientation` | string | `Portrait` or `Landscape` |\n| `page_height` | number | Page height (e.g., 297 for A4) |\n| `page_width` | number | Page width (e.g., 210 for A4) |\n| `top` | number | Top margin |\n| `bottom` | number | Bottom margin |\n| `left` | number | Left margin |\n| `right` | number | Right margin |\n| `header_height` | number | Height of the header area |\n| `header_spacing` | number | Spacing between header and body |\n| `footer_height` | number | Height of the footer area |\n| `footer_spacing` | number | Spacing between body and footer |\n\n## Template Type Discovery\n\nDefault template type codes (IDs vary per tenant but codes are consistent):\n\n| Code | Description |\n|------|-------------|\n| `dispatch_note` | Dispatch note for outbound shipments |\n| `picking_note` | Picking instructions for warehouse staff |\n| `commercial_invoice` | Commercial invoice for international shipments |\n| `invoice` | Billing invoice |\n| `put_away_note` | Put-away instructions for received goods |\n| `pre_receipt` | Pre-receipt document for expected deliveries |\n| `pre_pick_label` | Label printed before picking |\n| `storage_unit_labels` | Labels for storage units (pallets, cages, etc.) |\n| `pick_storage_unit_label` | Label for storage units created during picking |\n\nActual template type IDs can be queried via GraphQL to find the ID for a given code.\n\n## Template Types and Liquid Variables\n\nEach template type has access to different variables in Liquid templates. Top-level variables and their key nested properties:\n\n### `dispatch_note`\n- `record` - the goods out record (reference, created_at, status)\n- `lines` - goods out lines (product.code, product.description, quantity)\n- `carrier` - carrier details (name)\n- `address` - delivery address (address_1 through address_5, postcode, country_code)\n- `account` - stock account (name, code, address.*)\n- `warehouse` - warehouse (code, address.*)\n- `customer` - end customer (name, code)\n- `subdomain` - tenant info (currency.code, tax_rate.component_rate)\n- `sales_order` - linked sales order (reference)\n- `total_weight` - total weight of the shipment\n- `products` - product list with details\n\n### `picking_note`\n- `goods_out_pick_list` - pick list record (reference)\n- `tasks` - pick tasks (location, product, quantity)\n- `carrier` - carrier details\n- `address` - delivery address\n- `account` - stock account\n- `warehouse` - warehouse details\n- `customer` - end customer\n- `subdomain` - tenant info\n\n### `commercial_invoice`\n- `shipment` - shipment record (created_at)\n- `packages` - packages with dimensions.weight, stocks[].product.code/description/commodity_code/country_of_manufacture, stocks[].quantity, stocks[].dimensions.value/weight\n- `account` - stock account (name, address.*, gb_eori_number)\n- `warehouse` - warehouse (address.country_code)\n- `subdomain` - tenant info (currency.code, tax_rate.component_rate)\n- `goods_out` - outbound order (address.*)\n\n### `invoice`\n- `record` - invoice record\n- `account` - stock account\n- `company` - company details\n- `lines` - invoice lines\n\n### `put_away_note`\n- `goods_in_receipt` - receipt record\n- `goods_in_receipt_lines` - receipt lines\n- `warehouse` - warehouse details\n- `account` - stock account\n- `supplier` - supplier details\n- `carrier` - carrier details\n- `subdomain` - tenant info\n- `tasks` - put-away tasks\n\n### `pre_receipt`\n- `goods_in_receipt` - receipt record\n- `account` - stock account\n- `warehouse` - warehouse details\n- `carrier` - carrier details\n- `supplier` - supplier details\n- `inbound_good_kind` - type of inbound good\n- `location` - receiving location\n- `lines` - receipt lines\n\n### `pre_pick_label`\n- `goods_out_pick_list` - pick list record\n- `goods_out` - outbound order\n- `product` - product details\n\n### `storage_unit_labels`\n- `stocks_lines[]` - stock line records with: reference, product.code, product.description, goods_in_receipt, batch, account, location, confirmed_quantity, custom fields (boolean1-5, datetime1-5, integer1-5, string1-5)\n\n### `pick_storage_unit_label`\n- `record` - storage unit record\n- `subdomain` - tenant info (company details)\n\n## Liquid Template Syntax\n\nTemplates use [Liquid](https://shopify.github.io/liquid/) syntax:\n\n```liquid\n<h1>Dispatch Note: {{ record.reference }}</h1>\n<p>Date: {{ record.created_at | date: \"%d/%m/%Y\" }}</p>\n\n{% for line in lines %}\n  <tr>\n    <td>{{ line.product.code }}</td>\n    <td>{{ line.quantity | times: 1 }}</td>\n    <td>{{ line.price | plus: 0 }}</td>\n  </tr>\n{% endfor %}\n\n{% if carrier %}\n  <p>Carrier: {{ carrier.name }}</p>\n{% endif %}\n```\n\n## Workflow\n\n1. **Create template** - POST /templates with template_type_id and print parameters\n2. **Upload Liquid HTML** - POST /templates/{id}/attachment with your .html.liquid file\n3. **Test print** - PATCH /templates/{id}/test to generate a test PDF\n4. **Download test** - Use Documents endpoints (POST /documents/{id}/download) to retrieve the generated PDF\n5. **Set as default** - Optionally PUT /templates/{id} with `default: true`"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"templates\",\n    \"attributes\": {\n      \"template_type_id\": 1,\n      \"name\": \"Custom Dispatch Note\",\n      \"default\": false,\n      \"print_params\": {\n        \"orientation\": \"Portrait\",\n        \"page_height\": 297,\n        \"page_width\": 210,\n        \"top\": 10,\n        \"bottom\": 10,\n        \"left\": 10,\n        \"right\": 10,\n        \"header_height\": 20,\n        \"header_spacing\": 5,\n        \"footer_height\": 15,\n        \"footer_spacing\": 5\n      }\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `template_type_id` | integer | ID of the template type (see Template Type Discovery below) |\n\n## Optional Fields\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `name` | string | Display name for the template |\n| `default` | boolean | Whether this is the default template for its type |\n| `template_header_id` | integer | ID of a template to use as header |\n| `template_footer_id` | integer | ID of a template to use as footer |\n| `print_params` | object | Print layout parameters (see below) |\n\n## Print Parameters\n\nAll dimensions are in millimeters (mm).\n\n| Parameter | Type | Description |\n|-----------|------|-------------|\n| `orientation` | string | `Portrait` or `Landscape` |\n| `page_height` | number | Page height (e.g., 297 for A4) |\n| `page_width` | number | Page width (e.g., 210 for A4) |\n| `top` | number | Top margin |\n| `bottom` | number | Bottom margin |\n| `left` | number | Left margin |\n| `right` | number | Right margin |\n| `header_height` | number | Height of the header area |\n| `header_spacing` | number | Spacing between header and body |\n| `footer_height` | number | Height of the footer area |\n| `footer_spacing` | number | Spacing between body and footer |\n\n## Template Type Discovery\n\nDefault template type codes (IDs vary per tenant but codes are consistent):\n\n| Code | Description |\n|------|-------------|\n| `dispatch_note` | Dispatch note for outbound shipments |\n| `picking_note` | Picking instructions for warehouse staff |\n| `commercial_invoice` | Commercial invoice for international shipments |\n| `invoice` | Billing invoice |\n| `put_away_note` | Put-away instructions for received goods |\n| `pre_receipt` | Pre-receipt document for expected deliveries |\n| `pre_pick_label` | Label printed before picking |\n| `storage_unit_labels` | Labels for storage units (pallets, cages, etc.) |\n| `pick_storage_unit_label` | Label for storage units created during picking |\n\nActual template type IDs can be queried via GraphQL to find the ID for a given code.\n\n## Template Types and Liquid Variables\n\nEach template type has access to different variables in Liquid templates. Top-level variables and their key nested properties:\n\n### `dispatch_note`\n- `record` - the goods out record (reference, created_at, status)\n- `lines` - goods out lines (product.code, product.description, quantity)\n- `carrier` - carrier details (name)\n- `address` - delivery address (address_1 through address_5, postcode, country_code)\n- `account` - stock account (name, code, address.*)\n- `warehouse` - warehouse (code, address.*)\n- `customer` - end customer (name, code)\n- `subdomain` - tenant info (currency.code, tax_rate.component_rate)\n- `sales_order` - linked sales order (reference)\n- `total_weight` - total weight of the shipment\n- `products` - product list with details\n\n### `picking_note`\n- `goods_out_pick_list` - pick list record (reference)\n- `tasks` - pick tasks (location, product, quantity)\n- `carrier` - carrier details\n- `address` - delivery address\n- `account` - stock account\n- `warehouse` - warehouse details\n- `customer` - end customer\n- `subdomain` - tenant info\n\n### `commercial_invoice`\n- `shipment` - shipment record (created_at)\n- `packages` - packages with dimensions.weight, stocks[].product.code/description/commodity_code/country_of_manufacture, stocks[].quantity, stocks[].dimensions.value/weight\n- `account` - stock account (name, address.*, gb_eori_number)\n- `warehouse` - warehouse (address.country_code)\n- `subdomain` - tenant info (currency.code, tax_rate.component_rate)\n- `goods_out` - outbound order (address.*)\n\n### `invoice`\n- `record` - invoice record\n- `account` - stock account\n- `company` - company details\n- `lines` - invoice lines\n\n### `put_away_note`\n- `goods_in_receipt` - receipt record\n- `goods_in_receipt_lines` - receipt lines\n- `warehouse` - warehouse details\n- `account` - stock account\n- `supplier` - supplier details\n- `carrier` - carrier details\n- `subdomain` - tenant info\n- `tasks` - put-away tasks\n\n### `pre_receipt`\n- `goods_in_receipt` - receipt record\n- `account` - stock account\n- `warehouse` - warehouse details\n- `carrier` - carrier details\n- `supplier` - supplier details\n- `inbound_good_kind` - type of inbound good\n- `location` - receiving location\n- `lines` - receipt lines\n\n### `pre_pick_label`\n- `goods_out_pick_list` - pick list record\n- `goods_out` - outbound order\n- `product` - product details\n\n### `storage_unit_labels`\n- `stocks_lines[]` - stock line records with: reference, product.code, product.description, goods_in_receipt, batch, account, location, confirmed_quantity, custom fields (boolean1-5, datetime1-5, integer1-5, string1-5)\n\n### `pick_storage_unit_label`\n- `record` - storage unit record\n- `subdomain` - tenant info (company details)\n\n## Liquid Template Syntax\n\nTemplates use [Liquid](https://shopify.github.io/liquid/) syntax:\n\n```liquid\n<h1>Dispatch Note: {{ record.reference }}</h1>\n<p>Date: {{ record.created_at | date: \"%d/%m/%Y\" }}</p>\n\n{% for line in lines %}\n  <tr>\n    <td>{{ line.product.code }}</td>\n    <td>{{ line.quantity | times: 1 }}</td>\n    <td>{{ line.price | plus: 0 }}</td>\n  </tr>\n{% endfor %}\n\n{% if carrier %}\n  <p>Carrier: {{ carrier.name }}</p>\n{% endif %}\n```\n\n## Workflow\n\n1. **Create template** - POST /templates with template_type_id and print parameters\n2. **Upload Liquid HTML** - POST /templates/{id}/attachment with your .html.liquid file\n3. **Test print** - PATCH /templates/{id}/test to generate a test PDF\n4. **Download test** - Use Documents endpoints (POST /documents/{id}/download) to retrieve the generated PDF\n5. **Set as default** - Optionally PATCH /templates/{id} with `default: true`"
         },
         "operationId": "createTemplate",
         "requestBody": {
@@ -8285,7 +8285,7 @@
       }
     },
     "/api/templates/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Templates"
         ],
@@ -8794,7 +8794,7 @@
       }
     },
     "/api/users/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Users"
         ],
@@ -9208,7 +9208,7 @@
       }
     },
     "/api/warehouses/{id}": {
-      "put": {
+      "patch": {
         "tags": [
           "Warehouses"
         ],
