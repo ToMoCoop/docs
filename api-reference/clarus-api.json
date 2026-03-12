@@ -111,6 +111,10 @@
       "description": "Storage unit management endpoints for containers like pallets, cages, and boxes"
     },
     {
+      "name": "Tasks",
+      "description": "Task management endpoints for warehouse operations including picking, putaway, receiving, dispatch, and replenishment tasks. Tasks are created automatically by warehouse operations (e.g., goods in receipts, goods out orders, replenishment) and cannot be created or deleted via the API. Use these endpoints to update task attributes, manage task allocation to users, and complete tasks."
+    },
+    {
       "name": "Templates",
       "description": "Template management endpoints for creating, updating, and testing Liquid HTML print templates"
     },
@@ -8506,6 +8510,812 @@
         }
       }
     },
+    "/graphql#ListTasks": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "List tasks",
+        "description": "Retrieve warehouse tasks using GraphQL. Supports filtering by status, subtype, task type, account, warehouse, product, location, user, and more. Tasks represent units of work such as picking, putaway, receiving, dispatch, and replenishment.",
+        "operationId": "listTasks",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: TaskFilterType) {\n  tasks {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          status\n          subtype\n          start_quantity\n          confirmed_quantity\n          priority\n          drop_sequence\n          notes\n          created_at\n          assigned_at\n          completed_at\n          start_at\n          end_at\n          last_accessed_at\n          account {\n            id\n            code\n            name\n          }\n          warehouse {\n            id\n            code\n            name\n          }\n          product {\n            id\n            code\n            name\n          }\n          location_from {\n            id\n            code\n          }\n          location_to {\n            id\n            code\n          }\n          task_type {\n            id\n            code\n            name\n          }\n          user {\n            id\n            name\n          }\n          storage_unit_from {\n            id\n            reference\n          }\n          storage_unit_to {\n            id\n            reference\n          }\n          goods_out {\n            id\n            reference\n          }\n          load {\n            id\n            reference\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"status\": {\n      \"eq\": \"AVAILABLE\"\n    },\n    \"task_type_code\": {\n      \"eq\": \"PICK\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `status` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Task status (e.g., AVAILABLE, ALLOCATED, COMPLETED) |\n| `subtype` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Task subtype |\n| `task_type_code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Task type code (PICK, DISP, RCV, PWAY, TRAN, REPLEN, LOAD, CONV) |\n| `account_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by account ID |\n| `warehouse_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by warehouse ID |\n| `product_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by product ID |\n| `location_from_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by source location ID |\n| `location_to_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by destination location ID |\n| `user_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by assigned user ID |\n| `goods_out_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by goods out order ID |\n| `goods_in_receipt_line_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by goods in receipt line ID |\n| `storage_unit_from_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by source storage unit ID |\n| `load_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by load ID |\n| `assigned_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | Filter by assignment date |\n| `completed_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | Filter by completion date |\n| `created_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | Filter by creation date |\n| `priority` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Filter by priority |\n| `drop_sequence` | IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` | Filter by drop sequence |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: TaskFilterType) { tasks { all(filter: $filter) { edges { node { id status subtype start_quantity confirmed_quantity priority drop_sequence notes created_at assigned_at completed_at start_at end_at last_accessed_at account { id code name } warehouse { id code name } product { id code name } location_from { id code } location_to { id code } task_type { id code name } user { id name } storage_unit_from { id reference } storage_unit_to { id reference } goods_out { id reference } load { id reference } } } } } }",
+                "variables": {
+                  "filter": {
+                    "status": {
+                      "eq": "AVAILABLE"
+                    },
+                    "task_type_code": {
+                      "eq": "PICK"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "tasks": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Tasks record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "tasks": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "status": "AVAILABLE",
+                              "subtype": "standard",
+                              "start_quantity": 10.0,
+                              "confirmed_quantity": null,
+                              "priority": 5,
+                              "drop_sequence": 1,
+                              "notes": null,
+                              "created_at": "2026-03-10T08:00:00Z",
+                              "assigned_at": null,
+                              "completed_at": null,
+                              "start_at": null,
+                              "end_at": null,
+                              "last_accessed_at": null,
+                              "account": {
+                                "id": "1",
+                                "code": "ACME",
+                                "name": "Acme Corp"
+                              },
+                              "warehouse": {
+                                "id": "1",
+                                "code": "WH1",
+                                "name": "Main Warehouse"
+                              },
+                              "product": {
+                                "id": "42",
+                                "code": "SKU-001",
+                                "name": "Widget A"
+                              },
+                              "location_from": {
+                                "id": "10",
+                                "code": "A-01-01"
+                              },
+                              "location_to": {
+                                "id": "20",
+                                "code": "B-02-01"
+                              },
+                              "task_type": {
+                                "id": "1",
+                                "code": "PICK",
+                                "name": "Picking"
+                              },
+                              "user": null,
+                              "storage_unit_from": null,
+                              "storage_unit_to": null,
+                              "goods_out": {
+                                "id": "100",
+                                "reference": "GO-2026-001"
+                              },
+                              "load": null
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}": {
+      "patch": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update a task",
+        "description": "Update attributes of an existing task. Tasks are created automatically by warehouse operations and this endpoint allows modifying task properties such as priority, notes, locations, quantities, and custom fields.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"tasks\",\n    \"attributes\": {\n      \"priority\": 10,\n      \"notes\": \"Urgent - customer waiting\",\n      \"location_to_id\": 25,\n      \"confirmed_quantity\": 8.0\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | No | Stock account ID |\n| `warehouse_id` | No | Warehouse ID |\n| `priority` | No | Task priority (higher = more urgent) |\n| `notes` | No | Free-text notes |\n| `status` | No | Task status |\n| `location_from_id` | No | Source location ID |\n| `location_to_id` | No | Destination location ID |\n| `product_id` | No | Product ID |\n| `start_quantity` | No | Starting quantity (>= 0) |\n| `confirmed_quantity` | No | Confirmed/completed quantity (>= 0) |\n| `start_at` | No | Planned start datetime |\n| `end_at` | No | Planned end datetime |\n| `completed_at` | No | Completion datetime |\n| `assigned_at` | No | Assignment datetime |\n| `user_id` | No | Assigned user ID |\n| `user_created_by_id` | No | User who created the task |\n| `user_completed_by_id` | No | User who completed the task |\n| `device_type_id` | No | Device type ID |\n| `device_id` | No | Device ID |\n| `storage_unit_from_id` | No | Source storage unit ID |\n| `storage_unit_to_id` | No | Destination storage unit ID |\n| `stock_id` | No | Associated stock record ID |\n| `load_id` | No | Associated load ID |\n| `load_drop_id` | No | Associated load drop ID |\n| `dispatch_container_id` | No | Associated dispatch container ID |\n| `parent_task_id` | No | Parent task ID for subtasks |\n| `transaction_number_id` | No | Transaction number ID |\n| `transaction_line_id` | No | Transaction line ID |\n| `stock_description` | No | Stock description text |\n| `drop_sequence` | No | Drop sequence (1-9999999999) |\n| `serial_numbers` | No | Array of serial number strings |\n| `string1`-`string5` | No | Custom string fields |\n| `integer1`-`integer5` | No | Custom integer fields |\n| `datetime1`-`datetime5` | No | Custom datetime fields |\n| `boolean1`-`boolean5` | No | Custom boolean fields |"
+        },
+        "operationId": "updateTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the task to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "tasks"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/TaskUpdateAttributes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "tasks",
+                  "attributes": {
+                    "priority": 10,
+                    "notes": "Urgent - customer waiting",
+                    "location_to_id": 25,
+                    "confirmed_quantity": 8.0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                },
+                "example": {
+                  "data": {
+                    "id": "1",
+                    "type": "tasks",
+                    "attributes": {
+                      "status": "AVAILABLE",
+                      "subtype": "standard",
+                      "priority": 10,
+                      "notes": "Urgent - customer waiting",
+                      "start_quantity": 10.0,
+                      "confirmed_quantity": 8.0,
+                      "stock_description": "Widget A",
+                      "created_at": "2026-03-10T08:00:00Z",
+                      "completed_at": null,
+                      "last_accessed_at": "2026-03-12T09:30:00Z",
+                      "start_at": null,
+                      "boolean1": null,
+                      "boolean2": null,
+                      "boolean3": null,
+                      "boolean4": null,
+                      "boolean5": null,
+                      "datetime1": null,
+                      "datetime2": null,
+                      "datetime3": null,
+                      "datetime4": null,
+                      "datetime5": null,
+                      "integer1": null,
+                      "integer2": null,
+                      "integer3": null,
+                      "integer4": null,
+                      "integer5": null,
+                      "string1": null,
+                      "string2": null,
+                      "string3": null,
+                      "string4": null,
+                      "string5": null
+                    },
+                    "relationships": {
+                      "account": {
+                        "data": {
+                          "id": "1",
+                          "type": "accounts"
+                        }
+                      },
+                      "warehouse": {
+                        "data": {
+                          "id": "1",
+                          "type": "warehouses"
+                        }
+                      },
+                      "product": {
+                        "data": {
+                          "id": "42",
+                          "type": "products"
+                        }
+                      },
+                      "location_from": {
+                        "data": {
+                          "id": "10",
+                          "type": "locations"
+                        }
+                      },
+                      "location_to": {
+                        "data": {
+                          "id": "25",
+                          "type": "locations"
+                        }
+                      },
+                      "task_type": {
+                        "data": {
+                          "id": "1",
+                          "type": "task_types"
+                        }
+                      },
+                      "goods_out": {
+                        "data": {
+                          "id": "100",
+                          "type": "goods_outs"
+                        }
+                      },
+                      "goods_out_line": {
+                        "data": null
+                      },
+                      "goods_out_pick_list": {
+                        "data": null
+                      },
+                      "inbound_good": {
+                        "data": null
+                      },
+                      "inbound_item": {
+                        "data": null
+                      },
+                      "last_accessed_by_user": {
+                        "data": null
+                      },
+                      "stock": {
+                        "data": null
+                      },
+                      "storage_unit_from": {
+                        "data": null
+                      },
+                      "storage_unit_to": {
+                        "data": null
+                      },
+                      "user_completed_by": {
+                        "data": null
+                      },
+                      "user_created_by": {
+                        "data": {
+                          "id": "5",
+                          "type": "users"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}/allocate": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Allocate a task to a user",
+        "description": "Allocate a task to a specific user. If no user_id is provided, the task is allocated to the currently authenticated user. Sets the task status to ALLOCATED and records the assignment timestamp.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"user_id\": 5\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `user_id` | No | User ID to allocate the task to. Defaults to the current authenticated user if omitted |\n\n## Behavior\n\n- Sets task status to ALLOCATED\n- Records `assigned_at` timestamp\n- Associates the task with the specified (or current) user\n- Returns 204 No Content on success\n- Returns 422 if the task is already completed or cannot be allocated"
+        },
+        "operationId": "allocateTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the task to allocate",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "User ID to allocate the task to. Defaults to the current authenticated user if omitted"
+                  }
+                }
+              },
+              "example": {
+                "user_id": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}/enter": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Enter a task (HHD)",
+        "description": "Used by handheld devices (HHDs) to enter/claim a task. Behavior depends on the current task state: if AVAILABLE, allocates to the current user and sets assigned_at and start_at; if ALLOCATED to the current user, updates last_accessed_at; if ALLOCATED to a different user, returns an error.",
+        "x-mint": {
+          "content": "## Behavior\n\nThis endpoint is used by handheld devices (HHDs) to claim and enter tasks.\n\n### State Transitions\n\n| Current State | Action |\n|--------------|--------|\n| AVAILABLE | Allocates task to current user, sets `assigned_at` and `start_at` |\n| ALLOCATED (to current user) | Updates `last_accessed_at` timestamp |\n| ALLOCATED (to different user) | Returns 422 error |\n| COMPLETED | Returns 422 error |\n\n- Returns 204 No Content on success\n- No request body required"
+        },
+        "operationId": "enterTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the task to enter",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}/exit": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Exit a task (HHD)",
+        "description": "Used by handheld devices (HHDs) to exit/release a task. Behavior depends on the current task state: if ALLOCATED to the current user, unallocates the task and clears user_id, assigned_at, and start_at; if AVAILABLE or COMPLETED, updates last_accessed_at only.",
+        "x-mint": {
+          "content": "## Behavior\n\nThis endpoint is used by handheld devices (HHDs) to release tasks they have entered.\n\n### State Transitions\n\n| Current State | Action |\n|--------------|--------|\n| ALLOCATED (to current user) | Sets status to AVAILABLE, clears `user_id`, `assigned_at`, `start_at` |\n| AVAILABLE | Updates `last_accessed_at` only |\n| COMPLETED | Updates `last_accessed_at` only |\n\n- Returns 204 No Content on success\n- No request body required"
+        },
+        "operationId": "exitTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the task to exit",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}/unallocate": {
+      "patch": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Unallocate a task",
+        "description": "Remove user allocation from a task, setting its status back to AVAILABLE and clearing the user assignment, assigned_at, and start_at fields.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Sets task status to AVAILABLE\n- Clears user assignment (`user_id`, `assigned_at`, `start_at`)\n- Returns 204 No Content on success\n- Returns 422 if the task is already completed or cannot be unallocated"
+        },
+        "operationId": "unallocateTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the task to unallocate",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}/export_receipt_task_confirmation": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Export receipt task confirmation",
+        "description": "Generate and download a receipt confirmation document for a completed receipt task. Returns the confirmation in the configured export format (CSV, JSON, or EDI).",
+        "x-mint": {
+          "content": "## Behavior\n\n- Generates a receipt confirmation document for the specified task\n- The task must be a completed receipt (RCV) task\n- Output format depends on system configuration (CSV, JSON, or EDI)\n- Returns the file content directly in the response body\n- Returns 404 if the task does not exist\n- Returns 422 if the task is not a completed receipt task"
+        },
+        "operationId": "exportReceiptTaskConfirmation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the completed receipt task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Receipt task confirmation document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Receipt confirmation data in the configured export format"
+                },
+                "example": {
+                  "task_id": 1,
+                  "status": "COMPLETED",
+                  "product_code": "SKU-001",
+                  "confirmed_quantity": 10.0,
+                  "location_code": "A-01-01",
+                  "completed_at": "2026-03-12T10:30:00Z"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/allocate": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Allocate tasks in bulk",
+        "description": "Allocate multiple tasks to a user in a single request. If no user_id is provided, tasks are allocated to the currently authenticated user.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [1, 2, 3],\n  \"user_id\": 5\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of task IDs to allocate |\n| `user_id` | No | User ID to allocate tasks to. Defaults to the current authenticated user if omitted |\n\n## Behavior\n\n- Allocates all specified tasks to the given (or current) user\n- Sets status to ALLOCATED and records `assigned_at` for each task\n- Returns 204 No Content on success\n- Returns 422 if any task cannot be allocated"
+        },
+        "operationId": "allocateTasksCollection",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of task IDs to allocate"
+                  },
+                  "user_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "User ID to allocate tasks to. Defaults to the current authenticated user if omitted"
+                  }
+                }
+              },
+              "example": {
+                "ids": [1, 2, 3],
+                "user_id": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/complete_collection": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Complete filtered tasks",
+        "description": "Complete multiple tasks matching the specified filters in a single request. Tasks are identified by warehouse, task type, and optional filters. Maximum 50 tasks per request. This endpoint does NOT use JSON:API format.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"warehouse_id\": 1,\n  \"task_type_code\": \"PICK\",\n  \"filters\": {\n    \"location_from_id\": 10,\n    \"product_id\": 42\n  },\n  \"attributes\": {\n    \"confirmed_quantity\": 10.0,\n    \"notes\": \"Completed via bulk action\"\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `warehouse_id` | Yes | Warehouse ID to scope the tasks |\n| `task_type_code` | Yes | Task type code: `PICK`, `DISP`, `RCV`, `PWAY`, `TRAN`, `REPLEN`, `LOAD`, `CONV` |\n| `filters` | Yes | At least one filter must be specified |\n| `filters.location_from_id` | No | Filter by source location ID |\n| `filters.product_id` | No | Filter by product ID |\n| `filters.storage_unit_from_id` | No | Filter by source storage unit ID |\n| `attributes` | No | Optional attributes to set on each completed task (same as update attributes) |\n\n## Behavior\n\n- Finds tasks matching the warehouse, task type, and filters\n- Completes up to 50 matching tasks per request\n- Optionally updates task attributes before completion\n- Returns 204 No Content on success\n- Returns 422 if no filters are specified or no matching tasks found"
+        },
+        "operationId": "completeTasksCollection",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "warehouse_id",
+                  "task_type_code",
+                  "filters"
+                ],
+                "properties": {
+                  "warehouse_id": {
+                    "type": "integer",
+                    "description": "Warehouse ID to scope the tasks"
+                  },
+                  "task_type_code": {
+                    "type": "string",
+                    "enum": [
+                      "PICK",
+                      "DISP",
+                      "RCV",
+                      "PWAY",
+                      "TRAN",
+                      "REPLEN",
+                      "LOAD",
+                      "CONV"
+                    ],
+                    "description": "Task type code"
+                  },
+                  "filters": {
+                    "type": "object",
+                    "description": "At least one filter must be specified. Maximum 50 tasks will be completed per request.",
+                    "properties": {
+                      "location_from_id": {
+                        "type": "integer",
+                        "nullable": true,
+                        "description": "Filter by source location ID"
+                      },
+                      "product_id": {
+                        "type": "integer",
+                        "nullable": true,
+                        "description": "Filter by product ID"
+                      },
+                      "storage_unit_from_id": {
+                        "type": "integer",
+                        "nullable": true,
+                        "description": "Filter by source storage unit ID"
+                      }
+                    }
+                  },
+                  "attributes": {
+                    "type": "object",
+                    "nullable": true,
+                    "description": "Optional attributes to set on each task before completion. Accepts the same fields as the task update endpoint.",
+                    "$ref": "#/components/schemas/TaskUpdateAttributes"
+                  }
+                }
+              },
+              "example": {
+                "warehouse_id": 1,
+                "task_type_code": "PICK",
+                "filters": {
+                  "location_from_id": 10,
+                  "product_id": 42
+                },
+                "attributes": {
+                  "confirmed_quantity": 10.0,
+                  "notes": "Completed via bulk action"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/unallocate": {
+      "patch": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Unallocate tasks in bulk",
+        "description": "Remove user allocation from multiple tasks in a single request. Sets each task's status back to AVAILABLE and clears user assignment fields.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"ids\": [1, 2, 3]\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `ids` | Yes | Array of task IDs to unallocate |\n\n## Behavior\n\n- Sets status to AVAILABLE for all specified tasks\n- Clears user assignment (`user_id`, `assigned_at`, `start_at`) for each task\n- Returns 204 No Content on success\n- Returns 422 if any task cannot be unallocated"
+        },
+        "operationId": "unallocateTasksCollection",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of task IDs to unallocate"
+                  }
+                }
+              },
+              "example": {
+                "ids": [1, 2, 3]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
     "/graphql#ListTemplates": {
       "post": {
         "tags": [
@@ -14142,6 +14952,920 @@
             "type": "boolean",
             "nullable": true,
             "description": "Custom boolean field 5"
+          }
+        }
+      },
+      "TaskUpdateAttributes": {
+        "type": "object",
+        "description": "Task update attributes. All fields are optional.",
+        "properties": {
+          "account_id": {
+            "type": "integer",
+            "description": "Stock account ID",
+            "example": 1
+          },
+          "assigned_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Assignment datetime",
+            "example": "2026-03-12T08:00:00Z"
+          },
+          "boolean1": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Custom boolean field 1",
+            "example": false
+          },
+          "boolean2": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Custom boolean field 2",
+            "example": null
+          },
+          "boolean3": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Custom boolean field 3",
+            "example": null
+          },
+          "boolean4": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Custom boolean field 4",
+            "example": null
+          },
+          "boolean5": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Custom boolean field 5",
+            "example": null
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Completion datetime",
+            "example": "2026-03-12T16:30:00Z"
+          },
+          "confirmed_quantity": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Confirmed/completed quantity",
+            "example": 8.0
+          },
+          "datetime1": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Custom datetime field 1",
+            "example": null
+          },
+          "datetime2": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Custom datetime field 2",
+            "example": null
+          },
+          "datetime3": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Custom datetime field 3",
+            "example": null
+          },
+          "datetime4": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Custom datetime field 4",
+            "example": null
+          },
+          "datetime5": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Custom datetime field 5",
+            "example": null
+          },
+          "device_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Device ID",
+            "example": 3
+          },
+          "device_type_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Device type ID",
+            "example": 1
+          },
+          "dispatch_container_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Associated dispatch container ID",
+            "example": 50
+          },
+          "drop_sequence": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1,
+            "maximum": 9999999999,
+            "description": "Drop sequence order",
+            "example": 1
+          },
+          "end_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Planned end datetime",
+            "example": "2026-03-12T17:00:00Z"
+          },
+          "integer1": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Custom integer field 1",
+            "example": null
+          },
+          "integer2": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Custom integer field 2",
+            "example": null
+          },
+          "integer3": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Custom integer field 3",
+            "example": null
+          },
+          "integer4": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Custom integer field 4",
+            "example": null
+          },
+          "integer5": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Custom integer field 5",
+            "example": null
+          },
+          "load_drop_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Associated load drop ID",
+            "example": 10
+          },
+          "load_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Associated load ID",
+            "example": 5
+          },
+          "location_from_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Source location ID",
+            "example": 10
+          },
+          "location_to_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Destination location ID",
+            "example": 25
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "description": "Free-text notes",
+            "example": "Urgent - customer waiting"
+          },
+          "parent_task_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Parent task ID for subtasks",
+            "example": 100
+          },
+          "priority": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Task priority (higher = more urgent)",
+            "example": 10
+          },
+          "product_id": {
+            "type": "integer",
+            "description": "Product ID",
+            "example": 42
+          },
+          "serial_numbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of serial number strings",
+            "example": ["SN-001", "SN-002"]
+          },
+          "start_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Planned start datetime",
+            "example": "2026-03-12T08:00:00Z"
+          },
+          "start_quantity": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Starting quantity",
+            "example": 10.0
+          },
+          "status": {
+            "type": "string",
+            "nullable": true,
+            "description": "Task status",
+            "example": "AVAILABLE"
+          },
+          "stock_description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Stock description text",
+            "example": "Widget A"
+          },
+          "stock_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Associated stock record ID",
+            "example": 200
+          },
+          "storage_unit_from_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Source storage unit ID",
+            "example": 30
+          },
+          "storage_unit_to_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Destination storage unit ID",
+            "example": 31
+          },
+          "string1": {
+            "type": "string",
+            "nullable": true,
+            "description": "Custom string field 1",
+            "example": null
+          },
+          "string2": {
+            "type": "string",
+            "nullable": true,
+            "description": "Custom string field 2",
+            "example": null
+          },
+          "string3": {
+            "type": "string",
+            "nullable": true,
+            "description": "Custom string field 3",
+            "example": null
+          },
+          "string4": {
+            "type": "string",
+            "nullable": true,
+            "description": "Custom string field 4",
+            "example": null
+          },
+          "string5": {
+            "type": "string",
+            "nullable": true,
+            "description": "Custom string field 5",
+            "example": null
+          },
+          "transaction_line_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Transaction line ID",
+            "example": 15
+          },
+          "transaction_number_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Transaction number ID",
+            "example": 500
+          },
+          "user_completed_by_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "User who completed the task",
+            "example": 5
+          },
+          "user_created_by_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "User who created the task",
+            "example": 3
+          },
+          "user_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Assigned user ID",
+            "example": 5
+          },
+          "warehouse_id": {
+            "type": "integer",
+            "description": "Warehouse ID",
+            "example": 1
+          }
+        }
+      },
+      "TaskResponse": {
+        "type": "object",
+        "description": "Task response in JSON:API format",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Task ID",
+                "example": "1"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "tasks"
+                ],
+                "description": "Resource type",
+                "example": "tasks"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "boolean1": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "Custom boolean field 1",
+                    "example": null
+                  },
+                  "boolean2": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "Custom boolean field 2",
+                    "example": null
+                  },
+                  "boolean3": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "Custom boolean field 3",
+                    "example": null
+                  },
+                  "boolean4": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "Custom boolean field 4",
+                    "example": null
+                  },
+                  "boolean5": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "Custom boolean field 5",
+                    "example": null
+                  },
+                  "completed_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "Completion datetime",
+                    "example": null
+                  },
+                  "confirmed_quantity": {
+                    "type": "number",
+                    "nullable": true,
+                    "description": "Confirmed/completed quantity",
+                    "example": null
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Creation timestamp",
+                    "example": "2026-03-10T08:00:00Z"
+                  },
+                  "datetime1": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "Custom datetime field 1",
+                    "example": null
+                  },
+                  "datetime2": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "Custom datetime field 2",
+                    "example": null
+                  },
+                  "datetime3": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "Custom datetime field 3",
+                    "example": null
+                  },
+                  "datetime4": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "Custom datetime field 4",
+                    "example": null
+                  },
+                  "datetime5": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "Custom datetime field 5",
+                    "example": null
+                  },
+                  "device_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Device ID",
+                    "example": null
+                  },
+                  "device_type_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Device type ID",
+                    "example": null
+                  },
+                  "id": {
+                    "type": "integer",
+                    "description": "Task ID",
+                    "example": 1
+                  },
+                  "integer1": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Custom integer field 1",
+                    "example": null
+                  },
+                  "integer2": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Custom integer field 2",
+                    "example": null
+                  },
+                  "integer3": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Custom integer field 3",
+                    "example": null
+                  },
+                  "integer4": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Custom integer field 4",
+                    "example": null
+                  },
+                  "integer5": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Custom integer field 5",
+                    "example": null
+                  },
+                  "last_accessed_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "Last accessed timestamp",
+                    "example": null
+                  },
+                  "notes": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Free-text notes",
+                    "example": null
+                  },
+                  "parent_task_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Parent task ID for subtasks",
+                    "example": null
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Task priority",
+                    "example": 5
+                  },
+                  "start_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "Planned start datetime",
+                    "example": null
+                  },
+                  "start_quantity": {
+                    "type": "number",
+                    "nullable": true,
+                    "description": "Starting quantity",
+                    "example": 10.0
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Task status (e.g., AVAILABLE, ALLOCATED, COMPLETED)",
+                    "example": "AVAILABLE"
+                  },
+                  "stock_description": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Stock description text",
+                    "example": "Widget A"
+                  },
+                  "string1": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Custom string field 1",
+                    "example": null
+                  },
+                  "string2": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Custom string field 2",
+                    "example": null
+                  },
+                  "string3": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Custom string field 3",
+                    "example": null
+                  },
+                  "string4": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Custom string field 4",
+                    "example": null
+                  },
+                  "string5": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Custom string field 5",
+                    "example": null
+                  },
+                  "subtype": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Task subtype",
+                    "example": "standard"
+                  },
+                  "transaction_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Transaction ID",
+                    "example": null
+                  },
+                  "transaction_line_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Transaction line ID",
+                    "example": null
+                  },
+                  "transaction_number_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Transaction number ID",
+                    "example": null
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "properties": {
+                  "account": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "1"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["accounts"],
+                            "example": "accounts"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "goods_out": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "100"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["goods_outs"],
+                            "example": "goods_outs"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "goods_out_line": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["goods_out_lines"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "goods_out_pick_list": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["goods_out_pick_lists"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "inbound_good": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["inbound_goods"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "inbound_item": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["inbound_items"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "last_accessed_by_user": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["users"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "location_from": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "10"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["locations"],
+                            "example": "locations"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "location_to": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "20"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["locations"],
+                            "example": "locations"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "product": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "42"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["products"],
+                            "example": "products"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "stock": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["stocks"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "storage_unit_from": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["storage_units"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "storage_unit_to": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["storage_units"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "task_type": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "1"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["task_types"],
+                            "example": "task_types"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "user_completed_by": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["users"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "user_created_by": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "5"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["users"],
+                            "example": "users"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "warehouse": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "nullable": true,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "1"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["warehouses"],
+                            "example": "warehouses"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },
