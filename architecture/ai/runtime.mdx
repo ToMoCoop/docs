@@ -25,7 +25,7 @@ The runtime uses a Claude Sonnet model with streaming enabled, extended thinking
 - `SESSION_BUCKET` — S3 bucket for conversation state persistence
 - `FRONTEND_DOMAIN` — Allowed frontend domain for CORS
 
-**Headers passed through:** `Authorization`, `X-Clarus-Subdomain`, `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain`
+**Inbound headers:** The runtime receives `Authorization` and `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` from AgentCore (the only custom header format AgentCore will pass through via its `requestHeaderAllowlist`). The runtime extracts the subdomain with a fallback chain — checking the Bedrock header first, then `X-Clarus-Subdomain` — and normalizes it to `X-Clarus-Subdomain` for all downstream MCP calls to the private gateway.
 
 ## Entry Point Flow
 

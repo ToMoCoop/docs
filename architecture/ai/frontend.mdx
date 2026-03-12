@@ -13,7 +13,7 @@ How the frontend knows which tenant to query depends on the mode:
 - **Standalone mode**: After login, the user selects their organization from a picker UI. The selected subdomain is stored in a server-side cookie and persists across page reloads.
 - **Embedded mode**: The parent application provides the subdomain via the `CLARUSWMS_AI_INIT` postMessage during initialization.
 
-The subdomain is sent to Agent Core with every request as both `X-Clarus-Subdomain` (application-level) and `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` (required by Agent Core to forward custom headers to the runtime).
+The subdomain is sent to AgentCore with every request as `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` — this is the only custom header format that AgentCore will pass through to the runtime (configured via `requestHeaderAllowlist`). The SSE bridge also sends `X-Clarus-Subdomain` for consistency, though only the Bedrock-prefixed header reaches the runtime.
 
 Resolution order in `/api/chat`: request body `subdomain` field (embedded mode) → server-side cookie (standalone mode).
 

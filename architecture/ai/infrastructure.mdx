@@ -68,7 +68,7 @@ Here's the flow: when a request arrives at a gateway, the interceptor fires firs
 
 ### Subdomain Extraction
 
-The interceptor looks for the tenant subdomain in the `X-Clarus-Subdomain` header. It also checks several case and naming variants for compatibility with different upstream components, but `X-Clarus-Subdomain` is the canonical form used throughout the stack. If no subdomain header is present, `subdomain` is `null` in the cached item.
+The interceptor checks for the tenant subdomain in both the Bedrock-format header (`X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain`) and the Clarus-native header (`X-Clarus-Subdomain`), including lowercase variants of each. The Bedrock header arrives on requests that pass through AgentCore (the frontend app path), while `X-Clarus-Subdomain` arrives on requests through the public MCP gateway (set by the CloudFront tenant extractor). The extracted value is cached as `subdomain` in DynamoDB for tool Lambdas to retrieve. If no subdomain header is present, `subdomain` is `null` in the cached item.
 
 ### Error Handling
 
