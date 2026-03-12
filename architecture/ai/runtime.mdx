@@ -60,30 +60,6 @@ The MCP cache is the expensive one — creating a new MCP client connection take
 
 The runtime streams events from Bedrock through the Strands framework to the frontend. Each event passes through several processing stages before reaching the client:
 
-```mermaid
-flowchart LR
-    subgraph Bedrock["Bedrock Converse Stream"]
-        raw[Raw Model Events]
-    end
-
-    subgraph Agent["Strands Agent"]
-        proc[Event Processing]
-        cb[Callback Handler]
-    end
-
-    subgraph Runtime["agent.py invoke()"]
-        strip[Strip invocation_state]
-        classify[Classify Event Type]
-        monitor[Size Monitoring]
-    end
-
-    subgraph Frontend["Frontend"]
-        render[Render Response]
-    end
-
-    raw --> proc --> cb --> strip --> classify --> monitor -->|yield| render
-```
-
 1. **Bedrock converse-stream** produces raw model events (text deltas, tool use, reasoning)
 2. **Strands Agent** processes events, fires callback handlers, and manages tool execution
 3. **Runtime handler** strips heavy `invocation_state` keys and classifies each event for monitoring
