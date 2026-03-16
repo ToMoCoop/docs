@@ -100,7 +100,6 @@
               {
                 "group": "Getting Started",
                 "pages": [
-                  "knowledgebase/getting-started/reset-my-password",
                   "knowledgebase/getting-started/use-the-booking-diary"
                 ]
               },
@@ -433,7 +432,8 @@
                   "knowledgebase/troubleshooting/failed-scheduled-reports",
                   "knowledgebase/troubleshooting/datagrid-error",
                   "knowledgebase/troubleshooting/cloud-print-troubleshooting",
-                  "knowledgebase/troubleshooting/random-logout"
+                  "knowledgebase/troubleshooting/random-logout",
+                  "knowledgebase/troubleshooting/login-issues"
                 ]
               }
             ]
@@ -450,7 +450,6 @@
               {
                 "group": "Aan de slag",
                 "pages": [
-                  "knowledgebase/nl/getting-started/reset-my-password",
                   "knowledgebase/nl/getting-started/use-the-booking-diary"
                 ]
               },
@@ -776,7 +775,8 @@
                   "knowledgebase/nl/troubleshooting/failed-scheduled-reports",
                   "knowledgebase/nl/troubleshooting/datagrid-error",
                   "knowledgebase/nl/troubleshooting/cloud-print-troubleshooting",
-                  "knowledgebase/nl/troubleshooting/random-logout"
+                  "knowledgebase/nl/troubleshooting/random-logout",
+                  "knowledgebase/nl/troubleshooting/login-issues"
                 ]
               }
             ]
