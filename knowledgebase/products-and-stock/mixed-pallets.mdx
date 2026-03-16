@@ -1,0 +1,52 @@
+---
+title: "Manage Mixed Pallets"
+description: "Step-by-step guide to creating and receiving mixed pallets using group numbers in the desktop application and via SFTP."
+---
+
+Mixed pallets let you assign different stock lines to a single storage unit reference, whether for the same or different products. You can create them through the desktop application or import them via SFTP.
+
+## Desktop application
+
+<Steps>
+<Step title="Fill in receipt details">
+Open a new receipt and complete the essential information in the **Details**, **Additional**, and **Transit** sections.
+</Step>
+<Step title="Enter product information">
+Enter the product code, quantity, and group number for each stock line. The **storage unit quantity** per line must be 1. Add another group number to assign different products to another storage unit.
+</Step>
+<Step title="Save and receive">
+Save the receipt. The storage units will be displayed with matching group numbers in the **Receive** section. Proceed to receive and put away the goods.
+</Step>
+</Steps>
+
+## SFTP import
+
+<Steps>
+<Step title="Prepare the pre-receipt file">
+Download the pre-receipt import file and fill in the required fields: receipt reference, warehouse code, account code, expected date, product code, item quantity, and storage unit quantity (group numbers).
+</Step>
+<Step title="Import the file">
+Upload the completed file using the SFTP method. The receipt will show as **Pending** in the desktop application once imported.
+</Step>
+</Steps>
+
+<Tip>
+SFTP imports are useful for large-scale imports but can also be used for smaller entries.
+</Tip>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What is a mixed pallet?">
+A mixed pallet contains different products assigned to a single storage unit reference.
+</Accordion>
+<Accordion title="What are group numbers?">
+Group numbers assign stock lines to specific storage units within a receipt.
+</Accordion>
+<Accordion title="Can I receive mixed pallets via SFTP?">
+Yes, you can import mixed pallets through an SFTP pre-receipt file.
+</Accordion>
+<Accordion title="What information is required for the SFTP import?">
+You need the receipt reference, warehouse code, account code, expected date, product code, item quantity, and storage unit quantity.
+</Accordion>
+</AccordionGroup>

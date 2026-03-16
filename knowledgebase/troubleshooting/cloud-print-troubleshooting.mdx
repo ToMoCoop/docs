@@ -1,0 +1,55 @@
+---
+title: "Common Cloud Print Issues and Fixes"
+description: "Diagnose and resolve common Cloud Print issues including printing errors and storage problems with this step-by-step troubleshooting guide."
+sidebarTitle: "Cloud Print Issues"
+---
+
+This guide helps you fix common problems with Cloud Print, offering clear solutions for printing errors and managing local file storage.
+
+## Resolve "Worker Exited with Return Code -15" error
+
+If you experience occasional printing problems and see "return code -15" in the **Logs** tab of Cloud Print:
+
+<Steps>
+<Step title="Update Cloud Print">
+Download and install the most recent version of Cloud Print. Refer to the [upgrading guide](/knowledgebase/cloud-print/upgrading) for detailed instructions.
+</Step>
+<Step title="Disable parallel printing">
+If updating does not fix the problem, open the **Cloud Print** application, go to the **Printers** tab, and uncheck the **Parallel printing** option.
+</Step>
+</Steps>
+
+<Info>
+Disabling parallel printing should resolve the "return code -15" error.
+</Info>
+
+## Prevent local print files causing storage problems
+
+Cloud Print saves printed files on your computer by default, which can use up storage space over time. If you do not need to keep these files, you can turn off this feature.
+
+<Steps>
+<Step title="Open settings">
+Open the **Cloud Print** application and go to the **Settings** tab.
+</Step>
+<Step title="Disable file retention">
+Uncheck the option **Retain printjob contents after printing**.
+</Step>
+</Steps>
+
+<Warning>
+Disabling file retention means you will no longer be able to access previously printed files locally.
+</Warning>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What does return code -15 mean?">
+Return code -15 usually indicates a problem with parallel printing. Disable parallel printing to resolve the issue.
+</Accordion>
+<Accordion title="How do I stop Cloud Print from saving print files locally?">
+Turn off this feature in the **Settings** tab by unchecking **Retain printjob contents after printing**.
+</Accordion>
+<Accordion title="Do I need to update Cloud Print regularly?">
+Yes, it is recommended to keep Cloud Print updated to avoid bugs and ensure smooth performance.
+</Accordion>
+</AccordionGroup>

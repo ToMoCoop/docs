@@ -1,0 +1,72 @@
+---
+title: "Hoe maak ik een bestand aan in een SFTP-account wanneer aandelen wordt overgedragen tussen accounts?"
+description: "U kunt automatiseringen instellen in Clarus WMS om automatisch bestanden te maken en te uploaden naar een SFTP-account wanneer de voorraad wordt overg"
+sidebarTitle: "Hoe maak ik een bestand aan in een..."
+---
+
+## Bestandscreatie voor aandelentransfers automatiseren
+
+U kunt automatiseringen instellen in Clarus WMS om automatisch bestanden te maken en te uploaden naar een SFTP-account wanneer de voorraad wordt overgedragen. Dit genereert dynamische bestanden met relevante gebeurtenisgegevens.
+
+## Stapsgewijze handleiding
+
+### 1. Creëer uw automatisering
+
+Ga naar het gedeelte automatiseringen in Clarus WMS en begin met het maken van een nieuwe automatisering.
+
+### 2. Definieer de trigger
+
+Stel de triggergebeurtenis van de automatisering in op ""Stock wordt overgebracht naar account". Kies de specifieke voorwaarden die u wilt dat deze gebeurtenis activeert, zoals overdrachten van een bepaald account, naar een bepaald account of binnen een specifiek magazijn.
+
+### 3. Geef de actie op
+
+Selecteer de optie ""Een bestand maken en uploaden naar FTP". Geef vervolgens het volgende op:
+
+ **Bestandsnaam:** Voer de naam in voor het bestand dat wordt gemaakt.
+
+ **FTP gebruiker:** Kies het FTP-account waar het bestand wordt geüpload.
+
+ **Document Categorie:** Geef de documentcategorie op waarop het bestand betrekking heeft (bijvoorbeeld verzending).
+
+ **Groeps-ID toewijzen:** Als u wilt dat het bestand toewijzingen uit een specifieke toewijzingsgroep gebruikt, selecteert u het hier.
+
+### 4. Een sjabloonbestand uploaden
+
+Upload in het vak Sjabloonbestand de sjabloon die wordt gebruikt wanneer de voorraad wordt overgedragen. Deze sjabloon kan in standaardformaten zijn, zoals **Csv** Of **Txt** .
+
+ **Herinnering:** U kunt dynamische gegevens in uw sjabloon opnemen met tijdelijke aanduidingen voor specifieke informatie met betrekking tot de voorraadoverdracht.
+
+De belangrijkste dynamische gegevensobjecten die beschikbaar zijn **Transactie_source** en **transactie_target** . Deze hebben betrekking op de transactiegegevens van de aandelenbeweging van en naar een account.
+
+Beide objecten bevatten gegevens zoals:
+
+[CALLOUT:INFO]idBeschrijvingboolean1 naar boolean5Categoriecreated_at (en geformatteerde versies)datetime1 tot datetime5 (en geformatteerde versies)geheel getal1 tot integer5Fifo_dateSnaar1 naar string5SubtypeHoeveelheidHold_notesHoogteEenheid_of_measureaccount (met id, code, naam en external_system_referenties)magazijn (met code, naam en externe_system_referenties)product (met id, code, beschrijving, productcodes, long_description, external_system_referenties, specifieke_zwaartekracht en unit_dimensions)goods_in_receipt (met id, referentie, datums, aantekeningen en gerelateerde gegevens zoals aanhangwagen, leverancier, vervoerder en adres)goods_in_receipt_line (met hoeveelheden en referenties)reason_code (met code, naam en externe_system_referenties)storage_unit_van (met referentie)storage_unit_to (met referentie)locatie_van (met code)locatie_to (met code)completion_user (met naam en e-mail)
+Als u bijvoorbeeld de accountcode van het account waarnaar de voorraad is overgedragen, gebruikt u de volgende variabele syntaxis in uw sjabloonbestand: `{{transaction_target.account.code}}` 
+
+### 5. De automatisering afronden en opslaan
+
+ **Bekijk de automatiseringsinstelling:** Zorg ervoor dat alle velden correct zijn ingevuld, inclusief de bestandsnaam, FTP-gebruiker en sjabloongegevens.
+
+ **Bewaar de automatisering:** Zodra alles klaar is, bewaart u de automatisering. Het maakt nu automatisch bestanden wanneer de voorraad wordt overgedragen, met behulp van de door u gekozen sjabloon en dynamische gegevens.
+
+## FAQs
+
+### Welke bestandsindelingen kunnen worden gebruikt voor de sjabloon?
+
+Gemeenschappelijke formaten zoals **Csv** en **Txt** worden ondersteund.
+
+### Wat zijn dynamische data?
+
+Dynamische gegevens verwijst naar tijdelijke aanduidingen binnen de sjabloon die worden gevuld met relevante, evenementspecifieke informatie wanneer de automatisering wordt uitgevoerd.
+
+### Kan ik meerdere FTP-gebruikers opgeven?
+
+Nee, met elke automatiseringsinstelling kunt u slechts één FTP-gebruiker opgeven.
+
+### Wat gebeurt er als de voorraadoverdracht niet aan de criteria voldoet?
+
+Het bestand wordt niet gemaakt tenzij aan de specifieke criteria die u instelt.
+
+### Kan ik de bestandsnaam dynamisch wijzigen?
+
+Ja, u kunt dynamische gegevens gebruiken om gebeurtenisspecifieke informatie in de bestandsnaam op te nemen.

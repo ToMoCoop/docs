@@ -1,0 +1,49 @@
+---
+title: "Een bestand maken in een FTP-account bij Load Drop verzending"
+description: "In deze handleiding wordt uitgelegd hoe u de automatiseringsfunctie in Clarus WMS kunt gebruiken om automatisch bestanden in een SFTP-account te maken."
+sidebarTitle: "FTP Load Dispatch"
+---
+
+In deze handleiding wordt uitgelegd hoe u de automatiseringsfunctie in Clarus WMS kunt gebruiken om automatisch bestanden in een bepaald SFTP-account te maken telkens wanneer een belastingdaling wordt verzonden.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Creeer uw automatisering">
+    Ga naar de **Automatiseringen** en maak een nieuwe automatisering aan. Stel de automatisering in om te activeren wanneer een belastingdaling wordt verzonden. Voer vervolgens de gewenste **Bestandsnaam** in, kies de **FTP gebruiker** account voor het uploaden van het bestand en selecteer de relevante **Document Categorie** (bijv. verzending).
+  </Step>
+  <Step title="Een sjabloonbestand uploaden">
+    In de *Sjabloonbestand* sectie, upload de sjabloon die wordt gebruikt om het bestand te maken. Deze sjabloon kan in gemeenschappelijke formaten zijn, zoals **CSV** of **TXT**. Deze sjabloon bevat automatisch gegevens van de verzonden belastingdaling, waardoor het bestand dynamisch wordt.
+  </Step>
+  <Step title="Dynamische gegevens gebruiken in de sjabloon">
+    U kunt dynamische gegevens aan uw sjabloon toevoegen met tijdelijke aanduidingen. De belangrijkste beschikbare gegevensobjecten zijn:
+
+    **load_drop:** Hiermee hebt u toegang tot informatie over de belastingdaling, zoals de ID of bestemming.
+
+    **dispatch_transacties:** Dit geeft details over de transacties die verband houden met de ladingdaling.
+
+    Als u bijvoorbeeld de postcode van het adres van het laaddruppel wilt weergeven, gebruikt u: `\{\{load_drop.address.postcode\}\}`
+
+    <Info>Raadpleeg de documentatie van Vloeibare sjablonen voor meer gedetailleerde richtlijnen voor het gebruik van dynamische gegevens.</Info>
+  </Step>
+  <Step title="De automatisering afronden en opslaan">
+    Controleer zorgvuldig of alle velden in uw automatiseringsinstelling correct zijn, inclusief de bestandsnaam, de FTP-gebruiker en sjabloongegevens. Als je eenmaal tevreden bent, klik **Bewaar automatisering**. Het maakt vervolgens automatisch bestanden wanneer load drops worden verzonden.
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Welke bestandsindelingen kunnen worden gebruikt voor de sjabloon?">
+Veelvoorkomende formaten zoals CSV en TXT worden ondersteund.
+</Accordion>
+<Accordion title="Wat zijn dynamische data?">
+Dynamische gegevens verwijzen naar tijdelijke aanduidingen binnen de sjabloon die worden gevuld met relevante gebeurtenisspecifieke informatie wanneer de automatisering wordt uitgevoerd.
+</Accordion>
+<Accordion title="Kan ik meerdere FTP-gebruikers opgeven?">
+Nee, de automatisering stelt u in staat om een FTP-gebruiker per automatiseringsinstelling op te geven.
+</Accordion>
+<Accordion title="Kan ik de bestandsnaam dynamisch wijzigen?">
+Ja, u kunt dynamische gegevens gebruiken om gebeurtenisspecifieke informatie in de bestandsnaam op te nemen.
+</Accordion>
+</AccordionGroup>

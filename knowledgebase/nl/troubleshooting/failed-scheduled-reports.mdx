@@ -1,0 +1,53 @@
+---
+title: "Problemen oplossen mislukte geplande rapporten"
+description: "In deze handleiding wordt uitgelegd hoe u geplande rapporten kunt oplossen die niet worden uitgevoerd of leeg worden weergegeven in Clarus WMS."
+sidebarTitle: "Mislukte geplande rapporten"
+---
+
+In deze handleiding wordt uitgelegd hoe u geplande rapporten kunt oplossen die niet worden uitgevoerd of leeg worden weergegeven in Clarus WMS. Volg deze stappen voordat u het probleem escaleert of verdere hulp vraagt.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Bekijk het rapport">
+    Ga naar het betreffende rapport en voer het uit om te zien of het met succes gegevens genereert. Als het rapport wordt uitgevoerd met gegevens, betekent dit meestal dat de parameters en variabelen van het rapport door de gebruiker zijn gewijzigd. Omdat 'mijn rapporten' gebruikersspecifiek zijn, moet u met de client praten en om schermafbeeldingen vragen om deze wijzigingen te identificeren.
+  </Step>
+  <Step title="Bekijk de rapportvraag">
+    Als de klant schermafbeeldingen geeft met extra invoer in de parameters, controleert u de rapportquery's op zijn domein. In tegenstelling tot 'mijn rapporten' zijn rapportquery's hetzelfde voor alle gebruikers op een domein.
+
+    Zodra u de rapportquery hebt gevonden, kijkt u door het script. Als er een 'leveradresnaam' aan het rapport van de gebruiker is toegevoegd, moet deze worden weergegeven in de rapportquery. Als het niet zichtbaar is, moet u het toevoegen.
+
+    <Warning>Test altijd eerst op uw eigen domein voordat u de vraag van een klant wijzigt!</Warning>
+
+    Het pad is gewoon de naam van het pand dat u wilt opnemen, samen met eventuele 'ouder'-objecten. Bijvoorbeeld:
+    `node.original_delivery_address.naam`
+    `node.goods_out_pick_list.id`
+
+    Eenmaal voltooid, voegt u de parameter toe aan het rapport. U zult waarschijnlijk de gebruiker moeten vragen om dit toe te voegen aan zijn rapport.
+  </Step>
+  <Step title="Check MailChimp (als het rapport succesvol was)">
+    Als het rapport succesvol is verlopen, controleert u of het daadwerkelijk is verzonden. Ga naar MailChimp door dit pad te volgen:
+    **Mailchimp > Automatiseringen > Transactionele e-mail > App starten > 'E-mail invoeren'**
+
+    Als de e-mailstatus 'Verwezen' is, betekent dit meestal dat de e-mail door de ontvanger als spam is gefilterd of op de zwarte lijst is gezet. In beide gevallen vereist dit input van hun externe IT-team (advies hen aan om contact op te nemen met hun IT-afdeling).
+
+    Als de e-mailstatus 'Vergeleverd' is, suggereert dit dat de e-mail zonder problemen is verzonden. Dit vereist verder onderzoek aan onze kant. Controleer in dit geval de resterende stappen voor probleemoplossing of bericht #support.
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat betekent 'mijn rapporten'?">
+'Mijn rapporten' verwijst naar rapporten die specifiek zijn voor de instellingen en configuraties van een individuele gebruiker binnen Clarus WMS.
+</Accordion>
+<Accordion title="Wat is een 'rapport query'?">
+Een 'rapportquery' is een script dat bepaalt welke gegevens worden opgehaald voor een rapport. In tegenstelling tot 'mijn rapporten' worden rapportquery's gedeeld met alle gebruikers op een specifiek domein.
+</Accordion>
+<Accordion title="Wat moet ik doen als een e-mail wordt 'Verwezen' in MailChimp?">
+Als een e-mail 'Verwezen' wordt, betekent dit meestal dat deze is geblokkeerd als spam of op de zwarte lijst is gezet. Advies de klant om contact op te nemen met zijn IT-afdeling voor hulp.
+</Accordion>
+<Accordion title="Wat moet ik doen als een e-mail 'Vergeleverd' is, maar de gebruiker deze nog steeds niet heeft ontvangen?">
+Als een e-mail 'Gevergeleverd' is in MailChimp, geeft dit een succesvolle verzending aan. Ga verder met verder onderzoek naar andere stappen voor probleemoplossing of neem contact op met #support.
+</Accordion>
+</AccordionGroup>

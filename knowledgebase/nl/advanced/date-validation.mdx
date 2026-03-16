@@ -1,0 +1,33 @@
+---
+title: "Validatie voor SBD en BBD - Voorkomen van verouderde voorraad"
+description: "Om de voorraadnauwkeurigheid te verbeteren en afval te verminderen, hebben we een nieuwe validatiecomponent geïntroduceerd in de **Handheld apparaat ("
+sidebarTitle: "Validatie voor SBD en BBD -..."
+---
+
+Om de voorraadnauwkeurigheid te verbeteren en afval te verminderen, hebben we een nieuwe validatiecomponent geïntroduceerd in de **Handheld apparaat (HHD)** systeem. Het systeem vergelijkt nu automatisch alle ingevoerde **Verkopen door** Of **Het beste voor** Datum ten opzichte van de huidige systeemdatum en tijd.
+
+Deze beveiliging is ontworpen om te voorkomen dat verouderde voorraad per ongeluk wordt ontvangen of in het systeem wordt ingevoerd.
+
+### Hoe het werkt: een praktisch voorbeeld
+
+Om de validatie in actie te zien, overweeg dan een standaard "blinde ontvangst"-workflow:
+
+- 
+ **Datum invoer:** Stel dat de datum van vandaag **11/03/2026** . Als een gebruiker probeert een verlopen datum in te voeren (bijv. **10/03/2025** ), het systeem activeert een onmiddellijke waarschuwing.
+<Frame>
+  <img src="/images/knowledgebase/validation-sbd-bbd-preventing-1.png" alt="" />
+</Frame>
+
+- 
+ **Foutafhandeling:** Wanneer u probeert vooruitgang te boeken, wordt een foutbericht weergegeven, waardoor de gebruiker wordt geblokkeerd om door te gaan met een datum in het verleden.
+<Frame>
+  <img src="/images/knowledgebase/validation-sbd-bbd-preventing-2.png" alt="" />
+</Frame>
+
+- 
+ **Correctie:** Zodra de datum is gecorrigeerd tot een geldige toekomstige datum (bijv. **12/03/2026** ), het systeem valideert de invoer en stelt de gebruiker in staat om de stroom te voltooien.
+<Frame>
+  <img src="/images/knowledgebase/validation-sbd-bbd-preventing-3.png" alt="" />
+</Frame>
+
+ **Opmerking:** Deze validatiecomponent functioneert identiek voor beide **Verkopen door** en **Het beste voor** Datumvelden.

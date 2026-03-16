@@ -1,0 +1,45 @@
+---
+title: "How to Set Up a Goods In Transaction Report"
+description: "Schedule a Goods In Transaction Report with custom date ranges and account filters to track inbound inventory."
+sidebarTitle: "Goods In Report"
+---
+
+## Goods In Transaction Report
+
+The Goods In Transaction Report gives you a view of all received goods within a specified date range and account. You set it up as a scheduled report with configurable parameters.
+
+<Steps>
+  <Step title="Schedule a new report">
+    Go to the **Reports** section and click **+Add Report**. Search for **Goods In Transactions** in the dropdown menu.
+  </Step>
+  <Step title="Add report parameters">
+    Configure three essential parameters:
+
+    | Parameter Name | Variable Value | Description |
+    |---|---|---|
+    | **account_id** | Your account ID (e.g. `1`) | Filters the report to a specific account |
+    | **created_from** | Start date (e.g. `2024-01-01`) | Beginning of the reporting period |
+    | **created_to** | End date (e.g. `2024-01-31`) | End of the reporting period |
+
+    <Warning>All three parameters are required for the report to generate correctly.</Warning>
+  </Step>
+  <Step title="Save the report">
+    Click **Save**. The report will display all goods-in transactions within the dates you specified. You can schedule it to run automatically at a set frequency.
+  </Step>
+</Steps>
+
+<Tip>You can add additional date variables such as "Start of last week", "Last Sunday", or "Start of today" to create dynamic, recurring reports.</Tip>
+
+<Accordion title="Frequently asked questions">
+  **Can I filter the report for a specific account?**
+
+  Yes. Set the **account_id** parameter to the ID of the account you want to report on.
+
+  **Can I add more than three parameters?**
+
+  Yes. You can add additional variables to refine the report further.
+
+  **Can I generate a report for today's transactions?**
+
+  Yes. Add a variable for the **start of today** to view same-day goods-in transactions.
+</Accordion>

@@ -1,0 +1,44 @@
+---
+title: "Consolidated Picking: A Simple Guide"
+description: "Combine multiple sales orders into one picking list to improve warehouse efficiency and reduce repetitive actions."
+sidebarTitle: "Consolidated Picking"
+---
+
+## Consolidated Picking
+
+Consolidated picking combines multiple sales orders into one picking list, making your warehouse operations more efficient and boosting productivity.
+
+<Steps>
+  <Step title="Navigate to warehouse settings">
+    Go to **Settings** > **Warehouses** > **Show** to access the settings for your chosen warehouse.
+  </Step>
+  <Step title="Enable consolidated picking">
+    In the **General** section, find the **Consolidated Picking** toggle and switch it to **Yes**.
+
+    <Info>Once activated, certain requirements must be met for consolidated picking to work correctly.</Info>
+  </Step>
+  <Step title="Meet requirements for consolidated picking">
+    For orders to be consolidated, they must meet these conditions:
+
+    - **Matching Accounts**: All orders must belong to the same customer account.
+    - **Matching Warehouses**: Orders must be linked to the same warehouse.
+    - **Order Status**: All orders must be saved and have a **Pending** status.
+
+    <Warning>If these conditions are not met, the system will not allow the orders to be consolidated.</Warning>
+  </Step>
+  <Step title="Create a consolidated picking list">
+    On the **Sales Order Data Grid** screen, tick the checkboxes next to the orders you want to consolidate. The **Consolidate & Process Picks** option will appear at the bottom.
+
+    Click it and fill in the required details:
+    - **Reference**: A unique ID for the pick.
+    - **Expected Date of Dispatch**: The date you expect the goods to be sent out.
+    - **Goods Out Bay**: The area where goods are ready for shipping.
+
+    The system will generate the consolidated picklist.
+  </Step>
+  <Step title="Complete the picking process">
+    After the consolidated picking list is created, the rest of the picking and dispatch process continues as normal.
+  </Step>
+</Steps>
+
+<Tip>Key benefits of consolidated picking include increased **efficiency** by grouping tasks, **time savings** by reducing repetitive actions, and improved **accuracy** in inventory management.</Tip>

@@ -1,0 +1,48 @@
+---
+title: "Hoe een webhookaanvraag te valideren"
+description: "In dit artikel wordt uitgelegd hoe u webhookgesprekken verifieert of valideert die worden gedaan op basis van een Clarus WMS-automatisering of integra"
+---
+
+## Het verifiëren en valideren van webhookgesprekken
+
+In dit artikel wordt uitgelegd hoe u webhookgesprekken verifieert of valideert die worden gedaan op basis van een Clarus WMS-automatisering of integratie. Lees meer over de vijf belangrijke headers die u helpen deze verzoeken te identificeren en te valideren.
+
+## Stapsgewijze handleiding
+
+### 1. Begrijp de koppen
+
+Webhookverzoeken van Clarus WMS-automatiseringen of integraties verzenden vijf specifieke headers. Deze headers bieden cruciale informatie om u te helpen de authenticiteit van het verzoek dat naar uw webhook-URL wordt verzonden te identificeren en te bevestigen.
+
+### 2. Identificeer 'X-ClarusWMS-Domain'
+
+Deze koptekst geeft de exacte URL die de webhookoproep heeft geïnitieerd. Dit is de basis URL die u gebruikt om in te loggen op Clarus WMS. Gebruik dit om de oorsprong van het verzoek te verifiëren.
+
+### 3. Identificeer 'X-ClarusWMS-API-Domain'
+
+Deze header bevat de API URL die is gekoppeld aan het domein. Dit helpt u het bijbehorende API-eindpunt voor het oorspronkelijke domein te bevestigen.
+
+### 4. Identificeer 'X-ClarusWMS-Subdomein'
+
+Deze koptekst geeft u het subdomeindeel van de URL die de webhook heeft geactiveerd. Het kan bijvoorbeeld 'klant' zijn. Dit helpt bij het lokaliseren van het specifieke subdomein waaruit de oproep afkomstig is.
+
+### 5. Identificeer 'X-ClarusWMS-Automation-ID'
+
+Deze koptekst biedt de unieke ID van de automatisering die ervoor zorgde dat de webhook werd geactiveerd. Het ID kan bijvoorbeeld '43' zijn. Hiermee kunt u traceren welke automatisering de oproep heeft geïnitieerd.
+
+### 6. Identificeer 'X-ClarusWMS-Integration-ID'
+
+Deze koptekst geeft de ID van de integratie die is gekoppeld aan de automatisering die de webhook heeft geactiveerd. Dit is alleen inbegrepen als het is ingesteld of van toepassing. De ID kan bijvoorbeeld '723' zijn. Dit helpt bij het identificeren van de specifieke integratie.
+
+### 7. Authenticiteit valideren
+
+De waarden in deze vijf koppen zijn essentieel om effectief te bevestigen dat het verzoek om uw webhook-URL echt is en afkomstig is van een vertrouwde bron.
+
+## FAQs
+
+### Wat zijn webhook headers?
+
+Webhook headers zijn stukjes informatie die samen met een webhookverzoek worden verzonden. Ze bevatten belangrijke details over de oorsprong en het doel van het verzoek, zodat u het kunt identificeren en valideren.
+
+### Waarom zijn deze headers belangrijk voor validatie?
+
+Deze headers zijn cruciaal omdat ze verifieerbare informatie verstrekken over de bron van de webhookoproep, zoals het domein, het subdomein en specifieke ID's van de automatisering of integratie in Clarus WMS. Hiermee kunt u bevestigen dat het verzoek legitiem is en niet van een ongeoorloofde bron.

@@ -1,0 +1,50 @@
+---
+title: "Database Backup and Retention"
+description: "How Clarus manages database backups, retention periods, recovery testing, and customer data retention policies."
+---
+
+## Data retention and security
+
+Clarus securely stores your data using automated backups, daily snapshots, and regular recovery testing. This page explains how each layer of protection works.
+
+## Automated backups
+
+The master database uses automated backups that allow recovery to within **5 minutes**. These backups are retained for **14 days**.
+
+## Full snapshots
+
+Full copies of the database are created every **24 hours** and saved in **two separate locations**. These snapshots are also retained for **14 days**.
+
+## Quarterly recovery checks
+
+As part of ISO 27001 certification, database backups are tested every three months. This ensures backups are always valid and can be used for recovery.
+
+## Alert system for backup failures
+
+Immediate alerts are triggered if the database backup process encounters any issues, allowing the team to quickly address and resolve problems.
+
+## Customer data retention
+
+Customer data is retained for **6 years** after the customer relationship ends. After this period, all data is anonymised.
+
+<Info>Clarus holds information in accordance with ISO 27001 information security standard practices.</Info>
+
+<Warning>All customer data is anonymised after the 6-year retention period following termination of the customer relationship.</Warning>
+
+<Accordion title="FAQ">
+  **How long are automated backups kept?**
+
+  Automated backups are retained for 14 days, providing point-in-time recovery within 5 minutes.
+
+  **Are full snapshots different from automated backups?**
+
+  Yes. Full snapshots are generated daily and uploaded to two separate storage locations, also retained for 14 days.
+
+  **What is ISO 27001 and how does it relate to data recovery?**
+
+  ISO 27001 is an information security standard. As part of this certification, Clarus performs quarterly full recoveries of database snapshots to ensure backup validity.
+
+  **What happens if a database backup fails?**
+
+  An alert system notifies the team immediately, allowing for prompt resolution.
+</Accordion>

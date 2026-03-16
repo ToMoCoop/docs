@@ -1,0 +1,38 @@
+---
+title: "Send a Webhook on Negative Stock Adjustment"
+description: "How to set up an automation that triggers a webhook when stock is negatively adjusted, notifying external systems in real time."
+sidebarTitle: "Webhook: Negative Adjustment"
+---
+
+## Overview
+
+You can set up automations that trigger a webhook when stock is negatively adjusted. This allows external systems to be automatically informed when stock levels decrease, enabling quicker action and better inventory management.
+
+<Steps>
+  <Step title="Access the Automation settings">
+    Go to the **Automations** section.
+  </Step>
+  <Step title="Create a new automation">
+    Click **+New** and choose **Negative Stock Adjustment** as the trigger event.
+  </Step>
+  <Step title="Specify webhook details">
+    Enter the **Webhook URL** and select the **Webhook Method** (e.g., **POST** or **GET**) that your external system expects.
+  </Step>
+  <Step title="Understand the webhook payload">
+    When triggered, a **JSON object** is sent containing details like the product ID, warehouse, and adjusted quantity.
+  </Step>
+  <Step title="Save the automation">
+    Click **Save** to activate the automation.
+  </Step>
+</Steps>
+
+<Warning>The JSON payload includes the adjustment ID, creation timestamp, product and warehouse codes, quantity adjusted, and custom data fields. Ensure your receiving endpoint handles these correctly.</Warning>
+
+<AccordionGroup>
+  <Accordion title="What event triggers this webhook?">
+    This webhook fires specifically when a **negative stock adjustment** takes place.
+  </Accordion>
+  <Accordion title="How do I test the webhook?">
+    Make a negative stock adjustment, then check your external system to confirm the webhook data was received.
+  </Accordion>
+</AccordionGroup>

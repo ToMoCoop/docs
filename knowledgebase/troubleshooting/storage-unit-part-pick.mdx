@@ -1,0 +1,42 @@
+---
+title: "\"Different Storage Unit Must Be Selected on Part Pick\" Error"
+description: "Diagnose and resolve the 'Different Storage Unit must be selected on Part Pick' error with this troubleshooting guide."
+sidebarTitle: "Storage Unit Part Pick"
+---
+
+This article explains why you might see the error "Different Storage Unit must be selected on Part Pick" when completing pick tasks, and provides two clear solutions.
+
+## Why this error occurs
+
+This error happens when you are picking two or more stock lines from the same storage unit and trying to place them into the same destination "storage unit to". Even if the items are different products or full picks, the system identifies this as a "part pick", which triggers the error.
+
+## Solution 1: Reallocate stock from a different storage unit
+
+<Steps>
+<Step title="Cancel the current pick list">
+Cancel the current pick list and return to the sales order.
+</Step>
+<Step title="Reassign the stock line">
+If possible, reassign the stock line to a different storage unit. This allows you to consolidate multiple stock lines onto the same "storage unit to" without triggering the error.
+</Step>
+</Steps>
+
+<Info>
+This solution is ideal if you have alternative storage units available for the stock.
+</Info>
+
+## Solution 2: Use a separate storage unit for each stock line
+
+Assign a different "storage unit to" for each stock line being picked from the same pallet. This ensures the system sees each part pick as coming from a unique storage unit.
+
+<Warning>
+This method requires you to use multiple destination storage units, which might not always be practical.
+</Warning>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What is a 'part pick'?">
+In the system, a "part pick" refers to when multiple stock lines are picked from the same storage unit, even if they are for different products or are full picks.
+</Accordion>
+</AccordionGroup>

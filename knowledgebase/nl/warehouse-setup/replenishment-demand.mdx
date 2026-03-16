@@ -1,0 +1,91 @@
+---
+title: "Pickface aanvulling types: Vraag Pickfaces"
+description: "Leer hoe u vraagaanvulling configureert voor pickface locaties in Clarus WMS."
+sidebarTitle: "Aanvulling vraag"
+---
+
+Alle pickfaces worden op dezelfde manier gekozen: een taak leidt u naar de locatie om de benodigde voorraad op te halen. Het verschil zit hem in hoe en wanneer die locaties worden aangevuld.
+
+## Aanvulling van vraag
+
+Deze locaties worden gebruikt voor picktaken die specifieke houdbaarheidsdatums vereisen waaraan niet door voorraad van andere pickfaces kunnen worden gehaald. Clarus vult deze locaties aan met een volledige pallet van de benodigde voorraad om de picktaken uit te voeren.
+
+Als een pick-taak bijvoorbeeld een houdbaarheid van 5 dagen vereist en geen van de pickfaces die zijn ingesteld op 'Doorgaan' aanvulling kan voldoen aan de keuze, wordt een aanvullingstaak gemaakt om de voorraad te verplaatsen naar een lege 'Vraag'-aanvulling, zodat de vereiste voorraad beschikbaar is voor het plukken.
+
+## Hoe werkt de vraagaanpassing?
+
+**Aanvulling van vraag** is een reactief aanvullingsproces dat is ontworpen om ervoor te zorgen dat picktaken kunnen worden voltooid wanneer de vereiste voorraad niet beschikbaar is in de pickface. In tegenstelling tot **Continue aanvulling**, die pickfaces proactief op voorraad houdt op basis van min/max triggers, reageert de vraagaanvulling direct op een onmiddellijke pickbehoefte.
+
+### Hoe het werkt stap voor stap:
+
+1. **Een pick Task wordt gegenereerd:** Wanneer een verkooporder of pick-taak wordt gemaakt, probeert het systeem deze eerst te vervullen met behulp van voorraad die beschikbaar is op de toegewezen 'Doorlopende' pickfacelocaties.
+
+2. **Voorraad Check in Pickfaces:**
+   - Als er voldoende voorraad is in de Continuous pickfaces, verloopt de pick taak zoals normaal.
+   - Als de toegewezen 'Continue' pickface locaties geen voorraad hebben met de vereiste houdbaarheidsdata, **of er zijn geen Continuous pickfaces setup**, bepaalt het systeem of een **Aanvulling van vraag** locatie is ingeschakeld voor het product.
+     - Als er geen vraagaanvulling is ingeschakeld, wordt de picktaak in de wacht gezet totdat een aanvulling is voltooid op een 'Continue' pickface. Het systeem zal dan proberen de taak vrij te geven wanneer de voorraad aan de picktaakvereisten kan voldoen.
+
+3. **Triggering vraagaanvulling:** Indien ingeschakeld, wordt de picktaak in de wacht gezet terwijl het systeem een aanvullingstaak creëert om voorraad te verplaatsen naar een lege locatie voor vraagaanvulling.
+   - Als er geen lege vraagpickface is, wordt de aanvullingstaak in de wacht gezet totdat een vraagpickface leeg is.
+   - Het systeem zal altijd een volledige pallet aanvullen.
+
+4. **Aanvullingstaak voltooiing:** Zodra de aanvulling is voltooid, is de pick-taak **vrijgelaten uit de hold** en kan als normaal worden vervuld.
+
+## Hoe beide aanvulling types kunnen samenwerken
+
+De **'Continue'** en **'Vraag'** aanvullingsinstellingen kunnen gelijktijdig voor hetzelfde product worden gebruikt door ze toe te wijzen aan verschillende pickface-locaties op basis van operationele behoeften.
+
+1. **Voortdurende aanvulling** - Zorgt ervoor dat een pickface regelmatig wordt bijgeborgen om de voorraadbeschikbaarheid te behouden.
+2. **Aanvulling van vraag** - Hiermee wordt aanvulling geactiveerd wanneer een pick-taak voorraad vereist die niet beschikbaar is in een andere pickface.
+
+### Hoe ze samenwerken
+
+**Primaire Pickface -> Continue aanvulling**: Een regelmatig gevulde locatie die het grootste deel van de voorraad voor standaard picking bevat.
+
+**Secundaire Pickface -> Vraagaanvulling**: Een aparte locatie die wordt gebruikt wanneer voorraad uit de primaire pickface onvoldoende is voor een specifieke bestelling (bijv. houdbaarheidseis).
+
+**Voorbeeld:**
+
+- Product 123: Klant 456 - Houdbaarheid: Min=5 dagen, Max=10 dagen
+  - Pickface 1 (Continue): Hoeveelheid = 10, Verkopen op Datum op voorraad = 15 dagen
+  - Pickface 2 (Vraag): Niet ingevuld
+  - Racking: SU Hoeveelheid = 20, Verkopen op Datum op voorraad = 5 dagen
+- Verkooporder: Klant 456, Hoeveelheid = 7
+
+In dit voorbeeld, wanneer picks op de bovenstaande verkooporder worden gemaakt, wordt de pick-taak van 7 in de wacht gezet en wordt een aanvullingstaak gegenereerd voor de vraagpickface. De reden hiervoor is dat klant 456 aandelen vereist met een maximale verkoop op datum van 10 dagen, de voorraad in de continue pickface 15 heeft, dus de voorraad binnen de continue pickface voldoet niet aan de houdbaarheid die nodig is voor de klant op de verkooporder.
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat gebeurt er als de voorraad in de pickface niet kan worden gebruikt om de picktaak te voltooien?">
+Het hangt af van de aanvulling-instellingen:
+
+- **Als alleen 'continue' aanvulling is ingeschakeld:** De pick taak zal in de wacht gaan totdat een aanvulling taak die voldoet aan de voorraadvereisten, is voltooid.
+- **Als zowel 'continue' als 'Demand'-aanvulling zijn ingeschakeld:** Het systeem probeert eerst continue pickfaces. Als geen continue pickface voldoet, zal een vraagaanvulling pickface worden gebruikt.
+</Accordion>
+<Accordion title="Wat gebeurt er als mijn vraagaanvulling niet leeg is?">
+Als uw vraagaanvulling pickfaces nog voorraad bevat (hoeveelheid boven 0), worden de kiestaak en de bijbehorende aanvullingstaak in de wacht gezet totdat de locatie leeg is.
+</Accordion>
+<Accordion title="Hoe weet het systeem wanneer het de aanvulling moet loslaten?">
+Wanneer de vraagaanvulling pickface leeg is met 0 voorraad, wordt de volgende aanvullingstaak vrijgegeven. Zodra de aanvullingstaak is voltooid, wordt de picktaak uit de wacht gehaald.
+</Accordion>
+<Accordion title="Hebben pickfaces hard voorraad toe?">
+We wijzen hard toe dat de voorraad die moet worden uitgekozen uit een **Aanvulling van vraag** pickface. Voor **Continue aanvulling** is dit standaard zacht toegewezen.
+</Accordion>
+<Accordion title="Waar kan ik de status van mijn picktaken zien?">
+De status van uw pick taken kan op twee locaties worden bekeken:
+
+- **Picklijst** - Voeg de kolom 'Status' toe aan het dataster wanneer u de picktaak in de picklijst bekijkt.
+- **Taken** - Zoek de taak in het dataster 'Taken' en verwijs naar de kolom 'Status' voor updates.
+</Accordion>
+<Accordion title="Kan ik een aanvullingstaak annuleren?">
+Een gebruiker kan op elk gewenst moment een beschikbare aanvullingstaak annuleren:
+
+1. Ga naar de taken pagina
+2. Voeg de knop Annuleren toe aan het dataster
+3. Vind de beschikbare aanvulling taak
+</Accordion>
+<Accordion title="Kan ik de maximale houdbaarheidsdagen leeg laten?">
+Ja, het niet invoeren van een waarde in maximale houdbaarheidsdagen zal de minimale dagen en vervolgens alles erboven gebruiken. Bijvoorbeeld, als de minimumdagen = 5 en Maximale dagen = leeg, zal het systeem zoeken naar houdbaarheid boven de 5.
+</Accordion>
+</AccordionGroup>

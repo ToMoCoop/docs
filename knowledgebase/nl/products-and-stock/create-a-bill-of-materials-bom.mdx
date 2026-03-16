@@ -1,0 +1,60 @@
+---
+title: "Een Bill of Materials (BOM) maken"
+description: "In deze handleiding wordt uitgelegd hoe u een Bill of Materials (BOM) product in Clarus WMS instelt."
+sidebarTitle: "Bill of Materials"
+---
+
+In deze handleiding wordt uitgelegd hoe u een Bill of Materials (BOM) product in Clarus WMS instelt. Een BOM geeft een overzicht van alle afzonderlijke producten die nodig zijn om een ouderproduct te maken, waardoor uw voorraadbeheer wordt gestroomlijnd.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Toegang tot het scherm van producten">
+    Klik in het linkermenu op **Producten**. Selecteer op het scherm van producten **+Nieuw** om een nieuw product te creeren.
+  </Step>
+  <Step title="Voer nieuwe productinformatie in">
+    Vul de volgende velden in: **Code**, **Beschrijving**, **Type voorraad eenheid** (artikelen, gewicht of kubus), **Account** (van dropdown) en stel **Producttype** in op **Bill of Materialen**. U kunt ook een optionele **Lange beschrijving** toevoegen en **Types van opslageenheid** kiezen. Klik **Opslaan en bewerken** om door te gaan.
+  </Step>
+  <Step title="Volledige productgegevens">
+    Eenmaal opgeslagen, verschijnen er meer velden. U kunt **Extern systeemverwijzingen** toevoegen indien nodig (deze zijn optioneel).
+
+    Voltooi de secties voor **Eenheid - Artikelen** (type voorraad eenheid, barcode, gewicht, waarde, output hoeveelheid), **Gevallen**, **Binnen en Buiten**, **Vlaggen**, en **Ontvangst en plukken**. Vergeet niet om elke sectie apart op te slaan.
+  </Step>
+  <Step title="Materiaal sectie (Bouwen aan de BOM)">
+    In het gedeelte Materialen definieert u de afzonderlijke items waaruit uw ouderproduct bestaat:
+
+    1. Klik **+Nieuw**.
+    2. Selecteer het kindproduct in de vervolgkeuzelijst.
+    3. Voer de **Hoeveelheid** nodig voor het ouderproduct in.
+    4. Klik op **Opslaan** om het item toe te voegen.
+    5. Herhaal voor extra items door **+Nieuw** te klikken.
+  </Step>
+  <Step title="Aanvullende secties">
+    - **Alternatieve codes** - Voeg verschillende codes toe voor verschillende gebruikers.
+    - **Productopslag eenheden** - Voeg extra opslagunits toe of verwijder ze.
+    - **Magazijnroutes** - Wijs een magazijnroute toe.
+    - **Pickfaces** - Configureer een pickface indien nodig.
+  </Step>
+</Steps>
+
+<Info>Uw Bill of Materials is nu opgesteld. Er is geen enkele knop 'Master save'; u moet onthouden om elke sectie op te slaan terwijl u gaat.</Info>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat is een Bill of Materials (BOM)?">
+Een BOM is een verzameling individuele producten die worden gebruikt om een ouderproduct te maken.
+</Accordion>
+<Accordion title="Hoe voeg ik materialen toe aan een BOM?">
+In de **Materialen** sectie, klik **+Nieuw**, selecteer het product, voer de hoeveelheid in en klik **Opslaan**.
+</Accordion>
+<Accordion title="Kan ik de materialen later bewerken?">
+Ja, u kunt items in de BOM bewerken of verwijderen door de hoeveelheid aan te passen of het product te verwijderen.
+</Accordion>
+<Accordion title="Wat is de optie 'assemblage op Pick'?">
+Hierdoor kan het BOM-product tijdens het pickproces worden gemonteerd. Dit is handig bij het uitvoeren van bestellingen met afzonderlijke componenten.
+</Accordion>
+<Accordion title="Kan ik meerdere opslagunits toewijzen aan een product?">
+Ja, u kunt meerdere opslagunits toevoegen door **+Nieuw** te selecteren in de **Productopslag eenheden** sectie.
+</Accordion>
+</AccordionGroup>

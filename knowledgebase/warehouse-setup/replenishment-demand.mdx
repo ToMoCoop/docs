@@ -1,0 +1,77 @@
+---
+title: "Pickface Replenishment: Demand"
+description: "Learn how demand pickface replenishment works and how to configure it for order-driven stock availability."
+sidebarTitle: "Replenishment (Demand)"
+---
+
+**Demand replenishment** is a reactive process that replenishes pickface locations only when a pick task requires stock that is not available in any other pickface. Unlike continuous replenishment, which proactively keeps pickfaces stocked, demand replenishment responds directly to an immediate picking need.
+
+## How demand replenishment works
+
+1. **A pick task is generated.** The system first attempts to fulfil it using stock in the assigned continuous pickface locations.
+
+2. **Stock is checked.** If continuous pickfaces have the required stock (including shelf-life criteria), the pick proceeds normally. If not, the system checks whether a demand replenishment location is enabled.
+
+3. **Demand replenishment is triggered.** The pick task goes on hold while the system creates a replenishment task to move a full pallet of stock to an empty demand pickface. If no empty demand pickface is available, the replenishment task is also placed on hold until one becomes available.
+
+4. **The pick task is released.** Once the replenishment is completed, the pick task is released from hold and proceeds as normal.
+
+## Setting up demand pickfaces
+
+<Steps>
+<Step title="Navigate to the product">
+From the left-hand menu, click **Products** and select the product you want to configure.
+</Step>
+<Step title="Assign locations">
+Open the **Pickface** panel and click **New** to add a pickface location. You can optionally use **Location Groups** to manage multiple pickfaces simultaneously.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-demand-1.png" alt="Pickface panel with demand location assignment" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-demand-2.png" alt="Location group assignment for demand pickfaces" />
+</Frame>
+</Step>
+<Step title="Select replenishment type">
+Choose **Demand Replenishment** as the strategy. A replenishment task is generated only when a pick task cannot be fulfilled by another active pickface.
+</Step>
+<Step title="Configure settings and prioritise">
+Set the location order using the arrow controls. The system will always replenish a full pallet into a demand pickface.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-demand-3.png" alt="Demand pickface configuration and trigger settings" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-demand-4.png" alt="Prioritising demand pickface locations" />
+</Frame>
+</Step>
+</Steps>
+
+## Using continuous and demand replenishment together
+
+The **Continuous** and **Demand** settings can be used simultaneously for the same product by assigning them to different pickface locations:
+
+- **Primary Pickface (Continuous)**: Regularly replenished, holding the majority of stock
+- **Secondary Pickface (Demand)**: Used when the primary cannot meet a specific order requirement (e.g., shelf-life dates)
+
+**Example**: Product 123 has a customer requiring a maximum sell-by date of 10 days. The continuous pickface holds stock with 15 days remaining, which does not meet the requirement. The system places the pick on hold, generates a demand replenishment task to move stock with 5 days remaining from racking into the demand pickface, and then releases the pick task.
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Why is my pick task on hold?">
+The system is waiting for stock to be replenished into a pickface. If only continuous replenishment is enabled, the task stays on hold until a replenishment to a continuous pickface provides suitable stock. If demand replenishment is also enabled, a replenishment task is created to move stock into the demand pickface.
+</Accordion>
+<Accordion title="What if my demand replenishment pickface is not empty?">
+The pick task and its associated replenishment task will be placed on hold until the demand pickface location is empty (quantity reaches 0).
+</Accordion>
+<Accordion title="Do pickfaces hard-allocate stock?">
+Demand replenishment pickfaces do hard-allocate the stock needed for picking, since a full pallet of specific stock must be moved into the pickface. Continuous replenishment pickfaces use soft allocation as standard.
+</Accordion>
+<Accordion title="Where can I see the status of my pick and replenishment tasks?">
+- **Picking List**: Add the Status column to the data grid to see the current status (e.g., On Hold)
+- **Tasks**: Locate the task in the Tasks data grid and check the Status column. Hovering over the status shows the reason for any hold.
+</Accordion>
+</AccordionGroup>

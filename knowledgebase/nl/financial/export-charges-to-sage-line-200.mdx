@@ -1,0 +1,51 @@
+---
+title: "Kosten exporteren naar Sage Line 200"
+description: "In deze handleiding wordt uitgelegd hoe u kosten van Clarus WMS kunt exporteren, zodat ze kunnen worden geimporteerd in Sage Line 200."
+sidebarTitle: "Export naar Sage Line 200"
+---
+
+In deze handleiding wordt uitgelegd hoe u kosten van Clarus WMS kunt exporteren, zodat ze kunnen worden geimporteerd in Sage Line 200. U leert hoe u rapporten kunt wijzigen en veelvoorkomende problemen oplost.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Navigeer naar Mijn rapporten">
+    Klik in de rechterbovenhoek van het scherm op uw **Gebruikersmenu**. Selecteer vervolgens **Mijn rapporten** om de lijst met beschikbare rapporten te openen.
+  </Step>
+  <Step title="Zoek het Sage Line 50-rapport">
+    Gebruik de zoekfunctie om de **Salielijn 50** rapport te vinden. Klik op de **Toon** knop om het rapport te openen.
+  </Step>
+  <Step title="Het rapport voor Sage Line 200 wijzigen">
+    Wijzig in de Algemene Afdeling de **Naam** naar **"Sagelijn 200 kosten"** en update van de **Beschrijving** naar **"Sagelijn 200 kosten"**. Klik **Opslaan**.
+
+    Verwijder in de sectie Rapportvelden de volgende velden: **"Accountnaam"** en **"Oplaadvenster Start"**. Klik **Opslaan** om deze wijzigingen toe te passen.
+  </Step>
+  <Step title="Voer het rapport uit">
+    Nadat u het rapport hebt opgeslagen, voert u het uit om een **CSV bestand** te genereren. U kunt dit CSV-bestand vervolgens importeren in **Salielijn 200**.
+  </Step>
+  <Step title="Optioneel: instellen als een gepland rapport">
+    Om het exportproces te automatiseren, kunt u het rapport instellen als een **Gepland rapport** om dagelijks, maandelijks of op elke frequentie te draaien die u nodig hebt.
+
+    <Warning>**Field Order Issue**: Als u problemen ondervindt tijdens de export, zorg er dan voor dat de velden in de volgende volgorde voor Sage Line 200 staan: **Type**, **Referentie van het account**, **Nominale A/C Ref**, **Referentie**, **Datum**, **Beschrijving**, **Netto bedrag**, **Fiscaal Wetboek**, **Belastingbedrag**. Controleer of alle velden correct zijn geformatteerd en in de opgegeven volgorde voordat u de gegevens exporteert.</Warning>
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Hoe wijzig ik het rapport Sage Line 50 voor Sage Line 200?">
+Open de **Salielijn 50** Rapport in **Mijn rapporten**. Wijzig de naam en beschrijving in **"Sagelijn 200 kosten"**. Verwijder de onnodige velden: **"Accountnaam"** en **"Oplaadvenster Start"**.
+</Accordion>
+<Accordion title="Kan ik dit rapport inplannen?">
+Ja, u kunt het rapport instellen als een **Gepland rapport** automatisch werken met regelmatige tussenpozen.
+</Accordion>
+<Accordion title="Welk bestandsformaat wordt gebruikt voor exporteren?">
+Het rapport exporteert als een **CSV bestand** die kan worden geimporteerd in **Salielijn 200**.
+</Accordion>
+<Accordion title="Wat moet ik doen als de veldvolgorde onjuist is?">
+Zorg ervoor dat de velden in deze volgorde staan: **Type**, **Referentie van het account**, **Nominale A/C Ref**, **Referentie**, **Datum**, **Beschrijving**, **Netto bedrag**, **Fiscaal Wetboek**, **Belastingbedrag**.
+</Accordion>
+<Accordion title="Kan ik kosten voor een bepaalde periode exporteren?">
+Ja, u kunt de periode opgeven wanneer het rapport uitvoert om kosten voor die specifieke duur worden uitgevoerd.
+</Accordion>
+</AccordionGroup>

@@ -1,0 +1,60 @@
+---
+title: "BTW toepassen op facturen"
+description: "In deze handleiding wordt uitgelegd hoe u belasting over de toegevoegde waarde (btw) toepast op uw facturen in Clarus WMS."
+sidebarTitle: "BTW op facturen"
+---
+
+In deze handleiding wordt uitgelegd hoe u belasting over de toegevoegde waarde (btw) toepast op uw facturen in Clarus WMS. U kunt kiezen of uw prijzen fiscaal inclusief of fiscaal exclusief zijn en het systeem berekent automatisch btw.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Begrijp btw-opties">
+    Bij het instellen van btw voor facturen heeft u twee keuzes:
+
+    - **Bedragen zijn - Belasting Inclusief**: De eenheidsprijzen zijn al inclusief BTW.
+    - **Bedragen zijn - Exclusief belasting**: BTW wordt afzonderlijk toegevoegd aan de eenheidsprijzen.
+  </Step>
+  <Step title="Opstellen van belastinginclusive bedragen">
+    Als uw prijzen al inclusief BTW:
+
+    - Selecteer **Bedragen zijn - Belasting Inclusief**.
+    - Kies een btw-tarief voor elk regelartikel:
+      - **Geen BTW**: Er wordt geen btw toegepast.
+      - **5% BTW op inkomsten**: 5% van de eenheidsprijs wordt beschouwd als btw.
+      - **20% BTW op inkomsten**: 20% van de eenheidsprijs wordt beschouwd als btw.
+
+    <Warning>Het systeem geeft het btw-bedrag onder het subtotaal van de factuur weer.</Warning>
+  </Step>
+  <Step title="Exclusieve bedragen instellen">
+    Als u btw apart wilt toevoegen:
+
+    - Selecteer **Bedragen zijn - Exclusief belasting**.
+    - Kies een btw-tarief voor elk regelartikel:
+      - **Geen BTW**: Er wordt geen btw toegepast.
+      - **5% BTW op inkomsten**: BTW tegen 5% wordt toegevoegd aan de eenheidsprijs.
+      - **20% BTW op inkomsten**: BTW tegen 20% wordt toegevoegd aan de eenheidsprijs.
+
+    <Warning>Het systeem voegt het btw-bedrag toe aan het totaal en toont het onder het subtotaal.</Warning>
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Kan ik verschillende btw-tarieven toepassen op verschillende artikelen op dezelfde factuur?">
+Ja, u kunt op elk regelitem verschillende btw-tarieven (geen btw, 5% of 20%) toepassen.
+</Accordion>
+<Accordion title="Wat is het verschil tussen fiscaal inclusieve en fiscaal exclusief bedragen?">
+Tax Inclusive betekent dat de eenheidsprijs al BTW omvat, terwijl Tax Exclusive betekent dat btw bovenop de eenheidsprijs wordt toegevoegd.
+</Accordion>
+<Accordion title="Hoe berekent het systeem de btw?">
+Het systeem berekent automatisch btw op basis van het geselecteerde tarief voor elk regelitem en geeft het onder het subtotaal van de factuur.
+</Accordion>
+<Accordion title="Kan ik het btw-tarief wijzigen na selectie?">
+Ja, u kunt het btw-tarief voor elk regelitem wijzigen voordat u de factuur afrondt.
+</Accordion>
+<Accordion title="Wat gebeurt er als ik Geen BTW selecteer?">
+Als u Geen btw selecteert, wordt het regelartikel als btw-vrij behandeld en wordt er geen btw op dat artikel toegepast.
+</Accordion>
+</AccordionGroup>

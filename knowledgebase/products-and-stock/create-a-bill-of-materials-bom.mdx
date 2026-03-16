@@ -1,0 +1,46 @@
+---
+title: "Create a Bill of Materials (BOM)"
+description: "Step-by-step guide to setting up a Bill of Materials product with child components, storage units, and warehouse routes."
+sidebarTitle: "Bill of Materials"
+---
+
+A Bill of Materials (BOM) lists all individual products (child components) needed to create a single parent product. This streamlines your inventory management by grouping related items together.
+
+<Steps>
+<Step title="Create the BOM product">
+From the left-hand menu, click **Products**, then select **+ New**. Fill in the **Code**, **Description**, **Stock Unit Type**, and **Account**. Set the **Product Type** to **Bill of Materials**. Optionally add a **Long Description** and choose **Storage Unit Types**. Click **Save and Edit**.
+</Step>
+<Step title="Complete product details">
+Fill in the sections for **Unit Items** (barcode, weight, value, output quantity, dimensions), **Cases**, **Inner**, and **Outer**. Configure **Flags** (New Product, Stop, Obsolete, Assemble on Pick). Set **Receipt and Pick** options (shelf life, default configurations). Click **Save** after each section.
+</Step>
+<Step title="Build the BOM (Materials section)">
+In the **Materials** section, click **+ New**. Select the child product from the dropdown, enter the **Quantity** needed for the parent product, and click **Save**. Repeat for additional items.
+</Step>
+<Step title="Configure additional sections">
+- **Alternative Codes**: Add different product codes for various users
+- **Product Storage Units**: Add or edit storage units
+- **Warehouse Routes**: Assign routes with account, customer, and warehouse codes
+- **Pickfaces**: Configure locations with min/max triggers if needed
+</Step>
+</Steps>
+
+<Info>
+There is no single "master save" button. You must save each section as you go.
+</Info>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What is a Bill of Materials (BOM)?">
+A BOM is a collection of individual products used to create a parent product.
+</Accordion>
+<Accordion title="How do I add materials to a BOM?">
+In the **Materials** section, click **+ New**, select the product, enter the quantity, and click **Save**.
+</Accordion>
+<Accordion title="Can I edit the materials later?">
+Yes, you can edit or delete items by adjusting the quantity or removing the product.
+</Accordion>
+<Accordion title="What is the 'Assemble on Pick' option?">
+This allows the BOM product to be assembled during the picking process, which is useful when fulfilling orders with individual components.
+</Accordion>
+</AccordionGroup>

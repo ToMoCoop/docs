@@ -1,0 +1,55 @@
+---
+title: "Hoe stuur ik een webhook als de voorraad negatief is aangepast?"
+description: "U kunt automatiseringen instellen in Clarus WMS om een webhook te activeren wanneer de voorraad negatief is aangepast. Dit betekent dat wanneer de voo"
+sidebarTitle: "Hoe stuur ik een webhook als de..."
+---
+
+## Webhooks automatiseren voor negatieve aandelenaanpassingen
+
+U kunt automatiseringen instellen in Clarus WMS om een webhook te activeren wanneer de voorraad negatief is aangepast. Dit betekent dat wanneer de voorraadniveaus onverwacht dalen, een extern systeem automatisch kan worden geïnformeerd, waardoor een snellere actie en beter voorraadbeheer mogelijk is.
+
+## Stapsgewijze handleiding
+
+### 1. Toegang tot de automatiseringsinstellingen
+
+Ga eerst naar de **Automatiseringen** sectie in Clarus WMS.
+
+### 2. Maak een nieuwe automatisering
+
+Klik op de **+Nieuw** Om te beginnen met het maken van een nieuwe automatisering. Kies voor het evenement dat deze automatisering triggert, kies **Negatieve voorraadaanpassing** .
+
+### 3. Webhookgegevens opgeven
+
+Ga naar de **Webhook URL** . Dit is het externe webadres waar de gegevens worden verzonden. Selecteer vervolgens de **Webhook methode** (bijv. **Post** Of **Get** Dat verwacht je externe systeem.
+
+### 4. Begrijp de Webhook Payload
+
+Wanneer de webhook wordt geactiveerd, een **JSON object** Informatie over de negatieve voorraadaanpassing zal worden verzonden. Dit omvat details zoals de product-ID, magazijn en de aangepaste hoeveelheid.
+
+[CALLOUT:WARNING] **Herinnering:** Het JSON-object bevat specifieke details zoals de instel-ID, het tijdstempel, product- en magazijncodes en de aangepaste hoeveelheid. Het bevat ook velden voor aangepaste gegevens (tegers, tekenreeksen, datetijden, boo Orleans) die kunnen worden ingevuld.
+
+### 5. Bewaar de automatisering
+
+Zodra u alle benodigde gegevens heeft ingevoerd, klikt u op **Opslaan** . De automatisering is nu actief en de webhook wordt geactiveerd wanneer er een negatieve voorraadaanpassing optreedt op basis van uw instellingen.
+
+## FAQs
+
+### Wat is een webhook?
+
+Een webhook is een methode om realtime gegevens naar een extern webadres te verzenden wanneer een gebeurtenis plaatsvindt in Clarus WMS.
+
+### Welke gebeurtenis triggert deze webhook?
+
+Deze webhook wordt specifiek geactiveerd wanneer een **Negatieve voorraadaanpassing** vindt plaats.
+
+### Welke gegevens worden naar de webhook verzonden?
+
+Er wordt een JSON-object verzonden, dat details bevat over de negatieve aanpassing. Deze informatie heeft betrekking op de product-ID, het betrokken magazijn, de hoeveelheid van de aanpassing en de reden daarvoor.
+
+### Kan ik de HTTP methode voor de webhook kiezen?
+
+Ja, wanneer u de automatisering instelt, kunt u de **Webhook methode** , zoals **Post** Of **Get** Afhankelijk van wat je externe systeem nodig heeft.
+
+### Hoe test ik of de webhook werkt?
+
+Maak na het instellen van de automatisering een negatieve voorraadaanpassing in Clarus WMS. Controleer vervolgens uw externe systeem om te bevestigen dat de webhookgegevens met succes zijn ontvangen.

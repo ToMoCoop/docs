@@ -1,0 +1,34 @@
+---
+title: "Prerequisites for Shipments"
+description: "Configure storage units, product weights, and carriers before creating shipments in your warehouse."
+sidebarTitle: "Shipment Prerequisites"
+---
+
+## Shipping Setup Guide
+
+Before you can create shipments, you need to configure storage units, product weights, and carriers. Follow these steps to ensure everything is set up correctly.
+
+<Steps>
+  <Step title="Create a storage unit type for packages">
+    Set up a new storage unit type for your packages (e.g., **CARDBOARDBOX01**). Make sure you select the **Leaves Warehouse** option. You can use an existing sequence for the storage unit reference or create a new one.
+
+    You must also input the **height**, **width**, and **length** for this storage unit. These dimensions will be used as the default package size for your shipments.
+  </Step>
+  <Step title="Ensure products have associated weights">
+    Every product must have a weight assigned in the stock unit type you use for picking. This product weight will be used as the default weight for your shipments.
+
+    <Warning>Without weights assigned to products, the system cannot calculate package weights for shipments, which may lead to shipping errors.</Warning>
+  </Step>
+  <Step title="Select and set up the carrier">
+    Add a new carrier or edit an existing one for the courier you plan to use. After selecting a carrier type, enter the authentication details (username and password) for the courier's online portal.
+
+    <Warning>Authentication details must be obtained directly from your courier. They are not provided by the system.</Warning>
+
+    You can use the **Test Carrier Type** option to test the shipping integration before going live. For testing, you can enter any username and password and turn on test mode.
+  </Step>
+  <Step title="Add carrier services">
+    Once your carrier is set up, add one or more carrier services (e.g., **Guaranteed Next Day**). Give each service a descriptive name matching the courier's own naming convention.
+
+    You can use carrier service presets to quickly configure these services. Only adjust advanced settings if you fully understand their impact.
+  </Step>
+</Steps>

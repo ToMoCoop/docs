@@ -1,0 +1,59 @@
+---
+title: "Hoe stuur ik een webhook als de voorraad positief is aangepast?"
+description: "In deze handleiding wordt uitgelegd hoe u automatiseringen instelt in Clarus WMS die een webhook activeren wanneer de voorraad positief is aangepast. "
+sidebarTitle: "Hoe stuur ik een webhook als de..."
+---
+
+## Webhooks automatiseren met voorraadaanpassingen
+
+In deze handleiding wordt uitgelegd hoe u automatiseringen instelt in Clarus WMS die een webhook activeren wanneer de voorraad positief is aangepast. Hiermee kunt u realtime voorraadgegevens naar externe systemen verzenden voor verdere verwerking.
+
+## Stapsgewijze handleiding
+
+### 1. Toegang tot de automatiseringsinstellingen
+
+Ga naar de **Automatiseringen** sectie in Clarus WMS.
+
+### 2. Maak een nieuwe automatisering
+
+Klik **+Nieuw** Om een nieuwe automatisering op te zetten. U moet de exacte regels definiëren voor wanneer deze automatisering zou moeten plaatsvinden.
+
+### 3. Webhookgegevens opgeven
+
+Ga naar de **Webhook URL** waar de gegevens moeten worden verzonden. Kies vervolgens de **Webhook methode** (bijv. **Post** , **Get** Dat moet worden gebruikt wanneer de webhook wordt gebeld.
+
+### 4. Stel de evenementcriteria in
+
+Bepaal wanneer de webhook geactiveerd moet worden. Stel voor deze automatisering de gebeurtenis in op trigger **Wanneer de voorraad positief wordt aangepast** .
+
+### 5. Webhook Payload
+
+Wanneer de webhook wordt geactiveerd, een **JSON object** zal worden verzonden met details van de voorraadaanpassing, inclusief de product-ID, magazijn en de nieuwe hoeveelheid. Een voorbeeld van deze datastructuur is te vinden in het oorspronkelijke artikel.
+
+ **Herinnering:** Het JSON-object bevat belangrijke details over de voorraadaanpassing, zoals 'id', 'gemaakt_at', 'account', 'product', 'warehouse', 'hoeveelheid' en 'new_quantity'.
+
+### 6. Bewaar de automatisering
+
+Zodra u alles hebt ingesteld, klikt u op **Opslaan** Om uw automatisering te activeren.
+
+## FAQs
+
+### Wat is een webhook?
+
+Een webhook is een manier om realtime gegevens naar een ander online adres te sturen wanneer er iets specifieks gebeurt in Clarus WMS.
+
+### Welke gebeurtenis triggert deze webhook?
+
+Deze specifieke webhook wordt geactiveerd wanneer de voorraadniveaus worden verhoogd (positief aangepast).
+
+### Wat voor soort gegevens worden er naar de webhook verzonden?
+
+Er wordt een JSON object verzonden. Het bevat informatie over de positieve voorraadaanpassing, zoals de product-ID, het betrokken magazijn, de aangepaste hoeveelheid en waarom de aanpassing is gemaakt.
+
+### Kan ik kiezen welke HTTP methode ik wil gebruiken voor de webhook?
+
+Ja, in de automatiseringsinstellingen kunt u de **Webhook methode** Bijvoorbeeld, **Post** Of **Get** .
+
+### Hoe kan ik testen of de webhook werkt?
+
+Maak na het instellen van de automatisering een positieve voorraadaanpassing die aan uw criteria voldoet. Controleer vervolgens uw externe systeem om te bevestigen dat het de webhookgegevens heeft ontvangen.

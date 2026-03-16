@@ -1,0 +1,54 @@
+---
+title: "Add a Storage Unit to Loose Stock"
+description: "Learn how to assign a storage unit to loose stock using receipt reversal or the Add Stock feature with this configuration guide."
+sidebarTitle: "Loose Stock Storage Units"
+---
+
+If you have stock in the system without a storage unit reference, there are two ways to assign one: reverting the original receipt, or using the Add Stock feature.
+
+## Option 1: Revert the original receipt
+
+Undo the original booking-in receipt, then add a storage unit to the specific stock line when you re-receive it.
+
+<Warning>
+This method only works if no stock from that receipt has been moved or allocated. If it has, you cannot revert the receipt.
+</Warning>
+
+## Option 2: Use the Add Stock feature
+
+If reverting the receipt is not possible, adjust the stock manually:
+
+<Steps>
+<Step title="Select the stock line">
+In the stock list data grid, tick the box next to the stock line you want to update.
+</Step>
+<Step title="Make a negative adjustment">
+Go to **Stock Controls** and click **Negative Adjustment**. This removes the stock from the system.
+</Step>
+<Step title="Add the stock back">
+Go back to **Stock Controls** in the data grid and click **Add Stock**.
+</Step>
+<Step title="Re-enter stock details with storage unit">
+In the **Add Stock** menu, re-enter all relevant details for the stock line, including:
+
+- Account
+- Product code
+- Location to
+- **Storage unit**
+</Step>
+</Steps>
+
+<Info>
+You must have a reason code set up for both positive and negative adjustments to proceed with manual adjustments.
+</Info>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What happens once the stock is added back?">
+The stock will have a dedicated storage unit reference attached to it.
+</Accordion>
+<Accordion title="Are there any prerequisites for making adjustments?">
+Yes, you must have a reason code set up for both positive and negative adjustments.
+</Accordion>
+</AccordionGroup>

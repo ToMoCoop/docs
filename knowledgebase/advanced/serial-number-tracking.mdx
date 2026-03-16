@@ -1,0 +1,106 @@
+---
+title: "Serial Number Tracking"
+description: "How to enable and use serial number tracking to manage, trace, and control serial numbers across products during goods in and goods out."
+---
+
+## Serial number tracking overview
+
+Serial number tracking lets you manage, trace, and control serial numbers across your products. You can capture serial numbers during goods in (receiving) and goods out (picking/dispatch), giving you full traceability from receipt to shipment.
+
+## Getting started
+
+<Steps>
+  <Step title="Enable serial number tracking on a product">
+    Navigate to **Products** and select **New** to create a product.
+
+    <Frame>
+      <img src="/images/knowledgebase/introducing-serial-number-tracking-1.png" alt="Creating a new product in the Products menu" />
+    </Frame>
+
+    In the setup screen, you will find the **Serial Number Tracking Setting** field. Choose one of three tracking types:
+
+    - **No Tracking** -- Serial numbers are not required at any stage.
+    - **Track During Pick** -- Serial numbers are required only during goods-out processing. Ideal for high-value items like electronics.
+    - **Full Tracking** -- Serial numbers are required at both goods-in and goods-out stages. Ideal when full supplier visibility is needed.
+
+    <Frame>
+      <img src="/images/knowledgebase/introducing-serial-number-tracking-2.png" alt="Serial Number Tracking Setting field with tracking type options" />
+    </Frame>
+  </Step>
+  <Step title="Configure your HHD flow">
+    Serial number capture must be configured within your Handheld Device (HHD) flow before it can be used. Work with your administrator to ensure the serial number input screen is included in your goods in and goods out implementations.
+  </Step>
+</Steps>
+
+<Tip>You can adjust tracking settings anytime on the product screen under the Serial Numbers tab. Note that changes only apply to newly created products, not existing ones.</Tip>
+
+## Full tracking in action
+
+When Full Tracking is enabled, additional fields appear in the view manager during pre-receipt setup: **Serial Number Tracking Type**, **Serial Numbers**, and **Edit Serial Numbers**.
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-3.png" alt="View manager showing serial number tracking fields during pre-receipt setup" />
+</Frame>
+
+At the pre-receipt stage:
+
+- You must enter all expected serial numbers or none at all.
+- If all are entered, they cannot be changed after the pre-receipt is received.
+- If none are entered, serial numbers must be captured at the receipt stage. Entering more or fewer than expected will adjust the confirmed quantity accordingly.
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-4.png" alt="Pre-receipt serial number entry screen" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-5.png" alt="Editing serial numbers on receipt lines" />
+</Frame>
+
+## Managing serial numbers
+
+Once stock is received and stored, you can:
+
+- View all serial numbers and their tracking types under the **Stock List** menu.
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-6.png" alt="Stock List view showing serial numbers and tracking types" />
+</Frame>
+
+- Open a stock line to see a dedicated **Serial Numbers** tab.
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-7.png" alt="Serial Numbers tab on a stock line" />
+</Frame>
+
+- Filter the **Transactions** menu using the "Transactions with Serial Numbers" view.
+
+## Track during pick
+
+For products set to **Track During Pick**, goods-in works as usual with no serial number capture. Serial numbers are required only when completing a pick task.
+
+## HHD compatibility
+
+Serial Number Tracking is currently supported in two HHD workflows:
+
+- **Pre-Receipt Receive**
+- **Pick Tasks by Pick List**
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-8.png" alt="Serial number capture on HHD during pre-receipt receive" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-9.png" alt="Serial number capture on HHD during pick task" />
+</Frame>
+
+<Info>Serial number tracking provides end-to-end traceability, which is essential for recalls, warranty claims, and regulatory compliance.</Info>
+
+<Accordion title="What's not covered yet?">
+  The following processes currently do not support serial number tracking:
+
+  - Account transfers
+  - Warehouse transfers
+  - Adjustments
+  - Batch pick
+  - Tote picking
+</Accordion>

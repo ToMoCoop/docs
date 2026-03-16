@@ -1,0 +1,40 @@
+---
+title: "Fout 'Different opslageenheid moet worden geselecteerd op Part Pick'"
+description: "In dit artikel wordt uitgelegd waarom u de fout 'Different opslageenheid moet worden geselecteerd op Part Pick' kunt zien bij het voltooien van picktaken in Clarus WMS."
+sidebarTitle: "Opslageenheid part pick"
+---
+
+In dit artikel wordt uitgelegd waarom u de fout 'Different opslageenheid moet worden geselecteerd op Part Pick' kunt zien bij het voltooien van picktaken in Clarus WMS en biedt twee duidelijke oplossingen.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Voorraad opnieuw toewijzen van een andere opslageenheid">
+    Om het probleem op te lossen door voorraad opnieuw toe te wijzen:
+
+    - Eerst, **Annuleer de huidige picklijst** terug naar de verkooporder.
+    - Indien mogelijk, **Wijs de voorraadlijn opnieuw toewijzen** een andere opslagruimte.
+    - Met deze methode kunt u **Consolidatie van meerdere voorraadlijnen** naar dezelfde 'opslagunit naar' zonder de fout te activeren.
+
+    <Warning>Deze oplossing is ideaal als u alternatieve opslagunits beschikbaar heeft voor de voorraad.</Warning>
+  </Step>
+  <Step title="Gebruik een aparte opslagunit voor elke voorraadlijn">
+    Het probleem oplossen met behulp van afzonderlijke opslagunits:
+
+    - U moet **Een andere 'opslagunit toewijzen aan'** voor elke voorraadlijn die uit dezelfde pallet wordt geplukt.
+    - Dit zorgt ervoor dat het systeem elk onderdeel kiest als afkomstig van een unieke opslagunit, waardoor het proces soepel verloopt.
+
+    <Warning>Deze methode vereist dat u meerdere bestemmingsopslagunits gebruikt, wat misschien niet altijd praktisch is.</Warning>
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Waarom treedt de fout 'Different Storage Unit moet worden geselecteerd op Part Pick' op?">
+Deze fout treedt meestal op wanneer u twee of meer voorraadlijnen van dezelfde opslagunit plukt en probeert ze in dezelfde bestemming 'opslagunit naar'. Zelfs als de artikelen verschillende producten of volledige keuzes zijn, identificeert Clarus WMS dit als een 'part pick', wat de fout veroorzaakt.
+</Accordion>
+<Accordion title="Wat is een 'part pick' in Clarus WMS?">
+In Clarus WMS verwijst een 'part pick' naar de identificatie van het systeem wanneer meerdere voorraadlijnen uit dezelfde opslagunit worden gekozen, zelfs als ze voor verschillende producten zijn of volledige keuzes zijn, wat de fout veroorzaakt.
+</Accordion>
+</AccordionGroup>

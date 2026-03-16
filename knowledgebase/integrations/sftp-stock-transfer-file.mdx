@@ -1,0 +1,38 @@
+---
+title: "SFTP File Creation on Stock Transfer"
+description: "How to set up an automation that creates and uploads a file to SFTP whenever stock is transferred between accounts."
+sidebarTitle: "SFTP Stock Transfer File"
+---
+
+## Overview
+
+You can set up automations to automatically create and upload files to an SFTP account whenever stock is transferred between accounts. The files are generated dynamically with the relevant event data.
+
+<Steps>
+  <Step title="Create your automation">
+    Go to the **Automations** section and create a new automation.
+  </Step>
+  <Step title="Define the trigger">
+    Set the trigger event to **Stock is Transferred To Account**. Choose specific conditions such as transfers from a certain account, to a certain account, or within a specific warehouse.
+  </Step>
+  <Step title="Specify the action">
+    Select **Create a File and Upload to FTP** and configure:
+
+    - **File Name** -- name for the generated file
+    - **FTP User** -- the FTP account where the file will be uploaded
+    - **Document Category** -- e.g., dispatch
+    - **Mapping Group ID** -- optional, for file mappings from a specific group
+  </Step>
+  <Step title="Upload a template file">
+    Upload the template that will be used when stock is transferred. Templates can be in **CSV** or **TXT** format.
+  </Step>
+</Steps>
+
+## Dynamic data objects
+
+You can include dynamic data in your template using placeholders. The key objects available are:
+
+- **transaction_source** -- transactional data from the source account
+- **transaction_target** -- transactional data from the target account
+
+<Info>Both objects include fields such as `id`, `created_at`, `account`, `product`, `warehouse`, `quantity`, and `new_quantity`.</Info>

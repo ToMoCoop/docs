@@ -1,0 +1,51 @@
+---
+title: "Setting Dispatch Strategies for Accounts"
+description: "How to configure dispatch strategies per account, including auto dispatch, loading, manual dispatch, and shipment options."
+sidebarTitle: "Dispatch Strategies"
+---
+
+## Overview
+
+Each account can have its own dispatch strategy, controlling how orders are dispatched after picking is complete. You can also configure separate strategies for standard and tote dispatches.
+
+<Steps>
+  <Step title="Open the account">
+    From the **Accounts** screen, open the account you want to update.
+  </Step>
+  <Step title="Locate the Dispatch tab">
+    Use **CTRL + F** to search for "Dispatch" or scroll down to find the **Dispatch** tab.
+  </Step>
+  <Step title="Choose a dispatch strategy">
+    Select from the following options for both **Standard Dispatch Strategy** and **Tote Dispatch Strategy**:
+  </Step>
+</Steps>
+
+## Available strategies
+
+### Auto Dispatch on Completion of All Pick Tasks
+Automatically dispatches the order as soon as all picking tasks are finished. No manual action is needed.
+
+### Loading
+Groups stock into a load. Once the load is complete, it can be closed and dispatched. Useful for bulk handling.
+
+### Manual Dispatch
+Creates a dispatch task for every completed picking task. Each task must be dispatched manually.
+
+### Shipment
+Similar to Loading, but assigns stock to a shipment before dispatching. Ideal for combining several orders.
+
+## Additional options
+
+- **Dispatch by Output Quantity** -- prioritises dispatch based on item count, sending larger quantities first
+- **Footer Notes** -- add custom notes to generated dispatch notes
+
+<Warning>Tailoring dispatch strategies can significantly streamline the dispatch process for each account.</Warning>
+
+<AccordionGroup>
+  <Accordion title="What is the difference between Loading and Shipment?">
+    Both group stock together. **Loading** groups into a "load" for bulk handling, while **Shipment** assigns stock to a "shipment" that is ideal for consolidating multiple orders.
+  </Accordion>
+  <Accordion title="Can I add custom notes to dispatch notes?">
+    Yes. Use the **Footer Notes** field to add custom text to any generated dispatch note.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,46 @@
+---
+title: "Re-using Dispatched Storage Units"
+description: "Understand how dispatched storage units work and how to reuse references after dispatch."
+sidebarTitle: "Dispatched Storage Units"
+---
+
+When a storage unit type is configured with **Leaves Warehouse?** set to **Yes**, the storage unit transitions to a "Dispatched" status upon departure from the warehouse. This helps track assets leaving your facility.
+
+<Frame>
+  <img src="/images/knowledgebase/reusing-storage-units-dispatched-1.png" alt="Storage unit type configuration showing Leaves Warehouse toggle" />
+</Frame>
+
+## What happens when a storage unit is dispatched?
+
+- It moves to the **Dispatched** section on the Storage Units screen
+- The specific record is retired and **cannot be reused** (however, the reference name can be reused by creating a new storage unit with the same reference)
+
+## How to verify a unit's status
+
+<Steps>
+<Step title="Navigate to storage units">
+Go to **Settings > Storage Units**.
+</Step>
+<Step title="Search for the reference">
+Search for your **Storage Unit Reference**.
+</Step>
+<Step title="Check the view">
+If it appears in the default view, it is still active. If it does not appear, scroll to the **In Warehouse** filter at the bottom and change it to **Dispatched**.
+
+<Frame>
+  <img src="/images/knowledgebase/reusing-storage-units-dispatched-2.png" alt="Dispatched filter on the Storage Units screen" />
+</Frame>
+</Step>
+<Step title="Confirm the status">
+If the unit appears under the Dispatched filter, it is officially locked and out of circulation.
+</Step>
+</Steps>
+
+## Workarounds for reusing references
+
+If you need to continue using a dispatched reference, you have two options:
+
+| Option | Action | Impact |
+|--------|--------|--------|
+| **Manual Reuse** | Create a **new** storage unit using the same reference name | Keeps your naming convention while maintaining a clean history for the old unit |
+| **Configuration Change** | Set the "Leaves Warehouse?" toggle to **No** for that unit type | Prevents units from entering Dispatched status, but **may disrupt** shipments or external crossdock workflows |

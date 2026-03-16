@@ -1,0 +1,59 @@
+---
+title: "Wat wordt omgezet door outputhoeveelheid en hoe werkt het?"
+description: "Deze instelling in Clarus WMS bepaalt hoe conversietaken worden gegenereerd wanneer u werkorders verwerkt voor producten die zijn gemaakt van een Bill"
+sidebarTitle: "Wat wordt omgezet door..."
+---
+
+## Hoe conversietaken te beheren met Output Quantity Setting
+
+Deze instelling in Clarus WMS bepaalt hoe conversietaken worden gegenereerd wanneer u werkorders verwerkt voor producten die zijn gemaakt van een Bill of Materials (BOM).
+
+## Stapsgewijze handleiding
+
+### 1. Inzicht in de 'Convert By Output Quantity' Setting
+
+U kunt deze instelling vinden in het gedeelte Conversie van uw account en draaien **Op** Of **Off** . Wanneer gedraaid **Off** Het systeem creëert **Eén conversietaak per pick-taak** . Wanneer gedraaid **Op** (wat wordt aanbevolen), creëert het systeem **Eén conversietaak voor elk kindproduct** Voor elke BOM conversie, waardoor meer gedetailleerde tracking mogelijk is.
+
+### 2. Hoe de instelling conversietaken beïnvloedt
+
+De instelling wijzigt het aantal conversietaken dat tijdens een werkvolgorde is gemaakt.
+Voorbeeld scenario #1
+Stel je voor dat je 10 Xbox-eenheden en 10 Cyberpunk 2077 games op voorraad hebt. Uw BOM-product is een "Xbox en Cyberpunk 2077 Bundle", die een van elk artikel nodig heeft, met een uitvoerhoeveelheid van één. Je maakt een werkorder voor 10 van deze bundels, wat resulteert in 2 pick taken.
+
+Wanneer 'Convert By Output Quantity' wordt gedraaid **Off** Het systeem creëert **1 conversietaak voor Xbox** en **1 conversietaak voor Cyberpunk 2077** . Dit komt overeen met de 2 pick taken.
+
+Wanneer 'Convert By Output Quantity' wordt gedraaid **Op** Het systeem creëert **10 conversietaken voor Xbox** en **10 conversietaken voor Cyberpunk 2077** . Elke taak vertegenwoordigt de conversie van één eenheid, die overeenkomt met het totale aantal taken.
+Voorbeeld scenario #2
+Stel dat je 10 draadunits en 10 Tin Cans op voorraad hebt. Uw BOM-product is een "Tin Can Telephone"," waarvoor 1 draad en 2 Tin Cans vereist is, met een uitvoerhoeveelheid van één. U maakt een werkorder voor 10 Tin Can Telephones, wat leidt tot 3 picktaken.
+
+Wanneer 'Convert By Output Quantity' wordt gedraaid **Off** Het systeem creëert **1 conversietaak voor draad** en **2 conversietaken voor Tin Can** . Dit komt overeen met de 3 pick taken.
+
+Wanneer 'Convert By Output Quantity' wordt gedraaid **Op** Het systeem creëert **10 conversietaken voor Wire** (elk met een hoeveelheid van 1) en **10 conversietaken voor Tin Can** (Elk met een hoeveelheid van 2). Dit geeft een gedetailleerde registratie van elke conversietaak.
+
+### 3. Samenvatting van de instellingen
+
+Wanneer de setting is **Off** Het vereenvoudigt tracking door het creëren van **1 taak per pick taak** . Dit is ideaal voor bulkconversies wanneer u geen gedetailleerde tracking van elk afzonderlijk kindproduct nodig hebt.
+
+Wanneer de setting is **Op** (aanbevolen), het creëert **1 taak per kind product per baan** . Dit wordt aanbevolen voor gedetailleerde voorraadtracking en volledige controleerbaarheid van elke conversie.
+
+## FAQs
+
+### Wat is de aanbevolen instelling voor 'Converteren op uitvoerhoeveelheid'?
+
+De aanbevolen instelling is **Op** voor maximale controleerbaarheid, omdat het elke kinderproductconversie in detail volgt.
+
+### Kan ik schakelen tussen de twee instellingen?
+
+Ja, u kunt de instelling schakelen **Op** Of **Off** Afhankelijk van hoeveel details je nodig hebt voor het bijhouden van conversies.
+
+### Wanneer moet ik de instelling uitgeschakeld gebruiken?
+
+Gebruik dit bij het converteren van bulkproducten zonder dat u de omzetting van elk afzonderlijk materiaal in een ouderproduct hoeft te volgen.
+
+### Heeft de instelling invloed op picktaken?
+
+Nee, het heeft alleen invloed op het aantal conversietaken dat is gemaakt, niet op de picktaken zelf.
+
+### Hoe beïnvloedt dit het bijhouden van voorraadtracking?
+
+Wanneer de setting is **Op** Elke conversietaak registreert gedetailleerd voorraadgebruik, zodat u nauwkeurige voorraadniveaus voor kinderproducten kunt behouden.

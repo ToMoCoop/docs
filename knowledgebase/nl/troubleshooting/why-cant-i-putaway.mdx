@@ -1,0 +1,45 @@
+---
+title: "Waarom kan ik niet wegdoen?"
+description: "In deze handleiding worden veelvoorkomende redenen uitgelegd waarom u problemen hebt met stopaway en hoe u deze kunt oplossen in Clarus WMS."
+sidebarTitle: "Putaway problemen"
+---
+
+In deze handleiding worden veelvoorkomende redenen uitgelegd waarom u problemen hebt met stopaway en hoe u deze kunt oplossen, zodat uw voorraad soepel naar de juiste locaties wordt verplaatst in Clarus WMS.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Bekijk de locatie-instellingen voor Putaway">
+    Een veel voorkomend probleem is dat de bestemmingslocatie niet is ingesteld om putaway toe te staan. Volg deze stappen om dit te controleren en te corrigeren:
+
+    Ga naar de **'Goed in'** scherm en kijk naar de **'Locatie naar'** veld.
+
+    Klik op de locatie in het dataster of zoek naar de locatiecode in de **'Locaties'** tabblad.
+
+    Zodra de locatie-instellingen zijn geopend, scrolt u omlaag naar de **'Opties'** sectie.
+
+    Controleer of **'Sta putaway?'** het is ingesteld op **Ja**.
+
+    Als het is ingesteld op **Nee**, het systeem staat niet toe dat plaatsvervanging op die locatie. Om dit op te lossen, wijzigt u de instelling in **Ja**.
+  </Step>
+  <Step title="Problemen oplossen met voorgestelde paletten op handheld apparaten">
+    Een ander veel voorkomend probleem treedt op bij het gebruik van **'Putaway door ontvangstreferentie'** op handheld apparaten. Wanneer u dit kiest, stelt het systeem een specifieke pallet voor om eerst te scannen en de stopawaytaak van die pallet toegewezen aan de gebruiker die de optie heeft geselecteerd. Als een andere gebruiker probeert te scannen en op te bergen, worden deze geblokkeerd.
+
+    #### Hoe dit op te lossen:
+
+    Laat de oorspronkelijke gebruiker de stopplaats voor die pallet voltooien, **of**
+
+    In plaats van te gebruiken **'Putaway by Receipt Reference'**, kies **'Putaway van Storage Unit'**. Met deze methode kan elke gebruiker elke pallet scannen en opbergen met een actieve taak, waardoor taaktoewijzingsproblemen worden voorkomen.
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Waarom kan ik de voorraad niet op een specifieke locatie plaatsen?">
+De meest voorkomende reden is dat de **'Sta putaway?'** instelling voor die locatie is ingesteld op **Nee**. Je moet dit veranderen om **Ja** in de locatie-instellingen.
+</Accordion>
+<Accordion title="Wat als een andere gebruiker probeert een voorgestelde pallet op een handheld apparaat te plaatsen?">
+Als een pallet werd voorgesteld aan een gebruiker via **'Putaway by Receipt Reference'**, zijn taak wordt aan hen toegewezen. Een andere gebruiker wordt geblokkeerd voor het voltooien van deze taak. De oorspronkelijke gebruiker moet deze invullen, of u moet de **'Putaway van Storage Unit'** optie in plaats daarvan.
+</Accordion>
+</AccordionGroup>

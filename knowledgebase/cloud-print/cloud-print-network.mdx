@@ -1,0 +1,63 @@
+---
+title: "Cloud Print Network Configuration"
+description: "Network requirements including domain names, IP ranges, and ports needed for Cloud Print to connect to its servers."
+sidebarTitle: "Network Configuration"
+---
+
+## Network configuration for Cloud Print
+
+Your network must allow the Cloud Print client to reach its servers. This page covers the domain names, IP address ranges, and ports you need to allow.
+
+## Required domain names
+
+Your Cloud Print client needs to resolve the following addresses:
+
+- `api.printnode.com`
+- `app.printnode.com`
+- `host2b.printnode.com`
+- `client.printnode.com`
+- `lon1.printnode.com`
+- `central.printnode.com`
+- `rdga3b.printnode.com`
+- `byfa3b.printnode.com`
+
+<Warning>While the IP address ranges for these domains are fixed, the specific IP address a domain points to can change at any time.</Warning>
+
+## IP address ranges
+
+The domains listed above can resolve to an IP address within any of these ranges:
+
+| CIDR block | Range |
+|---|---|
+| `5.10.27.32/28` | 5.10.27.33 -- 5.10.27.46 |
+| `5.10.23.32/27` | 5.10.23.33 -- 5.10.23.62 |
+| `94.228.44.128/28` | 94.228.44.129 -- 94.228.44.142 |
+
+## Required ports
+
+The Cloud Print client sends data outbound on ports **443** and **6123**. Ensure these ports are open for outbound connections.
+
+## Testing your connection
+
+To verify connectivity, open a web browser on the machine running Cloud Print and navigate to your portal.
+
+<Warning>If the page does not load, there is a connection problem between your computer and the Cloud Print servers.</Warning>
+
+## Troubleshooting connection issues
+
+If the connection test fails, you can trace the network route:
+
+- **Windows:** Open Command Prompt and run `tracert api.printnode.com`
+- **macOS / Linux:** Open Terminal and run `traceroute api.printnode.com`
+
+If your browser can reach the portal but the Cloud Print client still cannot connect, contact the support team.
+
+<Accordion title="FAQ">
+  **What are ports?**
+
+  Ports are virtual endpoints for network connections. They help your computer route incoming and outgoing data to the correct program or service.
+
+  **What is tracert / traceroute used for?**
+
+  These commands trace the path data takes from your computer to a destination on the internet, helping you identify where a connection problem occurs.
+</Accordion>

@@ -1,0 +1,40 @@
+---
+title: "Client Role"
+description: "How to set up the Client role to give your clients limited, account-specific access to goods in, sales orders, reports, and stock."
+---
+
+## Overview
+
+The Client role provides limited access tailored for external clients. Clients can view and manage **Goods In**, **Sales Orders**, **Reports**, **Stock**, and their own **Transactions** -- but only within their assigned warehouse and account.
+
+## Setting up a client user
+
+<Steps>
+  <Step title="Limit warehouse access">
+    When setting up a client, untick **View all warehouses**. This prevents the client from seeing every warehouse in the system.
+  </Step>
+  <Step title="Assign the correct warehouse">
+    After unticking the option, a selection screen appears. Choose the warehouse that is appropriate for this client.
+  </Step>
+</Steps>
+
+<Warning>Clients can only access the warehouses you assign to them during setup. They cannot browse other warehouses.</Warning>
+
+## Client permissions summary
+
+| Area | Access |
+|------|--------|
+| Goods In | View and manage |
+| Sales Orders | View and manage |
+| Reports | View and manage |
+| Stock | View, hold, and release from hold |
+| Transactions | View only |
+
+<AccordionGroup>
+  <Accordion title="Can a client run and manage reports?">
+    Yes, clients can view and manage reports within the permissions granted to them.
+  </Accordion>
+  <Accordion title="Can a client look at stock in more than one warehouse?">
+    Only if you assign multiple warehouses to them during setup.
+  </Accordion>
+</AccordionGroup>

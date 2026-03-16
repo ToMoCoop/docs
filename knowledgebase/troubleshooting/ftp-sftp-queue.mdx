@@ -1,0 +1,52 @@
+---
+title: "Checking the FTP/SFTP Queue"
+description: "Diagnose and resolve FTP/SFTP queue issues and stuck imports with this step-by-step troubleshooting guide."
+sidebarTitle: "FTP/SFTP Queue"
+---
+
+This guide explains how to check the FTP and SFTP queues to ensure your import files are processing correctly, especially when dealing with large datasets or potential import failures.
+
+## Diagnostic steps
+
+<Steps>
+<Step title="Check event logs">
+If an import is failing, first check the **Event Logs** menu on the frontend. This will show whether the import was successful or failed.
+</Step>
+<Step title="Check the queue using Sidekiq">
+If there are no event logs or the file appears stuck, check the queue using Sidekiq. Upon logging in, look for the **Enqueued** section to see the status of your imports.
+</Step>
+<Step title="Understand the Default (old FTP) queue">
+The "Default" queue represents the old FTP system. It usually shows around 7 files enqueued.
+</Step>
+<Step title="Understand the SFTP (new) queue">
+The "SFTP" queue is for the new SFTP system and shows the number of files currently being uploaded.
+</Step>
+<Step title="Identify potential issues">
+If the number of enqueued files is much higher than the usual 7, or if it is continuously increasing, there is likely an issue.
+</Step>
+</Steps>
+
+<Warning>
+For the old FTP queue, a stuck queue usually means a reset by a developer is needed.
+</Warning>
+
+<Info>
+The new SFTP queue generally should not get stuck. High numbers usually mean larger imports are taking longer to process -- waiting often resolves the issue.
+</Info>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What should I do if an import file gets stuck?">
+First, check the Event Logs menu. If no logs are available, check the queue using Sidekiq.
+</Accordion>
+<Accordion title="What is the usual number of files in the Default (old FTP) queue?">
+The Default queue usually has 7 files enqueued.
+</Accordion>
+<Accordion title="What does a high number in the SFTP queue indicate?">
+A high number usually means larger imports are taking a while to upload. Waiting generally allows them to go through.
+</Accordion>
+<Accordion title="Who can reset the old FTP queue if it's stuck?">
+The old FTP queue usually needs to be reset by one of the developers.
+</Accordion>
+</AccordionGroup>

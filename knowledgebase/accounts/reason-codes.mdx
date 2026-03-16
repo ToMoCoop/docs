@@ -1,0 +1,61 @@
+---
+title: "Account Reason Codes"
+description: "How to create, configure, and assign reason codes to accounts for tracking stock adjustments, holds, releases, and transfers."
+sidebarTitle: "Account Reason Codes"
+---
+
+## Overview
+
+Reason codes are essential for tracking stock adjustments and order line processes. There are six types, and you can assign them globally or to specific accounts.
+
+## Reason code types
+
+| Type | Purpose |
+|------|---------|
+| **Negative Adjustment** | Negatively adjust existing stock |
+| **Positive Adjustment** | Positively adjust stock (enables "Add Stock") |
+| **Hold** | Place available stock into hold status |
+| **Release** | Release stock from hold status |
+| **Short Order Lines** | Short a sales order when stock is insufficient |
+| **Account Transfer** | Transfer stock between accounts |
+
+## Creating reason codes
+
+<Steps>
+  <Step title="Navigate to Reason Codes settings">
+    Scroll down to the **Settings** tab and select **Reason Codes**. Click **New** to create a new code.
+  </Step>
+  <Step title="Input reason code information">
+    Provide the following:
+    - **Code** -- a unique identifier
+    - **Name** -- a descriptive title
+    - **Description** -- additional detail about the code's purpose
+    - **Reason Type** -- one of the six types above
+  </Step>
+  <Step title="Activate and configure">
+    Mark the code as **Active** or **Inactive**. Enable **Generic for All Accounts** to use it across all accounts, or leave it unchecked to assign it manually.
+  </Step>
+</Steps>
+
+## Assigning reason codes to accounts
+
+<Steps>
+  <Step title="Navigate to Accounts">
+    Go to the **Accounts** screen under the **Settings** tab.
+  </Step>
+  <Step title="Select the account">
+    Choose the account you want to configure.
+  </Step>
+  <Step title="Assign reason codes">
+    Scroll to the **Assigned Reason Codes** tab. Select and assign the relevant codes from the list.
+  </Step>
+</Steps>
+
+<AccordionGroup>
+  <Accordion title="Can a reason code be used for all accounts?">
+    Yes. Enable the **Generic for All Accounts** option when creating the code. Otherwise, assign it manually to specific accounts.
+  </Accordion>
+  <Accordion title="How many types of reason codes are there?">
+    Six: Negative Adjustment, Positive Adjustment, Hold, Release, Short Order Lines, and Account Transfer.
+  </Accordion>
+</AccordionGroup>

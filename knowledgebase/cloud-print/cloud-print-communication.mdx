@@ -1,0 +1,29 @@
+---
+title: "How Cloud Print Communicates with Printers"
+description: "How the Cloud Print client connects to and communicates with your locally installed printers."
+sidebarTitle: "Printer Communication"
+---
+
+## How Cloud Print communicates with your printers
+
+The Cloud Print client communicates directly with printers that are already installed on the same computer. It does not require printers to be network-shared or configured separately.
+
+## Requirements
+
+The Cloud Print client must be installed on a computer where the printers you want to use are already set up locally. The printers should appear in your operating system's **Printers & Scanners** settings.
+
+## How it works
+
+Once installed, the Cloud Print client communicates directly with your printers through your operating system. On Windows, for example, the client uses the Windows API to talk to the **Print Spooler** service.
+
+<Info>Any printer visible in your computer's **Printers & Scanners** settings will be available to Cloud Print once the client is installed on that machine.</Info>
+
+<Accordion title="FAQ">
+  **What does "locally installed" mean for printers?**
+
+  It means the printers are set up and recognised by the computer where the Cloud Print client is installed. You should be able to see them listed in your **Printers & Scanners** settings.
+
+  **How does the client communicate with printers on Windows?**
+
+  On Windows, the Cloud Print client communicates directly with the Print Spooler Windows Service using the Windows API.
+</Accordion>

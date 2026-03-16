@@ -1,0 +1,57 @@
+---
+title: "Create Sequences"
+description: "Learn how to create sequences for consistent naming of storage units, pick merges, and product codes with this configuration guide."
+---
+
+Sequences provide consistent naming conventions for storage units, consolidated pick merges, and product codes. Setting them up correctly keeps your operations organised and easy to track.
+
+<Steps>
+<Step title="Navigate to sequence settings">
+From the left-hand menu, go to **Settings** and select **Sequences**.
+</Step>
+<Step title="Create a new sequence">
+Click **New** to begin.
+</Step>
+<Step title="Fill in the required fields">
+You will see five fields:
+
+- **Code**: A unique identifier for the sequence (e.g., "STD" for a standard pallet sequence)
+- **Name**: A descriptive name (e.g., "Standard Pallet Sequence")
+- **Prefix**: Text that appears at the start of each generated name (e.g., "PAL" produces "PAL001")
+- **Next Number**: The starting number for the sequence (e.g., "001")
+- **Description** (optional): Additional notes about the sequence
+</Step>
+</Steps>
+
+### Example: Standard pallet sequence
+
+| Field | Value |
+|-------|-------|
+| Code | STD |
+| Name | Standard Pallet Sequence |
+| Prefix | PAL |
+| Next Number | 001 |
+
+The first new pallet will be named "PAL001", then "PAL002", and so on. The sequence only increments if a specific reference is not provided for the storage unit.
+
+<Info>
+Pay close attention to each field, as they define the unique identifier, descriptive name, starting characters, and initial number for your sequence.
+</Info>
+
+<Warning>
+Always double-check all fields before saving to prevent mistakes or duplicate entries.
+</Warning>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What is the purpose of sequences?">
+Sequences ensure consistent naming conventions for managing storage units, organising product codes, and handling pick merges.
+</Accordion>
+<Accordion title="What should I consider when choosing a prefix?">
+Choose a prefix that matches your organisation's existing naming rules to maintain consistency across all naming structures.
+</Accordion>
+<Accordion title="Can I change the starting number of a sequence?">
+Yes, you can define the starting point by entering a logical number in the Next Number field.
+</Accordion>
+</AccordionGroup>

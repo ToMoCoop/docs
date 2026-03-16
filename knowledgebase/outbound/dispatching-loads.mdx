@@ -1,0 +1,86 @@
+---
+title: "Creating and Dispatching Loads"
+description: "Configure, create, and dispatch loads including linking sales orders, managing load drops, and assigning pallets."
+sidebarTitle: "Dispatching Loads"
+---
+
+## Creating and Dispatching Loads
+
+This guide walks you through the full process of creating and dispatching loads, from pre-configuration to final dispatch.
+
+## Phase 1: Pre-Configuration
+
+Before creating your first load, ensure the following elements are configured in **Settings**:
+
+- **Warehouses**: Select a default **Goods Out** and **Goods In** Bay.
+- **Vehicles**: Create a **Trailer** and its corresponding **Trailer Type**.
+- **Carriers**: Ensure a carrier profile is active.
+- **Locations**: You must have at least one location designated with the **"Bay"** location type.
+- **Addresses**: Ensure you have the necessary **Delivery Addresses** saved.
+
+---
+
+## Phase 2: Creating the Load
+
+<Steps>
+  <Step title="Create a new load">
+    Navigate to **Goods Out** > **Loads** > **New**.
+  </Step>
+  <Step title="Fill in load details">
+    Enter the Carrier, Trailer/Trailer Type, Warehouse, and Bay.
+
+    **Optional settings:**
+    - Toggle **Enforce Matching Load Drops** to restrict loading to matching addresses or order references.
+    - Select a **Trunking Warehouse** for inter-warehouse transfers.
+  </Step>
+  <Step title="Save the load">
+    Click **Save & Edit**.
+  </Step>
+</Steps>
+
+---
+
+## Phase 3: Linking Sales Orders
+
+To add items to your load, they must be flagged correctly:
+
+<Steps>
+  <Step title="Create a sales order">
+    Set the **Dispatch Strategy** to **"Load"**.
+
+    <Tip>You can set "Load" as the default strategy in your account settings to skip this step in the future.</Tip>
+  </Step>
+  <Step title="Process the order">
+    Generate the pick list and complete all pick tasks.
+  </Step>
+  <Step title="Attach to load">
+    Return to your load and ensure the status is set to **"Open"** (click **Open Load** in the top right if needed).
+  </Step>
+  <Step title="Add the order">
+    Under the **Add Sales Order** tab, search for your reference and click **Add**.
+  </Step>
+  <Step title="Add the address">
+    Use the **Add Delivery Address** tab to link the destination.
+  </Step>
+</Steps>
+
+---
+
+## Phase 4: Finalising and Dispatch
+
+Both the sales order and address will now appear under **Load Drops**.
+
+<Steps>
+  <Step title="Assign pallets">
+    On the sales order load drop, click **Open** > **Manage Tasks**.
+  </Step>
+  <Step title="Complete tasks">
+    Select your pallets and choose **Assign** (to link them) or **Assign and Complete** (to link and finalise immediately).
+  </Step>
+  <Step title="Close drops">
+    Once tasks are finished, close the load drop for the sales order, then open and close the load drop for the delivery address.
+  </Step>
+  <Step title="Dispatch">
+    Click **Close Load** in the top right. Once closed, click **Dispatch** to finalise the process.
+  </Step>
+</Steps>

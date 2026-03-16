@@ -1,0 +1,73 @@
+---
+title: "Welke netwerkconfiguratie heeft deCloud Print Client nodig om verbinding te kunnen maken?"
+description: "In deze handleiding wordt uitgelegd hoe u uw netwerkinstellingen configureert om ervoor te zorgen dat de Clarus WMS Cloud Print Client verbinding kan "
+sidebarTitle: "Welke netwerkconfiguratie heeft..."
+---
+
+## Clarus WMS Cloud Print Client aansluiten
+
+In deze handleiding wordt uitgelegd hoe u uw netwerkinstellingen configureert om ervoor te zorgen dat de Clarus WMS Cloud Print Client verbinding kan maken met onze servers, met essentiële domeinnamen, IP-adressen en poortconfiguraties.
+
+## Stapsgewijze handleiding
+
+### 1. Zorg ervoor dat domeinnamen kunnen worden opgelost
+
+Uw Clarus WMS Cloud Print Client moet de volgende webadressen kunnen vinden:
+
+- Api.printnode.com
+- App.printnode.com
+- host2b.printnode.com
+- Klant.printnode.com
+- lon1.printnode.com
+- Centraal.printnode.com
+- rdga3b.printnode.com
+- byfa3b.printnode.com
+
+[CALLOUT:WARNING] **Herinnering:** Hoewel het IP-adresbereik voor deze domeinnamen vast zijn vastgesteld, kan het specifieke IP-adres waarnaar een domeinnaam wijst wijzigen.
+
+### 2. IP-adresbereiken begrijpen
+
+De hierboven vermelde domeinnamen kunnen worden opgelost tot een IP-adres binnen een van deze reeksen:
+
+- 5.10.27.32/28 (dat is 5.10.27.33 tot 5.10.27.46)
+- 5.10.23.32/27 (dat is 5.10.23.33 tot 5.10.23.62)
+- 94.228.44.128/28 (wat 94.228.44.129 tot 94.228.44.142)
+
+### 3. Bevestig de poortconfiguratie
+
+De Clarus WMS Cloud Print Client stuurt informatie naar buiten via poorten **443** en **6123** . Zorg ervoor dat deze poorten openstaan voor uitgaande verbindingen.
+
+### 4. Test uw verbinding
+
+Om te controleren of uw computer onze servers kan bereiken, opent u een webbrowser en gaat u naar uw portal.
+
+[CALLOUT:WARNING] **Waarschuwing:** Als deze pagina niet wordt geladen, is er een verbindingsprobleem tussen uw computer en onze servers.
+
+### 5. Problemen met verbindingsproblemen oplossen (indien nodig)
+
+Als de verbindingstest mislukt, kunt u meer technische informatie krijgen over de verbindingsroute:
+
+-  **Voor Windows:** Open de opdrachtprompt en typ:Tracert api.printnode.com
+-  **Voor macOS / OS X, Linux:** Open de terminal en typ:Traceroute api.printnode.com
+
+### 6. Contact Ondersteuning
+
+Als u het portaal in uw browser succesvol kunt bereiken, maar de Clarus WMS Cloud Print Client nog steeds geen verbinding kan maken, neem dan contact op met ons ondersteuningsteam.
+
+## FAQs
+
+### Wat zijn domeinnamen?
+
+Domeinnamen zijn de mensvriendelijke webadressen zoals 'google.com' die mensen gebruiken om websites en diensten online te vinden. Ze worden vertaald in numerieke IP-adressen door een systeem genaamd DNS.
+
+### Wat zijn IP-adressen?
+
+Een IP-adres is een uniek numeriek label dat is toegewezen aan elk apparaat dat is aangesloten op een computernetwerk dat het internetprotocol gebruikt voor communicatie. Het is als een postadres voor je computer op het internet.
+
+### Wat zijn havens?
+
+Poorten zijn virtuele punten waar netwerkverbindingen beginnen en eindigen. Ze helpen uw computer uit te zoeken tot welk programma of dienst inkomende en uitgaande gegevens behoren.
+
+### Wanneer wordt 'traceroute' of 'traceroute' voorgeschreven?
+
+Deze opdrachten helpen u het pad te traceren dat gegevens van uw computer naar een bestemming op internet brengen. Dit kan helpen identificeren waar een verbindingsprobleem zich kan voordoen.

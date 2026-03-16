@@ -1,0 +1,74 @@
+---
+title: "Creating and Completing Works Orders"
+description: "How to create a works order from a Bill of Materials and complete it using an RF scanner to produce finished products."
+sidebarTitle: "Works Orders"
+---
+
+## Works orders overview
+
+A works order combines individual products from a Bill of Materials (BOM) to create a new parent product. You create the order in the web interface and then process it using an RF scanner.
+
+## Prerequisites
+
+Before creating a works order, make sure:
+
+- **All products are in the system** -- verify they are entered in Clarus WMS.
+- **Stock is available** -- ensure products are booked in and you have sufficient quantities.
+- **The BOM exists** -- create the Bill of Materials listing all items required to make the parent product.
+
+## Creating the works order
+
+<Steps>
+  <Step title="Navigate to Works Orders">
+    From the home menu, select **Goods Out**, then **Works Order**.
+  </Step>
+  <Step title="Create a new works order">
+    On the Works Order screen, click **+New**.
+  </Step>
+  <Step title="Fill in the details">
+    Enter all the necessary information for the works order.
+  </Step>
+  <Step title="Add the Bill of Materials">
+    Add the BOM in the product field. The system automatically identifies which products are needed.
+  </Step>
+  <Step title="Save and check status">
+    Click **Save**. The works order status will show as **Pending**.
+  </Step>
+  <Step title="Process picks">
+    Select your works order and click **Save and Process Picks**. The status changes to **Allocated**.
+  </Step>
+</Steps>
+
+## Completing the works order on the RF scanner
+
+<Steps>
+  <Step title="Log in to the RF scanner">
+    From the RF scanner's main menu, select **Conversions**.
+  </Step>
+  <Step title="Select next conversion task">
+    Click **Next Conversion Task** to see a list of works order tasks.
+  </Step>
+  <Step title="Select the task">
+    Choose the task you want and click **Select**.
+  </Step>
+  <Step title="Review and confirm">
+    Check the conversion task details and click **Next**. Re-enter the product code in the **Confirm Product Code** field and click **Next**.
+  </Step>
+  <Step title="Confirm quantity and complete">
+    Enter the quantity and click **Next**. The system confirms the task is complete.
+  </Step>
+</Steps>
+
+<Info>Conversion tasks only appear after you have completed the pick tasks for the works order.</Info>
+
+Once all tasks are complete, the works order status updates to **Completed** and the parent product appears in stock.
+
+<Accordion title="FAQ">
+  **Do I need to list individual products in a works order?**
+
+  No, you only need to add the Bill of Materials. The system automatically determines which products are required.
+
+  **How will I know when a works order is completed?**
+
+  The status changes to **Completed** on the Works Order screen, and the parent product is added to your stock list.
+</Accordion>

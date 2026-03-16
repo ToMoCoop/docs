@@ -1,0 +1,41 @@
+---
+title: "Adding Conditions to HHD Implementations"
+description: "How to add custom conditions to Handheld Device implementations to control user access to specific screens and enforce custom rules."
+sidebarTitle: "HHD Conditions"
+---
+
+## Customising HHD flows with conditions
+
+You can add conditions to your Handheld Device (HHD) implementation to control which screens users see or to enforce custom rules based on defined parameters -- for example, restricting a specific account from accessing a particular screen.
+
+<Steps>
+  <Step title="Navigate to the implementation">
+    From the **Handheld Devices** tab, go to **Implementations**. Select the implementation you want to modify.
+  </Step>
+  <Step title="Preview the flow">
+    Scroll down to the **Preview** section. This shows a simulated view of the scanner screen. Click any option in Preview mode to simulate its functionality.
+  </Step>
+  <Step title="Edit a screen to add conditions">
+    On the desired screen, click the **Edit** button. New icons appear next to each option:
+
+    - **Plus sign (+)**: Add new conditions or components
+    - **Pencil icon**: Edit existing components
+    - **Trash bin**: Delete existing components
+    - **Arrow icon**: Navigate into the selected option
+  </Step>
+  <Step title="Add a condition">
+    Select an existing component. A panel appears on the right-hand side -- navigate to the **Conditions** tab. Click the **Plus (+) sign** next to **Component Conditions** to add a new condition.
+
+    Define the condition parameters. For example, set `task_account_code` **is equal to** `JOSEPH`. This means only users on that account code will see the relevant screen content.
+  </Step>
+</Steps>
+
+<Accordion title="FAQ">
+  **Why would I need to add a condition?**
+
+  To restrict a specific account from accessing a particular screen, or to introduce custom rules that control the HHD flow.
+
+  **What do the different icons mean when editing a screen?**
+
+  Plus (+) adds new conditions or components. Pencil edits existing ones. Trash bin deletes them. Arrow navigates into the selected option.
+</Accordion>

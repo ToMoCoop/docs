@@ -1,0 +1,43 @@
+---
+title: "What Is Batch Picking?"
+description: "Configure and use batch picking to pick multiple orders at once, reducing travel time and optimising warehouse operations."
+sidebarTitle: "Batch Picking"
+---
+
+## How to Set Up and Action Batch Picking
+
+Batch picking improves efficiency by allowing you to pick multiple orders at once, reducing travel time and optimising warehouse operations.
+
+<Steps>
+  <Step title="Set up your picking area">
+    Navigate to **Settings** > **Locations**. Create or edit a location and ensure it is designated as a **RACK**.
+  </Step>
+  <Step title="Configure batch picking rules">
+    Go to **Accounts**, then in the account settings, find **Flags**. Enable the batch pick flag. This helps the system group orders effectively.
+  </Step>
+  <Step title="Create a batch">
+    Go to the **Sales Order** data grid. Select the orders you wish to include in the batch. The system will generate a pick list for the entire batch.
+
+    <Info>Ensure all selected orders are ready for picking before creating a batch.</Info>
+  </Step>
+  <Step title="Action the batch pick">
+    Follow the sequence on the pick list to collect all items. As you pick each item, scan it using your mobile device or input it manually to confirm.
+
+    <Warning>Always double-check item quantities and locations to avoid errors.</Warning>
+  </Step>
+  <Step title="Consolidate and dispatch">
+    Once all items are picked, bring them to a consolidation area. Sort items by individual order and prepare them for packing and dispatch. Use the **Dispatch** module to process each order for shipping.
+  </Step>
+</Steps>
+
+<AccordionGroup>
+  <Accordion title="Can I mix different item types in one batch pick?">
+    Yes, you can mix different item types as long as they are part of the orders included in that batch.
+  </Accordion>
+  <Accordion title="What happens if an item is out of stock during a batch pick?">
+    Mark it as such in the system. You can then partially fulfil the order, wait for restock, or remove the order from the batch.
+  </Accordion>
+  <Accordion title="Can I cancel a batch pick once it has started?">
+    Yes, but it is not recommended once picking has begun. Navigate to the active batch and select **Cancel Batch**. Any picked items will need to be returned to their locations.
+  </Accordion>
+</AccordionGroup>

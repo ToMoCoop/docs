@@ -1,0 +1,44 @@
+---
+title: "Validating Webhook Requests"
+description: "How to authenticate and validate incoming webhook calls using the five ClarusWMS headers sent with every automation or integration request."
+sidebarTitle: "Validate Webhooks"
+---
+
+## Overview
+
+Webhook requests from automations and integrations include five specific headers that help you identify and validate the authenticity of each call.
+
+## Webhook headers
+
+| Header | Description |
+|--------|-------------|
+| **X-ClarusWMS-Domain** | The base URL that initiated the webhook call (your login URL) |
+| **X-ClarusWMS-API-Domain** | The API URL linked to the domain |
+| **X-ClarusWMS-Subdomain** | The subdomain part of the URL (e.g., `customer`) |
+| **X-ClarusWMS-Automation-ID** | The unique ID of the automation that triggered the webhook (e.g., `43`) |
+| **X-ClarusWMS-Integration-ID** | The ID of the linked integration (only included if applicable, e.g., `723`) |
+
+## Validation steps
+
+<Steps>
+  <Step title="Check X-ClarusWMS-Domain">
+    Verify the origin of the request matches your expected base URL.
+  </Step>
+  <Step title="Check X-ClarusWMS-API-Domain">
+    Confirm the associated API endpoint matches the originating domain.
+  </Step>
+  <Step title="Check X-ClarusWMS-Subdomain">
+    Pinpoint the specific subdomain from which the call originated.
+  </Step>
+  <Step title="Check X-ClarusWMS-Automation-ID">
+    Trace which automation initiated the call using its unique ID.
+  </Step>
+  <Step title="Check X-ClarusWMS-Integration-ID">
+    If present, identify the specific integration involved.
+  </Step>
+  <Step title="Validate authenticity">
+    Use the combined header values to confirm the request is genuine and from a trusted source.
+  </Step>
+</Steps>
+
+<Info>These headers are essential for confirming that a webhook request to your URL is legitimate and has not been spoofed.</Info>

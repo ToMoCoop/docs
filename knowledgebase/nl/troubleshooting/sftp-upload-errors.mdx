@@ -1,0 +1,46 @@
+---
+title: "Elementaire mislukte uploadfouten bij het oplossen van SFTP"
+description: "In deze handleiding worden veelvoorkomende problemen uitgelegd zoals 'ongeldige bytesequentie in UTF-8' en fouten met betrekking tot ontbrekende hoeveelheden bij het uploaden van bestanden via SFTP."
+sidebarTitle: "SFTP uploadfouten"
+---
+
+In deze handleiding worden veelvoorkomende problemen uitgelegd zoals 'ongeldige bytesequentie in UTF-8' en fouten met betrekking tot ontbrekende hoeveelheden bij het uploaden van bestanden via SFTP. Leer hoe u coderingsproblemen en lastige witte ruimte kunt identificeren en oplossen om ervoor te zorgen dat uw bestanden succesvol worden geupload naar Clarus WMS.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Bestandscodering controleren">
+    Als u een fout 'ongeldige bytereeks in UTF-8' ziet, wordt uw bestand mogelijk niet opgeslagen met de juiste codering. Het moet gered worden als **Utf-8**.
+  </Step>
+  <Step title="Identificeer de witte ruimte">
+    **Witte ruimte** is een veel voorkomende oorzaak van SFTP uploadfouten en kan leiden tot fouten zoals 'aantal ontbreekt: order_reference'. Dit omvat extra spaties na informatie, spaties tussen komma's of per ongeluk extra lijnen.
+  </Step>
+  <Step title="Bestand openen in Notitieblok">
+    Om uw bestand op witte ruimte te inspecteren, gaat u naar uw bestandsverkenner, **Klik met de rechtermuisknop** in het importbestand, selecteer **Open met**, en vervolgens kiezen **Notitieblok**.
+  </Step>
+  <Step title="Bestandsindeling begrijpen">
+    In Notitieblok ziet u de import in tekstvorm. De bovenste lijn bevat de verschillende velden (bijv. receipt_reference, warehouse_code). Elke onderstaande regel geeft de informatie van de ene cel, met een komma die gegevens scheidt voor de volgende cel. Lege cellen verschijnen als een enkele komma.
+  </Step>
+  <Step title="Verwijder witte ruimte en extra lijnen">
+    <Warning>Alle spaties na informatie, spaties tussen komma's of extra regels (die verschijnen als een stel lege komma's onderaan het bestand) worden beschouwd als witte ruimte. U moet deze verwijderen om ervoor te zorgen dat uw bestand met succes wordt geupload.</Warning>
+
+    Als u deze komma's onderaan en eventuele spaties in het bestand verwijdert, elimineert de witte ruimte en moet het bestand probleemloos uploaden.
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat betekent 'ongeldige byte sequentie in UTF-8'?">
+Deze fout betekent meestal dat het bestand dat u probeert te uploaden niet wordt opgeslagen met de juiste codering, wat UTF-8 zou moeten zijn.
+</Accordion>
+<Accordion title="Wat is een witte ruimte?">
+Witte ruimte verwijst naar onzichtbare tekens zoals spaties of extra regels in uw bestand. Het kan uploadstoringen veroorzaken, zelfs als het bestand er visueel correct uitziet. Dit omvat spaties na gegevens, tussen komma's of volledig lege regels aan het einde van het bestand.
+</Accordion>
+<Accordion title="Waarom is witte ruimte een veel voorkomend probleem?">
+Hoewel de witte ruimte mogelijk niet zichtbaar is, kan het interfereren met hoe het systeem het bestand verwerkt, wat leidt tot fouten. Het is de meest voorkomende reden waarom SFTP-bestanden niet uploaden.
+</Accordion>
+<Accordion title="Hoe kan ik witte ruimte voorkomen?">
+Controleer altijd uw bestand in een platte teksteditor zoals Notepad voordat u uploadt. Besteed veel aandacht aan eventuele extra spaties na komma's of gegevens en zorg ervoor dat er geen onbedoelde lege regels aan het einde van het bestand zijn.
+</Accordion>
+</AccordionGroup>

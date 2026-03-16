@@ -1,0 +1,33 @@
+---
+title: "How to Export Charges to Sage Line 200"
+description: "Export charges as a CSV file for import into Sage Line 200, including report configuration and scheduling."
+sidebarTitle: "Export to Sage Line 200"
+---
+
+## Exporting Charges to Sage Line 200
+
+You can export charges as a CSV file ready for import into Sage Line 200 by modifying the built-in Sage Line 50 report.
+
+<Steps>
+  <Step title="Navigate to My Reports">
+    In the top-right corner, click your **User Menu** and select **My Reports**.
+  </Step>
+  <Step title="Locate the Sage Line 50 report">
+    Search for the **Sage Line 50** report and click **Show** to open it.
+  </Step>
+  <Step title="Modify the report for Sage Line 200">
+    In the General Section, change the **Name** to **"Sage Line 200 Charges"** and update the **Description** accordingly. Click **Save**.
+
+    In the Report Fields Section, delete the following fields: **"Account Name"** and **"Charge Window Start"**. Click **Save** again.
+  </Step>
+  <Step title="Run the report">
+    Run the report to generate a **CSV file**. You can then import this into **Sage Line 200**.
+  </Step>
+  <Step title="Optional: Set up as a scheduled report">
+    To automate the export, configure the report as a **Scheduled Report** to run daily, monthly, or at any frequency you need.
+  </Step>
+</Steps>
+
+<Warning>
+If you encounter problems during the export, ensure the fields are in the following order for Sage Line 200: **Type**, **Account Reference**, **Nominal A/C Ref**, **Reference**, **Date**, **Description**, **Net Amount**, **Tax Code**, **Tax Amount**. Verify formatting and order before exporting.
+</Warning>

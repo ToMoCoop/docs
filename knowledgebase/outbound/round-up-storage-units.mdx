@@ -1,0 +1,29 @@
+---
+title: "Rounding Up to Full Storage Units on Picks"
+description: "Enable the round-up feature to pick full pallets or storage units instead of partial picks, improving warehouse efficiency."
+sidebarTitle: "Round Up Storage Units"
+---
+
+## Enable Rounding Up for Efficient Picks
+
+This feature ensures that full pallets or storage units are picked and sent out, avoiding the need for partial picks and improving overall efficiency.
+
+<Steps>
+  <Step title="Access account settings">
+    From the left-hand menu, select **Accounts**. Choose the account for which you want to enable rounding up.
+  </Step>
+  <Step title="Enable the rounding option">
+    Scroll down to the **Flags** section within the account settings. Tick the box that says **Round Up to Full Storage Units on Pick**.
+
+    <Info>
+    **Example:** If a client orders 250 items and you have 3 storage units with 100 items each -- without rounding, the system would allocate 2 full units (200 items) and part-pick 50 from the third. With rounding enabled, the system picks the entire third unit (100 items), resulting in 300 items being picked instead of 250.
+    </Info>
+  </Step>
+  <Step title="Save the changes">
+    After ticking the box, the system will now automatically round up picks to full storage units for that specific account.
+  </Step>
+</Steps>
+
+<Warning>Rounding up can result in over-picking (sending more items than ordered). Make sure your customer forecasting systems are aligned if this is a concern.</Warning>
+
+<Tip>This feature is enabled per account, so you can selectively apply it only where needed.</Tip>

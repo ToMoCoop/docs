@@ -1,0 +1,37 @@
+---
+title: "Set Up a Pickface"
+description: "Learn how to set up fixed and dynamic pickfaces to streamline stock replenishment with this configuration guide."
+sidebarTitle: "Create a Pickface"
+---
+
+Pickfaces are designated locations used for picking smaller quantities of stock. By configuring locations as pickfaces and associating products, you can streamline replenishment and ensure product availability.
+
+<Steps>
+<Step title="Configure the location as a pickface">
+Go to the **Locations** screen and select the location you want to use. Open the menu for that location and find the **Is Pickface** option. Enable it to designate the location as a pickface.
+</Step>
+<Step title="Associate a product with the pickface">
+Navigate to the **Products** screen and find the product you want to assign. Scroll down to the **Pickfaces** tab. Choose between two pickface types:
+
+- **Fixed**: You manually assign specific locations to the product
+- **Dynamic**: Uses a pre-defined location group, automatically including all locations within that group
+</Step>
+<Step title="Set triggers and save">
+Use the lower tab to either choose specific location(s) for a fixed pickface or a location group for a dynamic pickface. Define the **minimum** and **maximum** stock triggers, then click **Save**. The location or group of locations will now operate as a pickface.
+</Step>
+</Steps>
+
+<Info>
+For dynamic pickfaces to work correctly, ensure that the **Is Pickface** option is enabled for all locations in the chosen group.
+</Info>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What is a fixed pickface?">
+A fixed pickface means you manually assign specific locations to a product.
+</Accordion>
+<Accordion title="What is a dynamic pickface?">
+A dynamic pickface uses a pre-defined location group, automatically including all locations within that group.
+</Accordion>
+</AccordionGroup>

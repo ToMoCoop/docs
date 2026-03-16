@@ -1,0 +1,61 @@
+---
+title: "Het opzetten van uw magazijn"
+description: "Maak en configureer een magazijn binnen een site, inclusief adresgegevens en standaard GIBAY/GOBAY locaties."
+sidebarTitle: "Magazijn instellen"
+---
+
+Zodra u een [site hebt aangemaakt](/knowledgebase/nl/warehouse-setup/create-a-site), kunt u een of meer magazijnen erbinnen instellen. Elk magazijn vertegenwoordigt een afzonderlijke operationele ruimte waar voorraad wordt opgeslagen en beheerd.
+
+## Een magazijn aanmaken
+
+<Steps>
+<Step title="Ga naar de Magazijn sectie">
+Klik in het linkermenu op **Magazijnen**. Een lijst van alle bestaande magazijnen wordt weergegeven.
+</Step>
+<Step title="Voeg een nieuw magazijn toe">
+Klik op de **+Nieuw** knop om een nieuw magazijn te maken.
+</Step>
+<Step title="Vul magazijngegevens in">
+Voer de benodigde gegevens in:
+
+- **Code**: Een unieke code om uw magazijn te identificeren
+- **Naam**: Een beschrijvende naam (bijvoorbeeld gebouwnaam of functie)
+- **Adres**: Het volledige adres van het magazijn
+</Step>
+<Step title="Sla het magazijn op">
+Klik op **Opslaan** om de eerste instelling te voltooien.
+</Step>
+</Steps>
+
+<Info>
+Alleen de **Code** en **Naam** zijn verplicht. U dient echter altijd het **Adres** in te stellen — dit wordt gebruikt als afzenderadres op koerierszendingen die uw magazijn verlaten en wordt opgenomen in uitvoerbestanden zoals EDI-exports.
+</Info>
+
+## Standaard goods in en goods out bays instellen
+
+De velden **Default goods in bay** en **Default goods out bay** op het magazijnrecord bepalen waar inkomende en uitgaande voorraad aanvankelijk wordt gestuurd. Deze kunnen echter alleen worden ingesteld wanneer er al een locatie met type **GIBAY** of **GOBAY** bestaat binnen het magazijn.
+
+Aangezien een nieuw magazijn nog geen locaties heeft, is de typische installatievolgorde:
+
+<Steps>
+<Step title="Maak uw magazijn aan">
+Volg de bovenstaande stappen om het magazijnrecord aan te maken.
+</Step>
+<Step title="Maak uw bay-locaties aan">
+[Maak locaties aan](/knowledgebase/nl/warehouse-setup/create-a-location) met type **GIBAY** (goods in bay) en **GOBAY** (goods out bay) binnen het magazijn.
+</Step>
+<Step title="Stel de standaardwaarden in">
+Ga terug naar het magazijnrecord en stel de velden **Default goods in bay** en **Default goods out bay** in op de locaties die u zojuist hebt aangemaakt.
+</Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Kan ik meerdere magazijnen toevoegen?">
+Ja. U kunt zoveel magazijnen aanmaken als u nodig hebt, elk met een eigen code, adres en configuratie. Meerdere magazijnen kunnen tot dezelfde [site](/knowledgebase/nl/warehouse-setup/create-a-site) behoren.
+</Accordion>
+<Accordion title="Wat gebeurt er als ik verkeerde informatie invoer?">
+U kunt de magazijngegevens op elk moment bewerken door het magazijn uit de lijst te selecteren en de velden bij te werken.
+</Accordion>
+</AccordionGroup>

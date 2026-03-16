@@ -1,0 +1,53 @@
+---
+title: "Setting Up Scheduled Reports"
+description: "How to create automated scheduled reports with custom frequency, email delivery, variables, and optional SFTP output."
+sidebarTitle: "Scheduled Reports"
+---
+
+## Overview
+
+Scheduled reports let you receive regular updates automatically without manual intervention. You can configure the frequency, recipients, report type, and optional variables for each schedule.
+
+<Steps>
+  <Step title="Log in to your account">
+    Sign in to access the scheduling features.
+  </Step>
+  <Step title="Access Scheduled Reports">
+    Click your **username** at the top of the screen. From the dropdown, select **My Scheduled Reports**.
+  </Step>
+  <Step title="Add a Scheduled Report">
+    Click **+Add a Scheduled Report** to open the configuration screen.
+  </Step>
+  <Step title="Complete General Settings">
+    - Enter a **Name** for the report (e.g., "Daily Report")
+    - Set the **Frequency** (daily, monthly, etc.)
+    - Select the **Days of the Week** for the report to run
+    - Enter the **Time** to run
+  </Step>
+  <Step title="Set up Email Settings">
+    Enter the email **Subject** and **Body** message. Click **+New** to add recipients with their name and email address.
+  </Step>
+  <Step title="Add Reports">
+    Click **Add Report** and select from the pre-set reports in the dropdown menu.
+  </Step>
+  <Step title="Add Variables (optional)">
+    Click **+New** to add a variable. Choose a **Parameter Name** (e.g., `account_id` or `warehouse_id`) and enter the corresponding **Variable Value**.
+  </Step>
+  <Step title="Configure SFTP Users (optional)">
+    Instead of email, you can save reports to SFTP. Click **+New**, search for the SFTP user by name, and the report will be saved for them to access.
+  </Step>
+  <Step title="Save the Scheduled Report">
+    Click **Save**. The report will now run automatically at the scheduled time.
+  </Step>
+</Steps>
+
+<Warning>Avoid setting report times between midnight and 2 AM, as these may be affected by daylight saving time changes.</Warning>
+
+<AccordionGroup>
+  <Accordion title="Can I send reports to multiple recipients?">
+    Yes. Click **+New** in the Email Settings to add multiple recipients.
+  </Accordion>
+  <Accordion title="Can I deliver reports via SFTP instead of email?">
+    Yes. Use the **SFTP Users** section to save reports for download instead of email delivery.
+  </Accordion>
+</AccordionGroup>

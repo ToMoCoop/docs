@@ -1,0 +1,67 @@
+---
+title: "Creating a Kit"
+description: "How to set up a product kit using a Bill of Materials, create sales orders for it, and pick the kit using an RF scanner."
+---
+
+## Kitting overview
+
+A kit is a set of individual products sold together as a single package. You create it as a Bill of Materials (BOM) product with the **Assemble on Pick** option enabled, so the kit is assembled during the picking process.
+
+## Setting up a BOM product for kitting
+
+<Steps>
+  <Step title="Create a BOM product">
+    Create your product as a Bill of Materials (BOM) product. In the **Flag** section, set these options:
+
+    - **Assemble on Pick**: Tick this to assemble the kit when picking.
+    - **New Product?**: Tick if it is new; untick if existing.
+    - **Stop?**: Tick to stop sales; untick to reactivate.
+    - **Obsolete?**: Tick if the product is no longer in use.
+
+    Click **Save**.
+  </Step>
+  <Step title="Create a sales order for the kit">
+    Create a sales order as usual, adding your BOM product to the order.
+  </Step>
+  <Step title="View available stock">
+    In the **Available Stock** column, click the dropdown to view kit details:
+
+    - **From Stock**: Shows how many complete kits are ready.
+    - **Individual Items**: Lists all parts of the BOM and their stock levels.
+  </Step>
+  <Step title="Save and process picks">
+    Click **Save**, then on the main sales order screen, select your order and click **Save and Process Picks**.
+  </Step>
+</Steps>
+
+<Warning>All kit components must be available to complete the order. Every item must be picked for dispatch.</Warning>
+
+## Picking a kit order using an RF scanner
+
+<Steps>
+  <Step title="Log in to the RF scanner">
+    From the main menu, select **Find Next Pick Task**.
+  </Step>
+  <Step title="Select Pick by Order">
+    Choose **Pick by Order**, enter the Order Number, and click **Next**.
+  </Step>
+  <Step title="Select the order and review pick tasks">
+    Select the order you want to pick, review the details, and click **Next**.
+  </Step>
+  <Step title="Scan product and confirm quantity">
+    Scan the **Location From**, then the **Storage Unit From**, followed by the **Product Code**. Enter the **Quantity** and press **Enter**.
+  </Step>
+  <Step title="Complete the task">
+    The system confirms the task is successfully completed.
+  </Step>
+</Steps>
+
+<Accordion title="FAQ">
+  **What happens if some kit items are out of stock?**
+
+  All items must be in stock to fulfil the order. If any item is unavailable, the order cannot be completed.
+
+  **How do I view individual items in a kit during a sales order?**
+
+  In the **Available Stock** column, click the dropdown to see a detailed breakdown of all individual items and their current stock levels.
+</Accordion>

@@ -1,0 +1,44 @@
+---
+title: "Shorting Order Lines with Reason Codes"
+description: "How to close partially allocated orders by shorting unfulfilled lines using reason codes when stock is insufficient."
+sidebarTitle: "Short Order Lines"
+---
+
+## Overview
+
+When you process an order but do not have enough stock to fulfil it, the order goes into a **part-allocated** status. You can "short" the order to close it, using a reason code to explain why the remaining lines were not fulfilled.
+
+<Steps>
+  <Step title="Create a reason code">
+    Go to the **Reason Codes** section. Create a new reason code and set the type to **Short Order Lines**.
+  </Step>
+  <Step title="Activate the reason code">
+    Make sure the reason code is **active** so you can use it when shorting orders.
+  </Step>
+  <Step title="Access the Sales Order screen">
+    Find the order that is currently in a part-allocated status.
+  </Step>
+  <Step title="Short the order lines">
+    Click the **Short Order Lines** button to begin the process.
+  </Step>
+  <Step title="Enter the reason code and description">
+    Select the reason code you created and add a description explaining why the order is being shorted.
+  </Step>
+  <Step title="Confirm the shortage">
+    After confirmation, the order will no longer show as part-allocated.
+  </Step>
+  <Step title="Review the order status">
+    The order status changes to completed, but the **Fulfilment Status** changes from **PART** to **SHORT** (not FULL, unless all stock was allocated).
+  </Step>
+</Steps>
+
+<Warning>Once you short an order, it is closed and cannot be re-processed later. If you want to re-process when stock becomes available, do not short the order.</Warning>
+
+<AccordionGroup>
+  <Accordion title="What does 'shorting an order' mean?">
+    It means closing an order without fulfilling all remaining stock, using a reason code to explain the decision.
+  </Accordion>
+  <Accordion title="What happens to the fulfilment status?">
+    It changes from **PART** to **SHORT**. It will only show as **FULL** if all stock was allocated before shorting.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,41 @@
+---
+title: "SBD and BBD Date Validation"
+description: "How the HHD system validates Sell By and Best Before dates to prevent out-of-date stock from being received into the warehouse."
+sidebarTitle: "Date Validation"
+---
+
+## Preventing out-of-date stock
+
+The Handheld Device (HHD) system automatically validates any entered **Sell By Date (SBD)** or **Best Before Date (BBD)** against the current system date and time. This prevents expired stock from being accidentally received or entered into the system.
+
+## How it works
+
+Consider a standard "blind receipt" workflow:
+
+<Steps>
+  <Step title="Date entry">
+    When prompted, you enter a Sell By or Best Before date on the HHD. If today's date is **11/03/2026** and you enter an expired date such as **10/03/2025**, the system triggers an immediate alert.
+
+    <Frame>
+      <img src="/images/knowledgebase/validation-sbd-bbd-preventing-1.png" alt="HHD screen showing an expired date entry triggering an alert" />
+    </Frame>
+  </Step>
+  <Step title="Error handling">
+    An error message is displayed, blocking you from proceeding with a date in the past.
+
+    <Frame>
+      <img src="/images/knowledgebase/validation-sbd-bbd-preventing-2.png" alt="HHD error message blocking progress due to an expired date" />
+    </Frame>
+  </Step>
+  <Step title="Correction">
+    Once you correct the date to a valid future date (e.g., **12/03/2026**), the system validates the entry and allows you to continue.
+
+    <Frame>
+      <img src="/images/knowledgebase/validation-sbd-bbd-preventing-3.png" alt="HHD screen accepting a corrected valid future date" />
+    </Frame>
+  </Step>
+</Steps>
+
+<Info>This validation works identically for both **Sell By** and **Best Before** date fields.</Info>
+
+<Tip>This safeguard helps improve inventory accuracy and reduce waste by catching date entry errors at the point of receipt.</Tip>

@@ -1,0 +1,60 @@
+---
+title: "Sales Orders Not Allocating to a Pick"
+description: "Diagnose and resolve sales orders that won't allocate to a pick with this step-by-step troubleshooting guide."
+sidebarTitle: "Sales Order Allocation"
+---
+
+If you are struggling to allocate stock to a pick for a sales order, use this checklist to identify and resolve common issues.
+
+## Allocation troubleshooting checklist
+
+<Steps>
+<Step title="Check stock levels">
+Ensure you have enough **physical stock** available for the sales order. Verify stock quantities in both the **Stock List** and **Stock Balance** screens.
+</Step>
+<Step title="Check warehouse and account">
+Make sure the stock is located in the **same warehouse** and **account** as the goods out sales order. Mismatches here will prevent allocation.
+</Step>
+<Step title="Check stock availability">
+Confirm that the stock is marked as **available** for picking. Stock on hold, reserved, or otherwise unavailable cannot be allocated to the order.
+</Step>
+<Step title="Check location settings">
+Ensure the location where the stock is stored has the **Allow Picking** and **Active** flags set correctly. If these settings are incorrect, the stock may not be picked.
+</Step>
+<Step title="Check for other assigned tasks">
+Verify that the same stock is not already assigned to other tasks. Conflicting tasks can prevent stock from being allocated to your current pick.
+</Step>
+<Step title="Check filtering by sell-by date or batch">
+If your goods out lines are filtered by **Sell By Date** or **Batch**, make sure the stock exactly matches those criteria.
+</Step>
+<Step title="Check maximum life setting">
+Ensure the **Maximum Life** setting on the product is appropriate and not restricting the allocation of stock.
+</Step>
+<Step title="Change pick processing rules">
+Try modifying the **Pick Processing Rules** on the associated account to see if this resolves the issue.
+</Step>
+<Step title="Check non-pickable quantities">
+Look at the **Stock Balance** to check if any quantities are in a **non-pickable** status. These quantities will not be allocated to a pick.
+</Step>
+</Steps>
+
+<Warning>
+If you have gone through the entire checklist and the issue remains, contact support for further assistance.
+</Warning>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Why isn't my stock being allocated to the pick?">
+This could be due to insufficient stock, mismatches in warehouse or account, or stock availability issues. Check all the items in the checklist above.
+</Accordion>
+<Accordion title="How do I check if stock is non-pickable?">
+Go to the **Stock Balance** screen and check if any stock quantities are marked as **non-pickable**.
+</Accordion>
+<Accordion title="Can other tasks prevent stock allocation?">
+Yes, if the stock is already assigned to another task, it will not be available for the current pick.
+</Accordion>
+<Accordion title="What if my stock matches the Sell By Date but still won't allocate?">
+Ensure that the **Sell By Date** filters are set correctly and that there is no mismatch with the stock batch or expiration settings.
+</Accordion>
+</AccordionGroup>

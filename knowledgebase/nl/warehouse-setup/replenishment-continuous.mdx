@@ -1,0 +1,98 @@
+---
+title: "Pickface aanvulling types: Doorlopende Pickfaces"
+description: "Leer hoe u doorlopende aanvulling configureert voor pickface locaties in Clarus WMS."
+sidebarTitle: "Aanvulling doorlopend"
+---
+
+Alle pickfaces worden op dezelfde manier gekozen: een taak leidt u naar de locatie om de benodigde voorraad op te halen. Het verschil zit hem in hoe en wanneer die locaties worden aangevuld. Om magazijnprestaties te optimaliseren en consistente voorraadbeschikbaarheid te behouden, ondersteunt Clarus nu **twee belangrijke aanvulling types** die kunnen worden toegewezen aan uw pickface locaties.
+
+## Doorlopende aanvulling
+
+Doorlopende aanvulling is een proactief aanvullingsproces dat pickfaces automatisch op voorraad houdt op basis van min/max triggers. Wanneer de voorraad in een pickface onder de minimale trigger daalt, genereert het systeem automatisch een aanvullingstaak om de pickface bij te vullen tot het maximale triggerniveau.
+
+## Gids voor het opzetten van pickfaces
+
+<Steps>
+  <Step title="Navigeer naar het product">
+    Klik in het linkermenu op **Producten**. Zoek en selecteer het product waarvoor u pickfaces wilt configureren.
+  </Step>
+  <Step title="Locaties toewijzen">
+    Open het deelvenster Pickface. Klik **Nieuw** om een nieuwe pickface locatie toe te voegen.
+
+    ### Locatiegroepen toewijzen (optioneel)
+
+    Gebruik **Locatie Groepen** om meerdere pickfaces voor een product tegelijkertijd te beheren, waardoor consistentie en efficiëntie wordt gewaarborgd.
+
+    - Locatiegroepen kunnen worden geconfigureerd binnen de **Groepen** pagina in Clarus.
+    - Alle locaties binnen een groep moeten de **Is het Pickface?** vlag ingesteld op **Ja** hebben.
+    - Zodra een groep is toegewezen aan het pickfacepaneel, kunt u instellingen voor de hele groep beheren of afzonderlijke locaties naar behoefte aanpassen.
+  </Step>
+  <Step title="Instellingen toewijzen aan de locaties">
+    ### Selecteer Aanvullingstype
+
+    Kies de aanvullingstrategie die het beste past bij de pick- en voorraadstroom van uw product:
+
+    - **Voortdurende aanvulling:** Een aanvullingstaak wordt automatisch gegenereerd wanneer de **Minimale trigger** niveau wordt bereikt.
+    - **Aanvulling op vraag:** Een aanvullingstaak wordt alleen gegenereerd wanneer een pick-taak niet kan worden uitgevoerd door een andere actieve pickface.
+
+    ### Definieer minimale en maximale triggers
+
+    *(Alleen vereist wanneer Doorlopende aanvulling is geselecteerd.)*
+
+    - **Minimale trigger:** De voorraadhoeveelheid die een aanvullingstaak activeert wanneer de niveaus onder deze drempel dalen.
+    - **Maximale trigger:** De doelhoeveelheid aan te vullen bij het opnieuw opslaan van de pickface.
+      - Als de **'Alleen volledige opslagunits'** toggle is ingesteld op **Ja**, wordt de Max Trigger overschreven.
+
+    ### Volledige opslagunits opgeven
+
+    Bepaal of aanvulling alleen volledige opslagunits mag gebruiken.
+
+    - **Schakel 'nee':** De aanvullingstaak wordt het Max Trigger-niveau, zelfs als dit betekent dat een opslagunit moet worden afgebroken.
+    - **Schakel 'ja' in:** Alleen volledige opslagunits worden aangevuld in de pickface. Dit overschrijft de Max Trigger setting.
+      - Als de Max Trigger bijvoorbeeld is ingesteld op 100 en elke opslagunit 60 bevat, brengt het systeem 2 volledige opslagunits (120 eenheden) in de pickface.
+  </Step>
+  <Step title="Prioriteren aan locaties">
+    Gebruik de **Pijlcontroles** aan de linkerkant van elke locatie om ze opnieuw te bestellen. De volgorde bepaalt de volgorde waarin pickfaces worden gebruikt bij het toewijzen van picktaken of aanvullingen.
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Hoe beïnvloedt de accountkeuzeregel mijn toegewezen pickfaces?">
+Clarus gebruikt uw account pick regel om de voorraad te bepalen die is aangevuld in een pickface:
+
+- **Eerste in de eerste uit** - Het systeem vult de voorraad aan met de **Vroegste FIFO-datum** naar de volgende beschikbare pickface.
+- **Verkopen op datum** - Het systeem vult de voorraad aan met de **Vroegste sell-by date** naar de volgende beschikbare pickface.
+- **Beste voor date** - Het systeem vult de voorraad aan met de **Vroegste best-voor-date** naar de volgende beschikbare pickface.
+</Accordion>
+<Accordion title="Waarom is de volgorde van de locaties belangrijk?">
+De volgorde van locaties is cruciaal omdat het dicteert hoe het systeem picktaken toewijst aan pickfaces wanneer meerdere 'Continue' aanvulling pickfaces aan een product worden toegewezen. Het systeem volgt een opeenvolgende en afwisselende toewijzingsmethode. Bijvoorbeeld:
+
+- Pickfaces locaties setup = Pickface A & B & C
+- Kies taken uit te voeren = 4
+  - **Kies taak 1 -> Pickface A**
+  - **Kies taak 2 -> Pickface B**
+  - **Kies taak 3 -> Pickface C**
+  - **Kies taak 4 -> Pickface A** (cyclus herhalingen)
+</Accordion>
+<Accordion title="Wat gebeurt er als ik een pickface locatie inactief maak?">
+Wanneer een pickface locatie is ingesteld op inactief:
+
+- Picktaken worden niet langer toegewezen aan de inactieve pickface.
+- Aanvullingstaken worden niet gegenereerd, zelfs niet als de voorraad onder de minimale hoeveelheid valt.
+- Alle bestaande voorraad in de inactieve pickface blijft daar en moet handmatig worden beheerd.
+</Accordion>
+<Accordion title="Wat gebeurt er als de hoeveelheid in mijn opslagunits groter is dan de maximale triggerset?">
+Het aanpassingsgedrag hangt af van de **"Alleen volledige opslagunits"** setting:
+
+- **Als je gaat naar 'nee'**: Het systeem zal de voorraad tot de maximale trigger aanvullen, zelfs als dit betekent dat een opslagunit moet worden afgebroken.
+- **Als je inschakelt op 'ja'**: Het systeem zal alleen volledige opslagunits aanvullen, waardoor de maximale trigger overschrijft.
+</Accordion>
+<Accordion title="Waarom staat mijn pick taak in de wacht?">
+Uw pick-taak staat in de wacht omdat het systeem wacht tot voorraad wordt aangevuld in een pickface om de pick-taak te vervullen.
+
+- **Als slechts 'continue' aanvulling is ingeschakeld:** De pick-taak wordt in de wacht gezet wanneer er geen voorraad is die aan de vereisten van de picktaak in een pickface kan voldoen.
+- **Als zowel 'continue' als 'Demand'-aanvulling zijn ingeschakeld:** Het systeem zal eerst proberen de pickfaces te gebruiken via het continue aanvullingsproces. De pick-taak blijft in de wacht totdat de aanvullingstaak is voltooid.
+</Accordion>
+</AccordionGroup>

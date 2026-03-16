@@ -1,0 +1,47 @@
+---
+title: "Basic Failed Upload Errors When Troubleshooting SFTP"
+description: "Diagnose and resolve common SFTP upload errors including UTF-8 encoding and white space issues with this troubleshooting guide."
+sidebarTitle: "SFTP Upload Errors"
+---
+
+This guide explains common issues like "invalid byte sequence in UTF-8" and errors related to missing quantities when uploading files via SFTP.
+
+## Common causes and fixes
+
+<Steps>
+<Step title="Check file encoding">
+If you see an "invalid byte sequence in UTF-8" error, your file may not be saved with the correct encoding. It should be saved as **UTF-8**.
+</Step>
+<Step title="Identify white space">
+**White space** is the most common cause of SFTP upload failures and can lead to errors such as "Quantity is missing: order_reference". This includes extra spaces after information, spaces between commas, or accidental extra lines.
+</Step>
+<Step title="Open file in Notepad">
+To inspect your file for white space, right-click on the import file, select **Open with**, then choose **Notepad**. In Notepad, you will see the import laid out in text form with comma-separated values.
+</Step>
+<Step title="Remove white space and extra lines">
+Look for and remove:
+- Spaces after information
+- Spaces between commas
+- Extra lines at the bottom of the file (appearing as a bunch of empty commas)
+
+Removing these will eliminate the white space and should allow the file to upload successfully.
+</Step>
+</Steps>
+
+<Warning>
+Even though white space might not be visible in a spreadsheet application, it can interfere with how the system processes the file. Always double-check your file in a plain text editor before uploading.
+</Warning>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What does 'invalid byte sequence in UTF-8' mean?">
+This error usually means the file you are trying to upload is not saved using the correct encoding, which should be UTF-8.
+</Accordion>
+<Accordion title="What is white space?">
+White space refers to invisible characters like spaces or extra lines in your file. It includes spaces after data, between commas, or entirely empty lines at the end of the file.
+</Accordion>
+<Accordion title="How can I prevent white space?">
+Always double-check your file in a plain text editor like Notepad before uploading. Pay close attention to any extra spaces and ensure there are no unintended empty lines at the end.
+</Accordion>
+</AccordionGroup>

@@ -1,0 +1,52 @@
+---
+title: "Linking Accounts"
+description: "How to link accounts so orders can pull stock from other accounts when the primary account runs low."
+sidebarTitle: "Link Accounts"
+---
+
+## Overview
+
+Linking accounts lets you pull stock from other accounts when your primary account runs low, ensuring orders are always fulfilled smoothly.
+
+## Linking accounts
+
+<Steps>
+  <Step title="Access the Accounts screen">
+    From the left-hand menu, click **Accounts**. Select an existing account or create a new one.
+  </Step>
+  <Step title="Link accounts">
+    Scroll to the **Linked Accounts** section and use the dropdown to select the account(s) you want to link.
+  </Step>
+  <Step title="Save changes">
+    Click **Save** to confirm.
+  </Step>
+</Steps>
+
+## Unlinking accounts
+
+<Steps>
+  <Step title="Click Unlink">
+    Click the **Unlink** button next to the account you want to remove.
+  </Step>
+  <Step title="Confirm">
+    Select **Unlink** when prompted (or **Cancel** to keep the link).
+  </Step>
+</Steps>
+
+## Enabling linked account stock usage
+
+For orders to use stock from linked accounts, enable these settings in the account's **Flag Section**:
+
+- **Order from Linked Accounts** -- allows orders to be fulfilled from linked accounts
+- **Pick from Linked Accounts if Stock is Unavailable** -- allows picking from linked accounts when the primary is out of stock
+
+<Info>Stock is always picked from the primary account first. Linked accounts are used only when primary stock is unavailable.</Info>
+
+<AccordionGroup>
+  <Accordion title="How do I link multiple accounts?">
+    Navigate to the **Linked Accounts** section and select each account from the dropdown.
+  </Accordion>
+  <Accordion title="Do I need to enable settings to pick from linked accounts?">
+    Yes. Both **Order from Linked Accounts** and **Pick from Linked Accounts if Stock is Unavailable** must be enabled in the account's Flag Section.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,43 @@
+---
+title: "Creating FTP Files on Load Drop Dispatch"
+description: "Automate file creation in an SFTP account every time a load drop is dispatched, using dynamic templates with Liquid syntax."
+sidebarTitle: "FTP Load Dispatch File"
+---
+
+## Automatically Create Files on Load Drop Dispatch
+
+You can use the automation feature to automatically create files in a specified SFTP account every time a load drop is dispatched. This is ideal for generating dynamic files with specific event details.
+
+<Steps>
+  <Step title="Create your automation">
+    Go to the **Automations** section and create a new automation. Set it to activate when a load drop is dispatched. Enter the desired **File Name**, choose the **FTP User** account for the file upload, and select the relevant **Document Category** (e.g., dispatch).
+  </Step>
+  <Step title="Upload a template file">
+    In the *Template File* box, upload the template that will be used to create the file. This template can be in common formats such as **CSV** or **TXT**. The template will automatically include data from the dispatched load drop.
+  </Step>
+  <Step title="Use dynamic data in the template">
+    Add dynamic data to your template using placeholders. The main data objects available are:
+
+    - **load_drop**: Access information about the load drop, such as its ID or destination.
+    - **dispatch_transactions**: Details about the transactions linked to the load drop dispatch.
+
+    For example, to display the postcode of the load drop's address:
+
+    ```text
+    {{load_drop.address.postcode}}
+    ```
+
+    To list the product code for each dispatch transaction:
+
+    ```text
+    {% for transaction in dispatch_transactions %}
+    {{transaction.product.code}}
+    {% endfor %}
+    ```
+
+    <Info>Refer to the Liquid templates documentation for more detailed guidance on using dynamic data.</Info>
+  </Step>
+  <Step title="Finalise and save the automation">
+    Check that all fields are correct, including the file name, FTP user, and template data. Click **Save**. The automation will now create files automatically when load drops are dispatched.
+  </Step>
+</Steps>

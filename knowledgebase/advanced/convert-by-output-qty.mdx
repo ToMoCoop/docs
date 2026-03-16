@@ -1,0 +1,48 @@
+---
+title: "Convert By Output Quantity"
+description: "How the Convert By Output Quantity setting controls conversion task creation for works orders using a Bill of Materials."
+sidebarTitle: "Convert by Output Qty"
+---
+
+## Convert By Output Quantity setting
+
+This setting controls how conversion tasks are generated when you process works orders for products made from a Bill of Materials (BOM). You can find it in the **Conversion** section of your account settings.
+
+## How it works
+
+| Setting | Behaviour | Best for |
+|---|---|---|
+| **Off** | One conversion task per pick task | Bulk conversions without detailed individual tracking |
+| **On** (recommended) | One conversion task per child product per job | Detailed stock tracking and full auditability |
+
+<Info>This setting does not affect pick tasks -- it only changes the number of conversion tasks created.</Info>
+
+## Example: Xbox and Cyberpunk 2077 Bundle
+
+Your BOM product requires one Xbox and one Cyberpunk 2077 (output quantity: 1). A works order for 10 bundles creates 2 pick tasks.
+
+**When off:** 1 conversion task for Xbox + 1 for Cyberpunk 2077 = **2 total**.
+
+**When on:** 10 conversion tasks for Xbox + 10 for Cyberpunk 2077 = **20 total**.
+
+## Example: Tin Can Telephone
+
+Your BOM product requires 1 Wire and 2 Tin Cans (output quantity: 1). A works order for 10 telephones creates 3 pick tasks.
+
+**When off:** 1 conversion task for Wire + 2 for Tin Can = **3 total**.
+
+**When on:** 10 conversion tasks for Wire (qty 1 each) + 10 for Tin Can (qty 2 each) = **20 total**.
+
+<Accordion title="FAQ">
+  **What is the recommended setting?**
+
+  **On** is recommended for maximum auditability, as it tracks each child product conversion in detail.
+
+  **Can I switch between the two settings?**
+
+  Yes, you can toggle the setting on or off depending on how much detail you need.
+
+  **Does the setting affect pick tasks?**
+
+  No, it only affects the number of conversion tasks created.
+</Accordion>

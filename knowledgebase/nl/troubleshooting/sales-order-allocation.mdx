@@ -1,0 +1,59 @@
+---
+title: "Verkooporders die niet worden toegewezen aan een pick"
+description: "Als u moeite hebt om aandelen toe te wijzen aan een keuze voor een verkooporder, biedt deze handleiding een duidelijke checklist om veelvoorkomende problemen te identificeren en op te lossen."
+sidebarTitle: "Verkooporder toewijzing"
+---
+
+Als u moeite hebt om aandelen toe te wijzen aan een keuze voor een verkooporder, biedt deze handleiding een duidelijke checklist om u te helpen veelvoorkomende problemen te identificeren en op te lossen, zodat het uitvoeren van bestellingen soepel wordt gegarandeerd.
+
+## Checklist voor probleemoplossing
+
+<Steps>
+  <Step title="Bekijk aandelenniveaus">
+    Zorg er eerst voor dat je genoeg **Fysieke voorraad** beschikbaar hebt voor de verkooporder. Controleer de voorraadhoeveelheden in zowel de **Aandelenlijst** als **Aandelenbalans** schermen bij Clarus WMS.
+  </Step>
+  <Step title="Controleer magazijn en rekening">
+    Zorg ervoor dat de voorraad zich in het **Hetzelfde magazijn** en **Account** bevindt als de goederen uitverkoop. Mismatches hier voorkomen toewijzing.
+  </Step>
+  <Step title="Bekijk de voorraad beschikbaarheid">
+    Bevestig dat de voorraad is gemarkeerd als **Beschikbaar** voor plukken. Voorraden die in de wacht, gereserveerd of anderszins niet beschikbaar is, kan niet aan de bestelling worden toegewezen.
+  </Step>
+  <Step title="Bekijk de locatie-instellingen">
+    Zorg ervoor dat de locatie waar de voorraad is opgeslagen de **Picking toestaan** en **Actief** vlaggen correct ingesteld heeft. Als deze instellingen onjuist zijn, wordt de voorraad mogelijk niet uitgekozen.
+  </Step>
+  <Step title="Controleer voor andere toegewezen taken">
+    Controleer of dezelfde voorraad nog niet is toegewezen aan andere taken. Conflicterende taken kunnen voorkomen dat voorraad wordt toegewezen aan uw huidige keuze.
+  </Step>
+  <Step title="Bekijk filtering op verkopen op datum of partij">
+    Als uw goederen uit lijnen worden gefilterd door **Verkopen op datum** of **Batch**, zorg ervoor dat de voorraad precies aan die criteria voldoet.
+  </Step>
+  <Step title="Controleer de maximale levensduur">
+    Zorg dat de **Maximale levensduur** instelling op het product passend is en de toewijzing van voorraad niet beperkt.
+  </Step>
+  <Step title="Wijzigingsregels voor de keuzeverwerking">
+    Probeer de **Kies verwerkingsregels** op het bijbehorende account in Clarus WMS te wijzigen om te zien of dit het probleem oplost.
+  </Step>
+  <Step title="Niet-kiesbare hoeveelheden controleren">
+    Kijk naar de **Aandelenbalans** om te controleren of er hoeveelheden in een **Niet plukbaar** status zijn. Deze hoeveelheden worden niet toegewezen aan een pick.
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Waarom wordt mijn voorraad niet toegewezen aan de pick?">
+Dit kan te wijten zijn aan onvoldoende voorraad, mismatches in magazijn of account of problemen met voorraadbeschikbaarheid. Bekijk alle items in de checklist hierboven.
+</Accordion>
+<Accordion title="Hoe controleer ik of de voorraad niet plukbaar is?">
+Ga naar de **Aandelenbalans** en controleer of er voorraadhoeveelheden zijn gemarkeerd als **Niet plukbaar**.
+</Accordion>
+<Accordion title="Kunnen andere taken voorraadtoewijzing voorkomen?">
+Ja, als de voorraad al aan een andere taak is toegewezen, is deze niet beschikbaar voor de huidige keuze.
+</Accordion>
+<Accordion title="Wat als mijn voorraad overeenkomt met de Verkoop op datum, maar nog steeds niet toewijst?">
+Zorg ervoor dat de **Verkopen op datum** filters zijn correct ingesteld en dat er geen mismatch is met de voorraadbatch of vervalinstellingen.
+</Accordion>
+<Accordion title="Met wie kan ik contact opnemen als het probleem zich aanhoudt?">
+Als u de checklist hebt doorlopen en het probleem blijft bestaan, neem dan contact op met ondersteuning voor verdere hulp.
+</Accordion>
+</AccordionGroup>

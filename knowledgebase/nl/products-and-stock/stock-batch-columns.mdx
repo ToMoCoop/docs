@@ -1,0 +1,41 @@
+---
+title: "Batch- en Stock Batch kolommen"
+description: "In dit artikel wordt het verschil uitgelegd tussen de kolommen 'Batch' en 'Stock Batch' in Clarus WMS."
+sidebarTitle: "Stock Batch kolommen"
+---
+
+In dit artikel wordt het verschil uitgelegd tussen de kolommen 'Batch' en 'Stock Batch' in Clarus WMS. Hoewel ze vaak vergelijkbare informatie weergeven, halen ze gegevens van verschillende plaatsen, wat belangrijk is voor nauwkeurige voorraadtracking.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Een batchnummer toevoegen aan voorraad">
+    Wanneer u voorraad ontvangt of toevoegt, kunt u een batchnummer toewijzen. Om dit te doen, voeg je de **Batch** kolom toe met behulp van de kolommanager. Zodra je het hebt toegevoegd, wordt het batchnummer gekoppeld aan die specifieke aandelenlijn.
+  </Step>
+  <Step title="Het verschil tussen 'Batch' en 'Stock Batch'">
+    Er zijn twee kolommen gerelateerd aan batches: **Batch** en **Voorraad batch**. Hoewel ze vaak dezelfde of vergelijkbare details weergeven, krijgen ze hun informatie uit verschillende bronnen:
+
+    **Voorraad Batch:** Deze kolom haalt zijn gegevens rechtstreeks uit de voorraadrecords. Als een batchnummer is toegewezen aan een aandelenregel, wordt deze kolom die informatie weergegeven.
+
+    **Batch:** Deze kolom haalt zijn informatie uit het scherm taken/transacties. Het toont batchnummers die verband houden met actieve taken die voorraadlijnen gebruiken. Dit veld kan echter soms leeg zijn. Dit gebeurt als een taak is gemaakt voordat een batchnummer werd toegewezen.
+  </Step>
+</Steps>
+
+<Info>De kolom 'Stockbatch' geeft altijd het batchnummer rechtstreeks uit de voorraadrecord, zelfs als de kolom 'Batch' leeg is vanwege een taak die wordt gemaakt voordat een batch werd toegewezen.</Info>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat is de primaire functie van de kolom 'Batch'?">
+De kolom 'Batch' toont batchnummers gekoppeld aan actieve taken die aandelenlijnen gebruiken. Het haalt gegevens uit het scherm taken/transacties.
+</Accordion>
+<Accordion title="Waarom kan de kolom 'Batch' soms leeg zijn?">
+De kolom 'Batch' is mogelijk leeg als een taak is gemaakt voordat een batchnummer aan de voorraad werd toegewezen. In dergelijke gevallen bevat de kolom 'Stockbatch' de informatie.
+</Accordion>
+<Accordion title="Waar haalt de kolom 'Stock Batch' zijn informatie vandaan?">
+De kolom 'Stock Batch' haalt gegevens rechtstreeks uit voorraadrecords. Als een batchnummer is toegewezen aan een aandelenregel, wordt deze kolom die informatie weergegeven.
+</Accordion>
+<Accordion title="Waarom is het belangrijk om het verschil te begrijpen?">
+Door deze verschillen te begrijpen, kunt u batchgerelateerde voorraadgegevens nauwkeurig bijhouden op verschillende schermen in Clarus WMS.
+</Accordion>
+</AccordionGroup>

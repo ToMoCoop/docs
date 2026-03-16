@@ -1,0 +1,57 @@
+---
+title: "Stock Consolidation for Pickfaces"
+description: "Learn how to enable stock consolidation to merge multiple stock lines within a pickface into a single record."
+sidebarTitle: "Stock Consolidation"
+---
+
+Stock consolidation for pickfaces merges multiple stock lines for the same product within a pickface into a single stock record, making picking simpler and more efficient.
+
+## How to enable it
+
+<Steps>
+<Step title="Navigate to the product">
+Go to the **Products** section and select the product you want to enable consolidation for.
+</Step>
+<Step title="Enable the consolidation flag">
+Scroll down to the **Flags** tab. Toggle **Enforce Pickface Stock Consolidation** to on.
+</Step>
+</Steps>
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-1.png" alt="Enforce Pickface Stock Consolidation flag in the product Flags tab" />
+</Frame>
+
+<Warning>
+This option only works if the product has a pickface assigned. If none is assigned, the flag will not apply. You can assign a pickface after enabling the flag, and it will then work correctly.
+</Warning>
+
+## What changes with consolidation?
+
+Previously, if a product had stock in multiple lines within the same pickface, those lines would display separately. With consolidation enabled:
+
+- All stock lines for the same product within a pickface automatically merge into a **single stock record**
+- When searching stock by location code, you will no longer see multiple lines for the same product
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-2.png" alt="Stock list before consolidation showing multiple lines" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-3.png" alt="Stock detail view showing consolidated record" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-4.png" alt="Stock list after consolidation showing single unified entry" />
+</Frame>
+
+## Impact on the Add Stock feature
+
+This also applies when using the **Add Stock** function from the stock list. Instead of creating a new line, any added stock will automatically merge with the existing stock line in that pickface.
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-5.png" alt="Add Stock function with consolidation active" />
+</Frame>
+
+## Consolidation rules
+
+Stock consolidation only happens when the product and its **attributes** (such as batch number, sell-by date, etc.) are identical. If attribute details differ, the stock will remain as separate lines to ensure accuracy.

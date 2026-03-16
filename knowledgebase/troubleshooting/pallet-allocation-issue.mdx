@@ -1,0 +1,35 @@
+---
+title: "Why Is the Entire Pallet Allocating Instead of a Specified Quantity?"
+description: "Diagnose and resolve full pallet allocation instead of specified quantities with this troubleshooting guide."
+sidebarTitle: "Pallet Allocation Issue"
+---
+
+If your pick lists are allocating entire pallets instead of the specific quantities you requested, it is usually due to a single account setting.
+
+## How to fix it
+
+<Steps>
+<Step title="Go to Accounts">
+Navigate to the **Accounts** screen.
+</Step>
+<Step title="Select the account">
+Choose the specific account connected to the order you are dealing with.
+</Step>
+<Step title="Find the Flags section">
+Scroll down until you find the **Flags** section.
+</Step>
+<Step title="Check the 'Round Up' option">
+Look for the option called **Round Up to Full Storage Units on Pick**. If this flag is turned on, the system will always allocate a full pallet or storage unit during the picking process, regardless of the exact quantity on the order. Turn it off to allocate only the exact quantity needed.
+</Step>
+</Steps>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Why does the system allocate full pallets even when I only requested a small quantity?">
+This happens if the **Round Up to Full Storage Units on Pick** flag is turned on in your account settings. The system will always allocate a full pallet or storage unit during picking.
+</Accordion>
+<Accordion title="How can I make the system allocate only the exact quantity I need?">
+Turn off the **Round Up to Full Storage Units on Pick** flag. Once disabled, picks will be based strictly on the order quantity.
+</Accordion>
+</AccordionGroup>

@@ -1,0 +1,43 @@
+---
+title: "Geen kosten toegepast"
+description: "In dit artikel wordt uitgelegd hoe u kunt onderzoeken waarom een lading niet is toegepast in Clarus WMS."
+sidebarTitle: "Geen kosten toegepast"
+---
+
+In dit artikel wordt uitgelegd hoe u kunt onderzoeken waarom een lading niet is toegepast in Clarus WMS. Het biedt belangrijke gebieden om te controleren, zodat u eventuele ontbrekende kosten snel kunt lokaliseren en oplossen.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Controleer de installatie van de oplaadkaart">
+    Zorg ervoor dat de laadkaart correct is ingesteld. Dit omvat het verifiëren van de instelling 'autokosten'. Als 'automatisch opladen' niet is ingeschakeld, bevestigt u met de klant dat de kosten handmatig worden toegevoegd.
+  </Step>
+  <Step title="Controleer het type opslageenheid">
+    De meeste klanten rekenen via 'storage_unit' of 'storage_unit_to', wat palletkosten zijn. Slechts een klant (Altrea) gebruikt 'productgewicht' voor lasten. Controleer bij het controleren van het opslageenheidstype of de toe te passen lading is ingesteld op het juiste type eenheid.
+  </Step>
+  <Step title="Beoordeel lijnen opladen">
+    Zowel ontvangst- als pickkosten tonen de laadlijnen onder de picklist of ontvangstoverzicht. Als er geen vergoeding is toegepast, is dit meestal te wijten aan het volgende:
+
+    - **Gemaakt op datum**
+    - **Type opbergeenheid**
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat zijn de gemeenschappelijke redenen waarom kosten niet van toepassing zijn?">
+De meest voorkomende redenen voor kosten die niet van toepassing zijn, zijn problemen met het 'Op datum gemaakt' of het 'Opslageenheidstype'.
+</Accordion>
+<Accordion title="Waar kan ik de laadlijnen zien?">
+Laadlijnen voor zowel ontvangst- als pickkosten worden weergegeven onder de picklist of ontvangstoverzicht.
+</Accordion>
+</AccordionGroup>
+
+<Warning>
+De meeste clients gebruiken 'storage_unit' of 'storage_unit_to' voor palletkosten. Slechts een klant gebruikt 'productgewicht'.
+</Warning>
+
+<Warning>
+Als automatische kosten niet zijn ingeschakeld, bevestigt u bij de klant dat kosten handmatig worden toegevoegd om ontbrekende inkomsten te voorkomen.
+</Warning>

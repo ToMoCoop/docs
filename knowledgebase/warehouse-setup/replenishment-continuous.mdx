@@ -1,0 +1,96 @@
+---
+title: "Pickface Replenishment: Continuous"
+description: "Learn how continuous pickface replenishment works and how to configure it for consistent stock availability."
+sidebarTitle: "Replenishment (Continuous)"
+---
+
+All pickfaces are picked in the same way: a task directs you to the location to collect the required stock. The difference lies in how and when those locations are replenished. **Continuous replenishment** keeps pickface locations consistently stocked by automatically generating replenishment tasks when stock drops below a configured threshold.
+
+## How continuous replenishment works
+
+1. **Stock is replenished into the pickface** either through a manual transfer or automatically after picks cause stock to drop below the minimum trigger level.
+
+2. **A pick task is generated.** When a sales order requires stock from a continuous pickface, the system assigns the task to the first available pickface defined in the product setup.
+
+3. **Stock is validated across pickfaces.** The system checks stock availability and shelf-life requirements across all configured pickfaces. If all meet the criteria, the pick task is assigned to the next pickface in rotation for balanced workload. If none meet the requirements, the task goes **on hold** until a replenishment occurs.
+
+4. **Pick tasks are distributed evenly.** When multiple tasks are generated for the same product, the system distributes them across all eligible pickface locations in the order defined on the product setup screen.
+
+5. **Replenishment is triggered automatically.** When stock drops below the minimum trigger quantity (due to picks, transfers, or adjustments), the system creates a replenishment task to top up that location to its configured capacity.
+
+## Setting up continuous pickfaces
+
+<Steps>
+<Step title="Navigate to the product">
+From the left-hand menu, click **Products** and select the product you want to configure.
+</Step>
+<Step title="Assign locations">
+Open the **Pickface** panel and click **New** to add a pickface location. You can optionally use **Location Groups** to manage multiple pickfaces simultaneously.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-1.png" alt="Pickface panel with location assignment" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-2.png" alt="Location group assignment for pickfaces" />
+</Frame>
+</Step>
+<Step title="Select replenishment type">
+Choose **Continuous Replenishment** as the replenishment strategy. A replenishment task is generated automatically when the minimum trigger level is reached.
+</Step>
+<Step title="Define minimum and maximum triggers">
+- **Minimum Trigger**: The stock quantity that triggers a replenishment task when levels drop below this threshold
+- **Maximum Trigger**: The target quantity to replenish up to when restocking
+
+If the **Full Storage Units Only** toggle is set to **Yes**, the maximum trigger is overridden and only full storage units will be replenished into the pickface.
+</Step>
+<Step title="Configure full storage units (optional)">
+- **Toggle No**: The replenishment tops up to the max trigger level, even if it means breaking down a storage unit
+- **Toggle Yes**: Only full storage units are replenished, overriding the max trigger (e.g., if max trigger is 100 and each storage unit contains 60, the system brings 2 full units totalling 120)
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-3.png" alt="Full storage units and trigger configuration" />
+</Frame>
+</Step>
+<Step title="Prioritise the locations">
+Use the **arrow controls** on the left-hand side of each location to reorder them. The order determines the sequence in which pickfaces are used when assigning pick tasks or replenishments.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-4.png" alt="Arrow controls for reordering pickface locations" />
+</Frame>
+</Step>
+</Steps>
+
+## Using continuous and demand replenishment together
+
+The **Continuous** and **Demand** replenishment settings can be used simultaneously for the same product by assigning them to different pickface locations:
+
+- **Primary Pickface (Continuous)**: A regularly replenished location holding the majority of stock for standard picking
+- **Secondary Pickface (Demand)**: A separate location used when stock from the primary pickface is insufficient for a specific order (e.g., shelf-life requirement)
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="How does the account pick rule affect my pickfaces?">
+The system uses your account pick rule to determine which stock is replenished into a pickface:
+- **First In First Out**: Replenishes stock with the earliest FIFO date
+- **Sell by Date**: Replenishes stock with the earliest sell-by date
+- **Best Before Date**: Replenishes stock with the earliest best-before date
+</Accordion>
+<Accordion title="Why does the order of locations matter?">
+The order dictates how pick tasks are assigned when multiple continuous pickfaces are set up. The system follows a sequential, alternating allocation method (e.g., task 1 goes to Pickface A, task 2 to B, task 3 to C, task 4 back to A).
+</Accordion>
+<Accordion title="What happens if I make a pickface location inactive?">
+Pick tasks will no longer be assigned to the inactive pickface, replenishment tasks will not generate, and any existing stock will remain there and need to be managed manually.
+</Accordion>
+<Accordion title="What happens when a pick task goes on hold?">
+If no pickface meets the stock or shelf-life requirements, the pick task goes **on hold** until a replenishment occurs. Hovering over the status will show the reason for the "On Hold" status.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-5.png" alt="Hovering over the On Hold status to display the hold reason" />
+</Frame>
+</Accordion>
+<Accordion title="What if my storage units are larger than the max trigger?">
+If **Full Storage Units Only** is set to Yes, the system brings in full storage units even if they exceed the max trigger. If set to No, the system tops up to the max trigger, potentially breaking down a storage unit.
+</Accordion>
+</AccordionGroup>

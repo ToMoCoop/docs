@@ -1,0 +1,49 @@
+---
+title: "Setting Up a Goods Out Transaction Report"
+description: "How to configure a Goods Out Transaction Report with account and date range parameters for tracking outbound transactions."
+sidebarTitle: "Goods Out Report"
+---
+
+## Overview
+
+The Goods Out Transaction Report shows all outbound transactions within a specified time frame. You set it up as a scheduled report with three parameters.
+
+<Steps>
+  <Step title="Schedule a new report">
+    Go to the **Reports** section and click **+Add Report**. Search for **Goods Out Transactions** in the dropdown.
+  </Step>
+  <Step title="Add parameters and variables">
+    Add three parameter sections:
+
+    <Note>
+    **Parameter 1: Account ID**
+    Set **Parameter Name** to `account_id` and **Variable Value** to your account ID number (e.g., `1`).
+
+    **Parameter 2: Created From**
+    Set **Parameter Name** to `created_from` and **Variable Value** to the start date (e.g., `2024-01-01`).
+
+    **Parameter 3: Created To**
+    Set **Parameter Name** to `created_to` and **Variable Value** to the end date (e.g., `2024-01-31`).
+    </Note>
+  </Step>
+  <Step title="Save the report">
+    Click **Save**. Your report will show goods out transactions within your chosen time frame.
+  </Step>
+</Steps>
+
+<Tip>
+You can further customise the report with extra date variables:
+
+- **Start of last week** -- transactions from the beginning of the previous week
+- **Last Sunday** (or any day) -- a specific day in the past week
+- **Start of today** -- transactions from the beginning of the current day
+</Tip>
+
+<AccordionGroup>
+  <Accordion title="Can I add more than three variables?">
+    Yes. You can add additional variables to customise the report further.
+  </Accordion>
+  <Accordion title="Where do I find my account ID?">
+    Your account ID is in your account settings, or ask your administrator.
+  </Accordion>
+</AccordionGroup>

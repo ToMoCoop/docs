@@ -1,0 +1,47 @@
+---
+title: "Set Up Storage Unit Types"
+description: "Learn how to set up and manage storage unit types such as standard pallets, euro pallets, and tote boxes with this configuration guide."
+sidebarTitle: "Storage Unit Types"
+---
+
+Storage unit types define the physical containers or pallets where your stock is kept. Setting them up correctly ensures your inventory is organised and easy to track. The three standard types are **Standard Pallet** (STD), **Euro Pallet** (EURO), and **Tote Box** (TOTE).
+
+## Set up storage unit types
+
+<Steps>
+<Step title="Access storage unit types">
+From the left-hand menu, navigate to **Settings > Storage Unit Types**. You will see a list of all existing types, which you can view, edit, or add to.
+</Step>
+<Step title="Create a new storage unit type">
+Click **New** and fill in the required information:
+
+- **Name and Code**: A descriptive name and short code for the unit type
+- **Reference Sequence**: A sequence for tracking (see the [sequences guide](/knowledgebase/warehouse-setup/create-sequences) for more details)
+- **Next in Sequence**: The next identifier based on your sequence setup
+- **Check Digit Requirement**: Whether a check digit is needed
+- **Pallet Details**: Whether the pallet leaves the warehouse, and its dimensions
+- **Naming Convention**: How the unit type will be named
+
+Click **Save** when finished.
+</Step>
+<Step title="Assign storage unit types to products">
+Go to the **Products** screen, find the product you want to edit, and click **Show**. Navigate to the **Product Storage Unit** section and add the storage unit types you need. The unit type at the top of the list will be the default. Drag your preferred type to the top to reorder.
+</Step>
+<Step title="Use storage unit types during stock receipt">
+When you receive stock, the system automatically selects the primary storage unit type linked to the product. You can change the unit type manually before finishing the receipt. For data imports such as pre-receipt files, enter the storage unit type code (e.g., EURO, TOTE, STD) in the relevant field.
+</Step>
+</Steps>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What are the common default storage unit types?">
+The three common defaults are Standard Pallet (STD), Euro Pallet (EURO), and Tote Box (TOTE).
+</Accordion>
+<Accordion title="Can I assign multiple storage unit types to a single product?">
+Yes, there is no limit. The topmost unit in the list will be the default.
+</Accordion>
+<Accordion title="What does 'pallet used' mean in warehouse management?">
+"Pallet used" is another term for storage unit types. It describes the physical structure or container that holds stock within a warehouse.
+</Accordion>
+</AccordionGroup>

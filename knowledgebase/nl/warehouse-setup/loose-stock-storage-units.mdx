@@ -1,0 +1,50 @@
+---
+title: "Een opslageenheid toevoegen aan losse voorraad"
+description: "In dit artikel worden de twee belangrijkste manieren uitgelegd om een opslagunit toe te wijzen aan losse voorraad in Clarus WMS."
+sidebarTitle: "Losse voorraad opslagunits"
+---
+
+In dit artikel worden de twee belangrijkste manieren uitgelegd om een opslagunit toe te wijzen aan losse voorraad in Clarus WMS. U kunt het oorspronkelijke ontvangstbewijs terugdraaien of de functie 'Voorraad toevoegen' gebruiken, afhankelijk van de status van uw voorraad.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Optie 1: De oorspronkelijke ontvangstbewijs terugdraaien">
+    De eerste manier om een opslagruimte toe te voegen, is door het oorspronkelijke boekingsbewijs ongedaan te maken. Na terugkomst kunt u vervolgens een opslagunit toevoegen aan die specifieke voorraadlijn.
+
+    <Warning>Deze methode werkt alleen als er geen voorraad van dat ontvangstbewijs is verplaatst of toegewezen. Als dat het geval is, kunt u het ontvangstbewijs niet teruggeven.</Warning>
+  </Step>
+  <Step title="Optie 2: Gebruik de functie 'Voorraad toevoegen'">
+    Als het ontvangstbewijs niet mogelijk is, kunt u de voorraad handmatig aanpassen met behulp van de volgende stappen.
+  </Step>
+  <Step title="Selecteer de voorraadlijn">
+    Vink in het voorraadlijstgegevensraster het vakje aan naast de voorraadregel die u wilt bijwerken.
+  </Step>
+  <Step title="Maak een negatieve aanpassing">
+    Ga naar **Voorraadcontroles** en klik **Negatieve aanpassing**. Hiermee verwijdert u de voorraad uit het systeem.
+
+    <Info>U moet een redencode hebben ingesteld voor zowel positieve als negatieve aanpassingen om door te gaan.</Info>
+  </Step>
+  <Step title="Voeg de voorraad terug">
+    Zodra de voorraad van het systeem is aangepast, gaat u terug naar **Voorraadcontroles** in het datarster en klik **Voorraad toevoegen**.
+  </Step>
+  <Step title="Opbergdetails opnieuw invoeren met opbergunit">
+    In de **Voorraad toevoegen** menu, vul alle relevante details opnieuw in voor de voorraadlijn, waaronder:
+
+    - Account
+    - Productcode
+    - 'Locatie naar'
+    - **Opbergunit**
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat gebeurt er als de voorraad weer aan het systeem is toegevoegd?">
+Zodra de voorraad weer aan het systeem is toegevoegd met de bijgewerkte details, wordt er nu een speciale referentie op de opslagunit bevestigd.
+</Accordion>
+<Accordion title="Zijn er voorwaarden voor het aanbrengen van aanpassingen?">
+Ja, u moet een redencode hebben ingesteld voor zowel positieve als negatieve aanpassingen in Clarus WMS om door te gaan met handmatige aanpassingen.
+</Accordion>
+</AccordionGroup>

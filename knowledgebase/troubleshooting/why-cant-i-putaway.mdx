@@ -1,0 +1,40 @@
+---
+title: "Why Can't I Putaway?"
+description: "Diagnose and resolve putaway problems including location settings and handheld device issues with this troubleshooting guide."
+sidebarTitle: "Putaway Problems"
+---
+
+This guide explains common reasons why you might have issues with putaway and how to fix them.
+
+## Check location settings for putaway
+
+The most common issue is that the destination location is not set up to allow putaway.
+
+<Steps>
+<Step title="Find the location">
+Go to the **Goods In** screen and look at the **Location To** field. Click on the location in the data grid or search for the location code in the **Locations** tab.
+</Step>
+<Step title="Check the 'Allow Putaway' setting">
+Once the location settings are open, scroll down to the **Options** section. Check if **Allow Putaway?** is set to **Yes**. If it is set to **No**, change it to **Yes**.
+</Step>
+</Steps>
+
+## Resolve issues with suggested pallets on handheld devices
+
+When using **Putaway by Receipt Reference** on handheld devices, the system suggests a specific pallet to scan first, and that pallet's putaway task is assigned to the user who selected the option. If another user tries to scan and put away that suggested pallet, they will be blocked.
+
+**How to resolve this:**
+
+- Have the original user complete the putaway for that pallet, **or**
+- Instead of using **Putaway by Receipt Reference**, choose **Putaway by Storage Unit**. This method allows any user to scan and put away any pallet with an active task, avoiding task assignment problems.
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Why can't I put away stock into a specific location?">
+The most common reason is that the **Allow Putaway?** setting for that location is set to **No**. Change this to **Yes** in the location settings.
+</Accordion>
+<Accordion title="What if a different user tries to put away a suggested pallet on a handheld device?">
+If a pallet was suggested to a user via **Putaway by Receipt Reference**, its task is assigned to them. A different user will be blocked. The original user must complete it, or use the **Putaway by Storage Unit** option instead.
+</Accordion>
+</AccordionGroup>

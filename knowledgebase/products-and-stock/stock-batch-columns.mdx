@@ -1,0 +1,38 @@
+---
+title: "Stock Batch vs. Batch Columns"
+description: "Understand the difference between the Batch and Stock Batch columns for accurate stock tracking."
+sidebarTitle: "Stock Batch Columns"
+---
+
+The system has two columns related to batch numbers: **Batch** and **Stock Batch**. While they often show similar information, they pull data from different sources. Understanding this difference is important for accurate stock tracking.
+
+## How to add a batch number to stock
+
+When you receive or add stock, you can assign a batch number by adding the **Batch** column using the column manager. Once added, the batch number is linked to that specific stock line.
+
+## Understanding the difference
+
+| Column | Data Source | Description |
+|--------|-------------|-------------|
+| **Stock Batch** | Stock records | Always reflects the batch number directly from the stock record |
+| **Batch** | Tasks/transactions | Shows batch numbers connected to active tasks that use stock lines |
+
+The **Batch** column might sometimes be blank. This happens when a task was created before a batch number was assigned. In these cases, the **Stock Batch** column will have the information, but the **Batch** column will not.
+
+<Info>
+The Stock Batch column always reflects the batch number directly from the stock record, even if the Batch column is blank due to a task being created before a batch was assigned.
+</Info>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What is the primary function of the Batch column?">
+It shows batch numbers linked to active tasks that use stock lines, pulling data from the tasks/transactions screen.
+</Accordion>
+<Accordion title="Why might the Batch column sometimes be empty?">
+The Batch column may be empty if a task was created before a batch number was assigned. In that case, check the Stock Batch column instead.
+</Accordion>
+<Accordion title="How can I assign a batch number when receiving stock?">
+Add the Batch column via the column manager when receiving or adding stock. The batch number will be linked to that stock line.
+</Accordion>
+</AccordionGroup>

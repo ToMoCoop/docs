@@ -1,0 +1,42 @@
+---
+title: "No Charge Applied"
+description: "Diagnose and resolve missing charges on receipts and picks with this step-by-step troubleshooting guide."
+---
+
+This article explains how to investigate why a charge has not been applied, covering the key areas to check so you can quickly pinpoint and resolve any missing charges.
+
+## Diagnostic steps
+
+<Steps>
+<Step title="Check the charge card setup">
+Ensure the charge card has been set up correctly, including verifying the **auto charges** setting. If auto charge is not toggled on, confirm with the client that charges are being added manually.
+</Step>
+<Step title="Verify storage unit type">
+Most clients charge via **storage_unit** or **storage_unit_to** (pallet charges). When checking the storage unit type, make sure the charge is set to the correct unit type.
+</Step>
+<Step title="Review charge lines">
+Both receipt and pick charges will show the charge lines underneath the picklist or receipt summary. If a charge has not applied, it is usually due to:
+
+- **Created at date** mismatch
+- **Storage unit type** mismatch
+</Step>
+</Steps>
+
+<Warning>
+If auto charge is not toggled on, confirm with the client that charges are being added manually to avoid missing revenue.
+</Warning>
+
+<Info>
+Most clients use "storage_unit" or "storage_unit_to" for pallet charges. Only rare cases use "product weight" for charges.
+</Info>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What are the common reasons for charges not applying?">
+The most common reasons are issues with the "Created at date" or the "Storage unit type."
+</Accordion>
+<Accordion title="Where can I see the charge lines?">
+Charge lines for both receipt and pick charges are displayed underneath the picklist or receipt summary.
+</Accordion>
+</AccordionGroup>

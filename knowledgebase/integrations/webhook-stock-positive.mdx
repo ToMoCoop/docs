@@ -1,0 +1,41 @@
+---
+title: "Send a Webhook on Positive Stock Adjustment"
+description: "How to set up an automation that triggers a webhook when stock is positively adjusted, sending real-time data to external systems."
+sidebarTitle: "Webhook: Positive Adjustment"
+---
+
+## Overview
+
+You can set up automations that trigger a webhook when stock is positively adjusted. This sends real-time stock data to external systems for further processing.
+
+<Steps>
+  <Step title="Access the Automation settings">
+    Go to the **Automations** section.
+  </Step>
+  <Step title="Create a new automation">
+    Click **+New** to set up a new automation. Define the rules for when this automation should fire.
+  </Step>
+  <Step title="Specify webhook details">
+    Enter the **Webhook URL** where data should be sent. Choose the **Webhook Method** (e.g., **POST** or **GET**).
+  </Step>
+  <Step title="Set the event criteria">
+    Set the event to trigger **when stock is positively adjusted**.
+  </Step>
+  <Step title="Review the webhook payload">
+    When triggered, a **JSON object** is sent with details of the stock adjustment, including the product ID, warehouse, and the new quantity.
+  </Step>
+  <Step title="Save the automation">
+    Click **Save** to activate your automation.
+  </Step>
+</Steps>
+
+<Warning>The JSON payload contains important details such as `id`, `created_at`, `account`, `product`, `warehouse`, `quantity`, and `new_quantity`. Make sure your receiving system can parse these fields.</Warning>
+
+<AccordionGroup>
+  <Accordion title="What is a webhook?">
+    A webhook sends real-time data to another online address when a specific event occurs.
+  </Accordion>
+  <Accordion title="How can I test if the webhook is working?">
+    Make a positive stock adjustment that matches your criteria, then check your external system to confirm it received the data.
+  </Accordion>
+</AccordionGroup>

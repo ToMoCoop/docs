@@ -1,0 +1,35 @@
+---
+title: "Available Stock by Sell By Date Report"
+description: "How to set up a report that shows available stock organised by sell-by date for effective expiry tracking."
+sidebarTitle: "Sell By Date Report"
+---
+
+## Overview
+
+The Available Stock in Sell By Date report helps you track stock expiration dates by showing available inventory grouped by sell-by date. You can set it up as a scheduled report filtered by account.
+
+<Steps>
+  <Step title="Schedule a new report">
+    Set up a [scheduled report](/knowledgebase/reporting/set-up-scheduled-reports). In the **Reports** section, click **+Add Report** and search for **Available Stock in Sell By Date**.
+  </Step>
+  <Step title="Add the Account ID parameter">
+    Select `account_id` as the **Parameter Name** and enter your **account ID number** (e.g., `1`) as the **Variable Value**.
+  </Step>
+  <Step title="Save the report">
+    Click **Save**. The report will display available stock with sell-by dates for the specified account.
+  </Step>
+</Steps>
+
+<Warning>The account ID number is essential -- the report will not display data without it.</Warning>
+
+<AccordionGroup>
+  <Accordion title="Can I add more variables to the report?">
+    Yes. You can add additional parameters to refine the report based on your needs.
+  </Accordion>
+  <Accordion title="Can I generate reports for multiple accounts?">
+    Yes. Add additional `account_id` variables to run the report across multiple accounts.
+  </Accordion>
+  <Accordion title="Can I schedule this report to run regularly?">
+    Yes. Once saved, the report can be scheduled to run at your chosen frequency.
+  </Accordion>
+</AccordionGroup>

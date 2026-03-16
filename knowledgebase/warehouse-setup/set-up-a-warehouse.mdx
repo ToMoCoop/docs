@@ -1,0 +1,60 @@
+---
+title: "Set Up a Warehouse"
+description: "Create and configure a warehouse within a site, including address details and default goods in/out bays."
+---
+
+Once you have [created a site](/knowledgebase/warehouse-setup/create-a-site), you can set up one or more warehouses within it. Each warehouse represents a distinct operational space where stock is stored and managed.
+
+## Creating a warehouse
+
+<Steps>
+<Step title="Go to the warehouse section">
+From the left-hand menu, click on **Warehouses**. A list of all existing warehouses will be displayed.
+</Step>
+<Step title="Add a new warehouse">
+Click the **+New** button to create a new warehouse.
+</Step>
+<Step title="Fill in warehouse details">
+Enter the required details:
+
+- **Code**: A unique code to identify your warehouse
+- **Name**: A descriptive name (e.g. building name or function)
+- **Address**: The full address of the warehouse
+</Step>
+<Step title="Save the warehouse">
+Click **Save** to complete the initial setup.
+</Step>
+</Steps>
+
+<Info>
+Only the **Code** and **Name** fields are mandatory. However, you should always set the **Address** — it is used as the sender address on courier shipments leaving your warehouse and is included in any output files such as EDI exports.
+</Info>
+
+## Setting default goods in and goods out bays
+
+The **Default goods in bay** and **Default goods out bay** fields on the warehouse record control where inbound and outbound stock is initially directed. However, these can only be set once a location with type **GIBAY** or **GOBAY** already exists within the warehouse.
+
+Since a brand new warehouse has no locations yet, the typical setup flow is:
+
+<Steps>
+<Step title="Create your warehouse">
+Follow the steps above to create the warehouse record.
+</Step>
+<Step title="Create your bay locations">
+[Create locations](/knowledgebase/warehouse-setup/create-a-location) with type **GIBAY** (goods in bay) and **GOBAY** (goods out bay) inside the warehouse.
+</Step>
+<Step title="Set the defaults">
+Return to the warehouse record and set the **Default goods in bay** and **Default goods out bay** fields to the locations you just created.
+</Step>
+</Steps>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Can I add multiple warehouses?">
+Yes. You can create as many warehouses as you need, each with its own code, address, and configuration. Multiple warehouses can belong to the same [site](/knowledgebase/warehouse-setup/create-a-site).
+</Accordion>
+<Accordion title="What happens if I enter wrong information?">
+You can edit the warehouse details at any time by selecting the warehouse from the list and updating the fields.
+</Accordion>
+</AccordionGroup>

@@ -1,0 +1,59 @@
+---
+title: "Prerequisites for an ASN Export"
+description: "Complete setup checklist for automatically generating Advanced Shipping Notice (ASN) files when loads are dispatched, including GLN, storage units, and carrier configuration."
+sidebarTitle: "ASN Export"
+---
+
+## Overview
+
+To automatically generate an Advanced Shipping Notice (ASN) when a load is dispatched, you need to complete several setup steps. This ensures all required data is present for the ASN file.
+
+## Setup checklist
+
+<Steps>
+  <Step title="Set up Global Location Numbers (GLN)">
+    Ensure you have the **GLN** for all connected parties, such as **suppliers, consolidators, and depots**. These are vital for tracking locations in ASNs.
+  </Step>
+  <Step title="Set up storage unit types">
+    Create at least one storage unit type using one of these codes: **DOLLIES**, **EURO**, **CHEP**, or **SEMI**.
+
+    <Warning>Only orders with these specific storage unit types will be recognised by the ASN file.</Warning>
+  </Step>
+  <Step title="Set up delivery addresses">
+    For each delivery address, enter the depot's **ANA/GLN** into the **External System Reference 1** field. This populates the **LOC segment** of the ASN.
+  </Step>
+  <Step title="Set up accounts">
+    In the account setup, populate **External System Reference 1** with the **supplier ASN number** (for consolidated ASNs). This populates the **PIA segment of type DEL**.
+  </Step>
+  <Step title="Set up carriers">
+    Add an **External System Reference 1** for each required carrier. The system checks for values in this order:
+    1. Carrier external system reference and name
+    2. Consolidator ID and name (if set on the event trigger)
+    3. Supplier ID and name (if provided)
+  </Step>
+  <Step title="Set up an FTP user">
+    Create a new **FTP user** with the direction set to **Download** for ASN files.
+  </Step>
+  <Step title="Contact support for event trigger setup">
+    Once the above steps are complete, contact support to set up the event trigger. Provide the following:
+
+    **Required:**
+    - **FTP User ID** -- where the ASN files will be created
+    - **Customer ID** -- for which the ASN will be created (one event trigger per customer)
+
+    **Optional:**
+    - Consolidator ID and Name
+    - File Name Prefix (default is "ASN")
+    - Supplier ID and Name
+    - Secondary Consolidator ID
+  </Step>
+</Steps>
+
+<AccordionGroup>
+  <Accordion title="What is a GLN?">
+    A **Global Location Number** is a unique identifier for locations in the supply chain, such as depots or suppliers.
+  </Accordion>
+  <Accordion title="Can I use multiple carriers in the ASN?">
+    Yes. Ensure each carrier has an **external system reference** so they are correctly included in the ASN file.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,22 @@
+---
+title: "Stock Lines After Pick Cancellation"
+description: "Understand what happens to stock lines when you cancel pick tasks, including how to properly complete the associated sales order."
+sidebarTitle: "Stock Lines & Pick Removal"
+---
+
+## Cancelling Pick Tasks and Stock Status
+
+When you cancel pick tasks, the allocated stock lines become available again and retain all their original information. However, the sales order will not automatically update to "Completed" unless you also cancel the lines from the order itself.
+
+<Steps>
+  <Step title="Cancel associated tasks">
+    Go to either the **pick list screen** or the **tasks screen**. Cancelling tasks here will automatically change the status of the stock lines back to "Available" while keeping all their original information.
+  </Step>
+  <Step title="Update the sales order">
+    After cancelling the tasks, the stock lines will still be on the sales order. To change the sales order status to "Completed", you must also cancel the lines from the order. Otherwise, the order will remain in a "Part" status.
+  </Step>
+</Steps>
+
+<Warning>Simply cancelling pick tasks does not complete the sales order. You must cancel the lines from the order to change its status to "Completed".</Warning>
+
+<Info>Always check the sales order status after cancelling pick tasks to ensure it reflects your desired outcome.</Info>

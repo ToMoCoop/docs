@@ -1,0 +1,81 @@
+---
+title: "Wat zijn de vereisten voor een ASN export?"
+description: "Als u automatisch een Advanced Shipping Notice (ASN) wilt genereren wanneer een lading wordt verzonden in Clarus WMS, moet u een paar instelstappen vo"
+sidebarTitle: "Wat zijn de vereisten voor een ASN..."
+---
+
+## Hoe ASN Export op Load Dispatch
+
+Als u automatisch een Advanced Shipping Notice (ASN) wilt genereren wanneer een lading wordt verzonden in Clarus WMS, moet u een paar instelstappen voltooien. Dit zorgt ervoor dat alle benodigde gegevens klaar zijn voor het ASN-bestand.
+
+## Stapsgewijze handleiding
+
+### 1. Wereldwijde locatienummers (GLN) instellen
+
+Zorg ervoor dat je de **Gln** voor alle verbonden partijen, zoals **Leveranciers, consolidatoren en depots** . Deze cijfers zijn van vitaal belang voor het volgen van locaties in ASN's.
+
+### 2. Opslagseenheidstypen instellen
+
+U moet ten minste één opslagunittype instellen met behulp van een van deze codes: **DOLLIES, EURO, CHEP of SEMI** .
+[CALLOUT:WARNING]
+ **Waarschuwing:** Alleen bestellingen met deze specifieke opslagunitstypen worden herkend door het ASN-bestand.
+
+### 3. Leveringsadressen instellen
+
+Voer voor elk afleveradres de **Ana/gln** In de **Referentie van extern systeem 1** veld. Deze informatie bevolkt de **LOC segment** van de ASN.
+
+### 4. Accounts instellen
+
+Vul in de accountinstelling de **Referentie van extern systeem 1** veld met de **Leverancier ASN nummer** (voor geconsolideerde ASN's). Dit helpt het oorspronkelijke ASN-nummer van de leverancier bij te houden en bevolkt de **PIA segment van type DEL** .
+
+### 5. Vervoerders opzetten
+
+Voeg een **Referentie van extern systeem 1** Voor elke benodigde vervoerder. Dit identificeert de gebruikte vervoersdiensten en zal de **TDT lijn** in het ASN-bestand. Het systeem controleert op deze waarden in volgorde van prioriteit:
+
+-  **Vervoerder externe systeemreferentie en naam van de vervoerder.** 
+-  **Consolidator ID en naam** (indien ingesteld op de trigger van het evenement).
+-  **Leverancier ID en naam** (indien voorzien).
+
+### 6. Een FTP-gebruiker instellen
+
+Wij raden u aan een nieuwe **FTP gebruiker** Zorg ervoor dat de richting is ingesteld op **Download** voor ASN bestanden.
+
+### 7. Neem contact op met Clarus WMS voor Event Trigger Setup
+
+Nadat u de bovenstaande stappen hebt voltooid, neemt u contact op met **Clarus WMS** om de gebeurtenis trigger in te stellen die ASN-bestanden genereert bij het verzenden van lading. U moet het volgende verstrekken:
+
+ **Vereiste informatie:** 
+
+-  **FTP gebruikers-ID:** De ID van Clarus WMS waar de ASN-bestanden worden gemaakt.
+-  **Klant-ID:** De ID van Clarus WMS waarvoor de ASN wordt gemaakt. Voor elke klant is een aparte event trigger nodig.
+
+ **Optionele informatie:** 
+
+-  **Consolidator ID:** De GLN van de consolidator (populeert de **NAD+CS segment** ).
+-  **Consolidator Naam:** De naam van de consolidator.
+-  **Bestandsnaam Prefix:** Een voorvoegsel om aan het begin van elk bestand te gebruiken (standaard is ASN).
+-  **Leverancier ID:** De GLN van de leverancier (populeert de **NAD+SE segment** ).
+-  **Naam van de leverancier:** De naam van de leverancier.
+-  **Secundaire Consolidator ID:** De GLN van een secundaire consolidator (populeert de **NAD+DP segment** ).
+
+## FAQs
+
+### Wat is een Global Location Number (GLN)?
+
+A **Wereldwijd locatienummer (GLN)** is een unieke identificatiecode voor locaties in de supply chain, zoals depots of leveranciers. Het zorgt ervoor dat elke partij in het ASN-proces nauwkeurig wordt geïdentificeerd.
+
+### Waarom moet ik opslagunittypen instellen?
+
+De ASN-export herkent alleen specifieke soorten opslagunits, zoals **Dollies** Of **Chep** . Het instellen van deze zorgt ervoor dat uw bestellingen voldoen aan de criteria voor ASN's.
+
+### Kan ik meerdere vervoerders gebruiken in de ASN?
+
+U kunt meerdere vervoerders gebruiken. Zorg ervoor dat elke vervoerder een **Referentie van extern systeem** Ze zijn dus correct opgenomen in het ASN-bestand.
+
+### Wat als ik niet de GLN van een consolidator of leverancier heb?
+
+Als de **Gln** De ASN zal deze informatie niet opnemen in de **Nad+cs** Of **Nad+se** segmenten, die van invloed kunnen zijn op tracking.
+
+### Hoe controleer ik de status van de ASN-opstelling?
+
+Na het verstrekken van de vereiste informatie aan **Clarus WMS** Zij zullen de trigger van het evenement opzetten. U kunt de voltooiing bevestigen door contact op te nemen **Ondersteuning van Clarus** rechtstreeks.

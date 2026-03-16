@@ -13,68 +13,773 @@
       "display": "interactive"
     },
     "examples": {
-      "languages": ["curl", "python", "javascript"],
+      "languages": [
+        "curl",
+        "python",
+        "javascript"
+      ],
       "defaults": "all"
     }
   },
   "navigation": {
-    "tabs": [
+    "languages": [
       {
-        "tab": "Guides",
-        "public": true,
-        "groups": [
+        "language": "en",
+        "tabs": [
           {
-            "group": "Overview",
-            "pages": ["index"]
-          },
-          {
-            "group": "Integrations",
-            "pages": ["integrations/cloudprint"]
-          }
-        ]
-      },
-      {
-        "tab": "Architecture",
-        "public": true,
-        "groups": [
-          {
-            "group": "AI Architecture",
-            "pages": [
-              "architecture/ai/overview",
-              "architecture/ai/infrastructure",
-              "architecture/ai/gateways",
-              "architecture/ai/runtime",
-              "architecture/ai/authentication",
-              "architecture/ai/tools",
-              "architecture/ai/sessions",
-              "architecture/ai/frontend"
-            ]
-          },
-          {
-            "group": "Deployment",
-            "pages": [
-              "architecture/deployment/index",
-              "architecture/deployment/ai-pipelines"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "API Documentation",
+            "tab": "Guides",
             "public": true,
-            "pages": ["api-reference/introduction"]
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "index"
+                ]
+              },
+              {
+                "group": "Integrations",
+                "pages": [
+                  "integrations/cloudprint"
+                ]
+              }
+            ]
           },
           {
-            "group": "Core Resources",
-            "pages": ["api-reference/core-resources/address"]
+            "tab": "Architecture",
+            "public": true,
+            "groups": [
+              {
+                "group": "AI Architecture",
+                "pages": [
+                  "architecture/ai/overview",
+                  "architecture/ai/infrastructure",
+                  "architecture/ai/gateways",
+                  "architecture/ai/runtime",
+                  "architecture/ai/authentication",
+                  "architecture/ai/tools",
+                  "architecture/ai/sessions",
+                  "architecture/ai/frontend"
+                ]
+              },
+              {
+                "group": "Deployment",
+                "pages": [
+                  "architecture/deployment/index",
+                  "architecture/deployment/ai-pipelines"
+                ]
+              }
+            ]
           },
           {
-            "group": "Operations",
-            "openapi": "api-reference/clarus-api.json",
-            "public": true
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "API Documentation",
+                "public": true,
+                "pages": [
+                  "api-reference/introduction"
+                ]
+              },
+              {
+                "group": "Core Resources",
+                "pages": [
+                  "api-reference/core-resources/address"
+                ]
+              },
+              {
+                "group": "Operations",
+                "openapi": "api-reference/clarus-api.json",
+                "public": true
+              }
+            ]
+          },
+          {
+            "tab": "Knowledgebase",
+            "public": true,
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "knowledgebase/getting-started/reset-my-password",
+                  "knowledgebase/getting-started/use-the-booking-diary"
+                ]
+              },
+              {
+                "group": "Using Clarus",
+                "pages": [
+                  "knowledgebase/reporting/customise-data-grids",
+                  "knowledgebase/reporting/data-grid-columns"
+                ]
+              },
+              {
+                "group": "System Setup",
+                "pages": [
+                  {
+                    "group": "Users & Roles",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/users-and-roles/creating-users",
+                      "knowledgebase/users-and-roles/user-roles-guide",
+                      {
+                        "group": "Role Types",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/users-and-roles/admin-role",
+                          "knowledgebase/users-and-roles/standard-role",
+                          "knowledgebase/users-and-roles/client-role",
+                          "knowledgebase/users-and-roles/financial-role",
+                          "knowledgebase/users-and-roles/rf-role"
+                        ]
+                      },
+                      "knowledgebase/users-and-roles/assigning-different-user-views",
+                      "knowledgebase/users-and-roles/restrict-user-visibility",
+                      "knowledgebase/users-and-roles/hhd-user-creation"
+                    ]
+                  },
+                  {
+                    "group": "Accounts",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/accounts/set-up-accounts",
+                      "knowledgebase/accounts/link-accounts",
+                      "knowledgebase/accounts/creating-customers",
+                      "knowledgebase/accounts/create-and-use-groups",
+                      "knowledgebase/accounts/use-the-customers-data-grid",
+                      "knowledgebase/accounts/dispatch-strategies",
+                      "knowledgebase/accounts/reason-codes",
+                      "knowledgebase/accounts/use-reason-codes",
+                      "knowledgebase/accounts/short-order-lines"
+                    ]
+                  },
+                  {
+                    "group": "Warehouse Setup",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/warehouse-setup/create-a-site",
+                      "knowledgebase/warehouse-setup/set-up-a-warehouse",
+                      {
+                        "group": "Locations",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/warehouse-setup/create-a-location",
+                          "knowledgebase/warehouse-setup/location-groups",
+                          "knowledgebase/warehouse-setup/location-check-digits",
+                          "knowledgebase/warehouse-setup/warehouse-map-locations",
+                          "knowledgebase/warehouse-setup/create-sequences"
+                        ]
+                      },
+                      {
+                        "group": "Storage",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/warehouse-setup/storage-unit-types",
+                          "knowledgebase/warehouse-setup/warehouse-confined-storage",
+                          "knowledgebase/warehouse-setup/loose-stock-storage-units"
+                        ]
+                      },
+                      {
+                        "group": "Pickfaces",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/warehouse-setup/create-pickface",
+                          "knowledgebase/warehouse-setup/enforcing-pick-types",
+                          "knowledgebase/warehouse-setup/stock-consolidation",
+                          "knowledgebase/warehouse-setup/replenishment-continuous",
+                          "knowledgebase/warehouse-setup/replenishment-demand"
+                        ]
+                      },
+                      "knowledgebase/warehouse-setup/create-carrier",
+                      "knowledgebase/warehouse-setup/create-trailer"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Products & Stock",
+                "pages": [
+                  "knowledgebase/products-and-stock/add-new-products",
+                  "knowledgebase/products-and-stock/product-import",
+                  "knowledgebase/products-and-stock/use-product-groups",
+                  "knowledgebase/products-and-stock/multi-account-products",
+                  "knowledgebase/products-and-stock/product-storage-units",
+                  "knowledgebase/products-and-stock/create-a-bill-of-materials-bom",
+                  {
+                    "group": "Stock Management",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/products-and-stock/stock-adjustments",
+                      "knowledgebase/products-and-stock/stock-balance",
+                      "knowledgebase/products-and-stock/stock-batch-columns",
+                      "knowledgebase/products-and-stock/sftp-stock-attributes",
+                      "knowledgebase/products-and-stock/transfer-stock-or-pallets",
+                      "knowledgebase/products-and-stock/perform-a-warehouse-transfer",
+                      "knowledgebase/products-and-stock/mixed-pallets",
+                      "knowledgebase/products-and-stock/merge-split-pallets",
+                      "knowledgebase/products-and-stock/reusing-dispatched-storage-units"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Warehouse Operations",
+                "pages": [
+                  {
+                    "group": "Inbound",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/inbound/book-goods-in",
+                      "knowledgebase/inbound/pre-receipt-import",
+                      "knowledgebase/inbound/pre-receipt-putaway-labels",
+                      "knowledgebase/inbound/guided-putaway-rules",
+                      "knowledgebase/inbound/put-away-products-via-groups",
+                      "knowledgebase/inbound/confirm-all-button",
+                      "knowledgebase/inbound/cancel-a-receipt",
+                      "knowledgebase/inbound/cancel-receive-tasks",
+                      "knowledgebase/inbound/goods-in-report"
+                    ]
+                  },
+                  {
+                    "group": "Outbound",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Sales Orders",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/outbound/create-a-sales-order",
+                          "knowledgebase/outbound/create-a-sales-order-without-selecting-a-warehouse",
+                          "knowledgebase/outbound/amend-order-line-quantities"
+                        ]
+                      },
+                      {
+                        "group": "Picking",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/outbound/create-and-process-a-pick-list",
+                          "knowledgebase/outbound/cancel-or-amend-a-pick-list",
+                          "knowledgebase/outbound/choose-a-pick-rule",
+                          "knowledgebase/outbound/use-pick-optimisation",
+                          "knowledgebase/outbound/pick-rules-account",
+                          "knowledgebase/outbound/account-pick-rules",
+                          "knowledgebase/outbound/batch-picking",
+                          "knowledgebase/outbound/consolidated-picking",
+                          "knowledgebase/outbound/round-up-storage-units",
+                          "knowledgebase/outbound/stock-lines-pick-removal",
+                          "knowledgebase/outbound/tally-records"
+                        ]
+                      },
+                      {
+                        "group": "Packing & Dispatch",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/outbound/packing-desk",
+                          "knowledgebase/outbound/pre-requisites-for-shipments",
+                          "knowledgebase/outbound/dispatching-loads",
+                          "knowledgebase/outbound/delivery-addresses",
+                          "knowledgebase/outbound/collection-addresses",
+                          "knowledgebase/outbound/ftp-load-dispatch-file",
+                          "knowledgebase/outbound/download-an-invoice",
+                          "knowledgebase/outbound/download-backups"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Financial",
+                "pages": [
+                  {
+                    "group": "Charges",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/financial/set-charges-to-accounts",
+                      "knowledgebase/financial/charge-window-and-create-one",
+                      "knowledgebase/financial/charge-period-dates",
+                      "knowledgebase/financial/export-charges-to-sage-line-200",
+                      "knowledgebase/financial/commercial-invoices"
+                    ]
+                  },
+                  {
+                    "group": "Invoices",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/financial/create-an-invoice",
+                      "knowledgebase/financial/amend-an-invoice",
+                      "knowledgebase/financial/customise-an-invoice",
+                      "knowledgebase/financial/print-an-invoice",
+                      "knowledgebase/financial/how-do-invoice-numbers-work",
+                      "knowledgebase/financial/invoice-screen-buttons",
+                      "knowledgebase/financial/invoice-currencies",
+                      "knowledgebase/financial/apply-vat-to-invoices",
+                      "knowledgebase/financial/manage-different-rates-of-tax"
+                    ]
+                  },
+                  {
+                    "group": "Suppliers",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/financial/add-a-new-supplier",
+                      "knowledgebase/financial/edit-or-delete-a-supplier",
+                      "knowledgebase/financial/set-a-supplier-as-active-or-inactive",
+                      "knowledgebase/financial/view-the-supplier-data-grid",
+                      "knowledgebase/financial/export-supplier-data"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Reporting",
+                "pages": [
+                  "knowledgebase/reporting/use-reports",
+                  "knowledgebase/reporting/add-variables-to-reports",
+                  "knowledgebase/reporting/select-and-group-data-by-warehouse",
+                  "knowledgebase/reporting/goods-out-report",
+                  "knowledgebase/reporting/sell-by-date-report",
+                  "knowledgebase/reporting/set-up-scheduled-reports",
+                  "knowledgebase/reporting/remove-a-scheduled-report"
+                ]
+              },
+              {
+                "group": "Integrations & Tools",
+                "pages": [
+                  {
+                    "group": "SFTP",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/integrations/use-sftp-for-imports",
+                      "knowledgebase/integrations/sftp-order-import",
+                      "knowledgebase/integrations/sftp-account-assignments",
+                      "knowledgebase/integrations/sftp-stock-transfer-file",
+                      "knowledgebase/integrations/asn-export"
+                    ]
+                  },
+                  {
+                    "group": "Webhooks",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/integrations/validate-a-webhook-request",
+                      "knowledgebase/integrations/webhook-stock-positive",
+                      "knowledgebase/integrations/webhook-stock-negative"
+                    ]
+                  },
+                  "knowledgebase/integrations/dhl-credentials",
+                  {
+                    "group": "Cloud Print",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/cloud-print/installation",
+                      "knowledgebase/cloud-print/logging-in",
+                      "knowledgebase/cloud-print/syncing-printers",
+                      "knowledgebase/cloud-print/default-printer",
+                      "knowledgebase/cloud-print/viewing-printers",
+                      "knowledgebase/cloud-print/cloud-print-communication",
+                      "knowledgebase/cloud-print/cloud-print-network",
+                      "knowledgebase/cloud-print/upgrading"
+                    ]
+                  },
+                  {
+                    "group": "Hardware",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/hardware/hhd-conditions",
+                      "knowledgebase/hardware/hhd-previews-duplication",
+                      "knowledgebase/hardware/image-capture"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Advanced & Reference",
+                "pages": [
+                  {
+                    "group": "Advanced Features",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/advanced/serial-number-tracking",
+                      "knowledgebase/advanced/date-validation",
+                      "knowledgebase/advanced/works-orders",
+                      "knowledgebase/advanced/manage-jobs",
+                      "knowledgebase/advanced/create-a-kit",
+                      "knowledgebase/advanced/use-templates",
+                      "knowledgebase/advanced/dispatch-by-output-qty",
+                      "knowledgebase/advanced/convert-by-output-qty"
+                    ]
+                  },
+                  {
+                    "group": "Security & Compliance",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/security/subprocessors",
+                      "knowledgebase/security/database-backup"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Troubleshooting",
+                "pages": [
+                  "knowledgebase/troubleshooting/attrup-meaning",
+                  "knowledgebase/troubleshooting/sales-order-allocation",
+                  "knowledgebase/troubleshooting/wrong-account-booking",
+                  "knowledgebase/troubleshooting/why-cant-i-putaway",
+                  "knowledgebase/troubleshooting/pallet-allocation-issue",
+                  "knowledgebase/troubleshooting/no-charge-applied",
+                  "knowledgebase/troubleshooting/label-printing-issues",
+                  "knowledgebase/troubleshooting/storage-unit-part-pick",
+                  "knowledgebase/troubleshooting/sftp-upload-errors",
+                  "knowledgebase/troubleshooting/import-errors",
+                  "knowledgebase/troubleshooting/ftp-sftp-queue",
+                  "knowledgebase/troubleshooting/failed-scheduled-reports",
+                  "knowledgebase/troubleshooting/datagrid-error",
+                  "knowledgebase/troubleshooting/cloud-print-troubleshooting",
+                  "knowledgebase/troubleshooting/random-logout"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "language": "nl",
+        "tabs": [
+          {
+            "tab": "Kennisbank",
+            "public": true,
+            "groups": [
+              {
+                "group": "Aan de slag",
+                "pages": [
+                  "knowledgebase/nl/getting-started/reset-my-password",
+                  "knowledgebase/nl/getting-started/use-the-booking-diary"
+                ]
+              },
+              {
+                "group": "Clarus gebruiken",
+                "pages": [
+                  "knowledgebase/nl/reporting/customise-data-grids",
+                  "knowledgebase/nl/reporting/data-grid-columns"
+                ]
+              },
+              {
+                "group": "Systeeminstellingen",
+                "pages": [
+                  {
+                    "group": "Gebruikers & Rollen",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/users-and-roles/creating-users",
+                      "knowledgebase/nl/users-and-roles/user-roles-guide",
+                      {
+                        "group": "Roltypes",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/users-and-roles/admin-role",
+                          "knowledgebase/nl/users-and-roles/standard-role",
+                          "knowledgebase/nl/users-and-roles/client-role",
+                          "knowledgebase/nl/users-and-roles/financial-role",
+                          "knowledgebase/nl/users-and-roles/rf-role"
+                        ]
+                      },
+                      "knowledgebase/nl/users-and-roles/assigning-different-user-views",
+                      "knowledgebase/nl/users-and-roles/hhd-user-creation"
+                    ]
+                  },
+                  {
+                    "group": "Accounts",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/accounts/set-up-accounts",
+                      "knowledgebase/nl/accounts/link-accounts",
+                      "knowledgebase/nl/accounts/creating-customers",
+                      "knowledgebase/nl/accounts/create-and-use-groups",
+                      "knowledgebase/nl/accounts/use-the-customers-data-grid",
+                      "knowledgebase/nl/accounts/dispatch-strategies",
+                      "knowledgebase/nl/accounts/reason-codes",
+                      "knowledgebase/nl/accounts/use-reason-codes",
+                      "knowledgebase/nl/accounts/short-order-lines"
+                    ]
+                  },
+                  {
+                    "group": "Magazijn Inrichting",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/warehouse-setup/create-a-site",
+                      "knowledgebase/nl/warehouse-setup/set-up-a-warehouse",
+                      {
+                        "group": "Locaties",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/warehouse-setup/create-a-location",
+                          "knowledgebase/nl/warehouse-setup/location-groups",
+                          "knowledgebase/nl/warehouse-setup/location-check-digits",
+                          "knowledgebase/nl/warehouse-setup/warehouse-map-locations",
+                          "knowledgebase/nl/warehouse-setup/create-sequences"
+                        ]
+                      },
+                      {
+                        "group": "Opslag",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/warehouse-setup/storage-unit-types",
+                          "knowledgebase/nl/warehouse-setup/warehouse-confined-storage",
+                          "knowledgebase/nl/warehouse-setup/loose-stock-storage-units"
+                        ]
+                      },
+                      {
+                        "group": "Pickfaces",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/warehouse-setup/create-pickface",
+                          "knowledgebase/nl/warehouse-setup/enforcing-pick-types",
+                          "knowledgebase/nl/warehouse-setup/replenishment-continuous",
+                          "knowledgebase/nl/warehouse-setup/replenishment-demand"
+                        ]
+                      },
+                      "knowledgebase/nl/warehouse-setup/create-carrier",
+                      "knowledgebase/nl/warehouse-setup/create-trailer"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Producten & Voorraad",
+                "pages": [
+                  "knowledgebase/nl/products-and-stock/add-new-products",
+                  "knowledgebase/nl/products-and-stock/product-import",
+                  "knowledgebase/nl/products-and-stock/use-product-groups",
+                  "knowledgebase/nl/products-and-stock/multi-account-products",
+                  "knowledgebase/nl/products-and-stock/product-storage-units",
+                  "knowledgebase/nl/products-and-stock/create-a-bill-of-materials-bom",
+                  {
+                    "group": "Voorraadbeheer",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/products-and-stock/stock-adjustments",
+                      "knowledgebase/nl/products-and-stock/stock-balance",
+                      "knowledgebase/nl/products-and-stock/stock-batch-columns",
+                      "knowledgebase/nl/products-and-stock/sftp-stock-attributes",
+                      "knowledgebase/nl/products-and-stock/transfer-stock-or-pallets",
+                      "knowledgebase/nl/products-and-stock/perform-a-warehouse-transfer",
+                      "knowledgebase/nl/products-and-stock/mixed-pallets",
+                      "knowledgebase/nl/products-and-stock/merge-split-pallets"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Magazijnoperaties",
+                "pages": [
+                  {
+                    "group": "Inbound",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/inbound/book-goods-in",
+                      "knowledgebase/nl/inbound/pre-receipt-import",
+                      "knowledgebase/nl/inbound/pre-receipt-putaway-labels",
+                      "knowledgebase/nl/inbound/guided-putaway-rules",
+                      "knowledgebase/nl/inbound/put-away-products-via-groups",
+                      "knowledgebase/nl/inbound/confirm-all-button",
+                      "knowledgebase/nl/inbound/cancel-a-receipt",
+                      "knowledgebase/nl/inbound/cancel-receive-tasks",
+                      "knowledgebase/nl/inbound/goods-in-report"
+                    ]
+                  },
+                  {
+                    "group": "Outbound",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Verkooporders",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/outbound/create-a-sales-order",
+                          "knowledgebase/nl/outbound/create-a-sales-order-without-selecting-a-warehouse",
+                          "knowledgebase/nl/outbound/amend-order-line-quantities"
+                        ]
+                      },
+                      {
+                        "group": "Picken",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/outbound/create-and-process-a-pick-list",
+                          "knowledgebase/nl/outbound/cancel-or-amend-a-pick-list",
+                          "knowledgebase/nl/outbound/choose-a-pick-rule",
+                          "knowledgebase/nl/outbound/use-pick-optimisation",
+                          "knowledgebase/nl/outbound/pick-rules-account",
+                          "knowledgebase/nl/outbound/account-pick-rules",
+                          "knowledgebase/nl/outbound/batch-picking",
+                          "knowledgebase/nl/outbound/consolidated-picking",
+                          "knowledgebase/nl/outbound/stock-lines-pick-removal",
+                          "knowledgebase/nl/outbound/tally-records"
+                        ]
+                      },
+                      {
+                        "group": "Verpakking & Verzending",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/outbound/packing-desk",
+                          "knowledgebase/nl/outbound/pre-requisites-for-shipments",
+                          "knowledgebase/nl/outbound/delivery-addresses",
+                          "knowledgebase/nl/outbound/collection-addresses",
+                          "knowledgebase/nl/outbound/ftp-load-dispatch-file",
+                          "knowledgebase/nl/outbound/download-an-invoice",
+                          "knowledgebase/nl/outbound/download-backups"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Financieel",
+                "pages": [
+                  {
+                    "group": "Kosten",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/financial/set-charges-to-accounts",
+                      "knowledgebase/nl/financial/charge-window-and-create-one",
+                      "knowledgebase/nl/financial/charge-period-dates",
+                      "knowledgebase/nl/financial/export-charges-to-sage-line-200",
+                      "knowledgebase/nl/financial/commercial-invoices"
+                    ]
+                  },
+                  {
+                    "group": "Facturen",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/financial/create-an-invoice",
+                      "knowledgebase/nl/financial/amend-an-invoice",
+                      "knowledgebase/nl/financial/customise-an-invoice",
+                      "knowledgebase/nl/financial/print-an-invoice",
+                      "knowledgebase/nl/financial/how-do-invoice-numbers-work",
+                      "knowledgebase/nl/financial/invoice-screen-buttons",
+                      "knowledgebase/nl/financial/invoice-currencies",
+                      "knowledgebase/nl/financial/apply-vat-to-invoices",
+                      "knowledgebase/nl/financial/manage-different-rates-of-tax"
+                    ]
+                  },
+                  {
+                    "group": "Leveranciers",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/financial/add-a-new-supplier",
+                      "knowledgebase/nl/financial/edit-or-delete-a-supplier",
+                      "knowledgebase/nl/financial/set-a-supplier-as-active-or-inactive",
+                      "knowledgebase/nl/financial/view-the-supplier-data-grid",
+                      "knowledgebase/nl/financial/export-supplier-data"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Rapportage",
+                "pages": [
+                  "knowledgebase/nl/reporting/use-reports",
+                  "knowledgebase/nl/reporting/add-variables-to-reports",
+                  "knowledgebase/nl/reporting/select-and-group-data-by-warehouse",
+                  "knowledgebase/nl/reporting/goods-out-report",
+                  "knowledgebase/nl/reporting/sell-by-date-report",
+                  "knowledgebase/nl/reporting/set-up-scheduled-reports",
+                  "knowledgebase/nl/reporting/remove-a-scheduled-report"
+                ]
+              },
+              {
+                "group": "Integraties & Tools",
+                "pages": [
+                  {
+                    "group": "SFTP",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/integrations/use-sftp-for-imports",
+                      "knowledgebase/nl/integrations/sftp-order-import",
+                      "knowledgebase/nl/integrations/sftp-account-assignments",
+                      "knowledgebase/nl/integrations/sftp-stock-transfer-file",
+                      "knowledgebase/nl/integrations/asn-export"
+                    ]
+                  },
+                  {
+                    "group": "Webhooks",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/integrations/validate-a-webhook-request",
+                      "knowledgebase/nl/integrations/webhook-stock-positive",
+                      "knowledgebase/nl/integrations/webhook-stock-negative"
+                    ]
+                  },
+                  "knowledgebase/nl/integrations/dhl-credentials",
+                  {
+                    "group": "Cloud Print",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/cloud-print/installation",
+                      "knowledgebase/nl/cloud-print/logging-in",
+                      "knowledgebase/nl/cloud-print/syncing-printers",
+                      "knowledgebase/nl/cloud-print/default-printer",
+                      "knowledgebase/nl/cloud-print/viewing-printers",
+                      "knowledgebase/nl/cloud-print/cloud-print-communication",
+                      "knowledgebase/nl/cloud-print/cloud-print-network",
+                      "knowledgebase/nl/cloud-print/upgrading"
+                    ]
+                  },
+                  {
+                    "group": "Hardware",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/hardware/hhd-conditions",
+                      "knowledgebase/nl/hardware/hhd-previews-duplication"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Geavanceerd & Referentie",
+                "pages": [
+                  {
+                    "group": "Geavanceerde Functies",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/advanced/date-validation",
+                      "knowledgebase/nl/advanced/works-orders",
+                      "knowledgebase/nl/advanced/manage-jobs",
+                      "knowledgebase/nl/advanced/create-a-kit",
+                      "knowledgebase/nl/advanced/use-templates",
+                      "knowledgebase/nl/advanced/dispatch-by-output-qty",
+                      "knowledgebase/nl/advanced/convert-by-output-qty"
+                    ]
+                  },
+                  {
+                    "group": "Beveiliging & Compliance",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/security/subprocessors",
+                      "knowledgebase/nl/security/database-backup"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Probleemoplossing",
+                "pages": [
+                  "knowledgebase/nl/troubleshooting/attrup-meaning",
+                  "knowledgebase/nl/troubleshooting/sales-order-allocation",
+                  "knowledgebase/nl/troubleshooting/wrong-account-booking",
+                  "knowledgebase/nl/troubleshooting/why-cant-i-putaway",
+                  "knowledgebase/nl/troubleshooting/pallet-allocation-issue",
+                  "knowledgebase/nl/troubleshooting/no-charge-applied",
+                  "knowledgebase/nl/troubleshooting/label-printing-issues",
+                  "knowledgebase/nl/troubleshooting/storage-unit-part-pick",
+                  "knowledgebase/nl/troubleshooting/sftp-upload-errors",
+                  "knowledgebase/nl/troubleshooting/import-errors",
+                  "knowledgebase/nl/troubleshooting/ftp-sftp-queue",
+                  "knowledgebase/nl/troubleshooting/failed-scheduled-reports",
+                  "knowledgebase/nl/troubleshooting/datagrid-error",
+                  "knowledgebase/nl/troubleshooting/cloud-print-troubleshooting",
+                  "knowledgebase/nl/troubleshooting/random-logout"
+                ]
+              }
+            ]
           }
         ]
       }

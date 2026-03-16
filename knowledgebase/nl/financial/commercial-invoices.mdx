@@ -1,0 +1,62 @@
+---
+title: "Commerciele facturen & internationale verzending"
+description: "Ontdek de nieuwe functies voor commerciele facturering en internationale verzending in Clarus WMS."
+sidebarTitle: "Commerciele facturen"
+---
+
+We zijn verheugd om de release van onze nieuwe **Commerciele facturering** & **internationale verzending** functies aan te kondigen, ontworpen om u meer controle en zichtbaarheid te geven over uw zendingen.
+
+## Aan de slag
+
+Om te beginnen navigeer naar de **Rekeningen** menu onder **Instellingen**. Selecteer het account dat u wilt configureren. Scroll vervolgens naar beneden naar de nieuwe **Douane-informatie** tabblad.
+
+In dit gedeelte vindt u velden voor het invoeren van uw **EORI nummers** en **IOSS nummers**. Elk van deze bevat een nuttige hyperlink die aanvullende informatie geeft over wat deze getallen zijn en hoe ze worden gebruikt.
+
+Vervolgens moet u er ook voor zorgen dat elk product de juiste douanegegevens heeft ingevoerd. Om dit te doen, opent u de individuele **Product** record en ga naar de **Douane** sectie. Vul hier de volgende twee verplichte velden in:
+
+- **Land van vervaardiging** - Het land waar het product is gemaakt.
+- **Grondstoffencode** - De tariefclassificatie voor het product. Deze code verschijnt als de **HS Code** op uw handelsfactuur.
+
+Het invoeren van deze informatie zorgt ervoor dat alle benodigde douanegegevens automatisch worden opgenomen bij het genereren van commerciele facturen.
+
+## EORI- en IOSS-nummers begrijpen
+
+Zowel EORI- als IOSS-nummers beginnen met een voorvoegsel van twee tekens dat het land of de regio van herkomst identificeert. Deze informatie wordt automatisch toegevoegd aan uw commerciele facturen indien van toepassing.
+
+- **GB EORI nummer** - Gebruikt bij verzending vanuit een in het Verenigd Koninkrijk gevestigd magazijn. Deze getallen beginnen met **'GB'**.
+- **NI EORI nummer** - Gebruikt bij verzending vanuit een magazijn in Noord-Ierland. Deze beginnen met **'XI'**.
+- **EU EORI-nummer** - Gebruikt voor zendingen vanuit Europese magazijnen. Het voorvoegsel verschilt per land (bijvoorbeeld **'FR'** voor Frankrijk).
+- **IOSS nummer** - Begint met **'IM'** en wordt alleen weergegeven wanneer de totale productwaarde op de handelsfactuur **onder de 150 euro** is. Daarom is het toevoegen van de waarde aan de producten verplicht voor de handelsfactuur en internationale verzending.
+
+## Gebruik van de functie in zendingen
+
+Zodra uw gegevens correct zijn geconfigureerd, gaat u naar de **Zendingen** menu. U ziet nu een nieuwe kolom extreemrechts gelabeld **Commerciele facturering** voor nieuw gecreeerde zendingen. Vanaf hier kunt u gemakkelijk de handelsfactuur downloaden.
+
+<Info>Let op: als een zending al is voltooid, is de **Commerciele facturering** kolom blijft zichtbaar, maar zal niet langer interactief zijn.</Info>
+
+## Internationale zendingen
+
+Internationale zendingen in Clarus volgen hetzelfde proces als standaard zendingen, maar er zijn een paar verplichte details die vooraf moeten worden geconfigureerd.
+
+### Productconfiguratie
+
+Voordat u producten internationaal kunt verzenden, moet u ervoor zorgen dat elk product de volgende informatie bevat:
+
+- **Waarde**: Toegevoegd onder het relevante tabblad productconfiguratie (bijv. Unit, Case, enz.).
+- **Douanegegevens**: Onder de **'Douane'** tab, vul de volgende velden in:
+  - **Grondstoffencode**
+  - **Douane Beschrijving**
+  - **Land van vervaardiging**
+
+<Warning>Als een van deze velden ontbreekt, kan het product niet internationaal worden verzonden.</Warning>
+
+### Magazijn Setup
+
+Zorg ervoor dat een **land** wordt geselecteerd in uw magazijninstellingen. Dit is essentieel omdat het systeem automatisch de juiste **EORI nummer** gebruikt, gebaseerd op het toegewezen land van het magazijn.
+
+### Voltooien van de verzending
+
+Zodra uw producten en magazijn correct zijn geconfigureerd, kunt u:
+
+- Selecteer uw **Vervoerder** en **Vervoerder service** voor internationale scheepvaart.
+- Ga verder met het voltooien van uw zendingen zoals gewoonlijk.

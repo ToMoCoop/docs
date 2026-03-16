@@ -1,0 +1,54 @@
+---
+title: "Voorwaarden voor zendingen"
+description: "Om uw systeem voor te bereiden op zendingen, moet u opslagunits, productgewichten en vervoerders configureren."
+sidebarTitle: "Voorwaarden zendingen"
+---
+
+Om uw systeem voor te bereiden op zendingen, moet u opslagunits, productgewichten en vervoerders configureren. Deze gids leidt u door de essentiele stappen om ervoor te zorgen dat alles correct is ingesteld voor soepele verzendactiviteiten.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Maak een opslageenheidstype voor pakketten">
+    Allereerst moet u een nieuw type opslagunit instellen voor uw pakketten, zoals **KaartboordBOX01**. Zorg ervoor dat u de **Verlaat magazijn** optie inschakelt. U kunt een bestaande volgorde gebruiken voor de referentie van de opslagunit of een nieuwe maken die speciaal voor items die het magazijn verlaten.
+
+    U moet ook de **Hoogte**, **Breedte**, en **Lengte** voor deze opslagunit instellen. Deze afmetingen worden gebruikt als standaard pakketgrootte voor uw zendingen.
+  </Step>
+  <Step title="Zorg ervoor dat producten geassocieerde gewichten hebben">
+    Het is van cruciaal belang dat elk product een gewicht heeft toegewezen in het type voorraadeenheid dat u gebruikt om te plukken. Dit productgewicht wordt gebruikt als standaardgewicht voor uw zendingen.
+
+    <Warning>Zonder gewichten die aan producten zijn toegewezen, kan het systeem geen pakketgewichten berekenen voor zendingen, wat kan leiden tot verzendfouten.</Warning>
+  </Step>
+  <Step title="Selecteer en stel de vervoerder in">
+    Vervolgens moet u een nieuwe provider toevoegen of een bestaande provider bewerken voor de koerier die u van plan bent te gebruiken. Nadat u een vervoerder hebt geselecteerd, wordt u gevraagd de authenticatiegegevens (zoals gebruikersnaam en wachtwoord) voor het online portaal van de koerier in te voeren.
+
+    <Info>Deze authenticatiegegevens moeten rechtstreeks bij uw koerier worden verkregen; ze worden niet verstrekt door Clarus WMS.</Info>
+
+    U kunt gebruik maken van de **Testdrager Type** optie om de verzendintegratie te testen voordat u live gaat. Voor het testen kunt u elke gebruikersnaam en wachtwoord invoeren en de testmodus inschakelen.
+  </Step>
+  <Step title="Vervoersdiensten toevoegen">
+    Zodra uw vervoerder is ingesteld, voegt u een of meer vervoerderservices van de gekozen koerier, bijvoorbeeld: **Gegarandeerd de volgende dag**. Geef een beschrijvende naam voor elke service, idealiter passend bij de eigen naamgevingsconventie van de koerier.
+
+    U kunt presetservicevoorinstellingen gebruiken om deze services snel te configureren. Indien nodig kunt u waarden aanpassen in de geavanceerde sectie, maar het is over het algemeen het beste om u aan de standaardinstellingen te houden, tenzij u de impact ervan volledig begrijpt.
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Waarom moet ik een nieuw type opslagunit maken?">
+Het creeren van een specifiek opslagunittype zorgt ervoor dat uw pakketten nauwkeurige afmetingen hebben en gedurende het hele verzendproces goed worden gevolgd.
+</Accordion>
+<Accordion title="Wat gebeurt er als mijn producten geen gewichten hebben?">
+Als producten geen gewichten hebben toegewezen, kan het systeem geen pakketgewichten voor zendingen berekenen, wat kan leiden tot verzendfouten.
+</Accordion>
+<Accordion title="Hoe krijg ik de authenticatiegegevens voor de vervoerder?">
+De authenticatiegegevens (gebruikersnaam, wachtwoord, enz.) moeten rechtstreeks bij de door u gekozen koerier worden verkregen; ze worden niet geleverd door Clarus WMS.
+</Accordion>
+<Accordion title="Kan ik de verzendopstelling testen voordat ik live ga?">
+Ja, u kunt de **Testdrager Type** optie gebruiken om de verzendintegratie te testen zonder dat dit van invloed is op uw live zendingen.
+</Accordion>
+<Accordion title="Moet ik presetservicevoorinstellingen wijzigen?">
+Het is over het algemeen het beste om de standaardinstellingen voor presetservicesvoorinstellingen te gebruiken, tenzij u bekend bent met de specifieke impact van het wijzigen van geavanceerde configuraties.
+</Accordion>
+</AccordionGroup>

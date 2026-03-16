@@ -1,0 +1,36 @@
+---
+title: "Voorraadlijnen bij pick verwijdering"
+description: "Als u picktaken annuleert, worden de toegewezen aandelenlijnen weer beschikbaar."
+sidebarTitle: "Voorraadlijnen bij pick"
+---
+
+Als u picktaken in Clarus WMS annuleert, worden de toegewezen aandelenlijnen weer beschikbaar. De verkooporder wordt echter niet automatisch bijgewerkt naar 'Voltooid', tenzij u ook de regels van de bestelling zelf annuleert.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Geassocieerde taken annuleren">
+    Als u de bijbehorende taken wilt annuleren, gaat u naar de **Kies lijst scherm** of de **Taken scherm** bij Clarus WMS. Het annuleren van taken hier verandert automatisch de status van de aandelenlijnen terug naar 'Beschikbaar'. Ze bewaren ook al hun originele informatie.
+  </Step>
+  <Step title="Begrijp de status van verkooporder">
+    Na het annuleren van de taken staan de voorraadlijnen nog steeds op de Sales Order. Als u wilt dat de Verkooporder als 'Voltooid' wordt weergegeven, moet u ook de regels van de bestelling annuleren. Anders blijft de bestelling in een 'Deel'-status.
+
+    <Warning>Het eenvoudigweg annuleren van picktaken voltooit de verkooporder niet. U moet de regels van de bestelling annuleren om de status te wijzigen in 'Voltooid'.</Warning>
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat gebeurt er met voorraadlijnen als ik picktaken annuleer?">
+Wanneer u picktaken annuleert, worden de aandelenlijnen automatisch terug naar de status 'Beschikbare'. Zij bewaren al hun oorspronkelijke informatie.
+</Accordion>
+<Accordion title="Voltooi het annuleren van pick-taken de verkooporder?">
+Nee, het annuleren van pick-taken alleen voltooit de verkooporder niet. U moet ook de regels rechtstreeks uit de Verkooporder annuleren.
+</Accordion>
+<Accordion title="Welke status heeft de verkooporder als ik alleen picktaken annuleer?">
+De verkooporder blijft in de status 'Deel'.
+
+<Info>Controleer altijd de status van verkooporder na het annuleren van picktaken om ervoor te zorgen dat deze uw gewenste uitkomst weerspiegelt.</Info>
+</Accordion>
+</AccordionGroup>

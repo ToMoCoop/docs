@@ -1,0 +1,42 @@
+---
+title: "Enforce All Pick Types from a Pickface"
+description: "Learn how to enforce all pick types including full pallet picks from a pickface location with this configuration guide."
+sidebarTitle: "Enforcing Pick Types"
+---
+
+You can enforce all types of picks from a pickface location, including full pallet picks. This gives you greater control over how stock is managed and picked, ensuring all quantities are always picked from the designated pickface.
+
+## How to enable pickface enforcement
+
+<Steps>
+<Step title="Navigate to the product">
+From the home page, go to **Products**. Use the column filters to locate the product you want to configure.
+</Step>
+<Step title="Enable the pickface enforcement flag">
+Open the product record and scroll down to the **Flags** section. Toggle **Enforce Picking from Pickface** to **on**.
+
+<Frame>
+  <img src="/images/knowledgebase/enforcing-all-pick-types-1.png" alt="Enforce Picking from Pickface flag in the product Flags section" />
+</Frame>
+</Step>
+</Steps>
+
+<Warning>
+The product must already have a pickface location assigned. If you try to enable this setting without one, you will see an error message when you attempt to save.
+</Warning>
+
+<Frame>
+  <img src="/images/knowledgebase/enforcing-all-pick-types-2.png" alt="Error message when no pickface is assigned" />
+</Frame>
+
+## What happens when this is enabled?
+
+Once enabled, the system directs all pick tasks for this product to its assigned pickface location, regardless of pick quantity. This includes full pallet picks that would normally be allocated from racking.
+
+<Frame>
+  <img src="/images/knowledgebase/enforcing-all-pick-types-3.png" alt="Pick task assigned to pickface location" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/enforcing-all-pick-types-4.png" alt="Pick task details showing pickface enforcement" />
+</Frame>

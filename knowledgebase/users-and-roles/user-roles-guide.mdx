@@ -1,0 +1,73 @@
+---
+title: "Creating and Implementing User Roles"
+description: "Comprehensive guide to understanding, creating, and assigning user roles to control access and maintain system security."
+sidebarTitle: "User Roles Guide"
+---
+
+## Overview
+
+User roles define what each person can see and do. By carefully setting roles, you can keep your system secure, help users work efficiently, and avoid granting unnecessary permissions.
+
+## Standard role types
+
+There are five built-in roles:
+
+| Role | Access level | Purpose |
+|------|-------------|---------|
+| **Admin** | Full system access | System administrators who need complete control |
+| **Standard** | General desktop access | Regular office staff |
+| **Client** | Limited access with stock visibility | External clients with restricted access |
+| **Financial** | Finance-specific access | Financial controllers handling charges and accounts |
+| **RF** | Handheld device only | Warehouse operatives using mobile RF devices |
+
+## Creating a custom role
+
+If the standard roles do not fit your needs, you can create custom roles with specific permissions.
+
+<Steps>
+  <Step title="Navigate to the Role Creation Panel">
+    Go to the bottom-left panel and select **New**.
+  </Step>
+  <Step title="Enter role details">
+    Give your role a **name** and choose a default **role type** as a starting point.
+  </Step>
+  <Step title="Configure permissions">
+    Use the toggles to adjust access levels:
+
+    - **Read Access** -- allows viewing but prevents changes
+    - **Manage Access** -- allows full viewing and editing
+  </Step>
+  <Step title="Save the role">
+    Click **Save** in the bottom-left corner. The new role will appear in the list and can be assigned to users.
+  </Step>
+</Steps>
+
+## Assigning roles to users
+
+<Steps>
+  <Step title="Access the User Management screen">
+    Go to **Settings > Users > Roles**.
+  </Step>
+  <Step title="Select a user">
+    Choose the user account that needs a role.
+  </Step>
+  <Step title="Add the role">
+    Assign the desired role(s) to the user.
+  </Step>
+  <Step title="Save changes">
+    Changes take effect immediately on the user's next login.
+  </Step>
+</Steps>
+
+<Warning>When you change a user's role, they will be logged out and must log back in for the new permissions to take effect.</Warning>
+
+<Info>When setting up a new user, make sure the role they need already exists so you can assign it straight away.</Info>
+
+<AccordionGroup>
+  <Accordion title="Can I create custom roles?">
+    Yes. You can create custom roles with tailored Read and Manage access permissions using the toggles in the role creation panel.
+  </Accordion>
+  <Accordion title="When do role changes take effect?">
+    Changes are applied instantly upon the user's next login.
+  </Accordion>
+</AccordionGroup>

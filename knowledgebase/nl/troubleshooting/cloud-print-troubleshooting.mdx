@@ -1,0 +1,61 @@
+---
+title: "Meest voorkomende problemen met Cloud Print"
+description: "Deze handleiding helpt u veelvoorkomende problemen met Clarus WMS Cloud Print op te lossen, duidelijke oplossingen te bieden voor afdrukfouten en het beheren van lokale bestandsopslag."
+sidebarTitle: "Cloud Print problemen"
+---
+
+Deze handleiding helpt u veelvoorkomende problemen met Clarus WMS Cloud Print op te lossen, duidelijke oplossingen te bieden voor afdrukfouten en het beheren van lokale bestandsopslag.
+
+## 'Werk verlaten met Retourcode -15' fout oplossen
+
+Als u af en toe drukproblemen ondervindt en 'retourcode -15' ziet in de **Logs** tab van Clarus WMS Cloud Print:
+
+<Steps>
+  <Step title="Cloud Print bijwerken">
+    Download en installeer de meest recente versie van Clarus WMS Cloud Print. Raadpleeg de handleiding 'Clarus WMS Cloud Print upgraden' voor gedetailleerde instructies.
+  </Step>
+  <Step title="Parallel afdrukken uitschakelen">
+    Als bijwerken het probleem niet oplost, open de **Clarus WMS Cloud Print** toepassing. Ga naar de **Printers** tabblad. Vink de **Parallelle afdrukken** optie uit.
+  </Step>
+</Steps>
+
+<Warning>
+Dit zou de afdrukfout moeten oplossen.
+</Warning>
+
+## Voorkom lokale afdrukbestanden die opslagproblemen veroorzaken
+
+Clarus WMS Cloud Print slaat standaard afgedrukte bestanden op uw computer op, wat opslagruimte in de loop van de tijd kan gebruiken. Als u deze bestanden niet hoeft te bewaren, kunt u deze functie uitschakelen.
+
+<Steps>
+  <Step title="Open instellingen">
+    Open de **Clarus WMS Cloud Print** toepassing. Ga naar de **Instellingen** tabblad.
+  </Step>
+  <Step title="Bestandsbehoud uitschakelen">
+    Vink de optie uit **De inhoud van printjob bewaren na het afdrukken**.
+  </Step>
+</Steps>
+
+<Warning>
+Dit voorkomt dat lokale kopieën worden opgeslagen na het afdrukken, waardoor er ruimte vrijmaakt op uw computer.
+</Warning>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat betekent retourcode -15?">
+Retourcode -15 duidt meestal op een probleem met parallel afdrukken. Volg de bovenstaande stappen om parallel afdrukken uit te schakelen en het probleem op te lossen.
+</Accordion>
+<Accordion title="Hoe voorkom ik Clarus WMS om printbestanden lokaal op te slaan?">
+U kunt deze functie uitschakelen in de **Instellingen** tabblad door uit te checken **De inhoud van printjob bewaren na het afdrukken**.
+</Accordion>
+<Accordion title="Hoe kan ik ruimte vrijmaken van opgeslagen printbestanden?">
+U kunt opgeslagen bestanden handmatig verwijderen of de retentiefunctie uitschakelen om te voorkomen dat nieuwe bestanden worden opgeslagen.
+</Accordion>
+<Accordion title="Moet ik Cloud Print regelmatig updaten?">
+Ja, het wordt aanbevolen om Clarus WMS Cloud Print up-to-date te houden om bugs te voorkomen en soepele prestaties te garanderen.
+</Accordion>
+<Accordion title="Kan ik bestanden herdrukken als ik bestandsretentie uitschakel?">
+Nee, het uitschakelen van bestandsretentie verwijdert de mogelijkheid om toegang te krijgen tot eerder afgedrukte bestanden.
+</Accordion>
+</AccordionGroup>

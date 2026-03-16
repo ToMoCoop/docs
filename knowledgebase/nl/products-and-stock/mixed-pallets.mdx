@@ -1,0 +1,53 @@
+---
+title: "Gemengde pallets beheren"
+description: "U kunt nu gemengde pallets maken of ontvangen in Clarus WMS met behulp van de functie groepsnummers."
+sidebarTitle: "Gemengde pallets"
+---
+
+U kunt nu gemengde pallets maken of ontvangen in Clarus WMS met behulp van de functie groepsnummers. Hiermee kunt u verschillende voorraadlijnen toewijzen aan een enkele opslagunitreferentie, hetzij voor dezelfde of verschillende producten.
+
+## Stapsgewijze handleiding
+
+### Desktop Toepassing
+
+<Steps>
+  <Step title="Vul de ontvangstgegevens in">
+    Open een nieuw ontvangstbewijs. Vul de essentiële informatie in de **Details**, **Aanvullende**, en **Transit** secties.
+  </Step>
+  <Step title="Voer productinformatie in">
+    Voer de productcode, hoeveelheid en groepsnummer in voor elke voorraadregel. U kunt meerdere lijnen gemengde of afzonderlijke producten hebben. De **Hoeveelheid van opslagunit** per lijn moet 1 zijn. Voeg een ander groepsnummer toe als u verschillende producten aan een andere opslageenheid wilt toewijzen.
+  </Step>
+  <Step title="Opslaan en ontvangen">
+    Bewaar het ontvangstbewijs. Na het opslaan worden de opslagunits weergegeven met de overeenkomende groepsnummers in de **Ontvang** sectie. Ga verder met het ontvangen en wegleggen van de goederen. De informatie verschijnt dan in de aandelenlijst.
+  </Step>
+</Steps>
+
+### SFTP importeren
+
+<Steps>
+  <Step title="Pre-Receipt bestand voorbereiden">
+    Download het importbestand vooraf ontvangen uit de Clarus WMS kennisbank. Vul de vereiste velden in: ontvangstreferentie, magazijncode, rekeningcode, verwachte datum van ontvangst, productcode, artikelhoeveelheid en hoeveelheid opslageenheid (groepsnummers). Groepsnummers zijn te vinden in rij/kolom (X1) van de spreadsheet.
+  </Step>
+  <Step title="Importeer het bestand">
+    Upload het voltooide bestand met de SFTP-methode. Het ontvangstbewijs wordt weergegeven als **In afwachting** in de desktop applicatie eenmaal geïmporteerd.
+
+    <Info>FTP-import is handig voor grootschalige import, maar kan ook worden gebruikt voor kleinere invoer.</Info>
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Wat is een gemengde pallet?">
+Een gemengde pallet bevat verschillende producten die zijn toegewezen aan een enkele opslagunitreferentie.
+</Accordion>
+<Accordion title="Wat zijn groepsnummers?">
+Groepsnummers worden gebruikt om voorraadlijnen toe te wijzen aan specifieke opslagunits binnen een ontvangstbewijs.
+</Accordion>
+<Accordion title="Kan ik gemengde pallets ontvangen via FTP?">
+Ja, u kunt gemengde pallets importeren via een FTP pre-receipt bestand.
+</Accordion>
+<Accordion title="Welke informatie is nodig voor de FTP-import?">
+U hebt de ontvangstreferentie, magazijncode, rekeningcode, verwachte datum, productcode, artikelhoeveelheid en hoeveelheid opslagunithoeveelheid nodig.
+</Accordion>
+</AccordionGroup>
