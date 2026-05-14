@@ -1,0 +1,113 @@
+---
+title: 'Federated GraphQL Overview'
+description: "How ClarusWMS exposes a single GraphQL surface composed from independent subgraphs running in separate AWS accounts"
+icon: 'diagram-project'
+---
+
+ClarusWMS operates a federated GraphQL gateway built on **[Apollo Router](https://www.apollographql.com/docs/router)**. Clients send a single GraphQL request to one public endpoint; the router resolves each field against the subgraph that owns it and composes the result. Subgraphs run in their own AWS accounts and are reached over **cross-account AWS PrivateLink**.
+
+The first federated subgraph is the **agents [PostGraphile](https://www.graphile.org/postgraphile/) service**, which exposes a Federation v2 schema derived from a Postgres database. The architecture is built to take additional subgraphs (e.g., the Ruby GraphQL surface) without changes to the router image or runtime configuration.
+
+<Note>
+The federation infrastructure spans three repositories: **ClarusWMS_Gateway** contains the Apollo Router image and configuration, **ClarusWMS_Agents** contains the PostGraphile subgraph code and SDL metadata, and **ClarusWMS_OPS** contains the Terraform that wires both into AWS, the build pipelines, and the network path between them.
+</Note>
+
+<Info>
+If you're new to Apollo Federation, [Apollo's official introduction](https://www.apollographql.com/docs/federation) covers the core concepts (subgraphs, supergraphs, composition). This documentation covers how ClarusWMS implements that pattern, not the pattern itself.
+</Info>
+
+## High-level architecture
+
+<Frame>
+  <img src="/images/diagrams/federated-graphql-overview.drawio.svg" alt="ClarusWMS Federated GraphQL — High-level architecture" zoom />
+</Frame>
+
+<sub><a href="/images/diagrams/federated-graphql-overview.drawio.svg" download="federated-graphql-overview.drawio.svg">Download SVG</a> · <a href="/images/diagrams/federated-graphql-overview.drawio" download="federated-graphql-overview.drawio">Download draw.io source</a></sub>
+
+A client sends a GraphQL request to `https://gateway.<domain>/`. The request flows through:
+
+1. **Public ALB** in the gateway AWS account, with an ACM certificate for the `gateway.<domain>` hostname.
+2. **Apollo Router** running as an ECS Fargate task. It validates the request's Cognito JWT against the shared user pool's JWKS, then plans an execution against the composed supergraph schema.
+3. For each subgraph fetch, the router opens a connection through a **VPC Interface Endpoint** to the subgraph's account, traversing AWS PrivateLink.
+4. The subgraph (in this case, **PostGraphile**) resolves the fields and returns data.
+5. The router composes the subgraph responses into a single GraphQL response and returns it to the client.
+
+The supergraph schema itself is fetched at runtime from **Apollo GraphOS Uplink**. The router polls Uplink for schema updates, so when a subgraph publishes a new schema the router picks it up without a redeploy.
+
+## Two communication paths
+
+<Tabs>
+  <Tab title="Client → Gateway → Subgraph (runtime)">
+    Carries every federated GraphQL query.
+
+    <Steps>
+      <Step title="Authenticate">
+        The client presents a Cognito JWT in the `Authorization: Bearer …` header. The router validates the signature against the JWKS for the configured Cognito user pool and extracts claims (`sub`, `email`, `cognito:groups`).
+      </Step>
+      <Step title="Plan">
+        The router consults its in-memory supergraph schema (fetched from Apollo Uplink) and decides which subgraph(s) to call for the requested fields.
+      </Step>
+      <Step title="Fetch from subgraph">
+        The router opens an HTTP connection to the subgraph's routing URL — which is the **gateway-account VPCE DNS name** for that subgraph, e.g. `http://vpce-<id>.vpce-svc-<id>.eu-west-2.vpce.amazonaws.com:5000/graphql`. AWS PrivateLink carries the request to the subgraph's NLB.
+      </Step>
+      <Step title="Forward identity">
+        The router injects the verified Cognito claims as headers on the subgraph request (`x-user-sub`, `x-user-email`, `x-cognito-groups`). The subgraph trusts these because the only path to reach it is through the VPCE — which the gateway account is explicitly allowlisted on.
+      </Step>
+      <Step title="Compose and return">
+        The router merges field results across subgraphs into a single GraphQL response and returns it to the client.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Subgraph → Apollo GraphOS (schema publish)">
+    Carries the published SDL after each subgraph deploy. Runs once per deployment, not per request.
+
+    <Steps>
+      <Step title="Subgraph deploys">
+        The subgraph's CodePipeline builds an image, deploys it to ECS, and confirms the service is healthy.
+      </Step>
+      <Step title="Introspect live SDL">
+        A pipeline stage runs a CodeBuild project inside the subgraph's VPC. It curls `_service { sdl }` against the live service and emits the SDL as a pipeline artifact.
+      </Step>
+      <Step title="Publish to Apollo">
+        A second pipeline stage runs a CodeBuild project in the shared build account (outside the subgraph VPC, with public internet egress). It reads the SDL artifact and runs `rover subgraph publish` to push the SDL to Apollo GraphOS for the appropriate variant.
+      </Step>
+      <Step title="Router picks up">
+        Apollo composes the supergraph centrally and serves it via Uplink. The Apollo Router polls Uplink and hot-reloads the new supergraph in seconds — no rebuild, no redeploy.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## AWS account split
+
+Each environment is composed of several AWS accounts. For federated GraphQL:
+
+| Account | Hosts | Owns |
+|---|---|---|
+| **Gateway** | Apollo Router, public ALB, ACM cert, Route53 zone for `gateway.<domain>`, VPC Interface Endpoints (one per subgraph) | The federated surface |
+| **Agents** | PostGraphile ECS service, RDS Postgres, internal NLB, VPC Endpoint Service | One subgraph |
+| **Build and Artifacts** | Shared ECR repositories, CodeBuild publish project, Apollo CI key in SSM | Build/publish infrastructure |
+| **Pipelines** | CodePipeline definitions, artifact S3 bucket, KMS key | Orchestration |
+
+Each subgraph lives in its own AWS account (or shares one if appropriate). The gateway account holds **one VPC Interface Endpoint per subgraph**, pointing at that subgraph's VPC Endpoint Service. Apollo GraphOS sits outside AWS and is reached over the public internet from both the router (Uplink polling) and the publish CodeBuild (schema push).
+
+## Explore the architecture
+
+<CardGroup cols={3}>
+  <Card title="Gateway Account" icon="route" href="/architecture/federated-graphql/gateway">
+    Apollo Router, ALB, Cognito JWT validation, GraphOS connection
+  </Card>
+  <Card title="Agents Subgraph" icon="database" href="/architecture/federated-graphql/agents-subgraph">
+    PostGraphile, RDS Postgres, internal NLB, federation plugin
+  </Card>
+  <Card title="Cross-Account Network" icon="network-wired" href="/architecture/federated-graphql/network">
+    AWS PrivateLink, VPC Endpoint Services, security group layout
+  </Card>
+  <Card title="Publish Pipeline" icon="cloud-arrow-up" href="/architecture/federated-graphql/publish-pipeline">
+    Introspect + publish flow, managed federation via Apollo Uplink
+  </Card>
+  <Card title="Adding a Subgraph" icon="circle-plus" href="/architecture/federated-graphql/adding-a-subgraph">
+    What needs to exist for a new subgraph to join the supergraph
+  </Card>
+</CardGroup>

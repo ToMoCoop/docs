@@ -1,0 +1,102 @@
+---
+title: 'Gateway Account'
+description: "Apollo Router, ALB, Cognito JWT validation, and the connection to Apollo GraphOS"
+icon: 'route'
+---
+
+The **gateway account** holds the single federated GraphQL endpoint that all clients connect to. Apollo Router runs as an ECS Fargate task behind a public ALB, validates Cognito JWTs at the edge, and federates queries to subgraphs over cross-account PrivateLink.
+
+## Account architecture
+
+<Frame>
+  <img src="/images/diagrams/federated-graphql-gateway-account.drawio.svg" alt="Gateway account — Apollo Router architecture" zoom />
+</Frame>
+
+<sub><a href="/images/diagrams/federated-graphql-gateway-account.drawio.svg" download="federated-graphql-gateway-account.drawio.svg">Download SVG</a> · <a href="/images/diagrams/federated-graphql-gateway-account.drawio" download="federated-graphql-gateway-account.drawio">Download draw.io source</a></sub>
+
+## Components
+
+### Public ALB
+
+| | |
+|---|---|
+| **Hostname** | `gateway.<domain>` (e.g. `gateway.clarus-api-staging.com`) |
+| **Certificate** | ACM, DNS-validated against the workspace's Route53 zone |
+| **DNS** | Route53 A-record alias from `gateway.<domain>` to the ALB |
+| **Listener** | HTTPS / 443 → target group on TCP 4000 |
+| **Routing** | Host-based; the gateway hostname is a top-level subdomain of the API domain |
+
+The Route53 zone for `gateway.<domain>` is delegated from the API account via an NS record (`api/gateway-dns-delegation.tf` in OPS), so the gateway account fully owns DNS for its subdomain without needing IAM rights into the API account's hosted zone.
+
+### Apollo Router (ECS Fargate task)
+
+| | |
+|---|---|
+| **Image** | `claruswms-gateway-apollo-router:<env>` from the shared ECR repository |
+| **Base** | The official Apollo Router image, pinned in the gateway repo's Dockerfile |
+| **Subnets** | Public; `assign_public_ip = true` |
+| **Containers** | `apollo-router` (port 4000), Datadog Agent sidecar |
+| **Health check** | `GET /health` on port 4000 |
+
+Tasks run on a mixed FARGATE / FARGATE_SPOT capacity strategy. The router listens on `:4000` and exposes both the GraphQL endpoint and the health check on that port.
+
+### Apollo Router configuration
+
+The router is configured by `router.yaml` baked into the Docker image. Key blocks:
+
+| Block | Purpose |
+|---|---|
+| `supergraph.introspection: false` | GraphQL introspection disabled on the public endpoint |
+| `health_check` | Exposes `/health` on port 4000 for ALB health checks |
+| `authentication.router.jwt` | Validates the `Authorization: Bearer …` header against the Cognito user pool's JWKS |
+| `headers.subgraphs.<name>.request` | Propagates verified Cognito claims to each subgraph (`x-user-sub`, `x-user-email`, `x-cognito-groups`) |
+| `telemetry.exporters.tracing.otlp` / `.metrics.otlp` | Ships APM traces and metrics to the in-task Datadog agent over OTLP HTTP |
+
+The router fetches the **composed supergraph schema** from Apollo GraphOS Uplink at runtime — it is not baked into the image. Two environment variables drive this:
+
+- `APOLLO_KEY` — Apollo GraphOS API key (SSM SecureString, injected as a task secret).
+- `APOLLO_GRAPH_REF` — graph + variant identifier (e.g. `claruswms@staging`).
+
+### Cognito JWT validation
+
+The router validates JWTs against the JWKS endpoint of the Cognito user pool that already serves the ClarusWMS frontend and API:
+
+```
+https://cognito-idp.<region>.amazonaws.com/<user-pool-id>/.well-known/jwks.json
+```
+
+The JWKS is fetched on startup and refreshed periodically. On a valid token, the router extracts claims and makes them available via the `apollo_authentication::JWT::claims.*` context paths, which the header-propagation block writes into outbound subgraph requests.
+
+Unauthenticated requests are rejected before any subgraph fetch. The `/health` endpoint is exempt — the ALB health check does not present a token.
+
+### Apollo GraphOS connection
+
+The router has a persistent outbound connection to **Apollo GraphOS Uplink** (over the public internet, via IGW). This connection serves two purposes:
+
+| Purpose | Notes |
+|---|---|
+| **Supergraph fetch** | The router polls Uplink for the latest composed supergraph for `APOLLO_GRAPH_REF` and hot-reloads on schema changes. |
+| **License + telemetry** | Apollo Router requires a GraphOS license for the JWT authentication plugin. The same key authenticates operation telemetry pushed back to Apollo Studio. |
+
+### VPC Interface Endpoints (one per subgraph)
+
+For each federated subgraph, the gateway account holds a VPC Interface Endpoint pointing at that subgraph's VPC Endpoint Service. Adding a new subgraph creates a new endpoint here without any other gateway-side changes.
+
+See the [Cross-Account Network](/architecture/federated-graphql/network) page for the full PrivateLink topology.
+
+### Egress
+
+Router task ENIs sit in public subnets with `assign_public_ip = true`, so they reach external services (Cognito JWKS, Apollo Uplink, ECR, CloudWatch Logs, Datadog) directly via the Internet Gateway. There is no NAT gateway in the gateway VPC.
+
+Traffic to subgraphs stays inside the VPC: the destination IPs resolved from VPCE DNS names are private IPs in the gateway VPC's private subnets, reached via the implicit `local` route.
+
+## Secrets
+
+Two secrets are stored in SSM Parameter Store within the gateway account, populated from the gateway secrets tfvars in S3:
+
+| Parameter | Used by |
+|---|---|
+| `/claruswms/gateway/<env>/apollo_key` | Apollo Router task — license + telemetry + Uplink fetch |
+| `/claruswms/gateway/<env>/datadog_api_key` | Datadog Agent sidecar |
+
+Both are referenced by ARN from the task definition's `secrets` block; ECS resolves them at task start.

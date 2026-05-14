@@ -1,0 +1,103 @@
+---
+title: 'Agents Subgraph'
+description: "PostGraphile-backed Federation v2 subgraph fronting the agents Postgres database"
+icon: 'database'
+---
+
+The **agents subgraph** is the first federated subgraph in the supergraph. It is a [PostGraphile](https://www.graphile.org/postgraphile/) service that exposes a Federation v2 schema auto-generated from a Postgres database. The router federates over it through cross-account PrivateLink.
+
+## Account architecture
+
+<Frame>
+  <img src="/images/diagrams/federated-graphql-agents-subgraph.drawio.svg" alt="Agents subgraph — account architecture" zoom />
+</Frame>
+
+<sub><a href="/images/diagrams/federated-graphql-agents-subgraph.drawio.svg" download="federated-graphql-agents-subgraph.drawio.svg">Download SVG</a> · <a href="/images/diagrams/federated-graphql-agents-subgraph.drawio" download="federated-graphql-agents-subgraph.drawio">Download draw.io source</a></sub>
+
+## Components
+
+### PostGraphile ECS Fargate task
+
+| | |
+|---|---|
+| **Image** | `claruswms-agents-postgraphile:<env>` from the shared ECR repository |
+| **Base** | A pinned Node.js Alpine image, set in the agents repo's Dockerfile |
+| **Subnets** | Public; `assign_public_ip = true` |
+| **Listener** | TCP 5000 |
+| **Health check** | `GET /health` on port 5000 |
+
+PostGraphile is wrapped in a thin Fastify server (`server.js`) that:
+
+- Initialises a Postgres `Pool` with `ssl: { rejectUnauthorized: true, ca: <rds-ca.pem> }` for verify-full TLS to RDS.
+- Mounts PostGraphile at `/graphql` with the Federation v2 plugin (`@apollo/subgraph`) appended.
+- Exposes `GET /health` for the NLB target group health check.
+
+Tasks run on the standard FARGATE / FARGATE_SPOT mix.
+
+### Federation plugin
+
+The subgraph is made federation-aware by `federation-plugin.js`, which wraps PostGraphile's generated schema with `@apollo/subgraph`'s `buildSubgraphSchema`. This produces:
+
+- The `_service { sdl }` introspection field required by Federation v2.
+- Federation directives (`@link`, `@key`, etc.) declared at the top of the emitted SDL.
+- Compatibility with Apollo Router's subgraph fetch protocol.
+
+The schema content itself is everything PostGraphile generates from the database — tables become GraphQL types, foreign keys become connections, Postgres comments become GraphQL descriptions. Adding a Postgres table (via future schema migration tooling) automatically expands the federated surface; no application code changes are required.
+
+### RDS Postgres
+
+| | |
+|---|---|
+| **Engine** | PostgreSQL |
+| **Storage** | Encrypted at rest |
+| **Subnets** | Private |
+| **Master credentials** | `manage_master_user_password = true` — AWS-managed via Secrets Manager |
+| **TLS** | `rds.force_ssl = 1` parameter group setting; PostGraphile uses verify-full with the AWS RDS CA bundle |
+| **CloudWatch Logs** | `postgresql` export enabled with retention |
+
+Engine version, instance class, storage type, and multi-AZ are configured per workspace in the agents secrets tfvars. The database is reachable only from the PostGraphile task's security group on port 5432.
+
+### Internal NLB
+
+| | |
+|---|---|
+| **Scheme** | Internal (private subnets) |
+| **Listener** | TCP 5000 |
+| **Target group** | `target_type = "ip"`, port 5000, HTTP health check on `/health` |
+| **Targets** | PostGraphile task ENIs |
+
+The NLB sits in front of the PostGraphile tasks and is the AWS-PrivateLink-facing endpoint. It does not handle TLS termination — PostGraphile speaks plain HTTP on `:5000` internally.
+
+### VPC Endpoint Service
+
+| | |
+|---|---|
+| **Backing NLB** | The internal NLB above |
+| **Acceptance** | Auto-accept |
+| **Allowed principals** | Gateway account root ARN(s) |
+
+The endpoint service is the AWS-side hook that lets the gateway account create a VPC Interface Endpoint into this VPC's NLB. The allowed-principals list is the trust boundary — only the gateway account can attach an endpoint.
+
+The endpoint service name is published to an SSM parameter so the gateway module knows what to attach to.
+
+### Introspect CodeBuild project
+
+| | |
+|---|---|
+| **Name** | `claruswms-agents-<env>-graphql-introspect` |
+| **Role** | `claruswms-agents-<env>-codebuild-introspect-role` |
+| **Subnets** | Private (VPC-configured) |
+| **Image** | A standard Amazon Linux CodeBuild image |
+
+Invoked by the agents-postgraphile CodePipeline after the ECS deploy stage. It curls `_service { sdl }` against the PostGraphile NLB from inside the VPC and writes the SDL as a pipeline artifact for the downstream publish stage. See the [Publish Pipeline](/architecture/federated-graphql/publish-pipeline) page for the full flow.
+
+## Trust model
+
+The subgraph does **not** validate Cognito JWTs itself. Trust is enforced at the network layer:
+
+- The only way to reach PostGraphile is via the internal NLB.
+- The only way to reach the NLB from outside the agents VPC is via the VPC Endpoint Service.
+- The VPC Endpoint Service explicitly allowlists the gateway account root.
+- The gateway account's Apollo Router validates JWTs at the edge and propagates verified claims as headers (`x-user-sub`, `x-user-email`, `x-cognito-groups`).
+
+PostGraphile reads those headers and treats them as authoritative. Because the network path is constrained, headers cannot be forged by an external client.

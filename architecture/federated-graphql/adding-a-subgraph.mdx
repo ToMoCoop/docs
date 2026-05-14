@@ -1,0 +1,120 @@
+---
+title: 'Adding a Subgraph'
+description: "Practical step-by-step for adding a new subgraph to the federated supergraph"
+icon: 'circle-plus'
+---
+
+The federation infrastructure is designed for additional subgraphs to be added without changes to the Apollo Router image, the router runtime configuration, or Apollo Studio. The work is split between **the subgraph's own application repo**, **the subgraph's OPS infrastructure module**, **the gateway module**, and **the pipelines module**.
+
+This page is a practical guide to the steps you actually carry out. Lower-level mechanics live on the [Gateway](/architecture/federated-graphql/gateway), [Agents Subgraph](/architecture/federated-graphql/agents-subgraph), and [Publish Pipeline](/architecture/federated-graphql/publish-pipeline) pages.
+
+<Steps>
+  <Step title="Make the subgraph speak Federation v2">
+    In the subgraph's application repo:
+
+    - Wrap your GraphQL implementation with Apollo's Federation v2 adapter (or equivalent) so the service exposes a `_service { sdl }` query and emits `@link(url: "https://specs.apollo.dev/federation/v2.x", ...)` at the top of its SDL.
+    - Make the service accept identity headers propagated by the Apollo Router: `x-user-sub`, `x-user-email`, `x-cognito-groups`. These are the verified Cognito claims the router forwards on each subgraph fetch.
+  </Step>
+
+  <Step title="Add a `subgraph.yaml`">
+    Create a `subgraph.yaml` somewhere in the subgraph repo:
+
+    ```yaml
+    name: <subgraph-name>
+
+    routing_urls:
+      staging: <staging-vpce-url>
+      production: <production-vpce-url>
+    ```
+
+    `name` is the subgraph identifier in the supergraph. `routing_urls` you'll fill in after Step 4 — the URLs come from the gateway after its apply.
+  </Step>
+
+  <Step title="Add provider-side infrastructure with the `subgraph-endpoint` module">
+    In the OPS module that owns the subgraph's AWS resources (e.g., `agents/`, `api/`, or a new module), one module call creates everything the subgraph needs on the provider side:
+
+    ```hcl
+    module "subgraph_endpoint" {
+      source = "../modules/subgraph-endpoint"
+
+      name                            = "<service>-<env>-graphql"
+      short_name                      = "<svc-short>-gql"
+      vpc_id                          = module.subgraph_vpc.vpc_id
+      vpc_cidr_block                  = module.subgraph_vpc.cidr_block
+      private_subnet_ids              = module.subgraph_vpc.private_subnet_ids
+      region                          = var.region
+      listener_port                   = 5000
+
+      # Cross-account trust
+      allowed_principal_arns          = [var.gateway_account_principal_arn]
+      supported_regions               = [var.region]
+      endpoint_service_name_ssm_param = "/<your>/graphql/endpoint-service-name"
+
+      # Introspect CodeBuild (inline buildspec — no per-subgraph file needed)
+      subgraph_task_security_group_id = aws_security_group.subgraph_task.id
+      subgraph_yaml_path              = "<path/to>/subgraph.yaml"
+      introspect_role_name            = "<service>-<env>-codebuild-introspect-role"
+      pipelines_deploy_role_id        = aws_iam_role.pipelines_deploy.id
+      pipeline_artifact_bucket        = var.pipeline_artifact_bucket
+      pipeline_kms_key_arn            = var.pipeline_kms_key_arn
+
+      tags = local.subgraph_tags
+    }
+    ```
+
+    The module creates:
+
+    - An internal NLB and target group for the subgraph's runtime tasks.
+    - A VPC Endpoint Service backed by the NLB, with the gateway account allowlisted.
+    - An SSM parameter recording the resulting endpoint-service name for the gateway to consume.
+    - A VPC-configured **introspect CodeBuild project** with an inline buildspec that pulls `_service { sdl }` from the live subgraph and emits the SDL + `subgraph.yaml` as a pipeline artifact.
+    - A security group rule on the subgraph's task SG allowing the introspect CodeBuild to reach it on the listener port.
+    - A cross-account `codebuild:StartBuild` policy attached to `PipelinesAccountDeployRole` so the central CodePipeline can invoke the introspect project.
+
+    After applying, two values matter:
+
+    - The SSM parameter holds the endpoint-service name — feed this into the gateway in the next step.
+    - The module exposes `introspect_codebuild_project_name` and `introspect_codebuild_role_arn` as outputs — referenced by the central pipelines module.
+  </Step>
+
+  <Step title="Register the subgraph with the gateway">
+    In `gateway/terraform.tfvars`, the `workspace_gateway_config` variable carries a `subgraphs` map per workspace. Append a new entry to it for **every workspace** the new subgraph should be federated in:
+
+    ```hcl
+    workspace_gateway_config = {
+      staging = {
+        # ... other workspace settings (apollo_router_image, vpc_cidr, etc.)
+        subgraphs = {
+          agents = {
+            endpoint_service_name = "com.amazonaws.vpce.eu-west-2.vpce-svc-<id>"
+            port                  = 5000
+          }
+          <new-subgraph-name> = {
+            endpoint_service_name = "<from-step-3-SSM>"
+            port                  = <your-listener-port>
+          }
+        }
+      }
+      production = {
+        # ... same shape; populate when ready
+      }
+    }
+    ```
+
+    Apply the gateway module. The gateway iterates the `subgraphs` map with `for_each` and creates a new VPC Interface Endpoint for each new entry automatically — the router, ALB, ACM cert, and DNS zone all stay as they are.
+
+    After the apply, grab the new VPCE DNS name from the gateway's `subgraph_endpoint_dns` Terraform output and paste it into your `subgraph.yaml`'s `routing_urls` map.
+  </Step>
+
+  <Step title="Add the pipeline">
+    In the pipelines module, create a new pipeline definition that mirrors the agents-postgraphile pipeline:
+
+    - A source action pulling from the subgraph's source repo.
+    - Build, tag, and deploy stages targeting the subgraph's account.
+    - An introspect stage that invokes the CodeBuild project the `subgraph-endpoint` module created.
+
+    The publish stage is **not** subgraph-specific — it invokes the shared `gateway-subgraph-publish` CodeBuild in the build-and-artifacts account, which already handles every subgraph generically. You don't add a publish project, a publish buildspec, or an Apollo key — those are all reused.
+
+    Add the new subgraph's introspect CodeBuild role ARN (the module's `introspect_codebuild_role_arn` output) to the pipeline artifact bucket and KMS key policies so it can write the SDL artifact across accounts.
+  </Step>
+</Steps>

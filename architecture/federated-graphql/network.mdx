@@ -1,0 +1,36 @@
+---
+title: 'Cross-Account Network'
+description: "How the Apollo Router reaches subgraphs in other AWS accounts via AWS PrivateLink"
+icon: 'network-wired'
+---
+
+Subgraphs run in separate AWS accounts to the Apollo Router. Traffic between them never leaves the AWS network — it traverses **AWS PrivateLink**, the same mechanism AWS uses for cross-account service exposure (e.g., consuming an AWS service via a VPC Endpoint).
+
+## The two halves
+
+A PrivateLink connection has two halves, each owned by a different account.
+
+### Provider side (subgraph account)
+
+Created once per subgraph, in the subgraph's account:
+
+| Component | Purpose |
+|---|---|
+| **Internal NLB** | Sits in front of the subgraph tasks. The PrivateLink fabric forwards consumer traffic to this NLB. |
+| **VPC Endpoint Service** | Registers the NLB as a service consumable by other AWS accounts. Carries the principal allowlist. |
+
+The endpoint service's name has the form `com.amazonaws.vpce.<region>.vpce-svc-<id>` and is published to SSM in the provider account so the consumer account knows what to attach to.
+
+### Consumer side (gateway account)
+
+Created per-subgraph, in the gateway account, one VPC Interface Endpoint per subgraph the gateway federates.
+
+## Trust boundary
+
+Access to a subgraph through PrivateLink is gated by the **endpoint service's principal allowlist** in the provider account. Only AWS accounts on that list can attach a VPC Interface Endpoint to the service. Connections from allowed principals are auto-accepted; connections from any other principal cannot be created.
+
+One detail worth knowing about how AWS PrivateLink behaves: it preserves the consumer's source IP through to the provider's NLB. The IP arriving at the subgraph's NLB is the Apollo Router task's address in the gateway VPC, not anything in the subgraph VPC. This means the trust boundary lives at the endpoint service's allowed-principals list rather than at the NLB's security group.
+
+## DNS
+
+Each VPC Interface Endpoint exposes a private DNS name inside the gateway VPC. That name resolves to private IPs reachable only from the consumer side of the PrivateLink connection. Each subgraph's DNS name (combined with its listener port) is the routing URL the subgraph publishes to Apollo GraphOS so the router knows where to call it.

@@ -1,0 +1,134 @@
+---
+title: 'Publish Pipeline'
+description: "How each subgraph's SDL gets from its running service into Apollo GraphOS for the Apollo Router to pick up"
+icon: 'cloud-arrow-up'
+---
+
+After a subgraph deploys, its schema needs to reach Apollo GraphOS so the supergraph is recomposed and the Apollo Router serves the new fields. This is **managed federation** — the router doesn't bake schemas into its image; it polls Apollo Uplink and hot-reloads.
+
+This page describes the publish pipeline pattern every subgraph follows, plus the specific implementation for the agents PostGraphile subgraph.
+
+## Pipeline flow
+
+<Frame>
+  <img src="/images/diagrams/federated-graphql-publish-flow.drawio.svg" alt="Federated GraphQL publish pipeline — introspect + publish flow" zoom />
+</Frame>
+
+<sub><a href="/images/diagrams/federated-graphql-publish-flow.drawio.svg" download="federated-graphql-publish-flow.drawio.svg">Download SVG</a> · <a href="/images/diagrams/federated-graphql-publish-flow.drawio" download="federated-graphql-publish-flow.drawio">Download draw.io source</a></sub>
+
+## The generic pipeline shape
+
+Every subgraph follows the same CodePipeline stage shape per environment:
+
+```
+Source → Build → TagStaging → DeployStaging → IntrospectStaging → PublishStaging
+                                                       (then approval + production mirror)
+```
+
+The first four stages — source, build, tag, deploy — are identical to any other ClarusWMS service pipeline. They get the new image built and rolled out. The two added stages that make a service into a federated subgraph are **introspect** and **publish**.
+
+### Introspect
+
+The introspect stage runs **in the subgraph's own AWS account**, VPC-configured into that subgraph's VPC. It needs to be on the inside of the network because the live subgraph is only reachable internally. It pulls the SDL straight from the running service and emits it as a CodePipeline artifact for the next stage.
+
+How the SDL is fetched depends on the subgraph's GraphQL implementation. All Federation v2 subgraphs expose a special `_service { sdl }` query — the introspect step calls that against an in-VPC URL and captures the response.
+
+### Publish
+
+The publish stage runs **in the shared build-and-artifacts account** with no VPC config. It needs public-internet egress to reach Apollo's API, which a VPC-configured CodeBuild in the subgraph's account doesn't have.
+
+The publish stage reads the SDL artifact from the introspect stage and calls `rover subgraph publish` with the subgraph's name, the SDL file, and the routing URL for the current variant. From that point Apollo recomposes the supergraph and serves the updated version via Uplink.
+
+## Why two CodeBuild projects
+
+The introspect and publish steps have **mutually exclusive network requirements**:
+
+- **Introspect** needs to reach the subgraph service, which is only accessible from inside the subgraph's VPC.
+- **Publish** needs to reach `api.apollographql.com` over the public internet.
+
+A single CodeBuild project can only satisfy one or the other. Subgraph VPCs do not have NAT gateways — VPC-configured CodeBuilds in the subgraph account have no internet egress. Splitting the work means each CodeBuild lives where its network requirements are met.
+
+The handoff between them is a CodePipeline artifact: the introspect stage emits a bundle containing the SDL (`schema.graphql`) and the subgraph's `subgraph.yaml`, and the publish stage consumes that artifact and finds both files at the root.
+
+## The publish CodeBuild project
+
+There is **one publish CodeBuild project** in the build-and-artifacts account — `gateway-subgraph-publish` — that handles every subgraph and every variant. The pipeline action overrides a `TARGET_VARIANT` env var to pick the variant for each invocation:
+
+```bash
+rover subgraph publish "claruswms@${TARGET_VARIANT}" \
+  --name "$SUBGRAPH_NAME" \
+  --schema ./schema.graphql \
+  --routing-url "$ROUTING_URL"
+```
+
+`APOLLO_KEY` is injected from an SSM parameter in the build-and-artifacts account.
+
+The publish buildspec is defined inline on the CodeBuild project rather than per-subgraph. The publish step is identical for every subgraph — read `schema.graphql` and `subgraph.yaml` from the input artifact, run `rover subgraph publish` — so it makes sense for the buildspec to live with the project, not duplicated across each subgraph's repo.
+
+The introspect buildspec is also inline — provided by the shared `subgraph-endpoint` Terraform module that every subgraph instantiates. The buildspec is parameterised by two env vars (`SUBGRAPH_INTERNAL_URL` and `SUBGRAPH_YAML_PATH`) that the module sets per-subgraph at the CodeBuild-project level, so the same buildspec works for every subgraph without copying it.
+
+The project is prefixed `gateway-` because the federation supergraph is a gateway-domain concept: publishing into Apollo exists to feed the supergraph the gateway consumes, regardless of which subgraph repo's pipeline triggered the publish.
+
+## subgraph.yaml — the per-subgraph identity declaration
+
+Each subgraph repo owns a `subgraph.yaml` declaring its identity for the federation:
+
+```yaml
+name: agents
+
+routing_urls:
+  staging: http://<staging-vpce-dns>:5000/graphql
+  production: http://<production-vpce-dns>:5000/graphql
+```
+
+| Field | Used for |
+|---|---|
+| `name` | The subgraph identifier in the supergraph. Must match the `--name` passed to `rover subgraph publish` and the name the gateway router expects. |
+| `routing_urls.<variant>` | The URL the Apollo Router uses to call this subgraph in each environment. This is the gateway-account VPCE DNS name — owned by the gateway, but co-located with the subgraph repo because it's the subgraph's declaration of where it is reachable in the supergraph. |
+
+When the gateway's VPCE for the subgraph is recreated and gets a new DNS name, this file is what needs updating.
+
+## Apollo GraphOS Uplink
+
+After a successful publish:
+
+1. Apollo's hosted service receives the new SDL for the subgraph in the named variant (e.g. `claruswms@staging`).
+2. Apollo composes the supergraph centrally, validating that the new SDL composes with any other subgraphs published to the same variant.
+3. The composed supergraph is served via **Uplink**, Apollo's CDN-backed schema distribution endpoint.
+4. The Apollo Router polls Uplink and picks up the new supergraph.
+5. The router hot-reloads the schema in-process. No router restart, no gateway redeploy.
+
+## Apollo GraphOS configuration
+
+ClarusWMS uses a single Apollo graph (`claruswms`) with one variant per environment (`@staging`, `@production`). The router's `APOLLO_GRAPH_REF` picks the variant per environment; the publish stages publish to the matching variant.
+
+The same `APOLLO_KEY` is used by both the router (for license + telemetry) and the publish CodeBuild (for schema push). On Apollo's free Serverless plan all keys are admin-role, so a single key suffices.
+
+## Permissions
+
+Two cross-account paths matter:
+
+| From → To | Mechanism |
+|---|---|
+| Pipeline → introspect CodeBuild | The pipeline assumes `PipelinesAccountDeployRole` in the subgraph's account. That role grants the pipeline permission to invoke the introspect project. |
+| Pipeline → publish CodeBuild | The pipeline assumes the shared cross-account build role in the build-and-artifacts account, which can invoke any CodeBuild project there. |
+
+The introspect CodeBuild's service role has cross-account read/write to the pipelines artifact bucket and KMS key — it needs to emit the SDL artifact. The publish CodeBuild's service role is the standard CodeBuild service role in the build-and-artifacts account, which already has the necessary pipelines-bucket access.
+
+---
+
+## PostGraphile specifics
+
+The agents-postgraphile pipeline is the first concrete instance of this pattern. A few details are specific to PostGraphile rather than to the federation pattern itself.
+
+### Where the SDL comes from
+
+PostGraphile auto-generates its GraphQL schema from the connected Postgres database at runtime — schema content is everything PostGraphile derives from tables, foreign keys, and Postgres comments. The introspect step calls `_service { sdl }` against the live PostGraphile service so the SDL we publish is exactly what the service currently serves. Adding a Postgres table automatically expands the federated surface; no application code changes are needed.
+
+### Introspection endpoint
+
+The introspect CodeBuild for the agents subgraph hits the internal NLB DNS for the PostGraphile service from inside the agents VPC. It writes the response body to `schema.graphql` and copies the agents repo's `subgraph.yaml` alongside it so the downstream publish stage finds both at the root of the artifact.
+
+### Source filtering
+
+The agents pipeline's source trigger is filtered to changes under `clarus-postgraphile/**` in the `ClarusWMS_Agents` repository so pushes to unrelated parts of the agents codebase don't trigger schema republishes.

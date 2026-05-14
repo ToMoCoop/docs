@@ -62,6 +62,17 @@
                 ]
               },
               {
+                "group": "Federated GraphQL",
+                "pages": [
+                  "architecture/federated-graphql/overview",
+                  "architecture/federated-graphql/gateway",
+                  "architecture/federated-graphql/agents-subgraph",
+                  "architecture/federated-graphql/network",
+                  "architecture/federated-graphql/publish-pipeline",
+                  "architecture/federated-graphql/adding-a-subgraph"
+                ]
+              },
+              {
                 "group": "Deployment",
                 "pages": [
                   "architecture/deployment/index",
