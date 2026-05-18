@@ -46,16 +46,35 @@ The router is configured by `router.yaml` baked into the Docker image. Key block
 
 | Block | Purpose |
 |---|---|
+| `supergraph` | Listens on `0.0.0.0:4000` with `path: /graphql`. The public endpoint is `https://gateway.<domain>/graphql`. Aligns with the org convention (Ruby API on `/graphql`, PostGraphile subgraph on `/graphql`) and matches what every standard GraphQL tool expects. |
 | `supergraph.introspection: false` | GraphQL introspection disabled on the public endpoint |
 | `health_check` | Exposes `/health` on port 4000 for ALB health checks |
+| `cors` | Allow-list for browser clients. Permits the `X-Clarus-Subdomain` header on preflight (the frontend sends it on every request); origins matched against the clarus root domains |
 | `authentication.router.jwt` | Validates the `Authorization: Bearer …` header against the Cognito user pool's JWKS |
-| `headers.subgraphs.<name>.request` | Propagates verified Cognito claims to each subgraph (`x-user-sub`, `x-user-email`, `x-cognito-groups`) |
+| `headers.subgraphs.<name>.request` | Forwards an explicit set of headers to each subgraph (see [Subgraph header propagation](#subgraph-header-propagation)) |
+| `include_subgraph_errors` | Controlled per-environment via `INCLUDE_SUBGRAPH_ERRORS`. See [Per-environment error visibility](#per-environment-error-visibility). |
 | `telemetry.exporters.tracing.otlp` / `.metrics.otlp` | Ships APM traces and metrics to the in-task Datadog agent over OTLP HTTP |
 
 The router fetches the **composed supergraph schema** from Apollo GraphOS Uplink at runtime — it is not baked into the image. Two environment variables drive this:
 
 - `APOLLO_KEY` — Apollo GraphOS API key (SSM SecureString, injected as a task secret).
 - `APOLLO_GRAPH_REF` — graph + variant identifier (e.g. `claruswms@staging`).
+
+### Subgraph header propagation
+
+For each subgraph, the router forwards a fixed set of headers on the outbound subgraph fetch. The trust posture varies per header:
+
+| Header | Mechanism | Trust |
+|---|---|---|
+| `x-user-sub` | `insert` from `apollo_authentication::JWT::claims.sub` | JWT-signed; only set on requests that passed JWT validation |
+| `x-user-email` | `insert` from `apollo_authentication::JWT::claims.email` | JWT-signed |
+| `x-cognito-groups` | `insert` from `apollo_authentication::JWT::claims.cognito:groups` | JWT-signed |
+| `x-clarus-subdomain` | `propagate` from the inbound client request | **Interim** — client-supplied, not JWT-bound. See below. |
+| `x-request-id` | `propagate` from the inbound client request | Trace correlation only |
+
+The three `insert.from_context` headers come from claims the router has already validated against the Cognito JWKS, so subgraphs can trust them as authoritative without re-verifying.
+
+`x-clarus-subdomain` is currently propagated from the client header as-is — the active tenant is whatever the client sends. The planned tightening is a Cognito Pre-Token Generation Lambda that injects `custom:subdomain` into issued tokens, at which point this row flips from `propagate` to `insert.from_context: apollo_authentication::JWT::claims.custom:subdomain` and the client header is ignored. Code comments in `router.yaml` flag the interim state. See the [agents subgraph trust model](/architecture/federated-graphql/agents-subgraph#trust-model) for the downstream side.
 
 ### Cognito JWT validation
 
@@ -89,6 +108,26 @@ See the [Cross-Account Network](/architecture/federated-graphql/network) page fo
 Router task ENIs sit in public subnets with `assign_public_ip = true`, so they reach external services (Cognito JWKS, Apollo Uplink, ECR, CloudWatch Logs, Datadog) directly via the Internet Gateway. There is no NAT gateway in the gateway VPC.
 
 Traffic to subgraphs stays inside the VPC: the destination IPs resolved from VPCE DNS names are private IPs in the gateway VPC's private subnets, reached via the implicit `local` route.
+
+## Operations
+
+### Per-environment error visibility
+
+By default Apollo Router redacts subgraph error messages and replies with `Subgraph errors redacted` — safer for production, painful for debugging. The router config flips this per-environment via `INCLUDE_SUBGRAPH_ERRORS`:
+
+```yaml
+include_subgraph_errors:
+  all: ${env.INCLUDE_SUBGRAPH_ERRORS}
+```
+
+The env var is set on the apollo-router task from `include_subgraph_errors` in the workspace's `gateway/terraform.tfvars` block:
+
+| Workspace | `include_subgraph_errors` | Effect |
+|---|---|---|
+| `staging` | `true` | Subgraph error messages flow through to clients — used for debugging |
+| `production` | `false` | Subgraph errors stay redacted at the gateway |
+
+To temporarily expose errors in any environment, flip the flag in tfvars and re-apply the `gateway/` workspace; the task definition revision change rolls a new ECS task generation. The agents subgraph has a matching per-environment knob (`NODE_ENV`) — see the [agents subgraph operations section](/architecture/federated-graphql/agents-subgraph#operations) for the downstream side.
 
 ## Secrets
 

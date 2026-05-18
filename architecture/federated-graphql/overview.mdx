@@ -24,7 +24,7 @@ If you're new to Apollo Federation, [Apollo's official introduction](https://www
 
 <sub><a href="/images/diagrams/federated-graphql-overview.drawio.svg" download="federated-graphql-overview.drawio.svg">Download SVG</a> · <a href="/images/diagrams/federated-graphql-overview.drawio" download="federated-graphql-overview.drawio">Download draw.io source</a></sub>
 
-A client sends a GraphQL request to `https://gateway.<domain>/`. The request flows through:
+A client sends a GraphQL request to `https://gateway.<domain>/graphql`. The request flows through:
 
 1. **Public ALB** in the gateway AWS account, with an ACM certificate for the `gateway.<domain>` hostname.
 2. **Apollo Router** running as an ECS Fargate task. It validates the request's Cognito JWT against the shared user pool's JWKS, then plans an execution against the composed supergraph schema.

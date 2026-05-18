@@ -29,20 +29,21 @@ The **agents subgraph** is the first federated subgraph in the supergraph. It is
 PostGraphile is wrapped in a thin Fastify server (`server.js`) that:
 
 - Initialises a Postgres `Pool` with `ssl: { rejectUnauthorized: true, ca: <rds-ca.pem> }` for verify-full TLS to RDS.
-- Mounts PostGraphile at `/graphql` with the Federation v2 plugin (`@apollo/subgraph`) appended.
+- Mounts PostGraphile at `/graphql` with the Federation v2 wiring described below.
 - Exposes `GET /health` for the NLB target group health check.
+- Resolves the calling tenant per-request and switches Postgres `search_path` before any resolver runs (see [Multi-tenant routing](#multi-tenant-routing)).
 
 Tasks run on the standard FARGATE / FARGATE_SPOT mix.
 
 ### Federation plugin
 
-The subgraph is made federation-aware by `federation-plugin.js`, which wraps PostGraphile's generated schema with `@apollo/subgraph`'s `buildSubgraphSchema`. This produces:
+The subgraph is made federation-aware by `federation-plugin.js`, which adds the `_service { sdl }` field through PostGraphile's own `makeExtendSchemaPlugin`:
 
-- The `_service { sdl }` introspection field required by Federation v2.
-- Federation directives (`@link`, `@key`, etc.) declared at the top of the emitted SDL.
-- Compatibility with Apollo Router's subgraph fetch protocol.
+- A `makeExtendSchemaPlugin` declares `type _Service { sdl: String! }` and `extend type Query { _service: _Service! }`, with a resolver that returns the printed schema SDL plus a Federation v2 `@link(url: …)` preamble.
+- The plugin is passed to `createPostGraphileSchema` via `appendPlugins`, so the federation field is added *during* PostGraphile's own schema build. This preserves all the metadata PostGraphile attaches to its types and fields — earlier approaches that reconstructed the schema after PostGraphile built it (`printSchema → parse → buildSubgraphSchema`, or `extendSchema` on the finished schema) dropped that metadata and broke connection resolvers.
+- The published SDL contains the standard PostGraphile types plus the federation handshake fields. Apollo Router uses `_service { sdl }` at compose time only; the same SDL is what the introspect pipeline publishes to GraphOS.
 
-The schema content itself is everything PostGraphile generates from the database — tables become GraphQL types, foreign keys become connections, Postgres comments become GraphQL descriptions. Adding a Postgres table (via future schema migration tooling) automatically expands the federated surface; no application code changes are required.
+The schema content itself is everything PostGraphile generates from the database — tables become GraphQL types, foreign keys become connections, Postgres comments become GraphQL descriptions. Adding a Postgres table via the migrate pipeline (see [Migrate CodeBuild](#migrate-codebuild-project) and [Multi-tenant routing](#multi-tenant-routing)) automatically expands the federated surface; no application code changes are required.
 
 ### RDS Postgres
 
@@ -89,7 +90,63 @@ The endpoint service name is published to an SSM parameter so the gateway module
 | **Subnets** | Private (VPC-configured) |
 | **Image** | A standard Amazon Linux CodeBuild image |
 
-Invoked by the agents-postgraphile CodePipeline after the ECS deploy stage. It curls `_service { sdl }` against the PostGraphile NLB from inside the VPC and writes the SDL as a pipeline artifact for the downstream publish stage. See the [Publish Pipeline](/architecture/federated-graphql/publish-pipeline) page for the full flow.
+Invoked by the agents-postgraphile CodePipeline after the ECS deploy stage. It curls `_service { sdl }` against the PostGraphile NLB from inside the VPC and writes the SDL as a pipeline artifact for the downstream publish stage. The curl carries `X-Clarus-Subdomain: template` so the subgraph's tenant-routing check (see below) is satisfied — `template` is the reserved schema that exists in every environment. See the [Publish Pipeline](/architecture/federated-graphql/publish-pipeline) page for the full flow.
+
+### Migrate CodeBuild project
+
+| | |
+|---|---|
+| **Name** | `claruswms-agents-<env>-graphql-migrate` |
+| **Role** | `claruswms-agents-<env>-codebuild-migrate-role` |
+| **Subnets** | Private (VPC-configured), with internet egress via the agents VPC NAT gateway |
+| **Tooling** | Flyway 10.x (downloaded from Maven Central per build), `psql`, `jq` |
+
+Invoked by the agents-postgraphile CodePipeline before the ECS deploy stage. It:
+
+1. Reads the RDS master credentials from Secrets Manager.
+2. Applies global migrations from `clarus-postgraphile/migrations/global/` to the `public` schema (extensions, `public.tenants` registry, `public.ensure_tenant_schema()` helper).
+3. Reads the canonical tenant list from `clarus-postgraphile/tenants.txt` in the source artifact (one subdomain per line, `#` comments and blank lines ignored).
+4. For each tenant: validates the subdomain format, calls `public.ensure_tenant_schema(<subdomain>)`, upserts a row into `public.tenants`, and applies tenant migrations from `clarus-postgraphile/migrations/tenant/` against that schema.
+
+Adding a tenant is a one-line edit to `tenants.txt` followed by a pipeline run — no Lambda, no operator script, no ad-hoc terraform. Removing a line stops further migrations being applied to that schema; data is not dropped automatically.
+
+The migrate CodeBuild runs in private subnets because RDS is private, so the agents VPC carries a NAT gateway to give it egress to yum / Maven Central / Secrets Manager / CloudWatch Logs. The gateway VPC remains NAT-free — its task ENIs use public subnets with `assign_public_ip = true`.
+
+## Multi-tenant routing
+
+The subgraph follows the same schema-per-subdomain isolation pattern as the Ruby API (Apartment gem) — each tenant has its own Postgres schema, and the subgraph swaps `search_path` per request to route into the calling tenant.
+
+### Schema layout
+
+| Schema | Purpose |
+|---|---|
+| `public` | Tenant registry (`public.tenants`), the `ensure_tenant_schema(citext)` helper function, and shared extensions (`pgcrypto`, `citext`). Created and migrated by the global migrations. |
+| `template` | The reserved schema-shape template. Migrated alongside every real tenant; never holds tenant data. PostGraphile introspects this schema at boot to generate the GraphQL types. |
+| `<subdomain>` | One schema per real tenant (e.g. `acme`, `widgetco`), created on first appearance in `tenants.txt`. Holds the actual tenant data. All tenant schemas have identical structure, kept in sync via the tenant migrations. |
+
+### Why `template`
+
+PostGraphile generates its GraphQL schema by introspecting Postgres at boot. With schema-per-tenant, naively pointing `PG_SCHEMAS` at real tenants would either:
+
+- Produce per-tenant prefixed types (`AcmeAgent`, `WidgetcoAgent` …) — useless for federation, drifts every time a tenant is added.
+- Need a re-introspect on every tenant addition.
+
+The `template` schema solves both: it is the canonical tenant-shape, migrated automatically so it's always in step with the latest schema, and the only thing PostGraphile introspects (`PG_SCHEMAS=template` on the ECS task). The generated GraphQL has one stable set of types regardless of how many tenants exist.
+
+### Per-request `search_path` swap
+
+Every request to `/graphql` carries an `X-Clarus-Subdomain` header (see [Trust model](#trust-model)). Before the request reaches any GraphQL resolver, `server.js` does:
+
+1. Read `x-clarus-subdomain` from the request headers.
+2. Validate the value matches `^[a-z][a-z0-9-]{0,62}$` (rejects SQL identifiers + injection attempts).
+3. Verify the tenant exists in `public.tenants` (rejects valid-looking but unknown subdomains).
+4. Acquire a pg client from the pool, open a transaction, run `SET LOCAL search_path = "<subdomain>", template, public`.
+5. Attach the client to the per-request Apollo context so PostGraphile resolvers find it at `context.pgClient`.
+6. At end of request, commit (or rollback on error), then release the client back to the pool.
+
+`SET LOCAL` is bound to the transaction — when it ends, the connection's `search_path` resets and the client is safe to return to the pool. The identifier interpolation is safe because the regex constrains the input to characters that can't form an injection.
+
+The result: resolvers physically read and write `<subdomain>.agents` even though the GraphQL types were introspected from `template.agents`. To a federation client, the subgraph looks like a single-tenant API; the multi-tenancy is invisible above the network boundary.
 
 ## Trust model
 
@@ -98,6 +155,43 @@ The subgraph does **not** validate Cognito JWTs itself. Trust is enforced at the
 - The only way to reach PostGraphile is via the internal NLB.
 - The only way to reach the NLB from outside the agents VPC is via the VPC Endpoint Service.
 - The VPC Endpoint Service explicitly allowlists the gateway account root.
-- The gateway account's Apollo Router validates JWTs at the edge and propagates verified claims as headers (`x-user-sub`, `x-user-email`, `x-cognito-groups`).
+- The gateway account's Apollo Router validates JWTs at the edge and forwards a fixed set of headers to the subgraph.
 
-PostGraphile reads those headers and treats them as authoritative. Because the network path is constrained, headers cannot be forged by an external client.
+The headers PostGraphile reads are:
+
+| Header | Source | Trust |
+|---|---|---|
+| `x-user-sub` | Apollo Router inserts from the verified JWT's `sub` claim | JWT-signed; the gateway already rejected unauthenticated traffic |
+| `x-user-email` | Apollo Router inserts from the JWT's `email` claim | JWT-signed |
+| `x-cognito-groups` | Apollo Router inserts from the JWT's `cognito:groups` claim | JWT-signed |
+| `x-clarus-subdomain` | Apollo Router propagates from the inbound client request | **Interim** — see below |
+| `x-request-id` | Apollo Router propagates from the inbound client request | Trace correlation only, not used for auth |
+
+Because the network path is constrained to the gateway's PrivateLink endpoint, headers cannot be forged by an external client.
+
+### Interim tenant-header trust model
+
+`x-clarus-subdomain` is currently a *propagated client header*, not a JWT claim. The router takes whatever the client sent and forwards it through. The subgraph's local defences are:
+
+- The subdomain regex (rejects malformed values).
+- The `public.tenants` lookup (rejects unregistered subdomains).
+
+A holder of a valid Cognito JWT could therefore claim any tenant the subgraph recognises. For the agents data this is currently acceptable because the data is greenfield and access is contained, but the gap is real.
+
+The planned tightening is a Cognito Pre-Token Generation Lambda that injects `custom:subdomain` into issued tokens (based on the user's active workspace). At that point the router config flips from `propagate.named: x-clarus-subdomain` to `insert.from_context: apollo_authentication::JWT::claims.custom:subdomain`, the client header is ignored, and the trust model becomes JWT-bound end-to-end. Code comments in `router.yaml` and `server.js` flag the interim state at both sides.
+
+## Operations
+
+### Per-environment error visibility
+
+`NODE_ENV` on the PostGraphile task is wired per environment via `agents/terraform.tfvars`:
+
+| Workspace | `NODE_ENV` | Effect |
+|---|---|---|
+| `develop` | `development` | Stack traces in responses, SQL query log, `hint`/`detail` error extensions. |
+| `staging` | `staging` | Same as `development`. |
+| `production` | `production` | No stack traces in responses, no SQL log, `errcode` only on error extensions. |
+
+Set the `node_env` field on the relevant workspace block in `postgraphile_subgraph_config` to flip the verbosity. The same `NODE_ENV` value is read by `server.js` to gate Apollo Server's `includeStacktraceInErrorResponses` and PostGraphile's `disableQueryLog` / `extendedErrors` / `showErrorStack` options.
+
+The router has a matching knob (`INCLUDE_SUBGRAPH_ERRORS` env var, set from `include_subgraph_errors` in `gateway/terraform.tfvars`) that controls whether subgraph error messages flow through to the client at the gateway. See the [Gateway Account](/architecture/federated-graphql/gateway#per-environment-error-visibility) page for that side of the wiring.

@@ -21,11 +21,13 @@ This page describes the publish pipeline pattern every subgraph follows, plus th
 Every subgraph follows the same CodePipeline stage shape per environment:
 
 ```
-Source → Build → TagStaging → DeployStaging → IntrospectStaging → PublishStaging
-                                                       (then approval + production mirror)
+Source → Build → TagStaging → [MigrateStaging] → DeployStaging → IntrospectStaging → PublishStaging
+                                                                     (then approval + production mirror)
 ```
 
-The first four stages — source, build, tag, deploy — are identical to any other ClarusWMS service pipeline. They get the new image built and rolled out. The two added stages that make a service into a federated subgraph are **introspect** and **publish**.
+Source, build, tag, deploy are identical to any other ClarusWMS service pipeline. They get the new image built and rolled out. The two added stages that make a service into a federated subgraph are **introspect** and **publish**.
+
+`MigrateStaging` is optional — only subgraphs backed by a stateful datastore include it. The agents subgraph has one (Flyway against RDS); future stateless subgraphs may not. See [Agents Subgraph › Migrate CodeBuild](/architecture/federated-graphql/agents-subgraph#migrate-codebuild-project) for the agents-specific shape.
 
 ### Introspect
 
@@ -46,7 +48,7 @@ The introspect and publish steps have **mutually exclusive network requirements*
 - **Introspect** needs to reach the subgraph service, which is only accessible from inside the subgraph's VPC.
 - **Publish** needs to reach `api.apollographql.com` over the public internet.
 
-A single CodeBuild project can only satisfy one or the other. Subgraph VPCs do not have NAT gateways — VPC-configured CodeBuilds in the subgraph account have no internet egress. Splitting the work means each CodeBuild lives where its network requirements are met.
+A single CodeBuild project can only satisfy one or the other. Splitting the work means each CodeBuild lives where its network requirements are met. (Some subgraph VPCs do have a NAT gateway — the agents VPC has one for its migrate CodeBuild, see [Agents Subgraph › Migrate CodeBuild](/architecture/federated-graphql/agents-subgraph#migrate-codebuild-project) — but introspect still doesn't need it, and publish still has to run outside the subgraph VPC to reach Apollo's API.)
 
 The handoff between them is a CodePipeline artifact: the introspect stage emits a bundle containing the SDL (`schema.graphql`) and the subgraph's `subgraph.yaml`, and the publish stage consumes that artifact and finds both files at the root.
 
