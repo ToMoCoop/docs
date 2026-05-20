@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "ClarusWMS API",
-    "description": "REST and GraphQL API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides REST mutation endpoints (POST, PATCH, DELETE) for managing warehouse operations and GraphQL list endpoints for data retrieval.\n\n**REST mutations** are available at `/api/*` paths.\n\n**GraphQL queries** are available at `/graphql` — each resource has a documented list query.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Use the client credentials or authorization code flow to obtain an access token from `https://clarus-api.com/oauth/token`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll REST mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```\n\n## GraphQL Queries\n\nAll data retrieval uses GraphQL at `POST /graphql`. Send a JSON body with `query` and optional `variables`:\n\n```json\n{\n  \"query\": \"query($code: String) { accounts { all(code: $code) { edges { node { id code name } } } } }\",\n  \"variables\": { \"code\": \"ACME\" }\n}\n```",
+    "description": "REST and GraphQL API for ClarusWMS - a multi-tenanted SaaS warehouse management system. This API provides REST mutation endpoints (POST, PATCH, DELETE) for managing warehouse operations and GraphQL list endpoints for data retrieval.\n\n**REST mutations** are available at `/api/*` paths.\n\n**GraphQL queries** are available at `/graphql` \u2014 each resource has a documented list query.\n\n## Authentication\n\nAll endpoints require OAuth 2.0 Bearer token authentication. Use the client credentials or authorization code flow to obtain an access token from `https://clarus-api.com/oauth/token`.\n\n## Multi-Tenancy\n\nThis is a multi-tenant system. Each tenant (subdomain) has isolated data. **You must include the `X-Clarus-Subdomain` header with every request** to specify which tenant you are operating on.\n\n### Required Header\n\n| Header | Required | Description |\n|--------|----------|-------------|\n| `X-Clarus-Subdomain` | Yes | The subdomain/tenant name identifying which tenant's data to access |\n\n**Example:**\n```\nX-Clarus-Subdomain: acme-warehouse\n```\n\n## Request Format (JSON:API)\n\nAll REST mutation requests use JSON:API format. Data must be sent within a `data` object containing `type` and `attributes`:\n\n```json\n{\n  \"data\": {\n    \"type\": \"resource_name\",\n    \"attributes\": {\n      \"field1\": \"value1\"\n    }\n  }\n}\n```\n\n## GraphQL Queries\n\nAll data retrieval uses GraphQL at `POST /graphql`. Send a JSON body with `query` and optional `variables`:\n\n```json\n{\n  \"query\": \"query($code: String) { accounts { all(code: $code) { edges { node { id code name } } } } }\",\n  \"variables\": { \"code\": \"ACME\" }\n}\n```",
     "version": "1.0.0",
     "contact": {
       "name": "Clarus Software",
@@ -51,8 +51,8 @@
       "description": "Document management endpoints for downloading, uploading, and transferring generated files"
     },
     {
-      "name": "Goods In Receipts",
-      "description": "Inbound receipt management endpoints for receiving inventory into the warehouse"
+      "name": "Goods In: Receipts",
+      "description": "Inbound receipt management endpoints for receiving inventory into the warehouse, including the receive task actions used to confirm stock has been received against a receipt"
     },
     {
       "name": "Goods Out: Orders",
@@ -76,7 +76,7 @@
     },
     {
       "name": "Loads",
-      "description": "Load management endpoints for grouping shipments onto vehicles"
+      "description": "Load management endpoints for grouping shipments onto vehicles, including the load task actions used to assign and load storage units onto a load"
     },
     {
       "name": "Locations",
@@ -84,7 +84,7 @@
     },
     {
       "name": "Products",
-      "description": "Product management endpoints for creating, updating, and deleting products in the warehouse catalog.\n\n## GraphQL Filtering Guide\n\nProducts support individual code/barcode filters: `code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`. Each supports operators: `eq`, `ilike`, `in`, `like`, `between`. When multiple individual filters are used together, they are AND'd (all conditions must match).\n\n### The `all_codes` filter\n\n`all_codes` is a **specialized cross-field search** that ORs across all 5 code fields (`code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`) in a single query. It performs exact matching (IN operator), not partial/ILIKE matching.\n\n**When to use `all_codes`:** Only when you have a code or barcode value and don't know which field it belongs to — e.g., a user scans a barcode that could be a unit barcode, case barcode, inner barcode, or outer barcode.\n\n**When NOT to use `all_codes`:** When you know which specific code field to search. Use the individual filter instead for better performance and precision."
+      "description": "Product management endpoints for creating, updating, and deleting products in the warehouse catalog.\n\n## GraphQL Filtering Guide\n\nProducts support individual code/barcode filters: `code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`. Each supports operators: `eq`, `ilike`, `in`, `like`, `between`. When multiple individual filters are used together, they are AND'd (all conditions must match).\n\n### The `all_codes` filter\n\n`all_codes` is a **specialized cross-field search** that ORs across all 5 code fields (`code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`) in a single query. It performs exact matching (IN operator), not partial/ILIKE matching.\n\n**When to use `all_codes`:** Only when you have a code or barcode value and don't know which field it belongs to \u2014 e.g., a user scans a barcode that could be a unit barcode, case barcode, inner barcode, or outer barcode.\n\n**When NOT to use `all_codes`:** When you know which specific code field to search. Use the individual filter instead for better performance and precision."
     },
     {
       "name": "Replenishment",
@@ -111,6 +111,10 @@
       "description": "Shipment management endpoints for carrier integration and parcel tracking"
     },
     {
+      "name": "Stock Checks",
+      "description": "Stock check endpoints for counting the products held at a location and reconciling them against the system. A stock check moves through `pending` to either `passed` or `failed`, and failed checks can subsequently be `resolved` with a reason code."
+    },
+    {
       "name": "Stocks",
       "description": "Stock management endpoints for inventory operations including holds, moves, transfers, and adjustments"
     },
@@ -120,7 +124,7 @@
     },
     {
       "name": "Tasks",
-      "description": "Task management endpoints for warehouse operations including picking, putaway, receiving, dispatch, and replenishment tasks. Tasks are created automatically by warehouse operations (e.g., goods in receipts, goods out orders, replenishment) and cannot be created or deleted via the API. Use these endpoints to update task attributes, manage task allocation to users, and complete tasks."
+      "description": "Generic task management endpoints that apply to every task type — updating attributes, completing tasks (single or bulk), and managing allocation to users. Tasks are created automatically by warehouse operations (e.g., goods in receipts, goods out orders, replenishment) and cannot be created or deleted via the API. Type-specific task actions live alongside the resource they belong to: receive task actions under *Goods In: Receipts*, load task actions under *Loads*."
     },
     {
       "name": "Templates",
@@ -274,7 +278,7 @@
           "Account Warehouses"
         ],
         "summary": "Create an account-warehouse association",
-        "description": "Links an account to a warehouse, allowing the account to operate in that warehouse. The `account_id` + `warehouse_id` combination must be unique — duplicates return 422. A nested route alternative exists at `/accounts/{account_id}/warehouses`.",
+        "description": "Links an account to a warehouse, allowing the account to operate in that warehouse. The `account_id` + `warehouse_id` combination must be unique \u2014 duplicates return 422. A nested route alternative exists at `/accounts/{account_id}/warehouses`.",
         "x-mint": {
           "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"account_warehouses\",\n    \"attributes\": {\n      \"account_id\": 1,\n      \"warehouse_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | Yes | The stock account to associate |\n| `warehouse_id` | Yes | The warehouse to associate |"
         },
@@ -368,7 +372,7 @@
           "Account Warehouses"
         ],
         "summary": "Update an account-warehouse association",
-        "description": "Update which account or warehouse is linked. Both `account_id` and `warehouse_id` are required. The combination must be unique — duplicates return 422. A nested route alternative exists at `/accounts/{account_id}/warehouses/{id}`.",
+        "description": "Update which account or warehouse is linked. Both `account_id` and `warehouse_id` are required. The combination must be unique \u2014 duplicates return 422. A nested route alternative exists at `/accounts/{account_id}/warehouses/{id}`.",
         "x-mint": {
           "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"account_warehouses\",\n    \"attributes\": {\n      \"account_id\": 2,\n      \"warehouse_id\": 3\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | Yes | The stock account to associate |\n| `warehouse_id` | Yes | The warehouse to associate |"
         },
@@ -1190,7 +1194,8 @@
                                 "$ref": "#/components/schemas/AccountId"
                               }
                             ],
-                            "nullable": true
+                            "nullable": true,
+                            "type": "integer"
                           },
                           "account_reference": {
                             "type": "string",
@@ -1253,7 +1258,8 @@
                                 "$ref": "#/components/schemas/LocationId"
                               }
                             ],
-                            "nullable": true
+                            "nullable": true,
+                            "type": "integer"
                           },
                           "notes": {
                             "type": "string",
@@ -1506,7 +1512,7 @@
         "summary": "Create a charge line",
         "description": "Create a new charge line to record a billable item. Charge lines are used for invoicing and billing operations.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity × price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity \u00d7 price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
         },
         "operationId": "createChargeLine",
         "requestBody": {
@@ -2159,7 +2165,7 @@
         "description": "Retrieve charge cards using GraphQL. Supports filtering by code, name, and active status.",
         "operationId": "listChargeCards",
         "x-mint": {
-          "content": "## Query Structure\n\n```graphql\nquery($filter: ChargeCardFilterType) {\n  charge_cards {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          description\n          active\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"active\": {\n      \"eq\": true\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Charge card ID |\n| `active` | BooleanInputType | `eq` | Whether the charge card is active |\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge card code |\n| `description` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Description |\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge card name |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n### Charge Configuration Hierarchy\n\n- **Charge Card** → Contains multiple **Charge Prices** (pricing rules)\n- **Charge Card** → Assigned to **Accounts** (via Account settings)\n- **Charge Prices** → Define rates per unit of measure and charge type\n- **Charge Windows** → Define recurring billing schedules (independent of cards)\n\n*More fields and filters available via GraphQL introspection.*"
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ChargeCardFilterType) {\n  charge_cards {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          description\n          active\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"active\": {\n      \"eq\": true\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Charge card ID |\n| `active` | BooleanInputType | `eq` | Whether the charge card is active |\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge card code |\n| `description` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Description |\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge card name |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n### Charge Configuration Hierarchy\n\n- **Charge Card** \u2192 Contains multiple **Charge Prices** (pricing rules)\n- **Charge Card** \u2192 Assigned to **Accounts** (via Account settings)\n- **Charge Prices** \u2192 Define rates per unit of measure and charge type\n- **Charge Windows** \u2192 Define recurring billing schedules (independent of cards)\n\n*More fields and filters available via GraphQL introspection.*"
         },
         "requestBody": {
           "required": true,
@@ -3405,7 +3411,7 @@
     "/graphql#ListGoodsInReceipts": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "List goods in receipts",
         "description": "Retrieve inbound receipts using GraphQL. Supports filtering by reference, status, account, warehouse, and date ranges.",
@@ -3478,7 +3484,7 @@
                                     "properties": {
                                       "node": {
                                         "type": "object",
-                                        "description": "A Goods In Receipts record"
+                                        "description": "A Goods In: Receipts record"
                                       }
                                     }
                                   }
@@ -3541,7 +3547,7 @@
     "/api/goods_in_receipts": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Create a goods in receipt",
         "description": "Create a new goods in receipt (purchase order/ASN) to receive inventory into the warehouse. Include line items using the lines_changes array.",
@@ -3663,7 +3669,7 @@
     "/api/goods_in_receipts/{id}": {
       "patch": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Update a goods in receipt",
         "description": "Update an existing goods in receipt. Use lines_changes to add, update, or remove line items. Receipts that have started receiving may have restrictions on what can be changed.",
@@ -3761,7 +3767,7 @@
       },
       "delete": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Delete a goods in receipt",
         "description": "Delete a goods in receipt. Receipts that have started receiving cannot be deleted.",
@@ -3796,12 +3802,12 @@
     "/api/goods_in_receipts/{id}/receive": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Receive a goods in receipt",
         "description": "Trigger the receiving process for a goods in receipt. The receipt must be in PENDING status with at least one line item. This changes the receipt status to RCV and creates receive tasks for each line item. Stock records are not created until individual receive tasks are completed.",
         "x-mint": {
-          "content": "## Behavior\n\n- Receipt must be in PENDING status\n- Receipt must have at least one line item\n- Changes receipt status from PENDING to RCV\n- Creates AVAILABLE receive tasks for each line item (one per line for loose items, one per storage unit for containerised items)\n- Stock records are NOT created at this stage — they are created when individual receive tasks are completed via the receive tasks endpoint\n- Returns the updated receipt with RCV status\n\n## No Request Body Required\n\nThe receipt ID is provided in the URL path. No request body is needed."
+          "content": "## Behavior\n\n- Receipt must be in PENDING status\n- Receipt must have at least one line item\n- Changes receipt status from PENDING to RCV\n- Creates AVAILABLE receive tasks for each line item (one per line for loose items, one per storage unit for containerised items)\n- Stock records are NOT created at this stage \u2014 they are created when individual receive tasks are completed via the receive tasks endpoint\n- Returns the updated receipt with RCV status\n\n## No Request Body Required\n\nThe receipt ID is provided in the URL path. No request body is needed."
         },
         "operationId": "receiveGoodsInReceipt",
         "parameters": [
@@ -3872,7 +3878,7 @@
     "/api/goods_in_receipts/{id}/revert": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Revert a goods in receipt",
         "description": "Revert a received goods in receipt back to its previous state. The receipt must not have any completed tasks associated with it.",
@@ -3948,7 +3954,7 @@
     "/api/goods_in_receipts/{id}/storage_unit_labels": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Print storage unit labels for a receipt",
         "description": "Generate storage unit labels for a goods in receipt. When `cloud_print` is true, the label is sent directly to the specified printer. When `cloud_print` is false or omitted, the response is a PDF binary stream (not JSON).",
@@ -4049,6 +4055,289 @@
                       "status": "processing"
                     }
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/receive_tasks/{id}/receive": {
+      "post": {
+        "tags": [
+          "Goods In: Receipts"
+        ],
+        "summary": "Receive stock against a receive task",
+        "description": "Complete a receive task by recording that the inbound stock has been physically received into the receiving area. The task is updated, the inbound item's `quantity_received` is incremented, a follow-on putaway task is generated, and a receive transaction is recorded. Use this endpoint when stock first lands at the receiving location; use `/api/receive_tasks/{id}/receive_to_putaway_location` when receiving directly into a putaway location instead.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"tasks\",\n    \"attributes\": {\n      \"location_to_id\": 25,\n      \"storage_unit_to_id\": 18,\n      \"confirmed_quantity\": 10.0,\n      \"serial_numbers\": [\"SN-001\", \"SN-002\"]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `location_to_id` | No | Location into which the stock is received |\n| `storage_unit_to_id` | No | Storage unit the received stock lands in |\n| `confirmed_quantity` | No | Quantity actually received (>= 0). Defaults to the task's `start_quantity` when omitted. |\n| `serial_numbers` | No | Serial numbers to assign to the received stock |\n| `base_storage_unit_type_id` | No | Base storage unit type for the received stock, when relevant |"
+        },
+        "operationId": "receiveStock",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the receive task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "tasks"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "properties": {
+                          "location_to_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Location into which the stock is received"
+                          },
+                          "storage_unit_to_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Storage unit the received stock lands in"
+                          },
+                          "confirmed_quantity": {
+                            "type": "number",
+                            "nullable": true,
+                            "minimum": 0,
+                            "description": "Quantity actually received. Defaults to the task's start quantity when omitted."
+                          },
+                          "serial_numbers": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Serial numbers to assign to the received stock"
+                          },
+                          "base_storage_unit_type_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Base storage unit type for the received stock"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "tasks",
+                  "attributes": {
+                    "location_to_id": 25,
+                    "storage_unit_to_id": 18,
+                    "confirmed_quantity": 10.0,
+                    "serial_numbers": [
+                      "SN-001",
+                      "SN-002"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/receive_tasks/{id}/receive_to_putaway_location": {
+      "post": {
+        "tags": [
+          "Goods In: Receipts"
+        ],
+        "summary": "Receive stock straight into a putaway location",
+        "description": "Complete a receive task by landing the stock directly into a putaway location instead of the receiving area. The destination `location_to_id` is required because the stock bypasses the receiving step. Otherwise behaves like `/api/receive_tasks/{id}/receive`: updates the task, increments the inbound item's `quantity_received`, and records the receive transaction.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"tasks\",\n    \"attributes\": {\n      \"location_to_id\": 47,\n      \"storage_unit_to_id\": 18,\n      \"confirmed_quantity\": 10.0,\n      \"serial_numbers\": [\"SN-001\", \"SN-002\"]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `location_to_id` | Yes | Putaway location where the stock is received |\n| `storage_unit_to_id` | No | Storage unit the received stock lands in |\n| `confirmed_quantity` | No | Quantity actually received (>= 0). Defaults to the task's `start_quantity` when omitted. |\n| `serial_numbers` | No | Serial numbers to assign to the received stock |"
+        },
+        "operationId": "receiveStockToPutawayLocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the receive task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "tasks"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "required": [
+                          "location_to_id"
+                        ],
+                        "properties": {
+                          "location_to_id": {
+                            "type": "integer",
+                            "description": "Putaway location where the stock is received"
+                          },
+                          "storage_unit_to_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Storage unit the received stock lands in"
+                          },
+                          "confirmed_quantity": {
+                            "type": "number",
+                            "nullable": true,
+                            "minimum": 0,
+                            "description": "Quantity actually received. Defaults to the task's start quantity when omitted."
+                          },
+                          "serial_numbers": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Serial numbers to assign to the received stock"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "tasks",
+                  "attributes": {
+                    "location_to_id": 47,
+                    "storage_unit_to_id": 18,
+                    "confirmed_quantity": 10.0,
+                    "serial_numbers": [
+                      "SN-001",
+                      "SN-002"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}/export_receipt_task_confirmation": {
+      "get": {
+        "tags": [
+          "Goods In: Receipts"
+        ],
+        "summary": "Export receipt task confirmation",
+        "description": "Generate and download a receipt confirmation document for a completed receipt task. Returns the confirmation in the configured export format (CSV, JSON, or EDI).",
+        "x-mint": {
+          "content": "## Behavior\n\n- Generates a receipt confirmation document for the specified task\n- The task must be a completed receipt (RCV) task\n- Output format depends on system configuration (CSV, JSON, or EDI)\n- Returns the file content directly in the response body\n- Returns 404 if the task does not exist\n- Returns 422 if the task is not a completed receipt task"
+        },
+        "operationId": "exportReceiptTaskConfirmation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the completed receipt task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Receipt task confirmation document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Receipt confirmation data in the configured export format"
+                },
+                "example": {
+                  "task_id": 1,
+                  "status": "COMPLETED",
+                  "product_code": "SKU-001",
+                  "confirmed_quantity": 10.0,
+                  "location_code": "A-01-01",
+                  "completed_at": "2026-03-12T10:30:00Z"
                 }
               }
             }
@@ -4826,6 +5115,135 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/graphql#ListPickProcessingRequests": {
+      "post": {
+        "tags": [
+          "Goods Out: Processing"
+        ],
+        "summary": "List pick processing requests",
+        "description": "Retrieve pick processing requests using GraphQL. A pick processing request records the status of an asynchronous pick processing operation (e.g. `process_picks_async`, `process_and_consolidate_picks`) against a goods out order. Use this query to check whether a recent processing request succeeded or failed and to surface any error message returned.",
+        "operationId": "listPickProcessingRequests",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: PickProcessingRequestFilterType) {\n  pick_processing_requests {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          process_reference\n          message\n          status\n          created_at\n          updated_at\n          goods_out {\n            id\n            reference\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"status\": {\n      \"eq\": \"failed\"\n    },\n    \"goods_out_id\": {\n      \"eq\": 1234\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Request ID |\n| `goods_out_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | ID of the goods out the request belongs to |\n| `goods_out_reference` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Reference of the related goods out |\n| `process_reference` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Identifier of the processing job that produced this request |\n| `message` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Message text, typically populated when a request fails |\n| `status` | PickProcessingRequestStatusInputType | `eq` | One of `pending`, `completed`, `failed` |\n| `created_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | When the request was created |\n| `updated_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | When the request was last updated |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: PickProcessingRequestFilterType) { pick_processing_requests { all(filter: $filter) { edges { node { id process_reference message status created_at updated_at goods_out { id reference } } } } } }",
+                "variables": {
+                  "filter": {
+                    "status": {
+                      "eq": "failed"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "pick_processing_requests": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A pick processing request record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "pick_processing_requests": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "process_reference": "process-picks-async-2026-05-20T12:00:00Z",
+                              "message": "Unable to allocate stock for product SKU-001",
+                              "status": "failed",
+                              "created_at": "2026-05-20T12:00:00Z",
+                              "updated_at": "2026-05-20T12:00:05Z",
+                              "goods_out": {
+                                "id": "1234",
+                                "reference": "SO-2026-0042"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           }
         }
       }
@@ -6056,6 +6474,159 @@
         }
       }
     },
+    "/api/load_tasks/{id}/assign_storage_unit": {
+      "post": {
+        "tags": [
+          "Loads"
+        ],
+        "summary": "Assign a storage unit to a load",
+        "description": "Assign the load task's storage unit to a load and/or load drop without yet completing the load. Used by loading workflows that need to reserve a storage unit against a specific load (or drop within a load) before the operator physically loads it. At least one of `load_id` or `load_drop_id` must be supplied. This endpoint does NOT use JSON:API format.",
+        "operationId": "assignLoadTaskStorageUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the load task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "load_id": {
+                    "type": "integer",
+                    "description": "Load to assign the storage unit to"
+                  },
+                  "load_drop_id": {
+                    "type": "integer",
+                    "description": "Specific load drop within a load to assign the storage unit to"
+                  }
+                }
+              },
+              "example": {
+                "load_id": 14,
+                "load_drop_id": 27
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/load_tasks/{id}/load_storage_unit": {
+      "post": {
+        "tags": [
+          "Loads"
+        ],
+        "summary": "Load a storage unit onto a load",
+        "description": "Complete a load task by recording that its storage unit has been physically loaded onto the supplied load (or load drop). Validates the load's status, the load drop's status, and \u2014 when loading validation settings are enabled \u2014 any configured pick list / booking date / delivery address checks. The task transitions to `COMPLETED`, the load and load drop counters are incremented, and a `load` transaction is recorded. This endpoint does NOT use JSON:API format.",
+        "operationId": "loadStorageUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the load task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "load_id": {
+                    "type": "integer",
+                    "description": "Load to load onto. Required unless the task already has a load assigned."
+                  },
+                  "load_drop_id": {
+                    "type": "integer",
+                    "description": "Load drop within the load. Required unless the task already has a load drop assigned."
+                  }
+                }
+              },
+              "example": {
+                "load_id": 14,
+                "load_drop_id": 27
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/load_tasks/{id}/unload_storage_unit": {
+      "post": {
+        "tags": [
+          "Loads"
+        ],
+        "summary": "Unload a storage unit from a load",
+        "description": "Reverse a previously loaded storage unit, returning the load task to an available state and decrementing the load and load drop counters. Used when a storage unit needs to be taken back off a load before dispatch.",
+        "operationId": "unloadStorageUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the load task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
     "/graphql#ListLocations": {
       "post": {
         "tags": [
@@ -7079,7 +7650,7 @@
         "summary": "Create a report query",
         "description": "Create a new report query definition. Report queries allow you to save GraphQL queries for repeated execution.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"graphql\": \"query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\\\"AVAILABLE\\\", \\\"ALLOCATED\\\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \\\"total_records DESC\\\") { task_type { code } total_records } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouse_id\", \"type\": \"Integer\" },\n        { \"name\": \"account_id\", \"type\": \"Integer\" },\n        { \"name\": \"created_at_from\", \"type\": \"Date\" },\n        { \"name\": \"created_at_to\", \"type\": \"Date\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | Yes | Named GraphQL query with typed parameters (never anonymous) |\n| `parameters` | No | Array of parameter definitions matching query variables |\n\n## GraphQL Query Rules\n\n- Must be a **named query** (e.g., `query getTasksToDo(...)`) — never anonymous\n- Use `$variable` syntax for parameters with GraphQL types (`ID`, `Chronic`, `String`)\n- Common query patterns: `aggregation(...)` for grouped/summarized data, `all(...) { edges { node { ... } } }` for paginated lists\n\n## Parameter Types\n\n| Type | GraphQL Type | Description |\n|------|-------------|-------------|\n| `Integer` | `ID` | Integer ID value |\n| `Date` | `Chronic` | Date/time parsed with natural language (e.g., 'start of today') |\n| `String` | `String` | Text value |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"report_queries\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"graphql\": \"query getTasksToDo($warehouse_id: ID, $account_id: ID, $created_at_from: Chronic, $created_at_to: Chronic) { tasks { aggregation(group_by: [task_type_id], statuses: [\\\"AVAILABLE\\\", \\\"ALLOCATED\\\"], warehouse_id: $warehouse_id, account_id: $account_id, created_from: $created_at_from, created_to: $created_at_to, limit: 9999999, order: \\\"total_records DESC\\\") { task_type { code } total_records } } }\",\n      \"parameters\": [\n        { \"name\": \"warehouse_id\", \"type\": \"Integer\" },\n        { \"name\": \"account_id\", \"type\": \"Integer\" },\n        { \"name\": \"created_at_from\", \"type\": \"Date\" },\n        { \"name\": \"created_at_to\", \"type\": \"Date\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name for identification |\n| `description` | No | Description of what the report shows |\n| `graphql` | Yes | Named GraphQL query with typed parameters (never anonymous) |\n| `parameters` | No | Array of parameter definitions matching query variables |\n\n## GraphQL Query Rules\n\n- Must be a **named query** (e.g., `query getTasksToDo(...)`) \u2014 never anonymous\n- Use `$variable` syntax for parameters with GraphQL types (`ID`, `Chronic`, `String`)\n- Common query patterns: `aggregation(...)` for grouped/summarized data, `all(...) { edges { node { ... } } }` for paginated lists\n\n## Parameter Types\n\n| Type | GraphQL Type | Description |\n|------|-------------|-------------|\n| `Integer` | `ID` | Integer ID value |\n| `Date` | `Chronic` | Date/time parsed with natural language (e.g., 'start of today') |\n| `String` | `String` | Text value |"
         },
         "operationId": "createReportQuery",
         "requestBody": {
@@ -7450,7 +8021,7 @@
         "summary": "Create a report",
         "description": "Create a new report definition based on an existing report query. Reports define how query results are formatted and what variables are used.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"report_type\": \"bar\",\n      \"report_query_id\": 1,\n      \"source_path\": \"data.tasks.aggregation\",\n      \"report_fields\": [\n        { \"name\": \"Task Type\", \"path\": \"task_type.code\" },\n        { \"name\": \"Tasks Left To Do\", \"path\": \"total_records\" }\n      ],\n      \"variables\": [\n        { \"name\": \"created_at_from\", \"value\": \"start of today\", \"prompt\": \"true\" },\n        { \"name\": \"created_at_to\", \"value\": \"end of today\", \"prompt\": \"true\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `source_path` | No | Dot-notation path to data in GraphQL response. Must start with `data.` (e.g., `data.tasks.aggregation`, `data.stocks.all.edges`) |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## source_path\n\nThe `source_path` tells the system where to find data in the GraphQL response. It always starts with `data.` Common patterns:\n- `data.{resource}.aggregation` — for grouped/summarized results\n- `data.{resource}.all.edges` — for paginated lists (each item under `node`)\n- For paginated queries, `report_fields` paths must start with `node.` (e.g., `node.warehouse.name`)\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `start of today`, `end of today`, `start of this month`) which are parsed at report generation time. Variable names must match parameters defined in the linked report query."
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"reports\",\n    \"attributes\": {\n      \"name\": \"Count of Tasks Left To Do\",\n      \"description\": \"Count of Tasks Left To Do by Task Type\",\n      \"report_type\": \"bar\",\n      \"report_query_id\": 1,\n      \"source_path\": \"data.tasks.aggregation\",\n      \"report_fields\": [\n        { \"name\": \"Task Type\", \"path\": \"task_type.code\" },\n        { \"name\": \"Tasks Left To Do\", \"path\": \"total_records\" }\n      ],\n      \"variables\": [\n        { \"name\": \"created_at_from\", \"value\": \"start of today\", \"prompt\": \"true\" },\n        { \"name\": \"created_at_to\", \"value\": \"end of today\", \"prompt\": \"true\" }\n      ]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Report name (max 50 chars) |\n| `report_type` | Yes | Output type: `single` (table), `bar` (bar chart), `pie` (pie chart) |\n| `report_query_id` | Yes | ID of the report query to use |\n| `source_path` | No | Dot-notation path to data in GraphQL response. Must start with `data.` (e.g., `data.tasks.aggregation`, `data.stocks.all.edges`) |\n| `description` | No | Report description (max 500 chars) |\n| `report_fields` | No | Array of field definitions for the report output |\n| `variables` | No | Array of variable values to pass to the report query |\n\n## source_path\n\nThe `source_path` tells the system where to find data in the GraphQL response. It always starts with `data.` Common patterns:\n- `data.{resource}.aggregation` \u2014 for grouped/summarized results\n- `data.{resource}.all.edges` \u2014 for paginated lists (each item under `node`)\n- For paginated queries, `report_fields` paths must start with `node.` (e.g., `node.warehouse.name`)\n\n## Variables\n\nVariables support Chronic-style date values (e.g., `start of today`, `end of today`, `start of this month`) which are parsed at report generation time. Variable names must match parameters defined in the linked report query."
         },
         "operationId": "createReport",
         "requestBody": {
@@ -7761,7 +8332,7 @@
         "summary": "Generate report output",
         "description": "Queue asynchronous report generation. Returns a Document record that can be polled for status and downloaded when complete.",
         "x-mint": {
-          "content": "## Workflow\n\n1. **Call this endpoint** — returns a Document with `status: queued`\n2. **Poll the document status** via GraphQL until `status` becomes `available` (or `failed`)\n3. **Download the file** via `GET /documents/{id}/download` to get a presigned S3 URL\n4. **Use the presigned URL** to download the generated report file\n\n## Request Body (Optional)\n\nYou can optionally pass `variables` to override the report's stored variable values:\n\n```json\n{\n  \"variables\": [\n    { \"name\": \"date_from\", \"value\": \"2024-01-01 00:00:00\" },\n    { \"name\": \"date_to\", \"value\": \"2024-01-31 23:59:59\" }\n  ]\n}\n```\n\nIf no variables are provided, the report's stored variables are used. Passed variables are merged with stored variables (passed values take precedence).\n\n## Variable Values\n\nVariables support Chronic-style date parsing:\n- `today 00:00:00` — start of today\n- `3 days ago` — 3 days before now\n- `beginning of month` — first day of current month\n- `2024-01-15 09:00:00` — explicit date/time\n\n## Access Control\n\nOnly the report owner can generate it. Returns 403 if the authenticated user is not the owner."
+          "content": "## Workflow\n\n1. **Call this endpoint** \u2014 returns a Document with `status: queued`\n2. **Poll the document status** via GraphQL until `status` becomes `available` (or `failed`)\n3. **Download the file** via `GET /documents/{id}/download` to get a presigned S3 URL\n4. **Use the presigned URL** to download the generated report file\n\n## Request Body (Optional)\n\nYou can optionally pass `variables` to override the report's stored variable values:\n\n```json\n{\n  \"variables\": [\n    { \"name\": \"date_from\", \"value\": \"2024-01-01 00:00:00\" },\n    { \"name\": \"date_to\", \"value\": \"2024-01-31 23:59:59\" }\n  ]\n}\n```\n\nIf no variables are provided, the report's stored variables are used. Passed variables are merged with stored variables (passed values take precedence).\n\n## Variable Values\n\nVariables support Chronic-style date parsing:\n- `today 00:00:00` \u2014 start of today\n- `3 days ago` \u2014 3 days before now\n- `beginning of month` \u2014 first day of current month\n- `2024-01-15 09:00:00` \u2014 explicit date/time\n\n## Access Control\n\nOnly the report owner can generate it. Returns 403 if the authenticated user is not the owner."
         },
         "operationId": "generateReport",
         "parameters": [
@@ -8350,7 +8921,7 @@
         "summary": "Create a scheduled report",
         "description": "Create a new scheduled report that delivers reports via email and/or FTP on a recurring schedule.",
         "x-mint": {
-          "content": "## Request Structure\n\nScheduled reports use JSON:API format with embedded relationships:\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Weekly Stock Report\",\n      \"frequency\": \"Day\",\n      \"numbers\": [1, 3, 5],\n      \"time\": \"09:00\",\n      \"subject\": \"Weekly Stock Report\",\n      \"body\": \"Please find the weekly stock report attached.\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": [\n                { \"name\": \"date_from\", \"value\": \"today 00:00:00\" }\n              ]\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      },\n      \"scheduled-report-ftp-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"ftp_user_id\": 5\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Schedule name (max 50 chars) |\n| `frequency` | Yes | `Day` (days of the week) or `Month` (days of the month) |\n| `numbers` | Yes | Array of integers — day numbers when schedule runs |\n| `time` | Yes | Time of day to run (e.g., `09:00`) |\n| `subject` | No | Email subject line (max 256 chars) |\n| `body` | No | Email body text |\n\n## Frequency & Numbers\n\n- `Day` frequency: numbers 1-7 (1 = Monday, 7 = Sunday)\n- `Month` frequency: numbers 1-31 (day of month)\n\n## Relationships\n\nRelationship keys use **kebab-case** in the JSON:API `relationships` object:\n\n| Relationship | Description |\n|--------------|-------------|\n| `scheduled-report-reports` | Reports to generate (each with optional variable overrides) |\n| `scheduled-report-recipients` | Email recipients |\n| `scheduled-report-ftp-recipients` | FTP destinations |"
+          "content": "## Request Structure\n\nScheduled reports use JSON:API format with embedded relationships:\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Weekly Stock Report\",\n      \"frequency\": \"Day\",\n      \"numbers\": [1, 3, 5],\n      \"time\": \"09:00\",\n      \"subject\": \"Weekly Stock Report\",\n      \"body\": \"Please find the weekly stock report attached.\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": [\n                { \"name\": \"date_from\", \"value\": \"today 00:00:00\" }\n              ]\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      },\n      \"scheduled-report-ftp-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"ftp_user_id\": 5\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `name` | Yes | Schedule name (max 50 chars) |\n| `frequency` | Yes | `Day` (days of the week) or `Month` (days of the month) |\n| `numbers` | Yes | Array of integers \u2014 day numbers when schedule runs |\n| `time` | Yes | Time of day to run (e.g., `09:00`) |\n| `subject` | No | Email subject line (max 256 chars) |\n| `body` | No | Email body text |\n\n## Frequency & Numbers\n\n- `Day` frequency: numbers 1-7 (1 = Monday, 7 = Sunday)\n- `Month` frequency: numbers 1-31 (day of month)\n\n## Relationships\n\nRelationship keys use **kebab-case** in the JSON:API `relationships` object:\n\n| Relationship | Description |\n|--------------|-------------|\n| `scheduled-report-reports` | Reports to generate (each with optional variable overrides) |\n| `scheduled-report-recipients` | Email recipients |\n| `scheduled-report-ftp-recipients` | FTP destinations |"
         },
         "operationId": "createScheduledReport",
         "requestBody": {
@@ -8480,7 +9051,7 @@
           "Scheduled Reports"
         ],
         "summary": "Update a scheduled report",
-        "description": "Update an existing scheduled report. Only the owner can update it. **Warning: updates are full replacements** — omitting a recipient or report from the update payload will delete it.",
+        "description": "Update an existing scheduled report. Only the owner can update it. **Warning: updates are full replacements** \u2014 omitting a recipient or report from the update payload will delete it.",
         "x-mint": {
           "content": "## Important: Full Replacement\n\n**Updates are full replacements for relationships.** If you omit a recipient or report from the update, it will be **deleted**. Always include all desired recipients and reports in the update payload.\n\n## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"scheduled_reports\",\n    \"attributes\": {\n      \"name\": \"Updated Weekly Report\",\n      \"time\": \"10:00\"\n    },\n    \"relationships\": {\n      \"scheduled-report-reports\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"report_id\": 1,\n              \"variables\": []\n            }\n          },\n          {\n            \"attributes\": {\n              \"report_id\": 2,\n              \"variables\": []\n            }\n          }\n        ]\n      },\n      \"scheduled-report-recipients\": {\n        \"data\": [\n          {\n            \"attributes\": {\n              \"email_address\": \"manager@example.com\",\n              \"name\": \"Warehouse Manager\"\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n## Access Control\n\nOnly the scheduled report owner can update it. Returns 403 if the authenticated user is not the owner."
         },
@@ -9099,6 +9670,361 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stock_checks": {
+      "post": {
+        "tags": [
+          "Stock Checks"
+        ],
+        "summary": "Create a stock check",
+        "description": "Create a new stock check for a location. A stock check is a request to physically count the products held at a location and reconcile them against the system count. Creating a stock check also creates an associated task that operators can be assigned to. If a stock check is already pending for the supplied location, the existing one is returned instead of a duplicate being created.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stock_checks\",\n    \"attributes\": {\n      \"location_id\": 25,\n      \"expected_completion_date\": \"2026-05-25T17:00:00Z\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `location_id` | Yes | ID of the location whose stock will be counted |\n| `expected_completion_date` | Yes | ISO 8601 datetime by which the count is expected to be completed |\n\n## Behavior\n\n- If a pending stock check already exists for the location, the existing one is returned and no new record is created.\n- Otherwise a new stock check is created in `pending` status together with an associated task.\n- The response returns both the stock check ID and the ID of the associated task."
+        },
+        "operationId": "createStockCheck",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "stock_checks"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "required": [
+                          "location_id",
+                          "expected_completion_date"
+                        ],
+                        "properties": {
+                          "location_id": {
+                            "type": "integer",
+                            "description": "ID of the location whose stock will be counted"
+                          },
+                          "expected_completion_date": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "ISO 8601 datetime by which the count is expected to be completed"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "stock_checks",
+                  "attributes": {
+                    "location_id": 25,
+                    "expected_completion_date": "2026-05-25T17:00:00Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stock check created, or existing pending stock check returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stock_check_id": {
+                      "type": "integer",
+                      "description": "ID of the stock check"
+                    },
+                    "task_id": {
+                      "type": "integer",
+                      "description": "ID of the task associated with the stock check"
+                    }
+                  }
+                },
+                "example": {
+                  "stock_check_id": 42,
+                  "task_id": 101
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stock_checks/{id}/record_attempt": {
+      "post": {
+        "tags": [
+          "Stock Checks"
+        ],
+        "summary": "Record a stock check count attempt",
+        "description": "Log a physical count of a product at the stock check's location. The system compares the supplied physical count against its expected (system) count for the matching product group and records whether the attempt succeeded or failed. Each product group can have up to two attempts; if both attempts fail the group must be resolved before the stock check can move on.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"attributes\": {\n      \"product_id\": 42,\n      \"physical_count\": 5.0,\n      \"batch\": \"BATCH_A\",\n      \"sell_by_date\": \"2026-06-01\",\n      \"best_before_date\": \"2026-12-01\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `product_id` | Yes | ID of the product being counted |\n| `physical_count` | Yes | Quantity actually counted in the location |\n| `batch` | No | Batch identifier when the account uses batch tracking |\n| `sell_by_date` | No | Sell-by date when the account uses sell-by tracking |\n| `best_before_date` | No | Best-before date when the account uses best-before tracking |\n\n## Behavior\n\n- The product, batch and date fields together identify a *stock group* within the stock check. Repeat counts for the same group accumulate as numbered attempts.\n- The attempt is `success` when `physical_count` matches the system count for that group, otherwise `failure`.\n- A third attempt for the same group is rejected with 422; failed groups must be resolved via `POST /api/stock_checks/resolve`.\n- The stock check and its associated task must still be active. Completed, cancelled or non-pending checks return 422."
+        },
+        "operationId": "recordStockCheckAttempt",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the stock check",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "attributes"
+                    ],
+                    "properties": {
+                      "attributes": {
+                        "type": "object",
+                        "required": [
+                          "product_id",
+                          "physical_count"
+                        ],
+                        "properties": {
+                          "product_id": {
+                            "type": "integer",
+                            "description": "ID of the product being counted"
+                          },
+                          "physical_count": {
+                            "type": "number",
+                            "description": "Quantity actually counted in the location"
+                          },
+                          "batch": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Batch identifier when the account uses batch tracking"
+                          },
+                          "sell_by_date": {
+                            "type": "string",
+                            "format": "date",
+                            "nullable": true,
+                            "description": "Sell-by date when the account uses sell-by tracking"
+                          },
+                          "best_before_date": {
+                            "type": "string",
+                            "format": "date",
+                            "nullable": true,
+                            "description": "Best-before date when the account uses best-before tracking"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "attributes": {
+                    "product_id": 42,
+                    "physical_count": 5.0,
+                    "batch": "BATCH_A",
+                    "sell_by_date": "2026-06-01",
+                    "best_before_date": "2026-12-01"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attempt recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "attempt_result": {
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "failure"
+                      ],
+                      "description": "Whether the physical count matched the system count for the matched stock group"
+                    },
+                    "attempt_number": {
+                      "type": "integer",
+                      "description": "Which attempt this is for the matched stock group (1 or 2)"
+                    }
+                  }
+                },
+                "example": {
+                  "attempt_result": "success",
+                  "attempt_number": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stock_checks/{id}/complete": {
+      "post": {
+        "tags": [
+          "Stock Checks"
+        ],
+        "summary": "Complete a stock check",
+        "description": "Finalize a stock check after counts have been recorded. Any product groups that were not counted are implicitly recorded as a physical count of zero. The stock check transitions to `passed` if every group's latest attempt matched the system count, or to `failed` otherwise. The associated task is marked as completed at the same time.",
+        "x-mint": {
+          "content": "## Request Structure\n\nNo request body is required.\n\n## Behavior\n\n- Any product group with no recorded attempt is automatically counted as zero, producing a failed attempt where stock was expected.\n- The stock check's final status is `passed` when all groups' latest attempts succeeded, otherwise `failed`.\n- The associated task is completed and `last_counted_at` is set on the location and any matched stocks.\n- The stock check must currently be in `pending` status and its task must not be completed or cancelled; otherwise 422 is returned.\n- Failed stock check records can subsequently be resolved with a reason code via `POST /api/stock_checks/resolve`."
+        },
+        "operationId": "completeStockCheck",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the stock check",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stock check completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "passed",
+                        "failed"
+                      ],
+                      "description": "Final status of the stock check after completion"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "passed"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stock_checks/resolve": {
+      "post": {
+        "tags": [
+          "Stock Checks"
+        ],
+        "summary": "Resolve failed stock check records",
+        "description": "Resolve one or more failed stock check records by attaching a reason code to explain the discrepancy. Once every failed record on a stock check has been resolved, the stock check itself transitions from `failed` to `resolved`. This endpoint does NOT use JSON:API format.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"stock_check_record_ids\": [1, 2, 3],\n  \"reason_code_id\": 5\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `stock_check_record_ids` | Yes | IDs of the failed stock check records to resolve (must contain at least one) |\n| `reason_code_id` | Yes | ID of an active reason code of type `stock_check` |\n\n## Behavior\n\n- Each record's latest attempt must be a failure and the record must not already be resolved, otherwise 422 is returned.\n- The reason code must exist, be of type `stock_check`, and be active.\n- When every failed record on a stock check has been resolved, the stock check's status changes from `failed` to `resolved`.\n- Returns 204 No Content on success."
+        },
+        "operationId": "resolveStockCheckRecords",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "stock_check_record_ids",
+                  "reason_code_id"
+                ],
+                "properties": {
+                  "stock_check_record_ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "IDs of the failed stock check records to resolve"
+                  },
+                  "reason_code_id": {
+                    "type": "integer",
+                    "description": "ID of an active reason code of type `stock_check`"
+                  }
+                }
+              },
+              "example": {
+                "stock_check_record_ids": [
+                  1,
+                  2,
+                  3
+                ],
+                "reason_code_id": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -10017,10 +10943,10 @@
         "tags": [
           "Tasks"
         ],
-        "summary": "Update a task",
-        "description": "Update attributes of an existing task. Tasks are created automatically by warehouse operations and this endpoint allows modifying task properties such as priority, notes, locations, quantities, and custom fields.",
+        "summary": "Update or complete a task",
+        "description": "Update attributes of an existing task, or complete it. Tasks are created automatically by warehouse operations and this endpoint allows modifying task properties such as priority, notes, locations, quantities, and custom fields. To complete a single task, send `status: \"completed\"` together with the attributes required by that task's type. To complete multiple tasks of the same type in one call use `POST /api/tasks/complete_collection`. Type-specific receive and load actions are documented under the *Goods In: Receipts* and *Loads* tags respectively.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"tasks\",\n    \"attributes\": {\n      \"priority\": 10,\n      \"notes\": \"Urgent - customer waiting\",\n      \"location_to_id\": 25,\n      \"confirmed_quantity\": 8.0\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | No | Stock account ID |\n| `warehouse_id` | No | Warehouse ID |\n| `priority` | No | Task priority (higher = more urgent) |\n| `notes` | No | Free-text notes |\n| `status` | No | Task status |\n| `location_from_id` | No | Source location ID |\n| `location_to_id` | No | Destination location ID |\n| `product_id` | No | Product ID |\n| `start_quantity` | No | Starting quantity (>= 0) |\n| `confirmed_quantity` | No | Confirmed/completed quantity (>= 0) |\n| `start_at` | No | Planned start datetime |\n| `end_at` | No | Planned end datetime |\n| `completed_at` | No | Completion datetime |\n| `assigned_at` | No | Assignment datetime |\n| `user_id` | No | Assigned user ID |\n| `user_created_by_id` | No | User who created the task |\n| `user_completed_by_id` | No | User who completed the task |\n| `device_type_id` | No | Device type ID |\n| `device_id` | No | Device ID |\n| `storage_unit_from_id` | No | Source storage unit ID |\n| `storage_unit_to_id` | No | Destination storage unit ID |\n| `stock_id` | No | Associated stock record ID |\n| `load_id` | No | Associated load ID |\n| `load_drop_id` | No | Associated load drop ID |\n| `dispatch_container_id` | No | Associated dispatch container ID |\n| `parent_task_id` | No | Parent task ID for subtasks |\n| `transaction_number_id` | No | Transaction number ID |\n| `transaction_line_id` | No | Transaction line ID |\n| `stock_description` | No | Stock description text |\n| `drop_sequence` | No | Drop sequence (1-9999999999) |\n| `serial_numbers` | No | Array of serial number strings |\n| `string1`-`string5` | No | Custom string fields |\n| `integer1`-`integer5` | No | Custom integer fields |\n| `datetime1`-`datetime5` | No | Custom datetime fields |\n| `boolean1`-`boolean5` | No | Custom boolean fields |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"tasks\",\n    \"attributes\": {\n      \"priority\": 10,\n      \"notes\": \"Urgent - customer waiting\",\n      \"location_to_id\": 25,\n      \"confirmed_quantity\": 8.0\n    }\n  }\n}\n```\n\n## Completing a Task\n\nA single task is completed through this endpoint by setting `status` to `\"completed\"` together with the attributes required for the task's type. The table below lists the minimum payload to complete each type; additional fields may be set in the same request when they need updating at the same time.\n\n| Task type | Minimum attributes to complete |\n|-----------|-------------------------------|\n| `PICK` | `status`, `confirmed_quantity`, `location_to_id` (drop location) |\n| `RCV` | `status`, `confirmed_quantity`, `location_to_id`, `storage_unit_to_id` |\n| `PWAY` | `status`, `confirmed_quantity`, `location_to_id`, `storage_unit_to_id` |\n| `TRAN` | `status`, `location_to_id`, `storage_unit_to_id` |\n| `CONV` | `status` (optionally `confirmed_quantity`; defaults to the task's `start_quantity`) |\n| `REPLEN` | `status`, `confirmed_quantity`, `location_to_id` |\n| `DISP` | `status` for `SHIPMENT` subtype only. `LOAD`-subtype DISP tasks must be completed by dispatching the load, not via this endpoint. |\n| `LOAD` | Not completable via this endpoint. Use `POST /api/load_tasks/{id}/load_storage_unit`. |\n\nTo complete many tasks of the same type in one call, use `POST /api/tasks/complete_collection` with a `task_type_code` and a `filters` block.\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | No | Stock account ID |\n| `warehouse_id` | No | Warehouse ID |\n| `priority` | No | Task priority (higher = more urgent) |\n| `notes` | No | Free-text notes |\n| `status` | No | Task status. Set to `completed` to complete the task (see *Completing a Task* above). |\n| `location_from_id` | No | Source location ID |\n| `location_to_id` | No | Destination location ID |\n| `product_id` | No | Product ID |\n| `start_quantity` | No | Starting quantity (>= 0) |\n| `confirmed_quantity` | No | Confirmed/completed quantity (>= 0) |\n| `start_at` | No | Planned start datetime |\n| `end_at` | No | Planned end datetime |\n| `completed_at` | No | Completion datetime |\n| `assigned_at` | No | Assignment datetime |\n| `user_id` | No | Assigned user ID |\n| `user_created_by_id` | No | User who created the task |\n| `user_completed_by_id` | No | User who completed the task |\n| `device_type_id` | No | Device type ID |\n| `device_id` | No | Device ID |\n| `storage_unit_from_id` | No | Source storage unit ID |\n| `storage_unit_to_id` | No | Destination storage unit ID |\n| `stock_id` | No | Associated stock record ID |\n| `load_id` | No | Associated load ID |\n| `load_drop_id` | No | Associated load drop ID |\n| `dispatch_container_id` | No | Associated dispatch container ID |\n| `parent_task_id` | No | Parent task ID for subtasks |\n| `transaction_number_id` | No | Transaction number ID |\n| `transaction_line_id` | No | Transaction line ID |\n| `stock_description` | No | Stock description text |\n| `drop_sequence` | No | Drop sequence (1-9999999999) |\n| `serial_numbers` | No | Array of serial number strings |\n| `string1`-`string5` | No | Custom string fields |\n| `integer1`-`integer5` | No | Custom integer fields |\n| `datetime1`-`datetime5` | No | Custom datetime fields |\n| `boolean1`-`boolean5` | No | Custom boolean fields |"
         },
         "operationId": "updateTask",
         "parameters": [
@@ -10390,60 +11316,6 @@
         }
       }
     },
-    "/api/tasks/{id}/export_receipt_task_confirmation": {
-      "get": {
-        "tags": [
-          "Tasks"
-        ],
-        "summary": "Export receipt task confirmation",
-        "description": "Generate and download a receipt confirmation document for a completed receipt task. Returns the confirmation in the configured export format (CSV, JSON, or EDI).",
-        "x-mint": {
-          "content": "## Behavior\n\n- Generates a receipt confirmation document for the specified task\n- The task must be a completed receipt (RCV) task\n- Output format depends on system configuration (CSV, JSON, or EDI)\n- Returns the file content directly in the response body\n- Returns 404 if the task does not exist\n- Returns 422 if the task is not a completed receipt task"
-        },
-        "operationId": "exportReceiptTaskConfirmation",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the completed receipt task",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Receipt task confirmation document",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "description": "Receipt confirmation data in the configured export format"
-                },
-                "example": {
-                  "task_id": 1,
-                  "status": "COMPLETED",
-                  "product_code": "SKU-001",
-                  "confirmed_quantity": 10.0,
-                  "location_code": "A-01-01",
-                  "completed_at": "2026-03-12T10:30:00Z"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
     "/api/tasks/allocate": {
       "post": {
         "tags": [
@@ -10509,9 +11381,9 @@
           "Tasks"
         ],
         "summary": "Complete filtered tasks",
-        "description": "Complete multiple tasks matching the specified filters in a single request. Tasks are identified by warehouse, task type, and optional filters. Maximum 50 tasks per request. This endpoint does NOT use JSON:API format.",
+        "description": "Complete multiple tasks of a single type matching the supplied filters in one request. Tasks are matched by warehouse, task type, and the contents of `filters`; up to 50 are completed per call. The values in `attributes` are applied to each matched task before completion, so they apply uniformly to the whole set. This endpoint does NOT use JSON:API format.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"warehouse_id\": 1,\n  \"task_type_code\": \"PICK\",\n  \"filters\": {\n    \"location_from_id\": 10,\n    \"product_id\": 42\n  },\n  \"attributes\": {\n    \"confirmed_quantity\": 10.0,\n    \"notes\": \"Completed via bulk action\"\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `warehouse_id` | Yes | Warehouse ID to scope the tasks |\n| `task_type_code` | Yes | Task type code: `PICK`, `DISP`, `RCV`, `PWAY`, `TRAN`, `REPLEN`, `LOAD`, `CONV` |\n| `filters` | Yes | At least one filter must be specified |\n| `filters.location_from_id` | No | Filter by source location ID |\n| `filters.product_id` | No | Filter by product ID |\n| `filters.storage_unit_from_id` | No | Filter by source storage unit ID |\n| `attributes` | No | Optional attributes to set on each completed task (same as update attributes) |\n\n## Behavior\n\n- Finds tasks matching the warehouse, task type, and filters\n- Completes up to 50 matching tasks per request\n- Optionally updates task attributes before completion\n- Returns 204 No Content on success\n- Returns 422 if no filters are specified or no matching tasks found"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"warehouse_id\": 1,\n  \"task_type_code\": \"PICK\",\n  \"filters\": {\n    \"location_from_id\": 10,\n    \"product_id\": 42\n  },\n  \"attributes\": {\n    \"confirmed_quantity\": 10.0,\n    \"notes\": \"Completed via bulk action\"\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `warehouse_id` | Yes | Warehouse ID to scope the tasks |\n| `task_type_code` | Yes | Task type code. One of: `PICK`, `DISP`, `RCV`, `PWAY`, `TRAN`, `REPLEN`, `LOAD`, `CONV` |\n| `filters` | Yes | Must contain at least one filter key. Filters are combined with AND. |\n| `filters.location_from_id` | No | Restrict to tasks with this source location |\n| `filters.product_id` | No | Restrict to tasks for this product |\n| `filters.storage_unit_from_id` | No | Restrict to tasks with this source storage unit |\n| `attributes` | No | Attributes applied to each matched task before completion. Same shape as the PATCH `/api/tasks/{id}` attributes. |\n\n## Minimum Attributes per Task Type\n\nThe `attributes` block needs to carry the fields each task type requires in order to complete. The minimum payload per type mirrors the single-task completion path:\n\n| Task type | Minimum attributes |\n|-----------|--------------------|\n| `PICK` | `confirmed_quantity`, `location_to_id` |\n| `RCV` | `confirmed_quantity`, `location_to_id`, `storage_unit_to_id` |\n| `PWAY` | `confirmed_quantity`, `location_to_id`, `storage_unit_to_id` |\n| `TRAN` | `location_to_id`, `storage_unit_to_id` |\n| `CONV` | `confirmed_quantity` (optional; defaults to the task's `start_quantity`) |\n| `REPLEN` | `confirmed_quantity`, `location_to_id` |\n\n`DISP` and `LOAD` tasks are not usually completed via this endpoint. Use the shipment dispatch flow for `DISP` and `POST /api/load_tasks/{id}/load_storage_unit` for `LOAD`.\n\n## Behavior\n\n- Matches tasks by `warehouse_id`, `task_type_code`, and the supplied filters (AND-combined).\n- Up to 50 matching tasks are completed per request.\n- Returns 204 No Content on success.\n- Returns 422 if no filters are supplied, if no tasks match, or if a matched task fails its per-type validations (e.g. missing `confirmed_quantity` on a `PICK`)."
         },
         "operationId": "completeTasksCollection",
         "requestBody": {
@@ -10566,10 +11438,14 @@
                     }
                   },
                   "attributes": {
-                    "type": "object",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/TaskUpdateAttributes"
+                      }
+                    ],
                     "nullable": true,
                     "description": "Optional attributes to set on each task before completion. Accepts the same fields as the task update endpoint.",
-                    "$ref": "#/components/schemas/TaskUpdateAttributes"
+                    "type": "object"
                   }
                 }
               },
@@ -12364,7 +13240,7 @@
           "code": {
             "type": "string",
             "nullable": true,
-            "description": "Address code for reference. Read-only when setting addresses inline on orders/warehouses — settable only via the delivery addresses endpoint directly.",
+            "description": "Address code for reference. Read-only when setting addresses inline on orders/warehouses \u2014 settable only via the delivery addresses endpoint directly.",
             "readOnly": true
           },
           "country_code": {
@@ -12699,7 +13575,7 @@
             "minimum": 0,
             "nullable": true,
             "default": 0.0,
-            "description": "Unit price for this charge. Total is calculated as quantity × price."
+            "description": "Unit price for this charge. Total is calculated as quantity \u00d7 price."
           },
           "product_id": {
             "type": "integer",
@@ -14178,7 +15054,8 @@
                 "$ref": "#/components/schemas/CarrierId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "carrier_service_id": {
             "allOf": [
@@ -14186,7 +15063,8 @@
                 "$ref": "#/components/schemas/CarrierServiceId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "customer_id": {
             "allOf": [
@@ -14194,7 +15072,8 @@
                 "$ref": "#/components/schemas/CustomerId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "datetime1": {
             "type": "string",
@@ -14281,7 +15160,8 @@
                 "$ref": "#/components/schemas/GoodsOutStatusId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "goods_out_type": {
             "type": "string",
@@ -14324,7 +15204,8 @@
                 "$ref": "#/components/schemas/IntegrationId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "lines_changes": {
             "type": "array",
@@ -14345,7 +15226,8 @@
                 "$ref": "#/components/schemas/LocationId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "order_notes": {
             "type": "string",
@@ -14359,7 +15241,8 @@
                 "$ref": "#/components/schemas/OrderTypeId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "original_delivery_address_id": {
             "type": "integer",
@@ -14412,7 +15295,8 @@
                 "$ref": "#/components/schemas/Priority"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "reference": {
             "allOf": [
@@ -14462,7 +15346,8 @@
                 "$ref": "#/components/schemas/WarehouseId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           }
         }
       },
@@ -14528,7 +15413,8 @@
                     "$ref": "#/components/schemas/CarrierId"
                   }
                 ],
-                "nullable": true
+                "nullable": true,
+                "type": "integer"
               },
               "carrier_service_id": {
                 "allOf": [
@@ -14536,7 +15422,8 @@
                     "$ref": "#/components/schemas/CarrierServiceId"
                   }
                 ],
-                "nullable": true
+                "nullable": true,
+                "type": "integer"
               },
               "datetime1": {
                 "type": "string",
@@ -16068,7 +16955,7 @@
       },
       "ScheduledReportAttributes": {
         "type": "object",
-        "description": "Scheduled report attributes for recurring report delivery. Note: reports to generate, email recipients, and FTP recipients are specified in the 'relationships' object (not in attributes) — see ScheduledReportRelationships.",
+        "description": "Scheduled report attributes for recurring report delivery. Note: reports to generate, email recipients, and FTP recipients are specified in the 'relationships' object (not in attributes) \u2014 see ScheduledReportRelationships.",
         "required": [
           "name",
           "frequency",
