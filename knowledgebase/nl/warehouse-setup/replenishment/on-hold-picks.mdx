@@ -1,0 +1,68 @@
+---
+title: "On Hold picks begrijpen"
+description: "Stel vast waarom een picktaak On Hold staat en begrijp hoe Clarus deze automatisch vrijgeeft wanneer voorraad beschikbaar komt."
+sidebarTitle: "Understanding On Hold"
+---
+
+Wanneer een picktaak niet kan worden vervuld door een geconfigureerde pickface, plaatst Clarus deze in de status **On Hold** in plaats van hem aan een operator toe te wijzen met voorraad die niet aan de vereisten voldoet. Dit voorkomt foute picks en houdt de wachtrij schoon. Zodra een geschikte aanvulling plaatsvindt, geeft het systeem de taak automatisch vrij.
+
+## Waarom een pick On Hold gaat
+
+Een pick wordt om een van twee redenen On Hold gezet:
+
+- **Geen pickface heeft geschikte voorraad.** Elke continuous pickface voor het product is leeg of bevat voorraad die niet aan de criteria voldoet — meestal een houdbaarheidsregel van de klant (maximale sell-by datum, minimaal aantal dagen resterend, FIFO-datum).
+- **Een demand pickface is geconfigureerd maar niet leeg.** Demand replenishment heeft een lege locatie nodig om een volledig pallet naar toe te verplaatsen. Als elke demand pickface nog voorraad heeft, wachten zowel de picktaak als de aanvullingstaak.
+
+Het gedrag hangt af van welke strategieën op het product zijn ingeschakeld. Zie [Continuous Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/continuous) en [Demand Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/demand) voor de mechanismen per strategie.
+
+## Een On Hold taak inspecteren
+
+De kolom **Status** toont de hold, en door over de waarde te zweven wordt de reden zichtbaar:
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-5.png" alt="Hovering over de On Hold status om de hold reason te tonen" />
+</Frame>
+
+U kunt de status op twee plaatsen zien:
+
+- **Picking List** — voeg de kolom **Status** toe aan het data grid om te zien of een pick op een lijst On Hold staat.
+- **Tasks** — zoek de taak op in het Tasks data grid en controleer de kolom **Status**. De tooltip bij hover werkt hier ook.
+
+Voor instructies over het aanpassen van kolommen, zie [Data grids aanpassen](/knowledgebase/nl/reporting/customise-data-grids).
+
+## Hoe Clarus taken automatisch vrijgeeft
+
+Clarus bewaakt elke inkomende voorraadbeweging in een pickface — aanvullingen, handmatige transfers en putaways — en hercontroleert eventuele On Hold taken voor hetzelfde product.
+
+Een paar belangrijke gedragingen om te weten:
+
+- **Criteria, niet hoeveelheid.** De vrijgavecontrole vraagt alleen "voldoet de nieuwe voorraad aan de criteria van deze taak?". Er wordt niet gecontroleerd of er voldoende voorraad is voor alle On Hold taken. De eerste taak die voldoet wordt vrijgegeven; aanvullende aanvullingen kunnen nodig zijn om de wachtrij leeg te krijgen.
+- **Oudste holds eerst.** Wanneer dezelfde aanvulling meerdere taken vrijgeeft, worden ze in de wachtrij geplaatst in de volgorde waarin ze On Hold werden gezet.
+- **Alle inkomende bewegingen tellen mee.** Transfers en putaways activeren dezelfde controle als een systeemgegenereerde aanvulling.
+
+### Voorbeeld vrijgavesequentie
+
+- 5 picktaken zijn On Hold, elk met een hoeveelheid van 20.
+- De pickface heeft een Maximum Trigger van 80 en een Minimum Trigger van 0.
+
+Een aanvulling brengt 80 eenheden in de pickface:
+
+1. Clarus controleert of de nieuwe voorraad voldoet aan de On Hold taken. Alle 5 voldoen.
+2. Alle 5 taken gaan naar **Available** in de volgorde waarin ze On Hold werden gezet.
+3. Operators voltooien 4 van de picks en de pickface raakt leeg.
+4. Een nieuwe aanvulling wordt geactiveerd.
+5. Zodra die aanvulling is voltooid, kan de vijfde pick worden voltooid.
+
+## Wanneer u moet ingrijpen
+
+Clarus geeft een taak automatisch vrij zodra geschikte voorraad arriveert. U hoeft meestal alleen in te grijpen als:
+
+- **De demand pickface heeft voorraad achter.** Verplaats of pick de resterende voorraad zodat de demand pickface leeg is en de wachtende aanvulling kan vuren.
+- **Geen voorraad in racking voldoet aan de criteria.** Breng voorraad binnen, transfer vanuit een ander warehouse, of — met instemming van de klant — versoepel de houdbaarheidsregels van de klant op het product zodat de bestaande voorraad voldoet.
+- **Een aanvullingstaak zelf zit vast.** Een gebruiker kan een beschikbare aanvullingstaak annuleren via de **Tasks** pagina met de **Cancel** knop op het data grid, en daarna het proces opnieuw starten.
+
+## Gerelateerde pagina's
+
+- [Continuous Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/continuous)
+- [Demand Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/demand)
+- [Strategieën combineren](/knowledgebase/nl/warehouse-setup/replenishment/combining-strategies)

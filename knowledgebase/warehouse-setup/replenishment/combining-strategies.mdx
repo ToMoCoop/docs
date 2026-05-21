@@ -1,0 +1,54 @@
+---
+title: "Combining Replenishment Strategies"
+description: "Use continuous and demand replenishment together on the same product to handle everyday throughput and shelf-life-sensitive picks."
+sidebarTitle: "Combining strategies"
+---
+
+The **Continuous** and **Demand** strategies are not exclusive. By assigning them to different locations on the same product, you can keep one pickface stocked at all times for normal picking while reserving another for orders that need stock the everyday location cannot supply. This is the most common configuration for products sold to customers with shelf-life rules.
+
+For the underlying strategies, see [Continuous Replenishment](/knowledgebase/warehouse-setup/replenishment/continuous) and [Demand Replenishment](/knowledgebase/warehouse-setup/replenishment/demand).
+
+## The primary + secondary pattern
+
+| Role | Strategy | Purpose |
+| --- | --- | --- |
+| **Primary pickface** | Continuous | Holds the majority of pick volume. Topped up automatically as picks deplete it. |
+| **Secondary pickface** | Demand | Sits empty until an order needs stock the primary cannot supply (typically due to customer shelf-life rules). Receives a full pallet when triggered. |
+
+When a pick task is generated, Clarus tries the continuous pickfaces first. If none of them hold stock that meets the criteria, Clarus looks for a demand pickface to use. If one is configured and empty, a replenishment task moves a full pallet of compliant stock into it; the pick task is released as soon as the replenishment is complete.
+
+## Worked example
+
+Consider a product sold to a customer that requires a maximum sell-by date of **10 days**:
+
+- **Product 123** — Customer 456, shelf life: min 5 days, max 10 days
+- **Pickface 1 (Continuous)** — quantity 10, sell-by date on stock 15 days
+- **Pickface 2 (Demand)** — empty
+- **Racking** — storage unit of 20, sell-by date 5 days
+
+A sales order arrives for **Customer 456** with quantity **7**. When picks are processed:
+
+1. Clarus checks Pickface 1. The stock has 15 days remaining, which exceeds the customer's 10-day maximum, so it cannot fulfil the pick.
+2. Clarus checks for a configured demand pickface. Pickface 2 is enabled and empty.
+3. The pick task is placed **On Hold**, and a replenishment task is generated to move the 5-day stock from racking into Pickface 2.
+4. The replenishment completes, and the pick task is released for picking.
+
+Without the demand pickface, the pick task would stay on hold indefinitely — the continuous pickface stock would never satisfy the criteria.
+
+## Common configurations
+
+- **One Continuous + one Demand** — the simplest setup. Use for any product that has occasional shelf-life-sensitive orders.
+- **Multiple Continuous + one Demand** — when pick volume is high, configure several Continuous locations to distribute the load. Keep a single Demand location as the safety valve for sensitive orders.
+- **Multiple Continuous + multiple Demand** — for products with several shelf-life-sensitive customers picking concurrently. Each demand pickface can be feeding a different order at any moment.
+
+## Pitfalls to avoid
+
+- **Demand pickface not actually empty.** If the demand location still holds stock, the replenishment task cannot fire and the pick task stays on hold. Audit demand locations periodically and clear them when stock is left behind.
+- **No demand pickface configured.** If only continuous pickfaces exist and none of them satisfy the criteria, the pick task waits for a qualifying continuous replenishment instead. This works, but releases are less predictable. Add a demand pickface for any product where shelf-life-sensitive orders are routine.
+- **Order of locations not reviewed.** Continuous pickfaces are tried in the order set on the Pickface panel. Demand pickfaces follow the same rule. Drag locations into the order that matches operational priority.
+
+## Related pages
+
+- [Continuous Replenishment](/knowledgebase/warehouse-setup/replenishment/continuous)
+- [Demand Replenishment](/knowledgebase/warehouse-setup/replenishment/demand)
+- [Understanding On Hold picks](/knowledgebase/warehouse-setup/replenishment/on-hold-picks)

@@ -1,0 +1,45 @@
+---
+title: "Pickface Aanvulling"
+description: "Vergelijk Continuous en Demand replenishment en kies de juiste strategie voor elke pickface locatie."
+sidebarTitle: "Overzicht"
+---
+
+Pickfaces zijn alleen nuttig als ze gevuld blijven. Clarus biedt twee aanvullingsstrategieën die bepalen **hoe en wanneer** voorraad een pickface bereikt: **Continuous Replenishment** en **Demand Replenishment**. U stelt de strategie per locatie in via het Pickface paneel van het product, en u kunt beide strategieën combineren op hetzelfde product wanneer verschillende locaties verschillende doelen dienen.
+
+## De twee strategieën
+
+<CardGroup cols={2}>
+<Card title="Continuous Replenishment" icon="repeat" href="/knowledgebase/nl/warehouse-setup/replenishment/continuous">
+Proactieve aanvulling. Een aanvullingstaak wordt automatisch gegenereerd zodra de voorraad onder de geconfigureerde Minimum Trigger daalt. Geschikt voor snel bewegende voorraad die altijd beschikbaar moet zijn.
+</Card>
+<Card title="Demand Replenishment" icon="bolt" href="/knowledgebase/nl/warehouse-setup/replenishment/demand">
+Reactieve aanvulling. Een aanvullingstaak wordt alleen gegenereerd wanneer een specifieke picktaak niet door een andere pickface kan worden vervuld — meestal vanwege houdbaarheidseisen. Geschikt voor gevoelige of weinig voorkomende vereisten.
+</Card>
+</CardGroup>
+
+## In één oogopslag
+
+| | **Continuous** | **Demand** |
+| --- | --- | --- |
+| **Wanneer aanvulling gebeurt** | Voorraad daalt onder de Minimum Trigger | Een picktaak kan door geen enkele andere pickface worden vervuld |
+| **Wat wordt aangevuld** | Tot aan de Maximum Trigger (of volledige opslagunits indien ingeschakeld) | Altijd een volledig pallet |
+| **Voorraadtoewijzing** | Soft allocation (standaard) | Hard allocation voor zowel de aanvulling- als de picktaak |
+| **Typische toepassing** | Standaard picking voor snel bewegende producten | Klant- of order-specifieke houdbaarheidsvereisten |
+| **Wat gaat On Hold** | De picktaak, als geen pickface voldoet | De picktaak én de aanvullingstaak, als geen lege demand pickface beschikbaar is |
+
+## Een strategie kiezen
+
+- **Kies Continuous** wanneer het product snel beweegt, een voorspelbare vraag heeft en klanten geen strikte houdbaarheidsregels afdwingen. Het systeem houdt de pickface automatisch gevuld en verdeelt picktaken over meerdere locaties in volgorde van prioriteit.
+- **Kies Demand** wanneer het product klanten heeft met strikte houdbaarheidscriteria (bijvoorbeeld een maximale sell-by datum) waaraan de dagelijkse pickface voorraad niet voldoet. Het systeem reserveert een lege locatie voor een volledig pallet conforme voorraad, alleen wanneer een order dit vereist.
+- **Gebruik beide** wanneer een product zowel dagelijkse doorvoer als incidentele compliance-picks vereist. Configureer een Continuous locatie als primair en een Demand locatie als secundair. Zie [Strategieën combineren](/knowledgebase/nl/warehouse-setup/replenishment/combining-strategies).
+
+## Voordat u begint
+
+Een locatie moet eerst zijn ingeschakeld als pickface voordat deze aan een product kan worden toegewezen. Zie [Een Pickface instellen](/knowledgebase/nl/warehouse-setup/create-pickface) voor de configuratie op locatieniveau.
+
+## Gerelateerde pagina's
+
+- [Continuous Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/continuous) — volledige instellingen en gedrag
+- [Demand Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/demand) — volledige instellingen en gedrag
+- [Strategieën combineren](/knowledgebase/nl/warehouse-setup/replenishment/combining-strategies) — primaire + secundaire patronen
+- [On Hold picks begrijpen](/knowledgebase/nl/warehouse-setup/replenishment/on-hold-picks) — waarom een pick On Hold gaat en hoe deze automatisch wordt vrijgegeven

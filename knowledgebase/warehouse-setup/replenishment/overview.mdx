@@ -1,0 +1,45 @@
+---
+title: "Pickface Replenishment"
+description: "Compare continuous and demand replenishment and choose the right strategy for each pickface location."
+sidebarTitle: "Overview"
+---
+
+Pickfaces only stay useful when they are kept stocked. Clarus offers two replenishment strategies that decide **how and when** stock arrives at a pickface: **Continuous** and **Demand**. You set the strategy per location on the product's Pickface panel, and you can mix the two on the same product when different locations serve different purposes.
+
+## The two strategies
+
+<CardGroup cols={2}>
+<Card title="Continuous Replenishment" icon="repeat" href="/knowledgebase/warehouse-setup/replenishment/continuous">
+Proactive top-ups. A replenishment task is generated automatically whenever stock falls below the configured minimum trigger. Best for fast-moving stock you always want available.
+</Card>
+<Card title="Demand Replenishment" icon="bolt" href="/knowledgebase/warehouse-setup/replenishment/demand">
+Reactive top-ups. A replenishment task is generated only when a specific pick task cannot be fulfilled by any other pickface — typically because of shelf-life criteria. Best for sensitive or low-frequency requirements.
+</Card>
+</CardGroup>
+
+## At a glance
+
+| | **Continuous** | **Demand** |
+| --- | --- | --- |
+| **When it replenishes** | Stock drops below the minimum trigger | A pick task cannot be fulfilled from any other pickface |
+| **What it replenishes** | Up to the maximum trigger (or full storage units if enabled) | Always a full pallet |
+| **Stock allocation** | Soft allocation (standard) | Hard allocation to the replen and pick task |
+| **Typical use case** | Standard picking for fast movers | Customer- or order-specific shelf-life requirements |
+| **What goes on hold** | The pick task, if no pickface meets criteria | The pick task and replen task, if no empty demand pickface is available |
+
+## Choosing a strategy
+
+- **Pick Continuous** when the product moves quickly, has predictable demand, and customers don't enforce tight shelf-life rules. The system keeps the pickface topped up automatically and distributes picks across multiple locations in priority order.
+- **Pick Demand** when the product has customers with strict shelf-life criteria (for example, a maximum sell-by date) that the everyday pickface stock may not meet. The system reserves an empty location to receive a full pallet of compliant stock only when the order demands it.
+- **Use both** when a single product needs everyday throughput *and* occasional compliance picks. Configure a Continuous location as the primary and a Demand location as the secondary. See [Combining strategies](/knowledgebase/warehouse-setup/replenishment/combining-strategies).
+
+## Before you start
+
+A location must already be enabled as a pickface before you can assign it to a product. See [Set up a pickface](/knowledgebase/warehouse-setup/create-pickface) for the location-level configuration.
+
+## Related pages
+
+- [Continuous Replenishment](/knowledgebase/warehouse-setup/replenishment/continuous) — full setup and behaviour
+- [Demand Replenishment](/knowledgebase/warehouse-setup/replenishment/demand) — full setup and behaviour
+- [Combining strategies](/knowledgebase/warehouse-setup/replenishment/combining-strategies) — primary + secondary patterns
+- [Understanding On Hold picks](/knowledgebase/warehouse-setup/replenishment/on-hold-picks) — why a pick goes on hold and how it auto-releases

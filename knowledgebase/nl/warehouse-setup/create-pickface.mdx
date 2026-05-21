@@ -1,34 +1,40 @@
 ---
 title: "Een Pickface instellen"
-description: "In deze handleiding wordt uitgelegd hoe u een pickface in Clarus WMS instelt om het voorraadbeheer te verbeteren."
+description: "Schakel een locatie in als pickface en wijs deze toe aan een product om picking en aanvulling te stroomlijnen."
 sidebarTitle: "Pickface instellen"
 ---
 
-In deze handleiding wordt uitgelegd hoe u een pickface in Clarus WMS instelt om het voorraadbeheer te verbeteren. Door locaties te configureren en producten te koppelen, kunt u voorraadaanvulling stroomlijnen en de beschikbaarheid van producten waarborgen.
+Een **pickface** is een aangewezen locatie die wordt gebruikt om kleinere hoeveelheden voorraad dichtbij waar ze nodig zijn te picken. Door een locatie als pickface te configureren en aan een product toe te wijzen, kan Clarus de voorraadbeschikbaarheid automatisch beheren via één van twee aanvullingsstrategieën.
 
-## Stapsgewijze handleiding
+## Hoe de opzet samenhangt
+
+Er zijn drie stappen om een pickface werkend te krijgen:
+
+1. **Schakel een locatie in** als pickface.
+2. **Wijs de pickface toe aan een product** — door specifieke locaties te selecteren of door een Location Group te gebruiken.
+3. **Kies een aanvullingsstrategie** — Continuous of Demand — voor elke toegewezen locatie.
+
+## Een pickface opzetten
 
 <Steps>
-  <Step title="Configureer de locatie als Pickface">
-    Ga eerst naar de **Locaties** scherm. Selecteer de locatie die u wilt gebruiken. Open het menu voor die locatie en zoek de optie label **'Is Pickface'**. Schakel deze optie in om van de locatie een pickface te maken.
-  </Step>
-  <Step title="Koppel een product aan de Pickface">
-    Navigeer vervolgens naar de **Producten** scherm en zoek het product dat u wilt toewijzen aan een pickface. Scroll naar beneden naar de **Pickfaces** tabblad. Hier kiest u uit twee pickface types: **Vast** of **Dynamisch**.
-  </Step>
-  <Step title="Stel de triggers in en sla de configuratie op">
-    Afhankelijk van het pickfacetype dat u hebt geselecteerd, gebruikt u het onderste tabblad om de specifieke locatie(s) te kiezen voor een vaste pickface of de locatiegroep voor een dynamische pickface. Definieer vervolgens de minimale en maximale voorraad triggers voor de pickface. Tot slot, **Opslaan** uw veranderingen. Eenmaal opgeslagen, zal de locatie (of groep locaties) werken als een pickface.
-  </Step>
+<Step title="Schakel de locatie in als pickface">
+Ga naar het scherm **Locations** en selecteer de locatie die u wilt gebruiken. Open het menu voor die locatie en zet **Is Pickface** op **Yes**. De locatie kan nu aan een product worden toegewezen.
+
+<Info>
+Als u van plan bent een [Location Group](/knowledgebase/nl/warehouse-setup/location-groups) als pickface toe te wijzen, moet elke locatie in de groep **Is Pickface** op **Yes** hebben staan.
+</Info>
+</Step>
+<Step title="Wijs de pickface toe aan een product">
+Navigeer naar het scherm **Products** en zoek het product. Open het **Pickface** paneel en klik **New** om een locatie toe te voegen, of wijs een **Location Group** toe om meerdere pickfaces tegelijk te beheren.
+
+Gebruik de **pijltjes** aan de linkerkant van elke regel om de volgorde in te stellen die Clarus gebruikt bij het verdelen van picks en aanvullingen.
+</Step>
+<Step title="Kies een aanvullingsstrategie">
+Kies voor elke toegewezen locatie **Continuous** of **Demand** replenishment. De strategie bepaalt hoe en wanneer Clarus de locatie aanvult. Zie [Pickface Aanvulling](/knowledgebase/nl/warehouse-setup/replenishment/overview) voor begeleiding bij het kiezen tussen beide, en volg de strategie-specifieke pagina's voor de overige configuratie.
+</Step>
 </Steps>
 
-## Veelgestelde vragen
+## Volgende stappen
 
-<AccordionGroup>
-<Accordion title="Wat is een Fixed Pickface?">
-Een vaste pickface betekent dat u handmatig specifieke locaties toewijst aan een product.
-</Accordion>
-<Accordion title="Wat is een dynamische pickface?">
-Een dynamische pickface maakt gebruik van een vooraf gedefinieerde locatiegroep, waarbij automatisch alle locaties binnen die groep worden opgenomen.
-</Accordion>
-</AccordionGroup>
-
-<Info>Om dynamische pickfaces correct te laten werken, moet u ervoor zorgen dat de **'Is Pickface'** optie is ingeschakeld voor alle locaties in de gekozen groep.</Info>
+- **[Pickface Aanvulling](/knowledgebase/nl/warehouse-setup/replenishment/overview)** — kies tussen Continuous en Demand en bekijk de volledige configuratiestappen voor beide.
+- **[Pick-types afdwingen](/knowledgebase/nl/warehouse-setup/enforcing-pick-types)** — bepaal van welke opslagunits operators mogen picken.

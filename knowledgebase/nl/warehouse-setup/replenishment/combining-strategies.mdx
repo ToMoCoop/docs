@@ -1,0 +1,54 @@
+---
+title: "Aanvullingsstrategieën combineren"
+description: "Gebruik continuous en demand replenishment samen op hetzelfde product voor dagelijkse doorvoer en houdbaarheidsgevoelige picks."
+sidebarTitle: "Strategieën combineren"
+---
+
+De strategieën **Continuous** en **Demand** sluiten elkaar niet uit. Door ze toe te wijzen aan verschillende locaties op hetzelfde product kunt u één pickface altijd gevuld houden voor normale picking, terwijl een andere wordt gereserveerd voor orders die voorraad nodig hebben die de dagelijkse locatie niet kan leveren. Dit is de meest voorkomende configuratie voor producten die aan klanten met houdbaarheidsregels worden verkocht.
+
+Voor de onderliggende strategieën, zie [Continuous Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/continuous) en [Demand Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/demand).
+
+## Het primair + secundair patroon
+
+| Rol | Strategie | Doel |
+| --- | --- | --- |
+| **Primaire pickface** | Continuous | Bevat het grootste deel van het pickvolume. Wordt automatisch aangevuld wanneer picks de voorraad verlagen. |
+| **Secundaire pickface** | Demand | Blijft leeg totdat een order voorraad nodig heeft die de primaire niet kan leveren (meestal door houdbaarheidsregels van de klant). Ontvangt een volledig pallet wanneer dit wordt geactiveerd. |
+
+Wanneer een picktaak wordt gegenereerd, probeert Clarus eerst de continuous pickfaces. Als geen van deze voorraad heeft die aan de criteria voldoet, zoekt Clarus naar een demand pickface. Als er een is geconfigureerd en deze leeg is, verplaatst een aanvullingstaak een volledig pallet conforme voorraad ernaartoe; de picktaak wordt vrijgegeven zodra de aanvulling is voltooid.
+
+## Uitgewerkt voorbeeld
+
+Beschouw een product dat wordt verkocht aan een klant met een maximale sell-by datum van **10 dagen**:
+
+- **Product 123** — Klant 456, houdbaarheid: min 5 dagen, max 10 dagen
+- **Pickface 1 (Continuous)** — hoeveelheid 10, sell-by datum op voorraad 15 dagen
+- **Pickface 2 (Demand)** — leeg
+- **Racking** — opslagunit van 20, sell-by datum 5 dagen
+
+Een verkooporder komt binnen voor **Klant 456** met hoeveelheid **7**. Wanneer picks worden verwerkt:
+
+1. Clarus controleert Pickface 1. De voorraad heeft 15 dagen resterend, wat het maximum van 10 dagen van de klant overschrijdt, dus kan deze de pick niet vervullen.
+2. Clarus controleert of er een demand pickface is geconfigureerd. Pickface 2 is ingeschakeld en leeg.
+3. De picktaak wordt **On Hold** gezet en een aanvullingstaak wordt gegenereerd om de 5-daagse voorraad vanuit racking naar Pickface 2 te verplaatsen.
+4. De aanvulling wordt voltooid en de picktaak wordt vrijgegeven voor picking.
+
+Zonder de demand pickface zou de picktaak voor onbepaalde tijd On Hold blijven — de voorraad in de continuous pickface zou nooit aan de criteria voldoen.
+
+## Veelvoorkomende configuraties
+
+- **Eén Continuous + één Demand** — de eenvoudigste opzet. Gebruik dit voor elk product dat incidenteel houdbaarheidsgevoelige orders heeft.
+- **Meerdere Continuous + één Demand** — wanneer het pickvolume hoog is, configureer meerdere Continuous locaties om de belasting te verdelen. Houd één Demand locatie als vangnet voor gevoelige orders.
+- **Meerdere Continuous + meerdere Demand** — voor producten met meerdere houdbaarheidsgevoelige klanten die gelijktijdig picken. Elke demand pickface kan op elk moment een andere order bedienen.
+
+## Valkuilen om te vermijden
+
+- **Demand pickface is niet echt leeg.** Als de demand locatie nog voorraad bevat, kan de aanvullingstaak niet vuren en blijft de picktaak On Hold. Controleer demand locaties periodiek en maak ze leeg wanneer er voorraad achterblijft.
+- **Geen demand pickface geconfigureerd.** Als alleen continuous pickfaces bestaan en geen van deze aan de criteria voldoet, wacht de picktaak in plaats daarvan op een geschikte continuous aanvulling. Dit werkt, maar vrijgaves zijn minder voorspelbaar. Voeg een demand pickface toe voor elk product waarbij houdbaarheidsgevoelige orders routinematig zijn.
+- **Volgorde van locaties niet beoordeeld.** Continuous pickfaces worden geprobeerd in de volgorde die op het Pickface paneel is ingesteld. Demand pickfaces volgen dezelfde regel. Sleep locaties in de volgorde die past bij de operationele prioriteit.
+
+## Gerelateerde pagina's
+
+- [Continuous Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/continuous)
+- [Demand Replenishment](/knowledgebase/nl/warehouse-setup/replenishment/demand)
+- [On Hold picks begrijpen](/knowledgebase/nl/warehouse-setup/replenishment/on-hold-picks)

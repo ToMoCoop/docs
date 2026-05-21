@@ -1,0 +1,97 @@
+---
+title: "Continuous Replenishment"
+description: "Configureer continuous pickfaces om voorraad automatisch beschikbaar te houden met Minimum en Maximum Triggers."
+sidebarTitle: "Continuous"
+---
+
+**Continuous Replenishment** houdt pickface locaties consistent gevuld. Een aanvullingstaak wordt automatisch gegenereerd zodra de voorraad onder de geconfigureerde **Minimum Trigger** daalt, waarbij de pickface wordt aangevuld tot de **Maximum Trigger** (of tot de eerstvolgende volledige opslagunit). Dit is de juiste keuze voor snel bewegende voorraad die altijd beschikbaar moet zijn.
+
+Voor een overzicht van beide strategieën, zie [Pickface Aanvulling](/knowledgebase/nl/warehouse-setup/replenishment/overview).
+
+## Hoe het werkt
+
+1. **Voorraad wordt aangevuld in de pickface** — bij het opzetten van de locatie via een handmatige overdracht, of automatisch zodra picks het niveau onder de Minimum Trigger brengen.
+2. **Een picktaak wordt gegenereerd.** Wanneer een verkooporder voorraad nodig heeft, wijst het systeem de taak toe aan de eerste beschikbare continuous pickface in de volgorde die op het productscherm is gedefinieerd.
+3. **Voorraad wordt gevalideerd over pickfaces.** Voordat de taak wordt toegewezen, controleert het systeem de beschikbaarheid en eventuele houdbaarheidscriteria in alle geconfigureerde pickfaces. Als meerdere pickfaces voldoen, gaat de taak naar de volgende pickface in de rotatie. Als geen pickface voldoet, gaat de taak [On Hold](/knowledgebase/nl/warehouse-setup/replenishment/on-hold-picks) totdat een geschikte aanvulling plaatsvindt.
+4. **Picktaken worden gelijkmatig verdeeld.** Wanneer meerdere taken worden gegenereerd voor hetzelfde product, doorloopt het systeem alle in aanmerking komende pickfaces in volgorde van prioriteit (taak 1 → A, taak 2 → B, taak 3 → C, taak 4 → A…).
+5. **Aanvulling wordt automatisch geactiveerd.** Elke beweging die de voorraad onder de Minimum Trigger brengt — picks, transfers, negatieve aanpassingen — creëert een nieuwe aanvullingstaak om de pickface weer op capaciteit te brengen.
+
+## Een continuous pickface opzetten
+
+<Steps>
+<Step title="Navigeer naar het product">
+Klik in het linkermenu op **Products** en selecteer het product dat u wilt configureren.
+</Step>
+<Step title="Locaties toewijzen">
+Open het **Pickface** paneel en klik **New** om een pickface locatie toe te voegen. U kunt ook een **Location Group** toewijzen om meerdere pickfaces tegelijk te beheren — elke locatie in de groep moet **Is Pickface** op **Yes** hebben staan.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-1.png" alt="Pickface paneel met locatietoewijzing" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-2.png" alt="Location group toegewezen aan een pickface" />
+</Frame>
+</Step>
+<Step title="Selecteer Continuous Replenishment">
+Kies **Continuous Replenishment** als strategie. Een aanvullingstaak wordt automatisch gegenereerd elke keer dat de voorraad onder de Minimum Trigger daalt.
+</Step>
+<Step title="Definieer Minimum en Maximum Triggers">
+- **Minimum Trigger**: de voorraadhoeveelheid die een aanvullingstaak activeert wanneer het niveau hieronder daalt.
+- **Maximum Trigger**: de doelhoeveelheid om de pickface tot aan te vullen.
+
+Als **Full Storage Units Only** op **Yes** is ingesteld, wordt de Maximum Trigger overschreven — alleen volledige opslagunits worden aangevuld.
+</Step>
+<Step title="Configureer Full Storage Units (optioneel)">
+- **No**: de aanvulling vult de locatie precies tot aan de Maximum Trigger, en breekt indien nodig een opslagunit op.
+- **Yes**: alleen volledige opslagunits worden aangevuld. Bijvoorbeeld: als de Maximum Trigger 100 is en elke opslagunit 60 bevat, brengt het systeem twee volledige units van in totaal 120 binnen.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-3.png" alt="Full Storage Units en trigger-configuratie" />
+</Frame>
+</Step>
+<Step title="Prioriteer de locaties">
+Gebruik de **pijltjes** aan de linkerkant van elke regel om de locaties te herordenen. De volgorde bepaalt de sequentie waarin pickfaces worden gebruikt voor picktaken en aanvullingen.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-4.png" alt="Pijltjes voor het herordenen van pickface locaties" />
+</Frame>
+</Step>
+</Steps>
+
+<Tip>
+De **Pick Rule** van het account bepaalt welke voorraad bij een aanvulling in de pickface wordt gebracht. FIFO gebruikt de vroegste FIFO-datum, Sell by Date de vroegste sell-by datum, en Best Before Date de vroegste best-before datum.
+</Tip>
+
+## Combineren met demand replenishment
+
+Continuous en Demand kunnen samen op hetzelfde product worden gebruikt door ze aan verschillende locaties toe te wijzen — meestal een Continuous primair en een Demand secundair voor houdbaarheidsgevoelige picks. Zie [Strategieën combineren](/knowledgebase/nl/warehouse-setup/replenishment/combining-strategies).
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Waarom is de volgorde van locaties belangrijk?">
+Wanneer meerdere continuous pickfaces aan hetzelfde product zijn toegewezen, verdeelt Clarus picktaken in de geconfigureerde volgorde en keert terug naar de eerste wanneer het einde is bereikt. De volgorde in het Pickface paneel is de volgorde die Clarus gebruikt.
+</Accordion>
+<Accordion title="Wat gebeurt er als ik een pickface locatie inactief maak?">
+Picktaken worden niet meer aan de inactieve pickface toegewezen en aanvullingstaken worden niet meer gegenereerd, zelfs als de voorraad onder de Minimum Trigger valt. Bestaande voorraad blijft in de locatie en moet handmatig worden verplaatst.
+</Accordion>
+<Accordion title="Wat gebeurt er als een picktaak On Hold gaat?">
+Als geen pickface voldoet aan de voorraad- of houdbaarheidscriteria, wordt de picktaak **On Hold** gezet. Zodra een aanvulling voorraad binnenbrengt die aan de criteria voldoet, geeft Clarus de taak automatisch vrij. Door over de status in het Tasks data grid te zweven, ziet u de reden van de hold.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-continuous-5.png" alt="Hovering over de On Hold status om de hold reason te zien" />
+</Frame>
+
+Zie [On Hold picks begrijpen](/knowledgebase/nl/warehouse-setup/replenishment/on-hold-picks) voor het volledige vrijgavegedrag.
+</Accordion>
+<Accordion title="Wat als mijn opslagunits groter zijn dan de Maximum Trigger?">
+Met **Full Storage Units Only** op **Yes** brengt Clarus volledige opslagunits binnen, zelfs als dit de Maximum Trigger overschrijdt. Met de optie op **No** vult het systeem precies tot aan de Maximum Trigger en breekt indien nodig een opslagunit op.
+</Accordion>
+<Accordion title="Welke acties activeren een aanvulling?">
+Elke beweging die de pickface voorraad onder de Minimum Trigger brengt creëert een aanvullingstaak — inclusief picks, handmatige transfers, warehouse transfers en negatieve voorraadcorrecties.
+</Accordion>
+<Accordion title="Worden continuous pickfaces hard-allocated?">
+Nee. Continuous pickfaces gebruiken soft allocation. Voorraad wordt pas hard-allocated wanneer deze wordt gepickt of wanneer [demand replenishment](/knowledgebase/nl/warehouse-setup/replenishment/demand) betrokken is.
+</Accordion>
+</AccordionGroup>

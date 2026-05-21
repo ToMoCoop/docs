@@ -1,0 +1,85 @@
+---
+title: "Demand Replenishment"
+description: "Configureer demand pickfaces om order-specifieke houdbaarheidsvereisten te vervullen die andere pickfaces niet kunnen waarmaken."
+sidebarTitle: "Demand"
+---
+
+**Demand Replenishment** is reactief. Een aanvullingstaak wordt alleen gegenereerd wanneer een picktaak niet door een andere pickface kan worden vervuld — meestal omdat de klant houdbaarheidsdatums vereist waaraan de dagelijkse voorraad niet voldoet. Clarus verplaatst een **volledig pallet** conforme voorraad naar een lege demand pickface en geeft de pick vervolgens vrij.
+
+Voor een overzicht van beide strategieën, zie [Pickface Aanvulling](/knowledgebase/nl/warehouse-setup/replenishment/overview).
+
+## Hoe het werkt
+
+1. **Een picktaak wordt gegenereerd.** Clarus probeert deze eerst te vervullen met voorraad uit de continuous pickface locaties van het product.
+2. **Voorraad wordt gecontroleerd.** Als een continuous pickface voorraad heeft die aan de criteria voldoet (inclusief houdbaarheidsregels), gaat de pick normaal verder. Zo niet, dan controleert Clarus of er een demand replenishment locatie voor het product is ingeschakeld.
+3. **Demand replenishment wordt geactiveerd.** De picktaak gaat **On Hold** terwijl Clarus een aanvullingstaak creëert om een volledig pallet conforme voorraad naar een lege demand pickface te verplaatsen. Als geen lege demand pickface beschikbaar is, gaat ook de aanvullingstaak On Hold totdat er een locatie vrijkomt.
+4. **De picktaak wordt vrijgegeven.** Zodra de aanvulling is voltooid, geeft Clarus de picktaak vrij en deze gaat normaal verder.
+
+<Info>
+Demand replenishment past **hard allocation** toe — zowel de aanvulling- als de picktaak zijn gekoppeld aan de specifieke voorraad die op het moment van aanmaken is geïdentificeerd. Dit garandeert dat de juiste batch wordt gepickt.
+</Info>
+
+## Een demand pickface opzetten
+
+<Steps>
+<Step title="Navigeer naar het product">
+Klik in het linkermenu op **Products** en selecteer het product dat u wilt configureren.
+</Step>
+<Step title="Locaties toewijzen">
+Open het **Pickface** paneel en klik **New** om een pickface locatie toe te voegen. U kunt ook een **Location Group** toewijzen om meerdere pickfaces tegelijk te beheren — elke locatie in de groep moet **Is Pickface** op **Yes** hebben staan.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-demand-1.png" alt="Pickface paneel met demand locatietoewijzing" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-demand-2.png" alt="Location group toegewezen aan demand pickfaces" />
+</Frame>
+</Step>
+<Step title="Selecteer Demand Replenishment">
+Kies **Demand Replenishment** als strategie. Minimum en Maximum Triggers worden niet gebruikt — Clarus verplaatst altijd een volledig pallet naar de locatie wanneer de strategie wordt geactiveerd.
+</Step>
+<Step title="Prioriteer de locaties">
+Gebruik de **pijltjes** aan de linkerkant van elke regel om de demand locaties te herordenen. De volgorde bepaalt welke lege demand pickface als eerste wordt gebruikt.
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-demand-3.png" alt="Demand pickface configuratie" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/pickface-replenishment-types-demand-4.png" alt="Prioriteren van demand pickface locaties" />
+</Frame>
+</Step>
+</Steps>
+
+## Combineren met continuous replenishment
+
+Demand wordt meestal gebruikt als secundaire locatie naast een Continuous primair. Zie [Strategieën combineren](/knowledgebase/nl/warehouse-setup/replenishment/combining-strategies) voor de patronen en een uitgewerkt voorbeeld.
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Waarom is mijn picktaak On Hold?">
+Of geen pickface bevat momenteel voorraad die aan de vereisten van de pick voldoet, of de demand pickface is nog niet leeg waardoor de aanvulling niet kan vuren. Zie [On Hold picks begrijpen](/knowledgebase/nl/warehouse-setup/replenishment/on-hold-picks) voor de volledige diagnose.
+</Accordion>
+<Accordion title="Wat als mijn demand replenishment pickface niet leeg is?">
+De picktaak en de bijbehorende aanvullingstaak blijven beide On Hold totdat de demand locatie leeg is (hoeveelheid bereikt 0). Zodra deze leeg is, vuurt de aanvulling en wordt de pick vrijgegeven.
+</Accordion>
+<Accordion title="Worden demand pickfaces hard-allocated?">
+Ja. Een volledig pallet specifieke voorraad wordt gereserveerd voor zowel de aanvulling als de pick. Dit verschilt van continuous pickfaces, die soft allocation gebruiken.
+</Accordion>
+<Accordion title="Kan ik een demand aanvullingstaak annuleren?">
+Ja. Een gebruiker kan een beschikbare aanvullingstaak op elk moment annuleren:
+
+1. Ga naar de **Tasks** pagina.
+2. Voeg de **Cancel** knop toe aan het data grid als deze er nog niet staat.
+3. Zoek de beschikbare aanvullingstaak en klik **Cancel**.
+</Accordion>
+<Accordion title="Kan ik Maximum Shelf Life Days leeg laten?">
+Ja. Als alleen het minimum is ingesteld, pickt Clarus voorraad met een houdbaarheid gelijk aan of groter dan het minimum. Bijvoorbeeld: met Minimum = 5 en Maximum = leeg zoekt Clarus naar voorraad met 5 of meer dagen resterend.
+</Accordion>
+<Accordion title="Waar kan ik de status van mijn pick- en aanvullingstaken zien?">
+- **Picking List**: voeg de kolom **Status** toe aan het data grid om te zien of een picktaak On Hold staat.
+- **Tasks**: zoek de taak op in het Tasks data grid en bekijk de kolom **Status**. Door over de status te zweven, ziet u de reden van een eventuele hold.
+</Accordion>
+</AccordionGroup>

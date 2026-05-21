@@ -1,37 +1,41 @@
 ---
 title: "Set Up a Pickface"
-description: "Learn how to set up fixed and dynamic pickfaces to streamline stock replenishment with this configuration guide."
+description: "Enable a location as a pickface and assign it to a product to streamline picking and replenishment."
 sidebarTitle: "Create a Pickface"
 ---
 
-Pickfaces are designated locations used for picking smaller quantities of stock. By configuring locations as pickfaces and associating products, you can streamline replenishment and ensure product availability.
+A **pickface** is a designated location used for picking smaller quantities of stock close to where they're needed. Configuring a location as a pickface and assigning it to a product lets Clarus manage stock availability automatically through one of two replenishment strategies.
+
+## How setup fits together
+
+There are three steps to getting a pickface working:
+
+1. **Enable a location** as a pickface.
+2. **Assign the pickface to a product** — either by selecting specific locations or by using a location group.
+3. **Choose a replenishment strategy** — Continuous or Demand — for each assigned location.
+
+## Set up a pickface
 
 <Steps>
-<Step title="Configure the location as a pickface">
-Go to the **Locations** screen and select the location you want to use. Open the menu for that location and find the **Is Pickface** option. Enable it to designate the location as a pickface.
-</Step>
-<Step title="Associate a product with the pickface">
-Navigate to the **Products** screen and find the product you want to assign. Scroll down to the **Pickfaces** tab. Choose between two pickface types:
+<Step title="Enable the location as a pickface">
+Go to the **Locations** screen and select the location you want to use. Open the menu for that location and set **Is Pickface** to **Yes**. The location can now be assigned to a product.
 
-- **Fixed**: You manually assign specific locations to the product
-- **Dynamic**: Uses a pre-defined location group, automatically including all locations within that group
+<Info>
+If you plan to assign a [location group](/knowledgebase/warehouse-setup/location-groups) as a pickface, every location in the group must have **Is Pickface** set to **Yes**.
+</Info>
 </Step>
-<Step title="Set triggers and save">
-Use the lower tab to either choose specific location(s) for a fixed pickface or a location group for a dynamic pickface. Define the **minimum** and **maximum** stock triggers, then click **Save**. The location or group of locations will now operate as a pickface.
+<Step title="Assign the pickface to a product">
+Navigate to the **Products** screen and find the product. Open the **Pickface** panel and click **New** to add a location, or assign a **Location Group** to manage multiple pickfaces at once.
+
+Use the **arrow controls** on the left of each row to set the order Clarus uses when distributing picks and replenishments.
+</Step>
+<Step title="Choose a replenishment strategy">
+For each assigned location, choose **Continuous** or **Demand** replenishment. The strategy decides how and when Clarus tops the location up. See [Pickface Replenishment](/knowledgebase/warehouse-setup/replenishment/overview) for guidance on choosing between them, and follow the strategy-specific setup pages for the remaining configuration.
 </Step>
 </Steps>
 
-<Info>
-For dynamic pickfaces to work correctly, ensure that the **Is Pickface** option is enabled for all locations in the chosen group.
-</Info>
+## Next steps
 
-## Frequently asked questions
-
-<AccordionGroup>
-<Accordion title="What is a fixed pickface?">
-A fixed pickface means you manually assign specific locations to a product.
-</Accordion>
-<Accordion title="What is a dynamic pickface?">
-A dynamic pickface uses a pre-defined location group, automatically including all locations within that group.
-</Accordion>
-</AccordionGroup>
+- **[Pickface Replenishment](/knowledgebase/warehouse-setup/replenishment/overview)** — choose between Continuous and Demand, and see the full configuration steps for each.
+- **[Enforce pick types](/knowledgebase/warehouse-setup/enforcing-pick-types)** — control which storage units operatives are allowed to pick from.
+- **[Stock consolidation](/knowledgebase/warehouse-setup/stock-consolidation)** — merge multiple stock lines in the same pickface into one.
