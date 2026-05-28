@@ -1,0 +1,45 @@
+---
+title: "Multi-Factor Authentication (MFA)"
+description: "What multi-factor authentication is and how to use it in Clarus WMS."
+sidebarTitle: "MFA Overview"
+---
+
+import MfaRollout from '/snippets/mfa-rollout.mdx';
+
+Clarus WMS supports multi-factor authentication (MFA) to keep your account safer. With MFA enabled, you enter a short code from an authenticator app on your phone after your password. This makes it much harder for someone to access your account, even if your password is leaked or guessed.
+
+<Note>You may also see MFA referred to as **Two-Factor Authentication** (2FA) on some screens. They mean the same thing.</Note>
+
+<MfaRollout />
+
+## Why use MFA?
+
+Passwords alone are not enough to keep work accounts safe. A second factor — a code that changes every 30 seconds on your device — protects your account, your customers' data, and your warehouse operations from unauthorised access.
+
+## What you'll need
+
+- A smartphone or tablet
+- An **authenticator app**, such as [1Password](https://1password.com/), [Authy](https://authy.com/), Google Authenticator, or Microsoft Authenticator
+
+<Tip>If your organisation already uses a password manager like 1Password, it can usually act as your authenticator app too — one less app to install.</Tip>
+
+## Getting started
+
+If you haven't set up MFA yet, you'll see a prompt at sign-in inviting you to set it up. You can choose to do it immediately or postpone the decision.
+
+<CardGroup cols={2}>
+  <Card title="MFA at login" icon="key" href="/knowledgebase/security/mfa-login-prompt">
+    What to expect when you see the MFA prompt while signing in.
+  </Card>
+  <Card title="Set up MFA" icon="qrcode" href="/knowledgebase/security/set-up-mfa">
+    Step-by-step setup with an authenticator app and QR code.
+  </Card>
+  <Card title="Enable MFA later" icon="shield-check" href="/knowledgebase/security/enable-mfa">
+    Turn MFA on from Security Settings after the fact.
+  </Card>
+  <Card title="Disable MFA" icon="shield" href="/knowledgebase/security/disable-mfa">
+    Turn MFA off from Security Settings.
+  </Card>
+</CardGroup>
+
+<Note>If you run into any problems with MFA — a lost device, codes that don't work — see [MFA Issues](/knowledgebase/troubleshooting/mfa-issues).</Note>

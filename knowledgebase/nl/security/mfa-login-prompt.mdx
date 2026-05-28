@@ -1,0 +1,53 @@
+---
+title: "MFA bij inloggen"
+description: "Wat te doen wanneer Clarus WMS je vraagt om multi-factor authenticatie in te stellen tijdens het inloggen."
+sidebarTitle: "MFA bij inloggen"
+---
+
+import MfaRollout from '/snippets/nl/mfa-rollout.mdx';
+
+Als MFA nog niet is ingesteld op je account, zie je bij het inloggen een korte melding die je uitnodigt om het toe te voegen. Deze pagina legt uit wat je ziet en wat elke optie doet.
+
+<Frame>
+  <img src="/images/knowledgebase/mfa-login-prompt-1.png" alt="De melding Set up Two-Factor Authentication met drie opties: Set up MFA, Remind me later en I don't want MFA." />
+</Frame>
+
+<MfaRollout />
+
+## Waarom je deze melding ziet
+
+Clarus WMS gebruikt multi-factor authenticatie (MFA) om accounts veiliger te houden. De melding verschijnt omdat MFA nog niet is ingesteld op je account — Clarus WMS nodigt je uit om een tweede aanmeldstap toe te voegen met behulp van een authenticator-app op je telefoon.
+
+Dit is geen beveiligingswaarschuwing — er is niets mis met je account. Het is een eenmalige instellingsmelding.
+
+## Je opties
+
+De melding biedt je drie keuzes:
+
+<AccordionGroup>
+  <Accordion title="Set up MFA">
+    De aanbevolen optie. Je wordt begeleid door een snelle QR-code-instelling met je authenticator-app. Reken op ongeveer twee minuten. Zie [MFA instellen](/knowledgebase/nl/security/set-up-mfa) voor volledige instructies.
+  </Accordion>
+  <Accordion title="Remind me later">
+    Slaat de instelling voor nu over. Je wordt opnieuw gevraagd bij de volgende keer inloggen. Kies dit als je je telefoon of authenticator-app nu niet bij de hand hebt.
+  </Accordion>
+  <Accordion title="I don't want MFA">
+    Sluit de melding en stopt Clarus WMS om je bij het inloggen opnieuw te vragen. MFA blijft uitgeschakeld op je account.
+
+    <Warning>Dit is een permanente verwerping van de aanmeldmelding — je wordt niet opnieuw gevraagd bij de volgende keer inloggen. Als je later van gedachten verandert, is de enige manier om MFA in te stellen via [MFA inschakelen in Security Settings](/knowledgebase/nl/security/enable-mfa).</Warning>
+  </Accordion>
+</AccordionGroup>
+
+## Wat we aanbevelen
+
+<Tip>Kies **Set up MFA** als je een paar minuten hebt. Het is de veiligste optie en je hoeft dit slechts eenmaal per account te doen.</Tip>
+
+## Ik koos "Remind me later" — wat nu?
+
+Vandaag hoef je niets meer te doen. De volgende keer dat je inlogt, zie je de melding opnieuw. Je kunt MFA ook op elk gewenst moment inschakelen vanuit je **Security Settings** — zie [MFA inschakelen in Security Settings](/knowledgebase/nl/security/enable-mfa).
+
+## Ik koos "I don't want MFA" en ben van gedachten veranderd
+
+Clarus WMS vraagt je niet meer bij het inloggen, maar je kunt MFA nog steeds zelf inschakelen. Open [MFA inschakelen in Security Settings](/knowledgebase/nl/security/enable-mfa) — dat is vanaf nu de enige manier om MFA in te stellen.
+
+<Note>Als de **Security Settings**-optie niet zichtbaar is op je account, is MFA mogelijk nog niet beschikbaar voor jouw organisatie. Probeer het later opnieuw of neem contact op met je beheerder.</Note>

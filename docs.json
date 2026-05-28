@@ -426,11 +426,28 @@
                     ]
                   },
                   {
-                    "group": "Security & Compliance",
+                    "group": "Security",
                     "expanded": false,
                     "pages": [
-                      "knowledgebase/security/subprocessors",
-                      "knowledgebase/security/database-backup"
+                      {
+                        "group": "Account Security",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/security/mfa-overview",
+                          "knowledgebase/security/mfa-login-prompt",
+                          "knowledgebase/security/set-up-mfa",
+                          "knowledgebase/security/enable-mfa",
+                          "knowledgebase/security/disable-mfa"
+                        ]
+                      },
+                      {
+                        "group": "Compliance",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/security/subprocessors",
+                          "knowledgebase/security/database-backup"
+                        ]
+                      }
                     ]
                   }
                 ]
@@ -453,7 +470,8 @@
                   "knowledgebase/troubleshooting/datagrid-error",
                   "knowledgebase/troubleshooting/cloud-print-troubleshooting",
                   "knowledgebase/troubleshooting/random-logout",
-                  "knowledgebase/troubleshooting/login-issues"
+                  "knowledgebase/troubleshooting/login-issues",
+                  "knowledgebase/troubleshooting/mfa-issues"
                 ]
               }
             ]
@@ -778,11 +796,28 @@
                     ]
                   },
                   {
-                    "group": "Beveiliging & Compliance",
+                    "group": "Beveiliging",
                     "expanded": false,
                     "pages": [
-                      "knowledgebase/nl/security/subprocessors",
-                      "knowledgebase/nl/security/database-backup"
+                      {
+                        "group": "Accountbeveiliging",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/security/mfa-overview",
+                          "knowledgebase/nl/security/mfa-login-prompt",
+                          "knowledgebase/nl/security/set-up-mfa",
+                          "knowledgebase/nl/security/enable-mfa",
+                          "knowledgebase/nl/security/disable-mfa"
+                        ]
+                      },
+                      {
+                        "group": "Compliance",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/security/subprocessors",
+                          "knowledgebase/nl/security/database-backup"
+                        ]
+                      }
                     ]
                   }
                 ]
@@ -805,7 +840,8 @@
                   "knowledgebase/nl/troubleshooting/datagrid-error",
                   "knowledgebase/nl/troubleshooting/cloud-print-troubleshooting",
                   "knowledgebase/nl/troubleshooting/random-logout",
-                  "knowledgebase/nl/troubleshooting/login-issues"
+                  "knowledgebase/nl/troubleshooting/login-issues",
+                  "knowledgebase/nl/troubleshooting/mfa-issues"
                 ]
               }
             ]

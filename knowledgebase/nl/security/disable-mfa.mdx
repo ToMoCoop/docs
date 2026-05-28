@@ -1,0 +1,43 @@
+---
+title: "MFA uitschakelen in Security Settings"
+description: "Hoe je multi-factor authenticatie uitschakelt vanuit Security Settings."
+sidebarTitle: "MFA uitschakelen"
+---
+
+import MfaRollout from '/snippets/nl/mfa-rollout.mdx';
+
+Je kunt MFA uitschakelen vanuit je **Security Settings**. Omdat dit een gevoelige wijziging is, vraagt Clarus WMS je om je identiteit opnieuw te bevestigen voordat de wijziging wordt voltooid. We raden aan om MFA waar mogelijk ingeschakeld te houden — het is de meest effectieve bescherming tegen accountovername.
+
+<MfaRollout />
+
+## MFA uitschakelen
+
+<Steps>
+  <Step title="Open Security Settings">
+    Open in het linker navigatiemenu je gebruikersprofiel en selecteer **Security Settings**.
+  </Step>
+  <Step title="Kies Disable MFA">
+    Zoek het gedeelte **Multi-Factor Authentication** en klik op **Disable MFA**.
+  </Step>
+  <Step title="Voer je wachtwoord opnieuw in">
+    Hoewel je al bent ingelogd, vraagt Clarus WMS je om je **huidige wachtwoord** opnieuw in te voeren om de wijziging te bevestigen.
+  </Step>
+  <Step title="Voer een code in vanuit je authenticator-app">
+    Open je authenticator-app, zoek de vermelding **Clarus WMS** en typ de huidige zescijferige code in het veld **Verification Code**. Klik op **Verify Code** om de uitschakel-actie te voltooien.
+  </Step>
+  <Step title="Verwijder de vermelding uit je authenticator-app">
+    Zodra MFA is uitgeschakeld in Clarus WMS, kun je de vermelding **Clarus WMS** uit je authenticator-app verwijderen om deze opgeruimd te houden. Dit is optioneel — de vermelding laten staan veroorzaakt geen problemen.
+  </Step>
+</Steps>
+
+<Warning>Het uitschakelen van MFA verwijdert de extra bescherming op je account. Iedereen met je wachtwoord kan inloggen zonder tweede controle. We raden ten zeerste aan MFA zo snel mogelijk weer in te schakelen als je het tijdelijk uitschakelt.</Warning>
+
+<Note>Als je de uitschakel-flow annuleert, of als een van de verificatiestappen mislukt, blijft MFA ingeschakeld op je account.</Note>
+
+## Word ik bij het inloggen weer gevraagd om MFA in te stellen?
+
+Nee. Nadat je MFA hebt uitgeschakeld, vraagt Clarus WMS je niet om het bij het inloggen in te stellen. Als je van gedachten verandert, schakel je MFA zelf weer in vanuit Security Settings — zie [MFA inschakelen in Security Settings](/knowledgebase/nl/security/enable-mfa).
+
+## MFA weer inschakelen
+
+Je kunt MFA op elk gewenst moment opnieuw inschakelen vanuit hetzelfde **Security Settings**-gedeelte — zie [MFA inschakelen in Security Settings](/knowledgebase/nl/security/enable-mfa). Je moet een nieuwe QR-code scannen en een nieuwe vermelding toevoegen aan je authenticator-app.

@@ -1,0 +1,36 @@
+---
+title: "Enable MFA in Security Settings"
+description: "How to turn on multi-factor authentication from Security Settings if you declined or postponed it earlier."
+sidebarTitle: "Enable MFA"
+---
+
+import MfaRollout from '/snippets/mfa-rollout.mdx';
+
+If you declined or postponed MFA at sign-in and want to turn it on now, you can do it from your account's Security Settings.
+
+<MfaRollout />
+
+## Enable MFA
+
+<Steps>
+  <Step title="Open Security Settings">
+    From the left-hand navigation, open your user profile and select **Security Settings**. This is the same area you use to change your password.
+  </Step>
+  <Step title="Choose Enable MFA">
+    Find the **Multi-Factor Authentication** section and click **Enable MFA**.
+  </Step>
+  <Step title="Follow the setup steps">
+    A QR code will appear. Follow the steps in [Set Up MFA](/knowledgebase/security/set-up-mfa) to scan it with your authenticator app and verify the first code.
+  </Step>
+</Steps>
+
+<Tip>Once enabled, MFA stays on until you turn it off — see [Disable MFA in Security Settings](/knowledgebase/security/disable-mfa).</Tip>
+
+## I can't see Security Settings or the Enable MFA option
+
+A few reasons this can happen:
+
+- **Your role may not have access to security settings.** Contact your administrator.
+- **MFA may not be available for your organisation yet.** See the gradual rollout note above.
+
+<Note>If you're stuck, see [MFA Issues](/knowledgebase/troubleshooting/mfa-issues) or contact your administrator.</Note>

@@ -1,0 +1,45 @@
+---
+title: "Multi-Factor Authenticatie (MFA)"
+description: "Wat multi-factor authenticatie is en hoe je het gebruikt in Clarus WMS."
+sidebarTitle: "MFA Overzicht"
+---
+
+import MfaRollout from '/snippets/nl/mfa-rollout.mdx';
+
+Clarus WMS ondersteunt multi-factor authenticatie (MFA) om je account veiliger te houden. Met MFA ingeschakeld voer je naast je wachtwoord een korte code in vanuit een authenticator-app op je telefoon. Hierdoor wordt het veel moeilijker voor iemand om toegang te krijgen tot je account, zelfs als je wachtwoord uitlekt of geraden wordt.
+
+<Note>MFA wordt op sommige schermen ook wel **Two-Factor Authentication** (2FA) genoemd. Het betekent hetzelfde.</Note>
+
+<MfaRollout />
+
+## Waarom MFA gebruiken?
+
+Wachtwoorden alleen zijn niet voldoende om werkaccounts veilig te houden. Een tweede factor — een code die elke 30 seconden verandert op je apparaat — beschermt je account, de gegevens van je klanten en je magazijnactiviteiten tegen onbevoegde toegang.
+
+## Wat je nodig hebt
+
+- Een smartphone of tablet
+- Een **authenticator-app**, zoals [1Password](https://1password.com/), [Authy](https://authy.com/), Google Authenticator of Microsoft Authenticator
+
+<Tip>Als je organisatie al een wachtwoordmanager zoals 1Password gebruikt, kan deze meestal ook dienen als authenticator-app — één app minder om te installeren.</Tip>
+
+## Aan de slag
+
+Als je MFA nog niet hebt ingesteld, zie je bij het inloggen een melding die je uitnodigt om het in te stellen. Je kunt kiezen om het direct te doen of de beslissing uit te stellen.
+
+<CardGroup cols={2}>
+  <Card title="MFA bij inloggen" icon="key" href="/knowledgebase/nl/security/mfa-login-prompt">
+    Wat je kunt verwachten wanneer je de MFA-melding ziet tijdens het inloggen.
+  </Card>
+  <Card title="MFA instellen" icon="qrcode" href="/knowledgebase/nl/security/set-up-mfa">
+    Stapsgewijze instelling met een authenticator-app en QR-code.
+  </Card>
+  <Card title="MFA later inschakelen" icon="shield-check" href="/knowledgebase/nl/security/enable-mfa">
+    Schakel MFA achteraf in vanuit **Security Settings**.
+  </Card>
+  <Card title="MFA uitschakelen" icon="shield" href="/knowledgebase/nl/security/disable-mfa">
+    Schakel MFA uit vanuit **Security Settings**.
+  </Card>
+</CardGroup>
+
+<Note>Als je problemen ondervindt met MFA — een verloren apparaat, codes die niet werken — zie [MFA-problemen](/knowledgebase/nl/troubleshooting/mfa-issues).</Note>

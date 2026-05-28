@@ -1,0 +1,43 @@
+---
+title: "Disable MFA in Security Settings"
+description: "How to turn off multi-factor authentication from Security Settings."
+sidebarTitle: "Disable MFA"
+---
+
+import MfaRollout from '/snippets/mfa-rollout.mdx';
+
+You can turn MFA off from your Security Settings. Because this is a sensitive change, Clarus WMS asks you to re-confirm your identity before completing it. We recommend keeping MFA on whenever possible — it's the most effective protection against account takeover.
+
+<MfaRollout />
+
+## Disable MFA
+
+<Steps>
+  <Step title="Open Security Settings">
+    From the left-hand navigation, open your user profile and select **Security Settings**.
+  </Step>
+  <Step title="Choose Disable MFA">
+    Find the **Multi-Factor Authentication** section and click **Disable MFA**.
+  </Step>
+  <Step title="Re-enter your password">
+    Even though you're already signed in, Clarus WMS asks you to enter your **current password** again to confirm the change.
+  </Step>
+  <Step title="Enter a code from your authenticator app">
+    Open your authenticator app, find the **Clarus WMS** entry, and type the current six-digit code into the **Verification Code** field. Click **Verify Code** to complete the disable action.
+  </Step>
+  <Step title="Remove the entry from your authenticator app">
+    Once MFA is disabled in Clarus WMS, you can delete the **Clarus WMS** entry from your authenticator app to keep it tidy. This is optional — leaving the entry in place doesn't cause any problems.
+  </Step>
+</Steps>
+
+<Warning>Disabling MFA removes the extra protection on your account. Anyone with your password could sign in without a second check. We strongly recommend re-enabling MFA as soon as possible if you turn it off temporarily.</Warning>
+
+<Note>If you cancel out of the disable flow, or either of the verification steps fails, MFA stays enabled on your account.</Note>
+
+## Will I be prompted to set up MFA at login again?
+
+No. After you disable MFA, Clarus WMS won't ask you to set it up at sign-in. If you change your mind, turn MFA back on yourself from Security Settings — see [Enable MFA in Security Settings](/knowledgebase/security/enable-mfa).
+
+## Turning MFA back on
+
+You can re-enable MFA at any time from the same Security Settings area — see [Enable MFA in Security Settings](/knowledgebase/security/enable-mfa). You'll need to scan a fresh QR code and add a new entry to your authenticator app.

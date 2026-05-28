@@ -1,0 +1,55 @@
+---
+title: "MFA Issues"
+description: "Resolve common multi-factor authentication problems, including lost devices, rejected codes, and re-enabling after declining."
+sidebarTitle: "MFA Issues"
+---
+
+import MfaRollout from '/snippets/mfa-rollout.mdx';
+
+If multi-factor authentication isn't working as expected, this page covers the most common situations.
+
+<MfaRollout />
+
+## I've lost access to my authenticator device
+
+If your phone is lost, broken, or replaced, you may not be able to generate codes to sign in.
+
+<Steps>
+  <Step title="Check if you have a backup">
+    Some authenticator apps (such as Authy or 1Password) sync your entries to other devices automatically. If you've signed into the same authenticator app on another phone, tablet, or computer, your Clarus WMS entry may already be there.
+  </Step>
+  <Step title="Ask an admin in your organisation to reset your MFA">
+    If you can't recover the code yourself, contact an admin user **within your own organisation first** — they can resolve this quicker than Clarus WMS support. From the **Users** screen, an admin with the MFA reset privilege can reset MFA on your account. After the reset, you'll be taken through the standard MFA setup at your next sign-in so you can register a new device.
+
+    <Note>The MFA reset privilege is granted to the **Admin** role by default. If your admin sees the reset action but it's disabled, their role doesn't have the privilege — they'll need to ask whoever manages roles in your organisation.</Note>
+  </Step>
+  <Step title="Escalate to Clarus WMS support if needed">
+    If no admin in your organisation can reset your MFA — for example, if every admin is locked out — contact the **Clarus WMS support team** and we'll help you recover access.
+  </Step>
+</Steps>
+
+## My codes are being rejected
+
+<AccordionGroup>
+  <Accordion title="Wait for the next code">
+    Codes refresh every 30 seconds. If you typed one just as it expired, it will be rejected. Wait for a fresh code and try again.
+  </Accordion>
+  <Accordion title="Check your phone's time">
+    Authenticator codes rely on accurate time. If your phone's clock is even a minute off, codes won't match. Set your phone's date and time to **automatic** or **network-provided**, then try a new code.
+  </Accordion>
+  <Accordion title="Make sure you're using the right entry">
+    If you have entries for other services in your authenticator app, double-check you're using the **Clarus WMS** entry — not a similarly named one.
+  </Accordion>
+</AccordionGroup>
+
+## I declined MFA at sign-in and want to turn it on now
+
+Open [Enable MFA in Security Settings](/knowledgebase/security/enable-mfa). If the option isn't visible, your role may not have access, or MFA may not be available for your organisation yet — contact your administrator.
+
+## I set up MFA and want to turn it off
+
+See [Disable MFA in Security Settings](/knowledgebase/security/disable-mfa).
+
+## Still stuck?
+
+Contact your administrator or the Clarus WMS support team.

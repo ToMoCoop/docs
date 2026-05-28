@@ -1,0 +1,55 @@
+---
+title: "MFA-problemen"
+description: "Veelvoorkomende problemen met multi-factor authenticatie oplossen, waaronder verloren apparaten, geweigerde codes en opnieuw inschakelen na weigeren."
+sidebarTitle: "MFA-problemen"
+---
+
+import MfaRollout from '/snippets/nl/mfa-rollout.mdx';
+
+Als multi-factor authenticatie niet werkt zoals verwacht, behandelt deze pagina de meest voorkomende situaties.
+
+<MfaRollout />
+
+## Ik heb geen toegang meer tot mijn authenticator-apparaat
+
+Als je telefoon kwijt, kapot of vervangen is, kun je mogelijk geen codes meer genereren om in te loggen.
+
+<Steps>
+  <Step title="Controleer of je een back-up hebt">
+    Sommige authenticator-apps (zoals Authy of 1Password) synchroniseren je vermeldingen automatisch naar andere apparaten. Als je bent ingelogd in dezelfde authenticator-app op een andere telefoon, tablet of computer, staat je Clarus WMS-vermelding daar mogelijk al.
+  </Step>
+  <Step title="Vraag een beheerder in je organisatie om je MFA te resetten">
+    Als je de code zelf niet kunt herstellen, neem dan **eerst** contact op met een beheerder binnen je eigen organisatie — zij kunnen dit sneller oplossen dan de Clarus WMS-support. Vanuit het scherm **Users** kan een beheerder met het MFA-reset-privilege MFA op je account resetten. Na de reset wordt je bij de volgende keer inloggen door de standaard MFA-instelling geleid zodat je een nieuw apparaat kunt registreren.
+
+    <Note>Het MFA-reset-privilege wordt standaard toegekend aan de rol **Admin**. Als je beheerder de reset-actie ziet maar deze is uitgeschakeld, heeft hun rol het privilege niet — ze moeten dit aanvragen bij degene die de rollen in je organisatie beheert.</Note>
+  </Step>
+  <Step title="Escaleer indien nodig naar de Clarus WMS-support">
+    Als geen enkele beheerder in je organisatie je MFA kan resetten — bijvoorbeeld als alle beheerders zijn buitengesloten — neem dan contact op met het **Clarus WMS-supportteam** en wij helpen je weer toegang te krijgen.
+  </Step>
+</Steps>
+
+## Mijn codes worden geweigerd
+
+<AccordionGroup>
+  <Accordion title="Wacht op de volgende code">
+    Codes vernieuwen elke 30 seconden. Als je er een hebt getypt net toen deze verliep, wordt deze geweigerd. Wacht op een nieuwe code en probeer het opnieuw.
+  </Accordion>
+  <Accordion title="Controleer de tijd op je telefoon">
+    Authenticator-codes zijn afhankelijk van nauwkeurige tijd. Als de klok van je telefoon zelfs maar een minuut afwijkt, komen de codes niet overeen. Stel de datum en tijd van je telefoon in op **automatisch** of **netwerk-aangeleverd** en probeer dan een nieuwe code.
+  </Accordion>
+  <Accordion title="Zorg dat je de juiste vermelding gebruikt">
+    Als je vermeldingen voor andere diensten in je authenticator-app hebt, controleer dan dat je de vermelding **Clarus WMS** gebruikt — niet een met een vergelijkbare naam.
+  </Accordion>
+</AccordionGroup>
+
+## Ik heb MFA geweigerd bij inloggen en wil het nu inschakelen
+
+Open [MFA inschakelen in Security Settings](/knowledgebase/nl/security/enable-mfa). Als de optie niet zichtbaar is, heeft je rol mogelijk geen toegang, of is MFA nog niet beschikbaar voor jouw organisatie — neem contact op met je beheerder.
+
+## Ik heb MFA ingesteld en wil het uitschakelen
+
+Zie [MFA uitschakelen in Security Settings](/knowledgebase/nl/security/disable-mfa).
+
+## Nog steeds vastgelopen?
+
+Neem contact op met je beheerder of het Clarus WMS-supportteam.
