@@ -1,0 +1,96 @@
+---
+title: "Hoe Cloud Print Werkt"
+description: "Architectuur, verbindingsmodel, protocollen, poorten en endpoints voor Clarus Cloud Print."
+sidebarTitle: "Hoe het werkt"
+---
+
+Deze pagina is bedoeld voor IT- en beveiligingsteams die Cloud Print evalueren of configureren. Eindgebruikers die afdrukken instellen hebben alleen [Cloud Print installeren](/knowledgebase/nl/cloud-print/installation) nodig.
+
+## Afdruktaakstroom
+
+<Frame>
+  <img src="/images/cloudprint-architecture.svg" alt="Diagram van de Cloud Print-architectuur: Clarus WMS stuurt een afdruktaak naar de Cloud Print API, die deze via een uitgaande WebSocket-verbinding aflevert bij de Cloud Print-agent in je netwerk. De agent stuurt vervolgens de afdruk naar de lokale printer." />
+</Frame>
+
+<Steps>
+  <Step title="Taak indienen">
+    Een gebruiker start een afdruktaak in Clarus WMS. Het document wordt naar de Cloud Print API gestuurd.
+  </Step>
+  <Step title="Veilige verzending">
+    De Cloud Print-agent in je netwerk onderhoudt een persistente, versleutelde uitgaande verbinding met de Cloud Print-service.
+  </Step>
+  <Step title="Directe levering">
+    Met event-driven WebSocket-levering wordt de afdruktaak naar de agent gepusht.
+  </Step>
+  <Step title="Lokale verwerking">
+    De agent ontvangt de taak en stuurt deze naar de juiste printer met standaard OS-printerstuurprogramma's.
+  </Step>
+  <Step title="Opruiming">
+    Zodra het afdrukken is voltooid, wordt het document permanent uit de cloud verwijderd. Er worden geen kopieën bewaard.
+  </Step>
+</Steps>
+
+## Verbindingsmodel
+
+De Cloud Print-agent gebruikt een **uitgaand-alleen** verbindingsmodel:
+
+- **Geen inkomende firewallregels vereist** — de agent initieert elke verbinding.
+- **Geen VPN of port forwarding nodig** — werkt door de meeste bedrijfsfirewalls.
+- **NAT-vriendelijk** — werkt correct achter network address translation.
+- **Versleuteld tijdens verzending** — al het verkeer gebruikt HTTPS/TLS.
+
+<Note>Alle verbindingen zijn alleen uitgaand. Er hoeven geen inkomende poorten op je firewall geopend te worden.</Note>
+
+## Protocollen en poorten
+
+| Protocol  | Poort | Doel                                                       |
+| --------- | ----- | ---------------------------------------------------------- |
+| HTTPS     | 443   | Primaire API-communicatie en aflevering van afdruktaken    |
+| WebSocket | 6123  | Real-time gebeurtenissen en statusupdates                  |
+
+## Endpoints
+
+De Cloud Print-agent maakt verbinding met de volgende endpoints voor afdrukservices:
+
+- `api.printnode.com`
+- `app.printnode.com`
+- `client.printnode.com`
+- `host2b.printnode.com`
+- `lon1.printnode.com`
+- `central.printnode.com`
+
+Gebruikersauthenticatie verloopt via de Clarus API op `api.clarus.ws`.
+
+Als je netwerk domeinwhitelisting gebruikt, zorg er dan voor dat deze endpoints bereikbaar zijn via poorten 443 en 6123.
+
+## Wat wordt gedetecteerd
+
+De Cloud Print-agent detecteert elke printer die:
+
+- Direct verbonden is met de hostmachine (USB, parallel, etc.)
+- Een netwerkprinter is waarvan de stuurprogramma's geïnstalleerd zijn op de hostmachine
+- Toegankelijk is via het afdruksubsysteem van het besturingssysteem
+
+<Info>Printerdetectie wordt doorgaans binnen 3 seconden voltooid op Windows en 3-10 seconden op macOS of Linux.</Info>
+
+## Printerverbinding vanaf de agent
+
+Eenmaal geïnstalleerd, communiceert de agent met printers via **standaard printerstuurprogramma's van het besturingssysteem** — hetzelfde pad dat elke andere applicatie gebruikt. Er zijn geen speciale protocollen vereist op de Cloud Print-laag.
+
+Als je netwerkprinters handmatige stuurprogrammaconfiguratie op de hostmachine vereisen, gebruiken ze meestal een van:
+
+| Protocol                      | Poort | Beschrijving                                  |
+| ----------------------------- | ----- | --------------------------------------------- |
+| RAW / AppSocket / JetDirect   | 9100  | Meest voorkomend, snelste optie               |
+| LPR / LPD                     | 515   | Verouderd protocol, breed ondersteund         |
+| IPP                           | 631   | Internet Printing Protocol                    |
+
+Deze zijn alleen relevant voor het installeren van printerstuurprogramma's op de agent-host — niet voor de Cloud Print-verbinding zelf.
+
+## Beveiligingsoverzicht
+
+- **TLS 1.2+** voor alle verzending
+- **Alleen uitgaande** netwerktoegang
+- **Ondertekende agent-binaries**
+- **Geen retentie van afdruktaken** in de cloud na aflevering
+- **Token-gebaseerde authenticatie** voor API-aanroepen

@@ -47,6 +47,46 @@ Na de installatie wordt u gevraagd aan te melden met de gebruikersnaam en wachtw
 
 Eenmaal ingelogd, verschijnt de integratie op uw **Integraties** scherm, dat bevestigt dat Clarus WMS Cloud Print succesvol is ingesteld.
 
+## Multi-user omgevingen
+
+Voor servers of machines met meerdere ingelogde gebruikers — zoals terminal servers of gedeelde werkstations — installeert u de agent als een **Windows Service** in plaats van als een desktopapplicatie. Dit zorgt ervoor dat:
+
+- De agent draait ongeacht welke gebruiker is ingelogd
+- Alle gebruikers op de machine consistent toegang hebben tot dezelfde printers
+- De agent automatisch start wanneer de machine opstart
+
+<Tip>Installeer de Cloud Print-agent met een account dat al toegang heeft tot elke printer die u nodig heeft. De agent detecteert printers met behulp van de weergave van dat account, dus elke printer die het niet kan zien op het moment van installatie verschijnt niet in Clarus WMS.</Tip>
+
+## Systeemvereisten
+
+### Ondersteunde besturingssystemen
+
+| Platform | Versies                                                     |
+| -------- | ----------------------------------------------------------- |
+| Windows  | Windows 10, Windows 11, Windows Server 2016 en later        |
+| macOS    | macOS 10.14 (Mojave) en later                               |
+| Linux    | Ubuntu, Debian, CentOS, RHEL, Raspbian en anderen           |
+
+### Hardware
+
+| Resource     | Minimum                              | Aanbevolen                              |
+| ------------ | ------------------------------------ | --------------------------------------- |
+| CPU          | 1 kern (elke moderne processor)      | 2+ kernen                               |
+| Geheugen     | 512 MB beschikbaar RAM               | 1 GB beschikbaar RAM                    |
+| Schijfruimte | 100 MB                               | 500 MB (voor buffering van afdruktaken) |
+
+<Note>De agent is licht. Elke machine die een moderne webbrowser kan draaien, kan de Cloud Print-agent comfortabel draaien.</Note>
+
+### Netwerk
+
+| Vereiste            | Details                                                     |
+| ------------------- | ----------------------------------------------------------- |
+| Internetverbinding  | Stabiele breedband                                          |
+| Uitgaande poorten   | 443 (HTTPS), 6123 (WebSocket)                               |
+| DNS-resolutie       | Moet de Cloud Print service-endpoints kunnen oplossen       |
+
+Voor de volledige endpoint-lijst en de architectuur achter de agent-verbinding, zie [Hoe Cloud Print werkt](/knowledgebase/nl/cloud-print/how-it-works).
+
 ## FAQs
 
 ### Waar vind ik de integratie van Cloud Print?

@@ -1,0 +1,40 @@
+---
+title: "Cloud Print Overview"
+description: "What Cloud Print is, how it keeps your print data secure, and where to start."
+sidebarTitle: "Overview"
+---
+
+Cloud Print lets you print documents and labels directly from Clarus WMS to printers on your local network — without complex VPN setup, port forwarding, or direct network access from the cloud.
+
+A lightweight **Cloud Print agent** runs on a machine in your network and makes an outbound, encrypted connection to Clarus. Print jobs travel through that connection and reach any printer the host machine can already print to.
+
+## Why use Cloud Print
+
+- **No inbound firewall rules.** The agent only makes outbound connections, so you don't need to open ports or expose printers to the internet.
+- **Works through corporate firewalls and NAT.** No VPN or port forwarding needed.
+- **Automatic printer discovery.** The agent finds all printers available to the host machine — USB, network, anything with installed drivers.
+- **Multi-platform.** Runs on Windows, macOS, and Linux.
+
+## Security
+
+- **Encrypted in transit.** All communication uses TLS 1.2+.
+- **No data retention.** Print jobs are permanently deleted from the cloud as soon as printing completes.
+- **Signed binaries.** The agent installer is digitally signed.
+- **Outbound-only.** No inbound network access required, so the attack surface stays minimal.
+
+## Where to start
+
+<CardGroup cols={2}>
+  <Card title="How Cloud Print works" icon="diagram-project" href="/knowledgebase/cloud-print/how-it-works">
+    Architecture, protocols, ports, and endpoints — for IT and security reviewers.
+  </Card>
+  <Card title="Install Cloud Print" icon="download" href="/knowledgebase/cloud-print/installation">
+    Step-by-step install on Windows or Mac, including multi-user environments.
+  </Card>
+  <Card title="View printers" icon="print" href="/knowledgebase/cloud-print/viewing-printers">
+    See and search the printers connected to your Cloud Print integration.
+  </Card>
+  <Card title="Troubleshooting" icon="circle-question" href="/knowledgebase/troubleshooting/cloud-print-troubleshooting">
+    Fix common issues like return code -15 and missing printers.
+  </Card>
+</CardGroup>

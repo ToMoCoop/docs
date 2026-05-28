@@ -39,6 +39,46 @@ Cloud Print lets you print documents and labels directly from Clarus WMS to your
 
 <Warning>You will need the username and password from the Edit Integration screen to log in to Cloud Print. If you lose them, you can retrieve them by returning to the **Edit Integration** screen.</Warning>
 
+## Multi-user environments
+
+For servers or machines with multiple logged-in users — such as terminal servers or shared workstations — install the agent as a **Windows Service** rather than a desktop application. This ensures:
+
+- The agent runs regardless of which user is logged in
+- All users on the machine get consistent access to the same printers
+- The agent starts automatically when the machine boots
+
+<Tip>Install the Cloud Print agent using an account that already has access to every printer you'll need. The agent discovers printers using that account's view, so any printer it can't see at install time won't appear in Clarus WMS.</Tip>
+
+## System requirements
+
+### Supported operating systems
+
+| Platform | Versions                                              |
+| -------- | ----------------------------------------------------- |
+| Windows  | Windows 10, Windows 11, Windows Server 2016 and later |
+| macOS    | macOS 10.14 (Mojave) and later                        |
+| Linux    | Ubuntu, Debian, CentOS, RHEL, Raspbian, and others    |
+
+### Hardware
+
+| Resource   | Minimum                            | Recommended                       |
+| ---------- | ---------------------------------- | --------------------------------- |
+| CPU        | 1 core (any modern processor)      | 2+ cores                          |
+| Memory     | 512 MB available RAM               | 1 GB available RAM                |
+| Disk space | 100 MB                             | 500 MB (for print job buffering)  |
+
+<Note>The agent is lightweight. Any machine that can run a modern web browser can run the Cloud Print agent comfortably.</Note>
+
+### Network
+
+| Requirement         | Details                                             |
+| ------------------- | --------------------------------------------------- |
+| Internet connection | Stable broadband                                    |
+| Outbound ports      | 443 (HTTPS), 6123 (WebSocket)                       |
+| DNS resolution      | Must resolve the Cloud Print service endpoints      |
+
+For the full endpoint list and the architecture behind the agent connection, see [How Cloud Print Works](/knowledgebase/cloud-print/how-it-works).
+
 <Accordion title="FAQ">
   **Can I install Cloud Print on both Windows and Mac?**
 
@@ -47,4 +87,8 @@ Cloud Print lets you print documents and labels directly from Clarus WMS to your
   **Can I remove the Cloud Print integration later?**
 
   Yes, you can manage or remove the integration from the **Integrations** menu at any time.
+
+  **Do I need to install the agent for each user?**
+
+  No. The agent is installed once per machine. For multi-user environments install it as a Windows Service so it's available to everyone on that machine.
 </Accordion>

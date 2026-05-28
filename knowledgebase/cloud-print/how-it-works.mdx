@@ -1,0 +1,96 @@
+---
+title: "How Cloud Print Works"
+description: "Architecture, connection model, protocols, ports, and endpoints for Clarus Cloud Print."
+sidebarTitle: "How it works"
+---
+
+This page is aimed at IT and security teams evaluating or configuring Cloud Print. End users setting up printing only need [Install Cloud Print](/knowledgebase/cloud-print/installation).
+
+## Print job flow
+
+<Frame>
+  <img src="/images/cloudprint-architecture.svg" alt="Diagram of the Cloud Print architecture: Clarus WMS sends a print job to the Cloud Print API, which delivers it over an outbound WebSocket connection to the Cloud Print agent running on your network. The agent then prints to the local printer." />
+</Frame>
+
+<Steps>
+  <Step title="Job submission">
+    A user initiates a print job in Clarus WMS. The document is sent to the Cloud Print API.
+  </Step>
+  <Step title="Secure transmission">
+    The Cloud Print agent on your network maintains a persistent, encrypted outbound connection to the Cloud Print service.
+  </Step>
+  <Step title="Instant delivery">
+    Using event-driven WebSocket delivery, the print job is pushed to the agent.
+  </Step>
+  <Step title="Local processing">
+    The agent receives the job and routes it to the appropriate printer using standard OS print drivers.
+  </Step>
+  <Step title="Cleanup">
+    Once printing completes, the document is permanently deleted from the cloud. No copies are retained.
+  </Step>
+</Steps>
+
+## Connection model
+
+The Cloud Print agent uses an **outbound-only** connection model:
+
+- **No inbound firewall rules required** — the agent initiates every connection.
+- **No VPN or port forwarding needed** — works through most corporate firewalls.
+- **NAT-friendly** — functions correctly behind network address translation.
+- **Encrypted in transit** — all traffic uses HTTPS/TLS.
+
+<Note>All connections are outbound only. No inbound ports need to be opened on your firewall.</Note>
+
+## Protocols and ports
+
+| Protocol  | Port | Purpose                                                  |
+| --------- | ---- | -------------------------------------------------------- |
+| HTTPS     | 443  | Primary API communication and print job delivery        |
+| WebSocket | 6123 | Real-time event notifications and status updates         |
+
+## Endpoints
+
+The Cloud Print agent connects to the following endpoints for print services:
+
+- `api.printnode.com`
+- `app.printnode.com`
+- `client.printnode.com`
+- `host2b.printnode.com`
+- `lon1.printnode.com`
+- `central.printnode.com`
+
+User authentication is handled via the Clarus API at `api.clarus.ws`.
+
+If your network uses domain whitelisting, make sure these endpoints are reachable over ports 443 and 6123.
+
+## What gets discovered
+
+The Cloud Print agent discovers any printer that is:
+
+- Connected directly to the host machine (USB, parallel, etc.)
+- A network printer with drivers installed on the host machine
+- Accessible through the operating system's print subsystem
+
+<Info>Printer discovery typically completes within 3 seconds on Windows, and 3-10 seconds on macOS or Linux.</Info>
+
+## Printer connectivity from the agent
+
+Once installed, the agent talks to printers using **standard operating system print drivers** — the same pathway any other application uses. No special protocols are required at the Cloud Print layer.
+
+If your network printers need manual driver configuration on the host machine, they typically use one of:
+
+| Protocol                  | Port | Description                                |
+| ------------------------- | ---- | ------------------------------------------ |
+| RAW / AppSocket / JetDirect | 9100 | Most common, fastest option              |
+| LPR / LPD                 | 515  | Legacy protocol, widely supported          |
+| IPP                       | 631  | Internet Printing Protocol                 |
+
+These are only relevant for installing printer drivers on the agent host — not for Cloud Print connectivity itself.
+
+## Security summary
+
+- **TLS 1.2+** for all transit
+- **Outbound-only** network access
+- **Signed agent binaries**
+- **No print-job retention** in the cloud after delivery
+- **Token-based authentication** for API calls

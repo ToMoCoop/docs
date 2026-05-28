@@ -27,7 +27,7 @@
         "language": "en",
         "tabs": [
           {
-            "tab": "Guides",
+            "tab": "Knowledgebase",
             "public": true,
             "groups": [
               {
@@ -36,78 +36,6 @@
                   "index"
                 ]
               },
-              {
-                "group": "Integrations",
-                "pages": [
-                  "integrations/cloudprint"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Architecture",
-            "public": true,
-            "groups": [
-              {
-                "group": "AI Architecture",
-                "pages": [
-                  "architecture/ai/overview",
-                  "architecture/ai/infrastructure",
-                  "architecture/ai/gateways",
-                  "architecture/ai/runtime",
-                  "architecture/ai/authentication",
-                  "architecture/ai/tools",
-                  "architecture/ai/sessions",
-                  "architecture/ai/frontend"
-                ]
-              },
-              {
-                "group": "Federated GraphQL",
-                "pages": [
-                  "architecture/federated-graphql/overview",
-                  "architecture/federated-graphql/gateway",
-                  "architecture/federated-graphql/agents-subgraph",
-                  "architecture/federated-graphql/network",
-                  "architecture/federated-graphql/publish-pipeline",
-                  "architecture/federated-graphql/adding-a-subgraph"
-                ]
-              },
-              {
-                "group": "Deployment",
-                "pages": [
-                  "architecture/deployment/index",
-                  "architecture/deployment/ai-pipelines"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "API Reference",
-            "groups": [
-              {
-                "group": "API Documentation",
-                "public": true,
-                "pages": [
-                  "api-reference/introduction"
-                ]
-              },
-              {
-                "group": "Core Resources",
-                "pages": [
-                  "api-reference/core-resources/address"
-                ]
-              },
-              {
-                "group": "Operations",
-                "openapi": "api-reference/clarus-api.json",
-                "public": true
-              }
-            ]
-          },
-          {
-            "tab": "Knowledgebase",
-            "public": true,
-            "groups": [
               {
                 "group": "Account & Sign-in",
                 "pages": [
@@ -398,6 +326,8 @@
                     "group": "Cloud Print",
                     "expanded": false,
                     "pages": [
+                      "knowledgebase/cloud-print/overview",
+                      "knowledgebase/cloud-print/how-it-works",
                       "knowledgebase/cloud-print/installation",
                       "knowledgebase/cloud-print/logging-in",
                       "knowledgebase/cloud-print/syncing-printers",
@@ -459,6 +389,66 @@
                   "knowledgebase/troubleshooting/random-logout",
                   "knowledgebase/troubleshooting/login-issues",
                   "knowledgebase/troubleshooting/mfa-issues"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "API Documentation",
+                "public": true,
+                "pages": [
+                  "api-reference/introduction"
+                ]
+              },
+              {
+                "group": "Core Resources",
+                "pages": [
+                  "api-reference/core-resources/address"
+                ]
+              },
+              {
+                "group": "Operations",
+                "openapi": "api-reference/clarus-api.json",
+                "public": true
+              }
+            ]
+          },
+          {
+            "tab": "Architecture",
+            "public": true,
+            "groups": [
+              {
+                "group": "AI Architecture",
+                "pages": [
+                  "architecture/ai/overview",
+                  "architecture/ai/infrastructure",
+                  "architecture/ai/gateways",
+                  "architecture/ai/runtime",
+                  "architecture/ai/authentication",
+                  "architecture/ai/tools",
+                  "architecture/ai/sessions",
+                  "architecture/ai/frontend"
+                ]
+              },
+              {
+                "group": "Federated GraphQL",
+                "pages": [
+                  "architecture/federated-graphql/overview",
+                  "architecture/federated-graphql/gateway",
+                  "architecture/federated-graphql/agents-subgraph",
+                  "architecture/federated-graphql/network",
+                  "architecture/federated-graphql/publish-pipeline",
+                  "architecture/federated-graphql/adding-a-subgraph"
+                ]
+              },
+              {
+                "group": "Deployment",
+                "pages": [
+                  "architecture/deployment/index",
+                  "architecture/deployment/ai-pipelines"
                 ]
               }
             ]
@@ -757,6 +747,8 @@
                     "group": "Cloud Print",
                     "expanded": false,
                     "pages": [
+                      "knowledgebase/nl/cloud-print/overview",
+                      "knowledgebase/nl/cloud-print/how-it-works",
                       "knowledgebase/nl/cloud-print/installation",
                       "knowledgebase/nl/cloud-print/logging-in",
                       "knowledgebase/nl/cloud-print/syncing-printers",

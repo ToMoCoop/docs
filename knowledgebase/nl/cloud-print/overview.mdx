@@ -1,0 +1,40 @@
+---
+title: "Cloud Print Overzicht"
+description: "Wat Cloud Print is, hoe het je afdrukgegevens beveiligt en waar je begint."
+sidebarTitle: "Overzicht"
+---
+
+Met Cloud Print kun je documenten en labels rechtstreeks vanuit Clarus WMS afdrukken naar printers op je lokale netwerk — zonder complexe VPN-instellingen, port forwarding of directe netwerktoegang vanuit de cloud.
+
+Een lichte **Cloud Print-agent** draait op een machine in je netwerk en maakt een uitgaande, versleutelde verbinding met Clarus. Afdruktaken worden via die verbinding verzonden naar elke printer waar de hostmachine al naar kan afdrukken.
+
+## Waarom Cloud Print gebruiken
+
+- **Geen inkomende firewallregels.** De agent maakt alleen uitgaande verbindingen, dus je hoeft geen poorten te openen of printers bloot te stellen aan het internet.
+- **Werkt door bedrijfsfirewalls en NAT.** Geen VPN of port forwarding nodig.
+- **Automatische printerdetectie.** De agent vindt alle printers die beschikbaar zijn op de hostmachine — USB, netwerk, alles met geïnstalleerde stuurprogramma's.
+- **Multi-platform.** Werkt op Windows, macOS en Linux.
+
+## Beveiliging
+
+- **Versleuteld tijdens verzending.** Alle communicatie gebruikt TLS 1.2+.
+- **Geen gegevensretentie.** Afdruktaken worden permanent uit de cloud verwijderd zodra het afdrukken is voltooid.
+- **Ondertekende binaries.** Het agent-installatieprogramma is digitaal ondertekend.
+- **Alleen uitgaand.** Geen inkomende netwerktoegang vereist, waardoor het aanvalsoppervlak minimaal blijft.
+
+## Waar te beginnen
+
+<CardGroup cols={2}>
+  <Card title="Hoe Cloud Print werkt" icon="diagram-project" href="/knowledgebase/nl/cloud-print/how-it-works">
+    Architectuur, protocollen, poorten en endpoints — voor IT- en beveiligingsbeoordelaars.
+  </Card>
+  <Card title="Cloud Print installeren" icon="download" href="/knowledgebase/nl/cloud-print/installation">
+    Stapsgewijze installatie op Windows of Mac, inclusief multi-user omgevingen.
+  </Card>
+  <Card title="Printers bekijken" icon="print" href="/knowledgebase/nl/cloud-print/viewing-printers">
+    Zie en doorzoek de printers die verbonden zijn met je Cloud Print-integratie.
+  </Card>
+  <Card title="Probleemoplossing" icon="circle-question" href="/knowledgebase/nl/troubleshooting/cloud-print-troubleshooting">
+    Los veelvoorkomende problemen op zoals retourcode -15 en ontbrekende printers.
+  </Card>
+</CardGroup>
