@@ -1,0 +1,141 @@
+---
+title: "Voorraadcontrole"
+description: "Plan voorraadcontroles op de desktop en voer ze uit op de handheld om uw voorraadtellingen nauwkeurig te houden."
+sidebarTitle: "Voorraadcontrole"
+---
+
+Een voorraadcontrole is een geplande fysieke telling van een locatie, uitgevoerd op de handheld om de geregistreerde voorraad te verifiëren. Plan de controle vanaf de desktop, tel op de HHD en bekijk de resultaten via het tabblad Stock.
+
+## Een voorraadcontrole plannen
+
+<Steps>
+<Step title="Open Locations">
+Vouw in het menu aan de linkerkant **Settings** uit en klik op **Locations**.
+</Step>
+<Step title="Selecteer de locatie">
+Vink het selectievakje aan naast de locatie die u wilt controleren. U kunt meerdere locaties selecteren om in één keer meerdere controles in te plannen.
+
+<Frame>
+  <img src="/images/knowledgebase/stock-check-1.png" alt="Locatieoverzicht met één geselecteerde locatie en de knop Create Stock Checks gemarkeerd" />
+</Frame>
+</Step>
+<Step title="Maak de controle aan">
+Klik op **Create Stock Checks**, stel een **Expected Completion Date** in en klik op **Create**.
+
+<Accordion title="Toon screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-2.png" alt="Dialoogvenster Create Stock Checks met een veld Expected Completion Date en een knop Create" />
+  </Frame>
+</Accordion>
+</Step>
+</Steps>
+
+<Info>
+Er kan geen nieuwe voorraadcontrole worden aangemaakt voor een locatie zolang er nog een andere **Pending** is. U kunt de huidige status controleren vanaf het Stock Checks-scherm.
+</Info>
+
+## De telling uitvoeren op de HHD
+
+<Steps>
+<Step title="Open Stock Check op de handheld">
+Open in het HHD-menu **Stock Check** en tik op **Stock Check by Location**. HHD-menu's zijn configureerbaar, dus uw labels kunnen afwijken van deze standaardwaarden.
+
+<Accordion title="Toon screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-3.png" alt="HHD Stock Check-menu met de optie Stock Check by Location" />
+  </Frame>
+</Accordion>
+</Step>
+<Step title="Scan de locatie">
+Scan of voer de **Location Code** in van de locatie die u wilt tellen.
+
+<Accordion title="Toon screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-4.png" alt="HHD-prompt voor het invoeren van de location code, met PICKTEST ingevuld" />
+  </Frame>
+</Accordion>
+
+<Warning>
+Als er voor de gescande locatie geen voorraadcontrole is ingepland, geeft de HHD de melding **No Pending Stock Check found in Location**. Plan de controle eerst op de desktop voordat u gaat tellen.
+
+<Accordion title="Toon screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-12.png" alt="HHD-foutmelding met de tekst No Pending Stock Check found in Location" />
+  </Frame>
+</Accordion>
+</Warning>
+</Step>
+<Step title="Voer het product in">
+Voer de **Product Code** in van het product op de locatie en tik op **Next**. De HHD bevestigt de bijbehorende productomschrijving voordat hij verder gaat.
+
+<Accordion title="Toon screenshots">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-5.png" alt="HHD Stock Check met de prompt voor de product code en de knoppen Back, Next en Stock Not Found" />
+  </Frame>
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-6.png" alt="HHD toont de ingevoerde product code Pickface Test met productomschrijving fff" />
+  </Frame>
+</Accordion>
+</Step>
+<Step title="Bevestig batch-attributen (indien van toepassing)">
+Als het product batch-gebonden is, voer dan de **Batch Code** in wanneer hierom wordt gevraagd. Bevestig vervolgens de **Sell By Date** of **Best Before Date** zoals gevraagd door het record.
+
+<Accordion title="Toon screenshots">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-7.png" alt="HHD-prompt voor het invoeren van de batch code voor het bijbehorende product" />
+  </Frame>
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-8.png" alt="HHD toont de Sell By Date en Best Before Date voor de batch" />
+  </Frame>
+</Accordion>
+</Step>
+<Step title="Voer de fysieke telling in">
+Voer de **Physical Count** in die u in de locatie heeft en bevestig.
+
+<Accordion title="Toon screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-9.png" alt="HHD-prompt voor het invoeren van de physical count, met de waarde 35 ingevuld" />
+  </Frame>
+</Accordion>
+</Step>
+</Steps>
+
+<Note>
+Prompts voor Batch, Sell By en Best Before verschijnen alleen op de HHD wanneer de accountvlaggen zijn ingesteld om deze attributen te gebruiken.
+</Note>
+
+## Verschillen en onderbrekingen afhandelen
+
+Als de fysieke telling niet overeenkomt met de geregistreerde waarde, toont de HHD een waarschuwing en biedt hij een tweede poging aan. Er zijn slechts twee pogingen toegestaan voordat de controle mislukt.
+
+<Accordion title="Toon screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-10.png" alt="HHD-waarschuwing dat de physical count niet overeenkwam met het record, met een knop Count Again" />
+  </Frame>
+</Accordion>
+
+| Situatie | Actie |
+|----------|-------|
+| Telverschil | Tik op **Count Again** om de telling voor dat item opnieuw te starten. Er zijn slechts twee pogingen toegestaan voordat de controle mislukt. |
+| Lege locatie | Tik op **Stock Not Found** om de controle voor die locatie af te ronden. Gebruik dit alleen wanneer de locatie daadwerkelijk leeg is. |
+| Tussentijds verlaten | Tik op **Back** om te kiezen tussen het voortzetten van de huidige controle, de locatie vroegtijdig afronden of overschakelen naar een nieuwe locatie. |
+
+Zodra pogingen zijn vastgelegd, kunt u op de HHD de locatie voortzetten, vroegtijdig afronden of naar een andere locatie gaan.
+
+<Accordion title="Toon screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-11.png" alt="HHD-bevestiging dat de stock check-pogingen zijn vastgelegd, met opties Continue Check Location, Finish Stock Check Location en Check Another Location" />
+  </Frame>
+</Accordion>
+
+## Geschiedenis van voorraadcontroles bekijken
+
+Vouw in het menu aan de linkerkant **Stock** uit en open **Stock Checks**. Het raster toont de geschiedenis van elke poging met de locatie, het product, de tellingen, het pogingnummer en de status.
+
+<Frame>
+  <img src="/images/knowledgebase/stock-check-13.png" alt="Stock Checks-datagrid met kolommen Location Code, Product Code, Batch, Sell By Date, Best Before Date, System Count, Physical Count, Attempt en Stock Check Status" />
+</Frame>
+
+<Tip>
+Voorraadcontroles verschijnen pas in dit raster zodra de telling daadwerkelijk is gestart op de HHD. Alleen inplannen vanaf het Locations-scherm is niet voldoende om ze hier zichtbaar te maken.
+</Tip>

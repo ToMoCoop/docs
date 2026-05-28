@@ -166,6 +166,7 @@
                     "pages": [
                       "knowledgebase/products-and-stock/stock-adjustments",
                       "knowledgebase/products-and-stock/stock-balance",
+                      "knowledgebase/products-and-stock/stock-check",
                       "knowledgebase/products-and-stock/stock-batch-columns",
                       "knowledgebase/products-and-stock/sftp-stock-attributes",
                       "knowledgebase/products-and-stock/transfer-stock-or-pallets",
@@ -590,6 +591,7 @@
                     "pages": [
                       "knowledgebase/nl/products-and-stock/stock-adjustments",
                       "knowledgebase/nl/products-and-stock/stock-balance",
+                      "knowledgebase/nl/products-and-stock/stock-check",
                       "knowledgebase/nl/products-and-stock/stock-batch-columns",
                       "knowledgebase/nl/products-and-stock/sftp-stock-attributes",
                       "knowledgebase/nl/products-and-stock/transfer-stock-or-pallets",

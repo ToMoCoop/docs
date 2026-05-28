@@ -1,0 +1,140 @@
+---
+title: "Stock Check"
+description: "Schedule stock checks on the desktop and execute them on the handheld to keep inventory counts accurate."
+---
+
+A stock check is a scheduled physical count of a location, run on the handheld device to verify recorded stock. Schedule the check from the desktop, count on the HHD, then review the results from the Stock tab.
+
+## Schedule a stock check
+
+<Steps>
+<Step title="Open Locations">
+From the left-hand menu, expand **Settings** and click **Locations**.
+</Step>
+<Step title="Select the location">
+Tick the checkbox next to the location you want to audit. You can select multiple locations to schedule several checks at once.
+
+<Frame>
+  <img src="/images/knowledgebase/stock-check-1.png" alt="Locations grid with a single location selected and the Create Stock Checks button highlighted" />
+</Frame>
+</Step>
+<Step title="Create the check">
+Click **Create Stock Checks**, set an **Expected Completion Date**, and click **Create**.
+
+<Accordion title="Show screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-2.png" alt="Create Stock Checks dialog with an Expected Completion Date field and Create button" />
+  </Frame>
+</Accordion>
+</Step>
+</Steps>
+
+<Info>
+A new stock check cannot be created for a location while another one is **Pending** for it. You can confirm the current status from the Stock Checks screen.
+</Info>
+
+## Run the count on the HHD
+
+<Steps>
+<Step title="Open Stock Check on the handheld">
+From the HHD menu, open **Stock Check** and tap **Stock Check by Location**. HHD menus are configurable, so your labels may differ from these defaults.
+
+<Accordion title="Show screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-3.png" alt="HHD Stock Check menu showing the Stock Check by Location option" />
+  </Frame>
+</Accordion>
+</Step>
+<Step title="Scan the location">
+Scan or enter the **Location Code** you want to count.
+
+<Accordion title="Show screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-4.png" alt="HHD prompt to enter the location code, with PICKTEST entered" />
+  </Frame>
+</Accordion>
+
+<Warning>
+If no stock check has been scheduled for the location you scan, the HHD returns **No Pending Stock Check found in Location**. Schedule the check from the desktop before counting.
+
+<Accordion title="Show screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-12.png" alt="HHD error message reading No Pending Stock Check found in Location" />
+  </Frame>
+</Accordion>
+</Warning>
+</Step>
+<Step title="Enter the product">
+Enter the **Product Code** found at the location, then tap **Next**. The HHD confirms the matched product description before continuing.
+
+<Accordion title="Show screenshots">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-5.png" alt="HHD Stock Check showing the product code prompt with Back, Next, and Stock Not Found buttons" />
+  </Frame>
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-6.png" alt="HHD displaying the entered product code Pickface Test with the product description fff" />
+  </Frame>
+</Accordion>
+</Step>
+<Step title="Confirm batch attributes (if applicable)">
+If the product is batch-tracked, enter the **Batch Code** when prompted, then confirm the **Sell By Date** or **Best Before Date** as prompted by the record.
+
+<Accordion title="Show screenshots">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-7.png" alt="HHD prompt to enter the batch code for the matched product" />
+  </Frame>
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-8.png" alt="HHD showing the Sell By Date and Best Before Date for the batch" />
+  </Frame>
+</Accordion>
+</Step>
+<Step title="Enter the physical count">
+Enter the **Physical Count** you have in the location and confirm.
+
+<Accordion title="Show screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-9.png" alt="HHD prompt to enter the physical count, with the value 35 entered" />
+  </Frame>
+</Accordion>
+</Step>
+</Steps>
+
+<Note>
+Batch, Sell By, and Best Before prompts only appear on the HHD when the account flags are set to use those attributes.
+</Note>
+
+## Handle mismatches and exits
+
+If the physical count does not match the recorded value, the HHD shows a warning and offers a second attempt. Only two attempts are allowed before the check fails.
+
+<Accordion title="Show screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-10.png" alt="HHD warning that the physical count didn't match the record, with a Count Again button" />
+  </Frame>
+</Accordion>
+
+| Scenario | Action |
+|----------|--------|
+| Count mismatch | Tap **Count Again** to restart the count for that item. Only two attempts are allowed before the check fails. |
+| Empty location | Tap **Stock Not Found** to complete the check for that location. Only use this when the location is genuinely empty. |
+| Leaving mid-check | Tap **Back** to choose between continuing the current check, finishing the location early, or switching to a new one. |
+
+Once attempts have been recorded, the HHD lets you continue the location, finish it early, or move to another one.
+
+<Accordion title="Show screenshot">
+  <Frame>
+    <img src="/images/knowledgebase/stock-check-11.png" alt="HHD confirmation that stock check attempts were recorded, with Continue Check Location, Finish Stock Check Location, and Check Another Location options" />
+  </Frame>
+</Accordion>
+
+## Review stock check history
+
+From the left-hand menu, expand **Stock** and open **Stock Checks**. The grid shows the history of each attempt with its location, product, counts, attempt number, and status.
+
+<Frame>
+  <img src="/images/knowledgebase/stock-check-13.png" alt="Stock Checks data grid showing Location Code, Product Code, Batch, Sell By Date, Best Before Date, System Count, Physical Count, Attempt, and Stock Check Status columns" />
+</Frame>
+
+<Tip>
+Stock checks only appear in this grid once the count has been started on the HHD. Scheduling a check from the Locations screen is not enough to make it visible here.
+</Tip>
