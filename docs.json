@@ -109,9 +109,19 @@
             "public": true,
             "groups": [
               {
-                "group": "Getting Started",
+                "group": "Account & Sign-in",
                 "pages": [
-                  "knowledgebase/getting-started/use-the-booking-diary"
+                  {
+                    "group": "Multi-Factor Authentication",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/security/mfa-overview",
+                      "knowledgebase/security/mfa-login-prompt",
+                      "knowledgebase/security/set-up-mfa",
+                      "knowledgebase/security/enable-mfa",
+                      "knowledgebase/security/disable-mfa"
+                    ]
+                  }
                 ]
               },
               {
@@ -242,6 +252,7 @@
               {
                 "group": "Warehouse Operations",
                 "pages": [
+                  "knowledgebase/getting-started/use-the-booking-diary",
                   {
                     "group": "Inbound",
                     "expanded": false,
@@ -409,47 +420,23 @@
                 ]
               },
               {
-                "group": "Advanced & Reference",
+                "group": "Advanced Features",
                 "pages": [
-                  {
-                    "group": "Advanced Features",
-                    "expanded": false,
-                    "pages": [
-                      "knowledgebase/advanced/serial-number-tracking",
-                      "knowledgebase/advanced/date-validation",
-                      "knowledgebase/advanced/works-orders",
-                      "knowledgebase/advanced/manage-jobs",
-                      "knowledgebase/advanced/create-a-kit",
-                      "knowledgebase/advanced/use-templates",
-                      "knowledgebase/advanced/dispatch-by-output-qty",
-                      "knowledgebase/advanced/convert-by-output-qty"
-                    ]
-                  },
-                  {
-                    "group": "Security",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Account Security",
-                        "expanded": false,
-                        "pages": [
-                          "knowledgebase/security/mfa-overview",
-                          "knowledgebase/security/mfa-login-prompt",
-                          "knowledgebase/security/set-up-mfa",
-                          "knowledgebase/security/enable-mfa",
-                          "knowledgebase/security/disable-mfa"
-                        ]
-                      },
-                      {
-                        "group": "Compliance",
-                        "expanded": false,
-                        "pages": [
-                          "knowledgebase/security/subprocessors",
-                          "knowledgebase/security/database-backup"
-                        ]
-                      }
-                    ]
-                  }
+                  "knowledgebase/advanced/serial-number-tracking",
+                  "knowledgebase/advanced/date-validation",
+                  "knowledgebase/advanced/works-orders",
+                  "knowledgebase/advanced/manage-jobs",
+                  "knowledgebase/advanced/create-a-kit",
+                  "knowledgebase/advanced/use-templates",
+                  "knowledgebase/advanced/dispatch-by-output-qty",
+                  "knowledgebase/advanced/convert-by-output-qty"
+                ]
+              },
+              {
+                "group": "Compliance",
+                "pages": [
+                  "knowledgebase/security/subprocessors",
+                  "knowledgebase/security/database-backup"
                 ]
               },
               {
@@ -486,9 +473,19 @@
             "public": true,
             "groups": [
               {
-                "group": "Aan de slag",
+                "group": "Account & Inloggen",
                 "pages": [
-                  "knowledgebase/nl/getting-started/use-the-booking-diary"
+                  {
+                    "group": "Multi-Factor Authenticatie",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/security/mfa-overview",
+                      "knowledgebase/nl/security/mfa-login-prompt",
+                      "knowledgebase/nl/security/set-up-mfa",
+                      "knowledgebase/nl/security/enable-mfa",
+                      "knowledgebase/nl/security/disable-mfa"
+                    ]
+                  }
                 ]
               },
               {
@@ -616,6 +613,7 @@
               {
                 "group": "Magazijnoperaties",
                 "pages": [
+                  "knowledgebase/nl/getting-started/use-the-booking-diary",
                   {
                     "group": "Inbound",
                     "expanded": false,
@@ -780,46 +778,22 @@
                 ]
               },
               {
-                "group": "Geavanceerd & Referentie",
+                "group": "Geavanceerde Functies",
                 "pages": [
-                  {
-                    "group": "Geavanceerde Functies",
-                    "expanded": false,
-                    "pages": [
-                      "knowledgebase/nl/advanced/date-validation",
-                      "knowledgebase/nl/advanced/works-orders",
-                      "knowledgebase/nl/advanced/manage-jobs",
-                      "knowledgebase/nl/advanced/create-a-kit",
-                      "knowledgebase/nl/advanced/use-templates",
-                      "knowledgebase/nl/advanced/dispatch-by-output-qty",
-                      "knowledgebase/nl/advanced/convert-by-output-qty"
-                    ]
-                  },
-                  {
-                    "group": "Beveiliging",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Accountbeveiliging",
-                        "expanded": false,
-                        "pages": [
-                          "knowledgebase/nl/security/mfa-overview",
-                          "knowledgebase/nl/security/mfa-login-prompt",
-                          "knowledgebase/nl/security/set-up-mfa",
-                          "knowledgebase/nl/security/enable-mfa",
-                          "knowledgebase/nl/security/disable-mfa"
-                        ]
-                      },
-                      {
-                        "group": "Compliance",
-                        "expanded": false,
-                        "pages": [
-                          "knowledgebase/nl/security/subprocessors",
-                          "knowledgebase/nl/security/database-backup"
-                        ]
-                      }
-                    ]
-                  }
+                  "knowledgebase/nl/advanced/date-validation",
+                  "knowledgebase/nl/advanced/works-orders",
+                  "knowledgebase/nl/advanced/manage-jobs",
+                  "knowledgebase/nl/advanced/create-a-kit",
+                  "knowledgebase/nl/advanced/use-templates",
+                  "knowledgebase/nl/advanced/dispatch-by-output-qty",
+                  "knowledgebase/nl/advanced/convert-by-output-qty"
+                ]
+              },
+              {
+                "group": "Compliance",
+                "pages": [
+                  "knowledgebase/nl/security/subprocessors",
+                  "knowledgebase/nl/security/database-backup"
                 ]
               },
               {
