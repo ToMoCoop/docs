@@ -1,0 +1,91 @@
+---
+title: "Order Volume-aanvulling"
+description: "Vul pickfaces dynamisch aan op basis van de werkelijke pickvraag in realtime, in plaats van vaste minimum- en maximumtriggers."
+sidebarTitle: "Order Volume"
+---
+
+**Order Volume-aanvulling** houdt pickfaces gevuld op basis van de werkelijke vraag in realtime. In tegenstelling tot [Continue](/knowledgebase/nl/warehouse-setup/replenishment/continuous)- en [Vraag](/knowledgebase/nl/warehouse-setup/replenishment/demand)-aanvulling, die werken met vaste minimum-/maximumniveaus, berekent Order Volume wat er nodig is op het moment dat een picktaak wordt gegenereerd — zo wordt voorraad alleen verplaatst wanneer een order dit daadwerkelijk vereist.
+
+<Note>
+Voordat u Order Volume-aanvulling kunt gebruiken, moet deze aan uw HHD-implementatie worden toegevoegd. Zie de stapsgewijze handleiding: [Een aanvulflow toevoegen aan uw HHD-implementatie](https://scribehow.com/viewer/Adding_a_Replenishment_Flow_to_your_HHD_implementation__PK81EEFrT5GsSH86dKyQ_Q).
+</Note>
+
+## Hoe het werkt
+
+In plaats van te wachten tot de voorraad een vooraf ingesteld laag punt bereikt, berekent het systeem de behoefte tijdens het genereren van de picktaak:
+
+1. **De trigger** — wanneer een picktaak wordt aangemaakt, controleert het systeem de beschikbare voorraad op de pickface.
+2. **De actie** — als de vereiste pickhoeveelheid groter is dan wat er op dat moment op de plank ligt, wordt automatisch een aanvultaak gegenereerd om het tekort aan te vullen.
+3. **Slimme validatie** — voordat een nieuwe taak wordt aangemaakt, controleert het systeem of er al bestaande aanvultaken zijn die aan de vereiste hoeveelheid voldoen, om dubbel werk te voorkomen.
+
+Het resultaat is een efficiëntere magazijnstroom: voorraad wordt niet onnodig verplaatst en aanvulling blijft gericht op actieve orders.
+
+## Een Order Volume-pickface instellen
+
+<Steps>
+<Step title="Navigeer naar het product">
+Klik in het linkermenu op **Products** en selecteer het item dat u wilt configureren.
+</Step>
+<Step title="Open het tabblad Pickfaces">
+Scroll naar het tabblad **Pickfaces** en kies ervoor om een nieuwe pickface aan te maken of een bestaande te bewerken.
+</Step>
+<Step title="Selecteer Order Volume">
+Zoek de dropdown **Replenishment Type** en wijzig de instelling van **Continuous** of **Demand** naar **Order Volume**.
+
+<Frame>
+  <img src="/images/knowledgebase/order-volume-replenishment-1.png" alt="Order Volume selecteren in de dropdown Replenishment Type" />
+</Frame>
+</Step>
+</Steps>
+
+<Warning>
+**Domeinbeperking:** een Order Volume-pickface kan slechts voor één product tegelijk actief zijn. Deze instelling toepassen op meerdere pickfaces binnen hetzelfde product werkt niet correct.
+</Warning>
+
+## De aanvulling uitvoeren
+
+Zodra deze actief is, neemt het systeem het zware werk over, maar de handheld (HHD)-workflow wijkt iets af. Omdat de hoeveelheden dynamisch zijn, blijft het veld **Confirmed Quantity** in het Tasks-scherm leeg totdat u het invult — het systeem wacht op uw handmatige invoer op basis van de actuele behoefte.
+
+<Frame>
+  <img src="/images/knowledgebase/order-volume-replenishment-2.png" alt="Het veld Confirmed Quantity blijft leeg bij een Order Volume-taak" />
+</Frame>
+
+Op de HHD:
+
+<Steps>
+<Step title="Open de volgende aanvulling">
+Ga naar **Replenishment** en vervolgens **Next Replenishment**.
+
+<Frame>
+  <img src="/images/knowledgebase/order-volume-replenishment-3.png" alt="Replenishment en vervolgens Next Replenishment op de HHD" />
+</Frame>
+</Step>
+<Step title="Bevestig de locaties">
+Bevestig de **From Location**, **From Storage Unit** en **To Location**.
+
+<Frame>
+  <img src="/images/knowledgebase/order-volume-replenishment-4.png" alt="De van- en naar-locaties bevestigen op de HHD" />
+</Frame>
+</Step>
+<Step title="Voer de bevestigde hoeveelheid in">
+Voer de **Confirmed Quantity** in — de exacte hoeveelheid voorraad die u naar de pickface verplaatst.
+
+<Frame>
+  <img src="/images/knowledgebase/order-volume-replenishment-5.png" alt="De bevestigde hoeveelheid invoeren op de HHD" />
+</Frame>
+</Step>
+</Steps>
+
+<Tip>
+U moet een waarde **groter dan 0** invoeren om de taak te voltooien. Het invoeren van 0 geeft een foutmelding en voorkomt dat de taak wordt afgesloten.
+
+<Frame>
+  <img src="/images/knowledgebase/order-volume-replenishment-6.png" alt="Foutmelding bij het invoeren van een bevestigde hoeveelheid van 0" />
+</Frame>
+</Tip>
+
+## Gerelateerde pagina's
+
+- [Pickface-aanvulling](/knowledgebase/nl/warehouse-setup/replenishment/overview) — vergelijk alle aanvulstrategieën
+- [Continue aanvulling](/knowledgebase/nl/warehouse-setup/replenishment/continuous)
+- [Vraag-aanvulling](/knowledgebase/nl/warehouse-setup/replenishment/demand)

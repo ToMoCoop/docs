@@ -148,6 +148,7 @@
                               "knowledgebase/warehouse-setup/replenishment/overview",
                               "knowledgebase/warehouse-setup/replenishment/continuous",
                               "knowledgebase/warehouse-setup/replenishment/demand",
+                              "knowledgebase/warehouse-setup/replenishment/order-volume",
                               "knowledgebase/warehouse-setup/replenishment/combining-strategies",
                               "knowledgebase/warehouse-setup/replenishment/on-hold-picks"
                             ],
@@ -277,7 +278,8 @@
                       "knowledgebase/financial/charge-window-and-create-one",
                       "knowledgebase/financial/charge-period-dates",
                       "knowledgebase/financial/export-charges-to-sage-line-200",
-                      "knowledgebase/financial/commercial-invoices"
+                      "knowledgebase/financial/commercial-invoices",
+                      "knowledgebase/financial/pick-charge-subtypes"
                     ],
                     "public": true
                   },
@@ -341,9 +343,10 @@
                     "public": true
                   },
                   {
-                    "group": "Webhooks",
+                    "group": "Automations",
                     "expanded": false,
                     "pages": [
+                      "knowledgebase/integrations/email-automations",
                       "knowledgebase/integrations/validate-a-webhook-request",
                       "knowledgebase/integrations/webhook-stock-positive",
                       "knowledgebase/integrations/webhook-stock-negative"
@@ -631,6 +634,7 @@
                               "knowledgebase/nl/warehouse-setup/replenishment/overview",
                               "knowledgebase/nl/warehouse-setup/replenishment/continuous",
                               "knowledgebase/nl/warehouse-setup/replenishment/demand",
+                              "knowledgebase/nl/warehouse-setup/replenishment/order-volume",
                               "knowledgebase/nl/warehouse-setup/replenishment/combining-strategies",
                               "knowledgebase/nl/warehouse-setup/replenishment/on-hold-picks"
                             ],
@@ -757,7 +761,8 @@
                       "knowledgebase/nl/financial/charge-window-and-create-one",
                       "knowledgebase/nl/financial/charge-period-dates",
                       "knowledgebase/nl/financial/export-charges-to-sage-line-200",
-                      "knowledgebase/nl/financial/commercial-invoices"
+                      "knowledgebase/nl/financial/commercial-invoices",
+                      "knowledgebase/nl/financial/pick-charge-subtypes"
                     ],
                     "public": true
                   },
@@ -821,9 +826,10 @@
                     "public": true
                   },
                   {
-                    "group": "Webhooks",
+                    "group": "Automations",
                     "expanded": false,
                     "pages": [
+                      "knowledgebase/nl/integrations/email-automations",
                       "knowledgebase/nl/integrations/validate-a-webhook-request",
                       "knowledgebase/nl/integrations/webhook-stock-positive",
                       "knowledgebase/nl/integrations/webhook-stock-negative"
