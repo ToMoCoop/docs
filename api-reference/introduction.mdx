@@ -9,12 +9,29 @@ The ClarusWMS API provides programmatic access to warehouse management operation
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens.
+The API uses **OAuth 2.0** Bearer tokens. Obtain an access token and send it on every request as an `Authorization: Bearer <token>` header.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+| | URL |
+|---|---|
+| Authorize | `https://clarus-api.com/oauth/authorize` |
+| Token | `https://clarus-api.com/oauth/token` |
+
+Request the scopes your integration requires.
+
+## Multi-tenancy: the subdomain header
+
+ClarusWMS is multi-tenant. **Every request must include the `X-Clarus-Subdomain` header** identifying which tenant's data you are operating on — it is sent in addition to the Bearer token, not instead of it.
+
 ```
+Authorization: Bearer <access-token>
+X-Clarus-Subdomain: acme-warehouse
+```
+
+## Using the playground
+
+The "Authorize" panel exposes both requirements:
+
+1. **BearerAuth** — paste an access token (or complete the OAuth flow if configured).
+2. **ClarusSubdomain** — enter your tenant subdomain; it is sent as the `X-Clarus-Subdomain` header on every request.
+
+Both are required, so requests sent from the playground carry the token and the subdomain header together.
