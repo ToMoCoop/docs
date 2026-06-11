@@ -34,7 +34,8 @@
                 "group": "Overview",
                 "pages": [
                   "index"
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Account & Sign-in",
@@ -48,16 +49,19 @@
                       "knowledgebase/security/set-up-mfa",
                       "knowledgebase/security/enable-mfa",
                       "knowledgebase/security/disable-mfa"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Using Clarus",
                 "pages": [
                   "knowledgebase/reporting/customise-data-grids",
                   "knowledgebase/reporting/data-grid-columns"
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "System Setup",
@@ -77,12 +81,14 @@
                           "knowledgebase/users-and-roles/client-role",
                           "knowledgebase/users-and-roles/financial-role",
                           "knowledgebase/users-and-roles/rf-role"
-                        ]
+                        ],
+                        "public": true
                       },
                       "knowledgebase/users-and-roles/assigning-different-user-views",
                       "knowledgebase/users-and-roles/restrict-user-visibility",
                       "knowledgebase/users-and-roles/hhd-user-creation"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Accounts",
@@ -97,7 +103,8 @@
                       "knowledgebase/accounts/reason-codes",
                       "knowledgebase/accounts/use-reason-codes",
                       "knowledgebase/accounts/short-order-lines"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Warehouse Setup",
@@ -114,7 +121,8 @@
                           "knowledgebase/warehouse-setup/location-check-digits",
                           "knowledgebase/warehouse-setup/warehouse-map-locations",
                           "knowledgebase/warehouse-setup/create-sequences"
-                        ]
+                        ],
+                        "public": true
                       },
                       {
                         "group": "Storage",
@@ -123,7 +131,8 @@
                           "knowledgebase/warehouse-setup/storage-unit-types",
                           "knowledgebase/warehouse-setup/warehouse-confined-storage",
                           "knowledgebase/warehouse-setup/loose-stock-storage-units"
-                        ]
+                        ],
+                        "public": true
                       },
                       {
                         "group": "Pickfaces",
@@ -141,15 +150,19 @@
                               "knowledgebase/warehouse-setup/replenishment/demand",
                               "knowledgebase/warehouse-setup/replenishment/combining-strategies",
                               "knowledgebase/warehouse-setup/replenishment/on-hold-picks"
-                            ]
+                            ],
+                            "public": true
                           }
-                        ]
+                        ],
+                        "public": true
                       },
                       "knowledgebase/warehouse-setup/create-carrier",
                       "knowledgebase/warehouse-setup/create-trailer"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Products & Stock",
@@ -174,9 +187,11 @@
                       "knowledgebase/products-and-stock/mixed-pallets",
                       "knowledgebase/products-and-stock/merge-split-pallets",
                       "knowledgebase/products-and-stock/reusing-dispatched-storage-units"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Warehouse Operations",
@@ -195,7 +210,8 @@
                       "knowledgebase/inbound/cancel-a-receipt",
                       "knowledgebase/inbound/cancel-receive-tasks",
                       "knowledgebase/inbound/goods-in-report"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Outbound",
@@ -208,7 +224,8 @@
                           "knowledgebase/outbound/create-a-sales-order",
                           "knowledgebase/outbound/create-a-sales-order-without-selecting-a-warehouse",
                           "knowledgebase/outbound/amend-order-line-quantities"
-                        ]
+                        ],
+                        "public": true
                       },
                       {
                         "group": "Picking",
@@ -225,7 +242,8 @@
                           "knowledgebase/outbound/round-up-storage-units",
                           "knowledgebase/outbound/stock-lines-pick-removal",
                           "knowledgebase/outbound/tally-records"
-                        ]
+                        ],
+                        "public": true
                       },
                       {
                         "group": "Packing & Dispatch",
@@ -239,11 +257,14 @@
                           "knowledgebase/outbound/ftp-load-dispatch-file",
                           "knowledgebase/outbound/download-an-invoice",
                           "knowledgebase/outbound/download-backups"
-                        ]
+                        ],
+                        "public": true
                       }
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Financial",
@@ -257,7 +278,8 @@
                       "knowledgebase/financial/charge-period-dates",
                       "knowledgebase/financial/export-charges-to-sage-line-200",
                       "knowledgebase/financial/commercial-invoices"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Invoices",
@@ -272,7 +294,8 @@
                       "knowledgebase/financial/invoice-currencies",
                       "knowledgebase/financial/apply-vat-to-invoices",
                       "knowledgebase/financial/manage-different-rates-of-tax"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Suppliers",
@@ -283,9 +306,11 @@
                       "knowledgebase/financial/set-a-supplier-as-active-or-inactive",
                       "knowledgebase/financial/view-the-supplier-data-grid",
                       "knowledgebase/financial/export-supplier-data"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Reporting",
@@ -297,7 +322,8 @@
                   "knowledgebase/reporting/sell-by-date-report",
                   "knowledgebase/reporting/set-up-scheduled-reports",
                   "knowledgebase/reporting/remove-a-scheduled-report"
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Integrations & Tools",
@@ -311,7 +337,8 @@
                       "knowledgebase/integrations/sftp-account-assignments",
                       "knowledgebase/integrations/sftp-stock-transfer-file",
                       "knowledgebase/integrations/asn-export"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Webhooks",
@@ -320,7 +347,8 @@
                       "knowledgebase/integrations/validate-a-webhook-request",
                       "knowledgebase/integrations/webhook-stock-positive",
                       "knowledgebase/integrations/webhook-stock-negative"
-                    ]
+                    ],
+                    "public": true
                   },
                   "knowledgebase/integrations/dhl-credentials",
                   {
@@ -337,7 +365,8 @@
                       "knowledgebase/cloud-print/cloud-print-communication",
                       "knowledgebase/cloud-print/cloud-print-network",
                       "knowledgebase/cloud-print/upgrading"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Hardware",
@@ -346,9 +375,11 @@
                       "knowledgebase/hardware/hhd-conditions",
                       "knowledgebase/hardware/hhd-previews-duplication",
                       "knowledgebase/hardware/image-capture"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Advanced Features",
@@ -361,14 +392,16 @@
                   "knowledgebase/advanced/use-templates",
                   "knowledgebase/advanced/dispatch-by-output-qty",
                   "knowledgebase/advanced/convert-by-output-qty"
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Compliance",
                 "pages": [
                   "knowledgebase/security/subprocessors",
                   "knowledgebase/security/database-backup"
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Troubleshooting",
@@ -390,7 +423,8 @@
                   "knowledgebase/troubleshooting/random-logout",
                   "knowledgebase/troubleshooting/login-issues",
                   "knowledgebase/troubleshooting/mfa-issues"
-                ]
+                ],
+                "public": true
               }
             ]
           },
@@ -500,16 +534,19 @@
                       "knowledgebase/nl/security/set-up-mfa",
                       "knowledgebase/nl/security/enable-mfa",
                       "knowledgebase/nl/security/disable-mfa"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Clarus gebruiken",
                 "pages": [
                   "knowledgebase/nl/reporting/customise-data-grids",
                   "knowledgebase/nl/reporting/data-grid-columns"
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Systeeminstellingen",
@@ -529,11 +566,13 @@
                           "knowledgebase/nl/users-and-roles/client-role",
                           "knowledgebase/nl/users-and-roles/financial-role",
                           "knowledgebase/nl/users-and-roles/rf-role"
-                        ]
+                        ],
+                        "public": true
                       },
                       "knowledgebase/nl/users-and-roles/assigning-different-user-views",
                       "knowledgebase/nl/users-and-roles/hhd-user-creation"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Accounts",
@@ -548,7 +587,8 @@
                       "knowledgebase/nl/accounts/reason-codes",
                       "knowledgebase/nl/accounts/use-reason-codes",
                       "knowledgebase/nl/accounts/short-order-lines"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Magazijn Inrichting",
@@ -565,7 +605,8 @@
                           "knowledgebase/nl/warehouse-setup/location-check-digits",
                           "knowledgebase/nl/warehouse-setup/warehouse-map-locations",
                           "knowledgebase/nl/warehouse-setup/create-sequences"
-                        ]
+                        ],
+                        "public": true
                       },
                       {
                         "group": "Opslag",
@@ -574,7 +615,8 @@
                           "knowledgebase/nl/warehouse-setup/storage-unit-types",
                           "knowledgebase/nl/warehouse-setup/warehouse-confined-storage",
                           "knowledgebase/nl/warehouse-setup/loose-stock-storage-units"
-                        ]
+                        ],
+                        "public": true
                       },
                       {
                         "group": "Pickfaces",
@@ -591,15 +633,19 @@
                               "knowledgebase/nl/warehouse-setup/replenishment/demand",
                               "knowledgebase/nl/warehouse-setup/replenishment/combining-strategies",
                               "knowledgebase/nl/warehouse-setup/replenishment/on-hold-picks"
-                            ]
+                            ],
+                            "public": true
                           }
-                        ]
+                        ],
+                        "public": true
                       },
                       "knowledgebase/nl/warehouse-setup/create-carrier",
                       "knowledgebase/nl/warehouse-setup/create-trailer"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Producten & Voorraad",
@@ -623,9 +669,11 @@
                       "knowledgebase/nl/products-and-stock/perform-a-warehouse-transfer",
                       "knowledgebase/nl/products-and-stock/mixed-pallets",
                       "knowledgebase/nl/products-and-stock/merge-split-pallets"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Magazijnoperaties",
@@ -644,7 +692,8 @@
                       "knowledgebase/nl/inbound/cancel-a-receipt",
                       "knowledgebase/nl/inbound/cancel-receive-tasks",
                       "knowledgebase/nl/inbound/goods-in-report"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Outbound",
@@ -657,7 +706,8 @@
                           "knowledgebase/nl/outbound/create-a-sales-order",
                           "knowledgebase/nl/outbound/create-a-sales-order-without-selecting-a-warehouse",
                           "knowledgebase/nl/outbound/amend-order-line-quantities"
-                        ]
+                        ],
+                        "public": true
                       },
                       {
                         "group": "Picken",
@@ -673,7 +723,8 @@
                           "knowledgebase/nl/outbound/consolidated-picking",
                           "knowledgebase/nl/outbound/stock-lines-pick-removal",
                           "knowledgebase/nl/outbound/tally-records"
-                        ]
+                        ],
+                        "public": true
                       },
                       {
                         "group": "Verpakking & Verzending",
@@ -686,11 +737,14 @@
                           "knowledgebase/nl/outbound/ftp-load-dispatch-file",
                           "knowledgebase/nl/outbound/download-an-invoice",
                           "knowledgebase/nl/outbound/download-backups"
-                        ]
+                        ],
+                        "public": true
                       }
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Financieel",
@@ -704,7 +758,8 @@
                       "knowledgebase/nl/financial/charge-period-dates",
                       "knowledgebase/nl/financial/export-charges-to-sage-line-200",
                       "knowledgebase/nl/financial/commercial-invoices"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Facturen",
@@ -719,7 +774,8 @@
                       "knowledgebase/nl/financial/invoice-currencies",
                       "knowledgebase/nl/financial/apply-vat-to-invoices",
                       "knowledgebase/nl/financial/manage-different-rates-of-tax"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Leveranciers",
@@ -730,9 +786,11 @@
                       "knowledgebase/nl/financial/set-a-supplier-as-active-or-inactive",
                       "knowledgebase/nl/financial/view-the-supplier-data-grid",
                       "knowledgebase/nl/financial/export-supplier-data"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Rapportage",
@@ -744,7 +802,8 @@
                   "knowledgebase/nl/reporting/sell-by-date-report",
                   "knowledgebase/nl/reporting/set-up-scheduled-reports",
                   "knowledgebase/nl/reporting/remove-a-scheduled-report"
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Integraties & Tools",
@@ -758,7 +817,8 @@
                       "knowledgebase/nl/integrations/sftp-account-assignments",
                       "knowledgebase/nl/integrations/sftp-stock-transfer-file",
                       "knowledgebase/nl/integrations/asn-export"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Webhooks",
@@ -767,7 +827,8 @@
                       "knowledgebase/nl/integrations/validate-a-webhook-request",
                       "knowledgebase/nl/integrations/webhook-stock-positive",
                       "knowledgebase/nl/integrations/webhook-stock-negative"
-                    ]
+                    ],
+                    "public": true
                   },
                   "knowledgebase/nl/integrations/dhl-credentials",
                   {
@@ -784,7 +845,8 @@
                       "knowledgebase/nl/cloud-print/cloud-print-communication",
                       "knowledgebase/nl/cloud-print/cloud-print-network",
                       "knowledgebase/nl/cloud-print/upgrading"
-                    ]
+                    ],
+                    "public": true
                   },
                   {
                     "group": "Hardware",
@@ -792,9 +854,11 @@
                     "pages": [
                       "knowledgebase/nl/hardware/hhd-conditions",
                       "knowledgebase/nl/hardware/hhd-previews-duplication"
-                    ]
+                    ],
+                    "public": true
                   }
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Geavanceerde Functies",
@@ -806,14 +870,16 @@
                   "knowledgebase/nl/advanced/use-templates",
                   "knowledgebase/nl/advanced/dispatch-by-output-qty",
                   "knowledgebase/nl/advanced/convert-by-output-qty"
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Compliance",
                 "pages": [
                   "knowledgebase/nl/security/subprocessors",
                   "knowledgebase/nl/security/database-backup"
-                ]
+                ],
+                "public": true
               },
               {
                 "group": "Probleemoplossing",
@@ -835,7 +901,8 @@
                   "knowledgebase/nl/troubleshooting/random-logout",
                   "knowledgebase/nl/troubleshooting/login-issues",
                   "knowledgebase/nl/troubleshooting/mfa-issues"
-                ]
+                ],
+                "public": true
               }
             ]
           }
