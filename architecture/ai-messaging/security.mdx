@@ -1,0 +1,31 @@
+---
+title: 'Security & Trust'
+description: "The signature schemes, service authentication, and tenant isolation that secure AI Messaging end to end"
+icon: 'shield-halved'
+---
+
+AI Messaging sits between public chat platforms and a cross-account AI runtime, so its trust model is layered: **prove every inbound request is genuine**, **authenticate to the agent and gateway as a scoped service**, and **isolate tenants in the database** as a last line of defence.
+
+## Inbound signatures
+
+Every request that enters the relay is signed; nothing is trusted on the strength of its source. All three schemes use an HMAC with a timing-safe comparison, and the inbound webhook schemes reject stale timestamps to block replay.
+
+| Caller | Verified by | Secret |
+|---|---|---|
+| **Slack** | Receiver / Install | Slack app signing secret |
+| **WhatsApp (Meta)** | Receiver | Meta app secret |
+| **Agent runtime** | Alerts | A secret shared between the runtime and the relay |
+
+The Alerts secret is shared with the agent-runtime account because the runtime calls the relay across an account boundary where AWS-native auth doesn't reach.
+
+## Service authentication
+
+When the relay calls *out* — to the agent runtime or the GraphQL gateway — it authenticates as a **Cognito client-credentials** service account. It obtains a token, caches it in-memory across invocations, and refreshes it before expiry, then presents it as a bearer credential to the agent runtime and to the subgraph through the gateway. The runtime authorises the call from that token rather than from AWS credentials.
+
+## Tenant isolation
+
+Tenant isolation is enforced in Postgres itself, so an application-layer mistake can't leak across tenants. The [subgraph](/architecture/ai-messaging/subgraph) uses the platform-standard [Row-Level Security](/architecture/gateway/postgraphile-subgraph#tenant-isolation-row-level-security) approach, and the only cross-tenant read path — the routing-lookup functions used before a tenant is known — returns just a subdomain, never row data. The subgraph trusts the tenant header forwarded by the [Apollo Router](/architecture/gateway/postgraphile-subgraph#trust-model), which is only reachable from the gateway; it never validates tokens itself.
+
+## Secrets
+
+Secrets are held in managed AWS secret stores and read at runtime — never baked into code or container images. Per-workspace bot tokens are written only by the onboarding flow, which is the sole component permitted to create them.

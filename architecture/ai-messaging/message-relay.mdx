@@ -1,0 +1,93 @@
+---
+title: 'Message Relay'
+description: "The asynchronous Receiver → SQS → Processor pipeline that carries a chat message to the agent runtime and back"
+icon: 'paper-plane'
+---
+
+The relay is the core of AI Messaging: it turns an inbound chat webhook into an agent invocation and posts the answer back. It is deliberately **asynchronous** — a thin Receiver that responds instantly, an SQS queue, and a Processor that does the slow work — because chat platforms expect a webhook acknowledgement within a few seconds while an agent turn can take much longer.
+
+## Why two Lambdas and a queue
+
+Slack requires a `200` response to an event webhook within **3 seconds**, or it retries and eventually disables the integration. An agent turn — model reasoning plus tool calls against the WMS — routinely exceeds that. Splitting receive from process means:
+
+- The **Receiver** does only signature verification, parsing, and an enqueue, then returns `200` immediately.
+- The **Processor** runs on its own clock, invoking the agent and posting back without any webhook deadline.
+- Traffic spikes are absorbed by the queue, and failures are retried and eventually parked in a dead-letter queue rather than lost.
+
+<Frame>
+  <img src="/images/diagrams/ai-messaging-relay-flow.drawio.svg" alt="AI Messaging — message relay flow" zoom />
+</Frame>
+
+<sub><a href="/images/diagrams/ai-messaging-relay-flow.drawio.svg" download="ai-messaging-relay-flow.drawio.svg">Download SVG</a> · <a href="/images/diagrams/ai-messaging-relay-flow.drawio" download="ai-messaging-relay-flow.drawio">Download draw.io source</a></sub>
+
+## Receiver
+
+The Receiver is exposed through a Lambda **Function URL** and dispatches by request path — Slack and WhatsApp each have their own route. Both follow the same shape — **verify, parse, enrich, queue** — and both apply Slack's 3-second budget even though Meta is more forgiving.
+
+| Step | Slack | WhatsApp |
+|---|---|---|
+| **Verify** | Request-signature HMAC, with a short replay window | Webhook-signature HMAC; a `GET` handshake answers the subscribe challenge |
+| **Parse** | Platform event → normalised envelope | Platform event → normalised envelope |
+| **Enrich** | — | Directory gate: resolve the sender/group to a tenant; classify system events (joins/leaves) |
+| **Queue** | Enqueue with `platform` + `workspace_id` attributes | same |
+
+The normalised envelope is the contract between Receiver and Processor. A standard message carries the platform, workspace, channel, user, text, and thread/message identifiers; side-channel events (an unauthorised WhatsApp DM, a group join/leave) carry a `kind` and a metadata block instead.
+
+<Note>
+The Receiver never talks to the agent and never holds a tenant's bot token — it only verifies the request and enqueues it. All the privileged work happens in the Processor.
+</Note>
+
+## Queue
+
+A standard SQS queue sits between the two Lambdas, with a visibility timeout matched to the Processor's runtime so a message isn't redelivered while still being worked. After a small number of failed receives a message is moved to a **dead-letter queue** (retained for inspection), and the Processor consumes one message at a time.
+
+## Processor
+
+The Processor is triggered by the queue. It branches on the envelope's `kind`:
+
+- **A standard message** → the full agent flow below.
+- **Side-channel events** (unauthorised DM, group join, group leave) → WhatsApp handlers that reply, authorise a group, or mark a group removed without ever invoking the agent.
+
+### The agent message flow
+
+<Steps>
+  <Step title="Resolve the workspace">
+    The Processor fetches the tenant's row from the [AI Messaging subgraph](/architecture/ai-messaging/subgraph): its subdomain, default model, default agent, and (for Slack) where the bot token lives.
+  </Step>
+  <Step title="Acknowledge in-chat">
+    A "thinking" reaction is added to the user's message so they can see the bot is working; it is removed whatever the outcome.
+  </Step>
+  <Step title="Authenticate as a service">
+    A Cognito **client-credentials** token is obtained (and cached in-memory between invocations). This is the same kind of token a user carries — the relay just obtains it as a service account.
+  </Step>
+  <Step title="Derive the session id">
+    The conversation is keyed by a **deterministic** session id (see below) so every message in a thread maps to the same agent session.
+  </Step>
+  <Step title="Invoke the agent runtime">
+    The Processor calls the agent runtime over HTTPS with the token and the prompt; the streamed response is collected into a single text answer.
+  </Step>
+  <Step title="Post back">
+    The answer is posted into the thread; on error a friendly fallback message is posted instead, and the failure is logged.
+  </Step>
+</Steps>
+
+### Deterministic session ids
+
+The Processor derives the agent session id from a hash of the platform, workspace, channel, and thread:
+
+```
+sha256( "{platform}:{workspace}:{channel}:{thread}" )
+```
+
+The platform prefix prevents Slack/WhatsApp collisions when both target the same subdomain, and the hash is stable across Lambda cold starts and redeploys — so a thread's conversational context survives in the agent runtime regardless of which Lambda instance handles the next message. There is no session state stored in the relay itself.
+
+### Invoking the agent runtime
+
+The Processor calls the agent runtime's data plane directly over HTTPS — the runtime uses a custom token authorizer (not AWS request signing). On each call it sends:
+
+- The Cognito service token as a bearer credential.
+- A **session id** header so the runtime threads the conversation.
+- A **subdomain** header telling the runtime which tenant to operate as, and a **workspace** header so the agent's notify tool knows where to post back (see [Notifications](/architecture/ai-messaging/notifications)).
+- A body with the prompt, the workspace's default `model` (`sonnet` / `haiku` / `opus`), and an optional custom `agent`.
+
+The runtime lives in a different AWS account per environment; the call is authorised by the service token. The response is a stream of text deltas that the Processor collects, with a timeout so a stuck turn can't hold the Lambda open indefinitely.

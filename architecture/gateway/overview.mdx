@@ -1,15 +1,15 @@
 ---
-title: 'Federated GraphQL Overview'
-description: "How ClarusWMS exposes a single GraphQL surface composed from independent subgraphs running in separate AWS accounts"
+title: 'Gateway Overview'
+description: "How ClarusWMS exposes a single, federated GraphQL surface composed from independent subgraphs running in separate AWS accounts"
 icon: 'diagram-project'
 ---
 
-ClarusWMS operates a federated GraphQL gateway built on **[Apollo Router](https://www.apollographql.com/docs/router)**. Clients send a single GraphQL request to one public endpoint; the router resolves each field against the subgraph that owns it and composes the result. Subgraphs run in their own AWS accounts and are reached over **cross-account AWS PrivateLink**.
+The Gateway is ClarusWMS's **federated GraphQL** layer, built on **[Apollo Router](https://www.apollographql.com/docs/router)**. Clients send a single GraphQL request to one public endpoint; the router resolves each field against the subgraph that owns it and composes the result. Subgraphs run in their own AWS accounts and are reached over **cross-account AWS PrivateLink**.
 
-The federated subgraphs are built from a shared **[PostGraphile](https://www.graphile.org/postgraphile/) stack**, each exposing a Federation v2 schema derived from a Postgres database. The architecture is built to take additional subgraphs without changes to the router image or runtime configuration.
+A subgraph can be **any service that exposes an Apollo Federation v2 schema** — the gateway doesn't care what's behind it. Today every ClarusWMS subgraph happens to be built from a shared **[PostGraphile](https://www.graphile.org/postgraphile/) stack** (which auto-generates its schema from a Postgres database), but the architecture takes any Federation v2 service — in any language or framework — without changes to the router image or runtime configuration.
 
 <Note>
-The federation infrastructure spans three repositories: **ClarusWMS_Gateway** contains the Apollo Router image and configuration, **ClarusWMS_Agents** contains the PostGraphile subgraph code and SDL metadata, and **ClarusWMS_OPS** contains the Terraform that wires both into AWS, the build pipelines, and the network path between them.
+The federation infrastructure spans several repositories: **ClarusWMS_Gateway** holds the Apollo Router image and configuration; each subgraph's code and SDL metadata live in its own service repo (for example **ClarusWMS_Agents** and **ClarusWMS_AI_Messaging**); and **ClarusWMS_OPS** holds the Terraform that wires them into AWS, the build pipelines, and the network path between them.
 </Note>
 
 <Info>
@@ -96,25 +96,19 @@ Each subgraph lives in its own AWS account (or shares one if appropriate). The g
 ## Explore the architecture
 
 <CardGroup cols={3}>
-  <Card title="Gateway Account" icon="route" href="/architecture/federated-graphql/gateway">
+  <Card title="Gateway Architecture" icon="route" href="/architecture/gateway/architecture">
     Apollo Router, ALB, Cognito JWT validation, GraphOS connection
   </Card>
-  <Card title="PostGraphile Subgraphs" icon="layer-group" href="/architecture/federated-graphql/postgraphile-subgraph">
+  <Card title="PostGraphile Subgraphs" icon="layer-group" href="/architecture/gateway/postgraphile-subgraph">
     The reusable stack: ECS service, federation package, RDS, Row-Level Security, trust model
   </Card>
-  <Card title="Agents Subgraph" icon="database" href="/architecture/federated-graphql/agents-subgraph">
-    The agents database, with scope-gated cost fields
-  </Card>
-  <Card title="AI Messaging Subgraph" icon="comments" href="/architecture/ai-messaging/subgraph">
-    The `ai_messaging` schema behind the messaging relay
-  </Card>
-  <Card title="Cross-Account Network" icon="network-wired" href="/architecture/federated-graphql/network">
+  <Card title="Cross-Account Network" icon="network-wired" href="/architecture/gateway/network">
     AWS PrivateLink, VPC Endpoint Services, security group layout
   </Card>
-  <Card title="Publish Pipeline" icon="cloud-arrow-up" href="/architecture/federated-graphql/publish-pipeline">
+  <Card title="Publish Pipeline" icon="cloud-arrow-up" href="/architecture/gateway/publish-pipeline">
     Introspect + publish flow, managed federation via Apollo Uplink
   </Card>
-  <Card title="Adding a Subgraph" icon="circle-plus" href="/architecture/federated-graphql/adding-a-subgraph">
+  <Card title="Adding a Subgraph" icon="circle-plus" href="/architecture/gateway/adding-a-subgraph">
     What needs to exist for a new subgraph to join the supergraph
   </Card>
 </CardGroup>

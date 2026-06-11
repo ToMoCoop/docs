@@ -1,0 +1,43 @@
+---
+title: 'Notifications'
+description: "The agent-initiated alerts channel — how the agent runtime pushes messages back into chat through the Alerts Lambda"
+icon: 'bell'
+---
+
+Most of AI Messaging is **pull**: a user asks, the agent answers. The **Alerts** Lambda is the **push** direction — it lets the agent runtime post a message into a chat destination on its own initiative (e.g. "low stock on SKU ABC123") without a user prompt in flight.
+
+Because the agent runtime lives in a **different AWS account**, the Alerts Lambda is exposed on a public Function URL and authenticates every request with a **shared-secret HMAC** rather than AWS-native auth.
+
+## Endpoints
+
+The Lambda accepts `POST` only and selects the operation by path:
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /notify` | Post a message to a workspace audience |
+| `POST /destinations` | Discovery: list every integration connected to a tenant |
+
+### `/notify`
+
+The agent calls `/notify` when it wants to send a message. The Lambda verifies the signature, resolves the workspace, resolves the **target** — a named audience like `ops`, or `default` — into a concrete platform, destination, and bot token, then dispatches through the same platform notify path the relay uses. Platform errors (e.g. "not in channel", "missing scope") are surfaced back to the agent so it gets actionable feedback rather than a generic failure.
+
+### `/destinations`
+
+The agent knows its tenant subdomain from its own context, but not which specific channels exist. `/destinations` returns every integration for the subdomain — connected platforms, description, default alert channel, and named audiences — so the agent can choose a target and then call `/notify`.
+
+## Audiences
+
+A workspace's **audiences** map is what turns an abstract target name into a real destination:
+
+```json
+{
+  "ops":     { "primary": "slack", "dests": { "slack": "#ops-alerts" } },
+  "default": { "primary": "slack", "dests": { "slack": "#general" } }
+}
+```
+
+Resolving a target picks the audience, chooses the platform (the caller's hint or the audience's `primary`), and returns the destination plus the bot token for that platform. The `default` audience is written automatically at install time from the alert channel the customer supplies, so a freshly installed workspace can receive alerts without any extra configuration.
+
+## Trust
+
+`/notify` and `/destinations` are signed exactly like the inbound webhooks, but with a secret **shared between the agent runtime and the relay**: the runtime signs each request with an HMAC over a timestamp and body, and the Alerts Lambda rejects anything that doesn't verify. See [Security](/architecture/ai-messaging/security) for how this sits alongside the Slack and WhatsApp signature schemes.

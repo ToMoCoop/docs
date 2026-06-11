@@ -1,0 +1,28 @@
+---
+title: 'Infrastructure'
+description: "The relay's runtime components — the Lambdas and the message queue that carry a chat message to the agent and back"
+icon: 'server'
+---
+
+The relay's AWS resources are defined as Terraform in **ClarusWMS_OPS**, one environment per AWS account, all in **eu-west-2**. At an architectural level it is a small, stateless set of components: four Lambdas and a queue. (The [subgraph](/architecture/ai-messaging/subgraph) is the only stateful part, and it runs on the shared [PostGraphile stack](/architecture/gateway/postgraphile-subgraph).)
+
+## Lambdas
+
+Four Node.js Lambdas, each kept deliberately small:
+
+| Lambda | Trigger | Purpose |
+|---|---|---|
+| **Receiver** | Function URL | Verify the inbound webhook and enqueue it |
+| **Processor** | SQS | Resolve the tenant, invoke the agent, post the reply |
+| **Install** | Function URL | Slack/WhatsApp onboarding and directory admin |
+| **Alerts** | Function URL | Agent-initiated [notifications](/architecture/ai-messaging/notifications) |
+
+The Function URLs don't use AWS-native authorization — callers (Slack, Meta, and the cross-account agent runtime) can't present AWS credentials, so each function authenticates requests with an application-level **signature** instead. See [Security](/architecture/ai-messaging/security).
+
+## Queue
+
+A standard SQS queue decouples the Receiver from the Processor. Its visibility timeout is matched to the Processor's runtime, the Processor consumes one message at a time, and messages that fail repeatedly are moved to a **dead-letter queue** for inspection rather than being lost. This is what lets the Receiver acknowledge Slack within its 3-second budget while agent turns take as long as they need — see [Message Relay](/architecture/ai-messaging/message-relay).
+
+## Deployment
+
+Application code is built and shipped by the shared ClarusWMS pipeline, not by Terraform — Terraform provisions the Lambdas with placeholder code and leaves the running code to the pipeline, so application releases never require an infrastructure change. The relay's Lambda bundles and the subgraph's container image and migrations are all deployed this way. See [Deployment](/architecture/deployment/index) for the cross-account build-and-release model.

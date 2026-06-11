@@ -1,0 +1,28 @@
+---
+title: 'WhatsApp'
+description: "How WhatsApp is wired into the relay via the Meta Cloud API, and why it relies on a phone/group directory"
+icon: 'whatsapp'
+---
+
+WhatsApp is integrated via the **Meta Cloud API**. It is more involved than [Slack](/architecture/ai-messaging/platforms/slack) because the bot phone number is **shared across all tenants** — there is no platform-issued workspace id — so the relay relies on a phone/group **directory** to decide which tenant a message belongs to.
+
+WhatsApp is gated behind a feature flag, so it can be enabled per environment.
+
+## Messaging
+
+- **Signature** — webhooks are verified with an HMAC against the Meta app secret; the subscribe handshake is answered with a configured verify token.
+- **Direct messages** — the sender's phone number is looked up in the directory. An unknown sender produces a side-channel "unauthorised DM" event (the relay replies politely and stops) rather than reaching the agent.
+- **Group messages** — the group must be an authorised group; the bot only operates in groups a known user has invited it into.
+- **System events** — group joins and leaves are classified into side-channel events: a join by a recognised user authorises the group, while an unrecognised inviter makes the bot announce itself and leave.
+- **Token** — a single global access token is used for all Cloud API calls; there is no per-tenant token.
+
+## The directory
+
+Because the bot phone is shared, two directory concepts link a WhatsApp identity to a tenant:
+
+- **Authorised users** — a directory of phone numbers (normalised to E.164), each owned by exactly one subdomain. A number can't belong to two tenants.
+- **Authorised groups** — groups the bot has been invited into by a known user, mapped to that user's subdomain.
+
+## Install &amp; onboarding
+
+The **Install** Lambda also serves WhatsApp onboarding and a directory admin view. First install records the installer as a directory user and creates the workspace record (keyed on the subdomain, since there is no Slack-style team id). The admin view lets an operator add, enable/disable, and remove authorised numbers for a subdomain.

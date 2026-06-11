@@ -1,0 +1,48 @@
+---
+title: 'AI Messaging Subgraph'
+description: "The ai_messaging schema exposed as a federated GraphQL subgraph, and how the relay reads and writes tenant configuration"
+icon: 'database'
+---
+
+AI Messaging's configuration — which workspaces are installed, which phone numbers are authorised, which WhatsApp groups the bot operates in — lives in a Postgres database (the **`ai_messaging` schema**) exposed as a federated GraphQL subgraph. The relay Lambdas never touch Postgres directly: they call the subgraph through the [Apollo Router](/architecture/gateway/overview), and the subgraph enforces tenant isolation in the database.
+
+<Note>
+The subgraph runs on the shared **[PostGraphile stack](/architecture/gateway/postgraphile-subgraph)** — the ECS service, federation package, database, and federation network are all common. This page covers what's **specific to AI Messaging**: the `ai_messaging` schema, its routing-lookup functions, and how it's exposed.
+</Note>
+
+## What the schema holds
+
+The `ai_messaging` schema is small and tenant-scoped. At a high level it holds three kinds of record (the exact columns evolve with the application, so they aren't reproduced here):
+
+- **Workspaces** — one per chat-platform install (a Slack team, or a WhatsApp tenant marker), carrying the tenant's defaults and per-platform install state.
+- **Authorised users** — the cross-platform directory of phone numbers permitted to message the bot (primarily WhatsApp).
+- **Authorised groups** — the WhatsApp groups the bot is allowed to operate in.
+
+PostGraphile generates the GraphQL surface directly from these tables, so the API tracks the schema automatically.
+
+## Tenant isolation
+
+The subgraph uses the platform-standard **[Row-Level Security](/architecture/gateway/postgraphile-subgraph#tenant-isolation-row-level-security)** approach: a single `ai_messaging` schema where every table is scoped to a tenant and Postgres enforces, in the database, that a connection only ever sees its own tenant's rows. The subgraph sets the active tenant per request from the validated subdomain; the rest is handled by the shared stack.
+
+## Routing-lookup functions
+
+The relay's webhook entry points hit a chicken-and-egg problem: they need to know **which tenant** a Slack team, phone number, or group belongs to *before* the request carries any tenant context — but tenant isolation hides exactly that mapping until a tenant is set.
+
+A small set of dedicated lookup functions solves it. Each takes one identifier and returns **only the owning subdomain** — never row data:
+
+| Lookup | Resolves |
+|---|---|
+| Workspace lookup | Slack team / WhatsApp marker → subdomain |
+| User lookup | phone number → subdomain |
+| Group lookup | WhatsApp group → subdomain |
+
+These run with elevated rights so a pre-auth webhook can resolve its tenant, but they deliberately expose nothing beyond the subdomain. The relay then re-queries normally with that tenant set, so all actual data access stays tenant-isolated. A separate atomic upsert (used by the install flow) runs as the caller, so install and edit are a single round-trip.
+
+## How it's exposed
+
+The subgraph exposes PostGraphile's generated queries and mutations plus the lookup functions, wrapped as a federated subgraph by the shared [federation package](/architecture/gateway/postgraphile-subgraph#federation-package). How it's reached differs by environment:
+
+| Environment | Exposure |
+|---|---|
+| **develop** | A direct GraphQL endpoint behind a Cognito-authorised API Gateway — convenient for direct queries |
+| **staging / production** | Federated into the gateway's Apollo Router and reached only through it |

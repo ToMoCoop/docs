@@ -1,0 +1,108 @@
+---
+title: 'PostGraphile Subgraphs'
+description: "The reusable PostGraphile-on-Fargate stack that turns a Postgres database into a federated subgraph — shared across ClarusWMS subgraphs"
+icon: 'layer-group'
+---
+
+Federation places no constraint on how a subgraph is built — it only has to surface an Apollo Federation v2 schema, in any language or framework. Today ClarusWMS standardises on a **shared [PostGraphile](https://www.graphile.org/postgraphile/) stack**, described on this page: a service that auto-generates a Federation v2 schema from a Postgres database, fronted by an internal load balancer and reached by the [gateway](/architecture/gateway/architecture) over cross-account PrivateLink. Tables become GraphQL types, foreign keys become connections, and Postgres comments become field descriptions — so the federated surface grows by running a migration, not by writing resolver code.
+
+This page documents the parts that are **identical across subgraphs**. Each subgraph adds only its own container image, database schema, and any scope restrictions on top:
+
+<CardGroup cols={2}>
+  <Card title="Agents Subgraph" icon="database" href="/architecture/agents/subgraph">
+    The agents database, with scope-gated cost fields
+  </Card>
+  <Card title="AI Messaging Subgraph" icon="comments" href="/architecture/ai-messaging/subgraph">
+    The `ai_messaging` schema behind the messaging relay
+  </Card>
+</CardGroup>
+
+<Note>
+The stack lives in two reusable Terraform modules in **ClarusWMS_OPS**: one for the runtime (ECS, database, migrations) and one for the network seam (load balancer, VPC Endpoint Service, introspect job). A subgraph module calls both, supplies its image and database config, and inherits everything described here. See [Adding a Subgraph](/architecture/gateway/adding-a-subgraph) for the practical wiring.
+</Note>
+
+## Anatomy of a subgraph
+
+<Frame>
+  <img src="/images/diagrams/postgraphile-subgraph-anatomy.drawio.svg" alt="PostGraphile subgraph — reusable stack anatomy" zoom />
+</Frame>
+
+<sub><a href="/images/diagrams/postgraphile-subgraph-anatomy.drawio.svg" download="postgraphile-subgraph-anatomy.drawio.svg">Download SVG</a> · <a href="/images/diagrams/postgraphile-subgraph-anatomy.drawio" download="postgraphile-subgraph-anatomy.drawio">Download draw.io source</a></sub>
+
+A subgraph is made of:
+
+- **A PostGraphile service** on ECS Fargate, listening on its container port with a health check. A thin server wraps PostGraphile with the [federation package](#federation-package) and the per-request [tenant scoping](#tenant-isolation-row-level-security), and connects to its database over verify-full TLS.
+- **A Postgres database** (RDS), private and encrypted, reachable only from the service and the migration job.
+- **An internal load balancer and a VPC Endpoint Service**, which expose the service to the gateway account over AWS PrivateLink — the only path in. The gateway account is the sole allowed principal. The wider cross-account path is described on the [Network](/architecture/gateway/network) page.
+- **Migrate and introspect jobs** (see below).
+
+### Migrate and introspect CodeBuild
+
+Two build jobs run as part of the subgraph's pipeline:
+
+| Job | Runs | Does |
+|---|---|---|
+| **Migrate** | Before deploy | Applies [Flyway](https://flywaydb.org/) migrations to the database. |
+| **Introspect** | After deploy | Pulls the live `_service { sdl }` from the running service and emits the SDL as a pipeline artifact for the [publish stage](/architecture/gateway/publish-pipeline). |
+
+Both run on the inside of the subgraph's network because the database and the service are only reachable internally.
+
+## Federation package
+
+Subgraphs are made federation-aware by a **shared package** (`@clarus/postgraphile-federation`) used by every PostGraphile subgraph, so federation behaviour is identical and maintained in one place rather than copied per repo. It:
+
+- Wraps the PostGraphile-generated schema as an **Apollo Federation v2** subgraph, adding the `_service { sdl }` field the router composes from. The federation field is added **during** PostGraphile's own schema build, so PostGraphile's metadata — and its connection resolvers — stay intact. (Reconstructing the schema afterwards drops that metadata and breaks those resolvers, which is why the in-build approach is used.)
+- Emits Federation v2 markup: **`@shareable`** on the Relay scaffolding that's identical across subgraphs, and **`@requiresScopes`** to gate fields behind Apollo Router scopes.
+- Supports per-subgraph **scope restrictions**: a subgraph supplies bindings that map a required scope to specific types and fields, so sensitive data is only returned to callers whose token carries that scope. The agents subgraph uses this to gate its cost-economics fields; a subgraph that needs no gating supplies no bindings.
+
+The published SDL is the standard PostGraphile schema plus the federation markup, and it's the same SDL the introspect job publishes to GraphOS.
+
+<Tip>
+Because the schema is generated from the database, **adding a table via the migrate pipeline automatically expands the federated surface** — no application code changes, no resolver wiring. The cost is that the database is the contract: column comments, constraints, and naming all surface directly in GraphQL.
+</Tip>
+
+## Tenant isolation (Row-Level Security)
+
+ClarusWMS subgraphs isolate tenants with **Postgres Row-Level Security (RLS)** rather than a schema or database per tenant. All tenant data lives in one schema, and the database — not the application — guarantees a connection only ever sees its own tenant's rows:
+
+- Every tenant-scoped table has a `subdomain` column that **defaults from a per-connection session setting** (`app.current_subdomain`), so application code never sets it explicitly.
+- An RLS policy restricts both reads and writes to rows whose `subdomain` matches that setting — a connection can't even insert a row naming another tenant.
+- RLS is **forced for the table owner too**, so the role the service connects as is also subject to it.
+- The service sets the active tenant **once per request, inside a transaction**, from a validated subdomain header. With no tenant set, the setting resolves to null and tenant rows are simply invisible.
+
+Both the agents and AI Messaging subgraphs use this identical pattern — they differ only in which schema holds the data. The same approach is the default for new subgraphs.
+
+## Trust model
+
+A PostGraphile subgraph does **not** validate Cognito JWTs itself. Trust is enforced at the network layer: the only way to reach the service is through the gateway account's PrivateLink endpoint, and the gateway's [Apollo Router](/architecture/gateway/architecture) validates tokens at the edge and forwards a fixed set of headers. The headers a subgraph reads:
+
+| Header | Source | Trust |
+|---|---|---|
+| `x-user-sub` | Router inserts from the verified token's `sub` claim | Token-signed; unauthenticated traffic already rejected at the gateway |
+| `x-user-email` | Router inserts from the token's `email` claim | Token-signed |
+| `x-cognito-groups` | Router inserts from the token's groups claim | Token-signed |
+| `x-clarus-subdomain` | Router propagates from the inbound request | Validated by the subgraph (format + tenant-exists check) |
+| `x-request-id` | Router propagates from the inbound request | Trace correlation only, not used for auth |
+
+Because the network path is constrained to the gateway's endpoint, headers can't be forged by an external client.
+
+## Per-environment error visibility
+
+How much detail leaves a subgraph is configured per environment: lower environments return stack traces, the SQL query log, and rich error extensions to make debugging easy, while production returns only an error code. The gateway has a matching control over whether subgraph error messages reach the client — see the [Gateway](/architecture/gateway/architecture#per-environment-error-visibility) page.
+
+## What each subgraph supplies
+
+Everything above is shared. A concrete subgraph provides only:
+
+- **A container image** — its own server and Dockerfile (both built on the shared federation package).
+- **A database schema** — its Flyway migrations and the schema PostGraphile introspects.
+- **Any scope restrictions** — the bindings that gate sensitive fields, if it has any.
+
+<CardGroup cols={2}>
+  <Card title="Agents Subgraph" icon="database" href="/architecture/agents/subgraph">
+    The agents database, with scope-gated cost fields
+  </Card>
+  <Card title="AI Messaging Subgraph" icon="comments" href="/architecture/ai-messaging/subgraph">
+    The `ai_messaging` schema behind the messaging relay
+  </Card>
+</CardGroup>

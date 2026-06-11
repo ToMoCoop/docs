@@ -1,10 +1,10 @@
 ---
-title: 'Gateway Account'
+title: 'Gateway Architecture'
 description: "Apollo Router, ALB, Cognito JWT validation, and the connection to Apollo GraphOS"
 icon: 'route'
 ---
 
-The **gateway account** holds the single federated GraphQL endpoint that all clients connect to. Apollo Router runs as an ECS Fargate task behind a public ALB, validates Cognito JWTs at the edge, and federates queries to subgraphs over cross-account PrivateLink.
+The **Gateway** is the single federated GraphQL endpoint that all clients connect to, hosted in its own AWS account. Apollo Router runs as an ECS Fargate task behind a public ALB, validates Cognito JWTs at the edge, and federates queries to subgraphs over cross-account PrivateLink.
 
 ## Account architecture
 
@@ -20,7 +20,7 @@ The **gateway account** holds the single federated GraphQL endpoint that all cli
 
 | | |
 |---|---|
-| **Hostname** | `gateway.<domain>` (e.g. `gateway.clarus-api-staging.com`) |
+| **Hostname** | `gateway.<domain>` (e.g. `gateway.example.com`) |
 | **Certificate** | ACM, DNS-validated against the workspace's Route53 zone |
 | **DNS** | Route53 A-record alias from `gateway.<domain>` to the ALB |
 | **Listener** | HTTPS / 443 → target group on TCP 4000 |
@@ -49,7 +49,7 @@ The router is configured by `router.yaml` baked into the Docker image. Key block
 | `supergraph` | Listens on `0.0.0.0:4000` with `path: /graphql`. The public endpoint is `https://gateway.<domain>/graphql`. Aligns with the org convention (Ruby API on `/graphql`, PostGraphile subgraph on `/graphql`) and matches what every standard GraphQL tool expects. |
 | `supergraph.introspection: false` | GraphQL introspection disabled on the public endpoint |
 | `health_check` | Exposes `/health` on port 4000 for ALB health checks |
-| `cors` | Allow-list for browser clients. Permits the `X-Clarus-Subdomain` header on preflight (the frontend sends it on every request); origins matched against the clarus root domains |
+| `cors` | Allow-list for browser clients. Permits the `X-Clarus-Subdomain` header on preflight (the AI App sends it on every request); origins matched against the clarus root domains |
 | `authentication.router.jwt` | Validates the `Authorization: Bearer …` header against the Cognito user pool's JWKS |
 | `headers.subgraphs.<name>.request` | Forwards an explicit set of headers to each subgraph (see [Subgraph header propagation](#subgraph-header-propagation)) |
 | `include_subgraph_errors` | Controlled per-environment via `INCLUDE_SUBGRAPH_ERRORS`. See [Per-environment error visibility](#per-environment-error-visibility). |
@@ -74,11 +74,11 @@ For each subgraph, the router forwards a fixed set of headers on the outbound su
 
 The three `insert.from_context` headers come from claims the router has already validated against the Cognito JWKS, so subgraphs can trust them as authoritative without re-verifying.
 
-`x-clarus-subdomain` is currently propagated from the client request — the active tenant is whatever the client sends, validated downstream by the subgraph (format and tenant-exists checks). See the [PostGraphile subgraph trust model](/architecture/federated-graphql/postgraphile-subgraph#trust-model) for the downstream side.
+`x-clarus-subdomain` is currently propagated from the client request — the active tenant is whatever the client sends, validated downstream by the subgraph (format and tenant-exists checks). See the [PostGraphile subgraph trust model](/architecture/gateway/postgraphile-subgraph#trust-model) for the downstream side.
 
 ### Cognito JWT validation
 
-The router validates JWTs against the JWKS endpoint of the Cognito user pool that already serves the ClarusWMS frontend and API:
+The router validates JWTs against the JWKS endpoint of the Cognito user pool that already serves the ClarusWMS platform:
 
 ```
 https://cognito-idp.<region>.amazonaws.com/<user-pool-id>/.well-known/jwks.json
@@ -101,7 +101,7 @@ The router has a persistent outbound connection to **Apollo GraphOS Uplink** (ov
 
 For each federated subgraph, the gateway account holds a VPC Interface Endpoint pointing at that subgraph's VPC Endpoint Service. Adding a new subgraph creates a new endpoint here without any other gateway-side changes.
 
-See the [Cross-Account Network](/architecture/federated-graphql/network) page for the full PrivateLink topology.
+See the [Cross-Account Network](/architecture/gateway/network) page for the full PrivateLink topology.
 
 ### Egress
 
@@ -127,15 +127,4 @@ The env var is set on the apollo-router task from `include_subgraph_errors` in t
 | `staging` | `true` | Subgraph error messages flow through to clients — used for debugging |
 | `production` | `false` | Subgraph errors stay redacted at the gateway |
 
-To temporarily expose errors in any environment, flip the flag in tfvars and re-apply the `gateway/` workspace; the task definition revision change rolls a new ECS task generation. The agents subgraph has a matching per-environment knob (`NODE_ENV`) — see the [agents subgraph operations section](/architecture/federated-graphql/agents-subgraph#operations) for the downstream side.
-
-## Secrets
-
-Two secrets are stored in SSM Parameter Store within the gateway account, populated from the gateway secrets tfvars in S3:
-
-| Parameter | Used by |
-|---|---|
-| `/claruswms/gateway/<env>/apollo_key` | Apollo Router task — license + telemetry + Uplink fetch |
-| `/claruswms/gateway/<env>/datadog_api_key` | Datadog Agent sidecar |
-
-Both are referenced by ARN from the task definition's `secrets` block; ECS resolves them at task start.
+To temporarily expose errors in any environment, flip the flag in tfvars and re-apply the `gateway/` workspace; the task definition revision change rolls a new ECS task generation. The agents subgraph has a matching per-environment knob (`NODE_ENV`) — see the [agents subgraph operations section](/architecture/agents/subgraph#operations) for the downstream side.

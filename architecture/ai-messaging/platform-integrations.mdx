@@ -1,0 +1,36 @@
+---
+title: 'Platform Integrations'
+description: "The platform abstraction that keeps chat platforms interchangeable, and where Slack and WhatsApp differ"
+icon: 'plug'
+---
+
+AI Messaging talks to chat platforms through a small **platform abstraction**: each platform implements the same handful of concerns, and the relay is written against that shape — so adding a platform (Teams, email) is a matter of adding an implementation, not rewiring the relay.
+
+Two platforms are live today, each documented on its own page:
+
+<CardGroup cols={2}>
+  <Card title="Slack" icon="slack" href="/architecture/ai-messaging/platforms/slack">
+    Event webhooks, the OAuth install flow, and per-workspace bot tokens
+  </Card>
+  <Card title="WhatsApp" icon="whatsapp" href="/architecture/ai-messaging/platforms/whatsapp">
+    The Meta Cloud API, the phone/group directory, and onboarding
+  </Card>
+</CardGroup>
+
+## The platform abstraction
+
+Each platform provides the same set of operations, and the Receiver and Processor call them without caring which platform is in play:
+
+| Concern | Responsibility |
+|---|---|
+| **Verify** | Validate the inbound webhook signature for this platform |
+| **Parse** | Turn the platform's event shape into the relay's normalised envelope |
+| **Format** | Format an agent answer for the platform (e.g. chunk long messages) |
+| **Respond** | Post messages and reactions back via the platform's API |
+| **Notify** | Post an agent-initiated alert to a destination (used by [Notifications](/architecture/ai-messaging/notifications)) |
+
+The Processor selects the responder by platform and calls the same add-reaction / post-response / post-error methods regardless of which platform a message came from.
+
+## The workspace row
+
+Both platforms converge on a single workspace record per install, persisted through the [AI Messaging subgraph](/architecture/ai-messaging/subgraph). It records the platform type, display name, default model and agent, where the bot token lives (Slack only), per-platform install state, and the named **audiences** used by the alerts flow. How a workspace is resolved — including the routing-lookup functions that let a pre-auth webhook find its tenant — is covered on the [subgraph page](/architecture/ai-messaging/subgraph).

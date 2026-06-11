@@ -1,0 +1,73 @@
+---
+title: 'AI Messaging Overview'
+description: "How ClarusWMS relays chat-platform conversations (Slack, WhatsApp) to the AI agent runtime and posts responses back"
+icon: 'comments'
+---
+
+**AI Messaging** lets warehouse staff talk to the ClarusWMS AI agent from the chat tools they already use — Slack and WhatsApp — instead of the embedded web chat. A user mentions the bot or sends it a message, the agent answers in the same thread, and the agent can also push alerts back into chat on its own initiative.
+
+Alongside the [AI App](/architecture/ai-app/overview), AI Messaging is a **client of the agent runtime**: it authenticates as a service and invokes the runtime exactly as the AI App does, just from a chat webhook instead of a browser. It is built from two largely independent halves:
+
+- **The message relay** — a set of Node.js Lambdas that receive platform webhooks, queue them, invoke the [agent runtime](/architecture/agents/runtime) over HTTPS, and post the reply back to the originating platform.
+- **The AI Messaging subgraph** — a Postgres database (the `ai_messaging` schema) exposed as a federated GraphQL subgraph, holding the workspace, user-directory, and group configuration that the relay reads and writes. It joins the same [Apollo Router](/architecture/gateway/overview) supergraph as the other subgraphs.
+
+<Note>
+AI Messaging spans two repositories: **ClarusWMS_AI_Messaging** holds all application code — the relay Lambdas and the PostGraphile subgraph — while **ClarusWMS_OPS** holds the Terraform that provisions the Lambdas, queue, database, and federation wiring. Application code is shipped by [pipeline](/architecture/deployment/index), not by Terraform.
+</Note>
+
+<Info>
+The agent runtime itself — the Strands Python agent, its tools, and its multi-tenant routing — is documented under [Agents Overview](/architecture/agents/overview). This section covers only the messaging client and its subgraph.
+</Info>
+
+## High-level architecture
+
+<Frame>
+  <img src="/images/diagrams/ai-messaging-overview.drawio.svg" alt="ClarusWMS AI Messaging — high-level architecture" zoom />
+</Frame>
+
+<sub>Click the diagram to zoom and pan. <a href="/images/diagrams/ai-messaging-overview.drawio.svg" download="ai-messaging-overview.drawio.svg">Download SVG</a> · <a href="/images/diagrams/ai-messaging-overview.drawio" download="ai-messaging-overview.drawio">Download draw.io source</a></sub>
+
+A message from Slack or WhatsApp lands on the **Receiver** Lambda, which verifies the platform signature and drops a normalised envelope onto an **SQS queue**. The **Processor** Lambda consumes the queue, resolves which tenant the message belongs to, obtains a service token from Cognito, and invokes the agent runtime. The agent's answer is posted back to the chat thread. Separately, the agent can call the **Alerts** Lambda to push a notification into a configured channel, and the **Install** Lambda handles the Slack/WhatsApp onboarding that provisions a workspace.
+
+## How a Slack message becomes an agent reply
+
+<Steps>
+  <Step title="Webhook received">
+    Slack POSTs an `app_mention` (or DM) event to the Receiver's Function URL. The Receiver verifies the request signature, parses the event into a normalised envelope, and returns `200 OK` — all within Slack's 3-second budget.
+  </Step>
+  <Step title="Queued">
+    The envelope is sent to SQS. Decoupling here means slow agent calls never threaten the webhook SLA, and bursts are absorbed by the queue.
+  </Step>
+  <Step title="Tenant resolved">
+    The Processor resolves the workspace (Slack team → ClarusWMS subdomain, default model) by calling the [AI Messaging subgraph](/architecture/ai-messaging/subgraph) through the gateway.
+  </Step>
+  <Step title="Agent invoked">
+    The Processor fetches a service token, derives a deterministic session id for the thread, adds a "thinking" reaction, and invokes the [agent runtime](/architecture/agents/runtime) over HTTPS with the user's prompt.
+  </Step>
+  <Step title="Reply posted">
+    The agent's response is posted back into the same Slack thread, the reaction is removed, and the conversation continues — the next message in the thread reuses the same agent session.
+  </Step>
+</Steps>
+
+## Explore the architecture
+
+<CardGroup cols={3}>
+  <Card title="Message Relay" icon="paper-plane" href="/architecture/ai-messaging/message-relay">
+    Receiver → SQS → Processor, session continuity, and agent invocation
+  </Card>
+  <Card title="Platform Integrations" icon="plug" href="/architecture/ai-messaging/platform-integrations">
+    The platform abstraction, plus Slack and WhatsApp wiring and onboarding
+  </Card>
+  <Card title="Notifications" icon="bell" href="/architecture/ai-messaging/notifications">
+    The agent-initiated alerts channel and audience resolution
+  </Card>
+  <Card title="Infrastructure" icon="server" href="/architecture/ai-messaging/infrastructure">
+    The relay components — Lambdas and the message queue
+  </Card>
+  <Card title="AI Messaging Subgraph" icon="database" href="/architecture/ai-messaging/subgraph">
+    The `ai_messaging` schema, tenant isolation, and routing-lookup functions
+  </Card>
+  <Card title="Security & Trust" icon="shield-halved" href="/architecture/ai-messaging/security">
+    Signature schemes, service auth, and tenant isolation
+  </Card>
+</CardGroup>

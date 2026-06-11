@@ -422,6 +422,17 @@
             "public": true,
             "groups": [
               {
+                "group": "Gateway",
+                "pages": [
+                  "architecture/gateway/overview",
+                  "architecture/gateway/architecture",
+                  "architecture/gateway/postgraphile-subgraph",
+                  "architecture/gateway/network",
+                  "architecture/gateway/publish-pipeline",
+                  "architecture/gateway/adding-a-subgraph"
+                ]
+              },
+              {
                 "group": "Agents",
                 "pages": [
                   "architecture/agents/overview",
@@ -430,7 +441,8 @@
                   "architecture/agents/runtime",
                   "architecture/agents/authentication",
                   "architecture/agents/tools",
-                  "architecture/agents/sessions"
+                  "architecture/agents/sessions",
+                  "architecture/agents/subgraph"
                 ]
               },
               {
@@ -456,18 +468,6 @@
                   "architecture/ai-messaging/infrastructure",
                   "architecture/ai-messaging/subgraph",
                   "architecture/ai-messaging/security"
-                ]
-              },
-              {
-                "group": "Gateway",
-                "pages": [
-                  "architecture/federated-graphql/overview",
-                  "architecture/federated-graphql/gateway",
-                  "architecture/federated-graphql/postgraphile-subgraph",
-                  "architecture/federated-graphql/agents-subgraph",
-                  "architecture/federated-graphql/network",
-                  "architecture/federated-graphql/publish-pipeline",
-                  "architecture/federated-graphql/adding-a-subgraph"
                 ]
               },
               {

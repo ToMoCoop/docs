@@ -1,0 +1,36 @@
+---
+title: 'Slack'
+description: "How Slack is wired into the relay — events, signature verification, bot tokens, and the OAuth install flow"
+icon: 'slack'
+---
+
+Slack is the primary AI Messaging platform. It delivers events to the relay, and customers onboard their own Slack workspace through a self-service install flow.
+
+## Messaging
+
+Slack sends `app_mention` and direct-message events to the [Receiver](/architecture/ai-messaging/message-relay#receiver):
+
+- **Signature** — every request is verified with an HMAC over the timestamp and body using the app signing secret, with a short replay window and a timing-safe comparison. Slack's one-time URL-verification challenge is echoed back directly.
+- **Bot token** — each workspace has its own bot token, recorded against the workspace and read by the Processor to post replies and toggle reactions.
+- **Scopes** requested at install cover reading mentions and message history, posting messages, and adding reactions.
+
+## Install (OAuth)
+
+The **Install** Lambda serves a self-service onboarding flow over its own Function URL:
+
+<Steps>
+  <Step title="Landing page">
+    The customer enters their ClarusWMS **subdomain**, a default model, an optional agent, an optional alert channel, and a required description (the description helps the agent choose alert destinations later).
+  </Step>
+  <Step title="Redirect to Slack">
+    The inputs are validated and signed into an OAuth `state` value (CSRF protection), and the customer is redirected to Slack's authorization page.
+  </Step>
+  <Step title="OAuth callback">
+    Slack redirects back with an authorization code. The Lambda verifies the `state`, exchanges the code for a bot token, and stores the token for that workspace.
+  </Step>
+  <Step title="Provision the workspace">
+    For a new workspace it persists the configuration via the subgraph and shows a success page. For an existing workspace it refreshes the token and shows a signed **edit page**; the record is only updated when the user submits.
+  </Step>
+</Steps>
+
+Re-running install for an existing workspace is idempotent — the token is refreshed and editable fields are updated without disturbing the rest of the configuration.

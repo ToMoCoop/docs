@@ -6,7 +6,7 @@ icon: 'circle-plus'
 
 The federation infrastructure is designed for additional subgraphs to be added without changes to the Apollo Router image, the router runtime configuration, or Apollo Studio. The work is split between **the subgraph's own application repo**, **the subgraph's OPS infrastructure module**, **the gateway module**, and **the pipelines module**.
 
-This page is a practical guide to the steps you actually carry out. Lower-level mechanics live on the [Gateway](/architecture/federated-graphql/gateway), [Agents Subgraph](/architecture/federated-graphql/agents-subgraph), and [Publish Pipeline](/architecture/federated-graphql/publish-pipeline) pages.
+This page is a practical guide to the steps you actually carry out. Lower-level mechanics live on the [Gateway](/architecture/gateway/architecture), [Agents Subgraph](/architecture/agents/subgraph), and [Publish Pipeline](/architecture/gateway/publish-pipeline) pages.
 
 <Steps>
   <Step title="Make the subgraph speak Federation v2">
@@ -69,7 +69,7 @@ This page is a practical guide to the steps you actually carry out. Lower-level 
     - An SSM parameter recording the resulting endpoint-service name for the gateway to consume.
     - A VPC-configured **introspect CodeBuild project** with an inline buildspec that pulls `_service { sdl }` from the live subgraph and emits the SDL + `subgraph.yaml` as a pipeline artifact.
     - A security group rule on the subgraph's task SG allowing the introspect CodeBuild to reach it on the listener port.
-    - A cross-account `codebuild:StartBuild` policy attached to `PipelinesAccountDeployRole` so the central CodePipeline can invoke the introspect project.
+    - A cross-account `codebuild:StartBuild` policy attached to the central cross-account deploy role so the central CodePipeline can invoke the introspect project.
 
     After applying, two values matter:
 
