@@ -1,0 +1,23 @@
+---
+title: 'Agents Subgraph'
+description: "The agents PostGraphile subgraph — its schema and the scope restrictions on cost-economics fields"
+icon: 'database'
+---
+
+The **agents subgraph** is a [PostGraphile](https://www.graphile.org/postgraphile/) service that exposes a Federation v2 schema auto-generated from the agents Postgres database, federated by the router over cross-account PrivateLink.
+
+<Note>
+The agents subgraph is built on the reusable stack documented in **[PostGraphile Subgraphs](/architecture/gateway/postgraphile-subgraph)** — the ECS service, federation package, database, network seam, and migrate/introspect jobs are all common, as is its [Row-Level Security](/architecture/gateway/postgraphile-subgraph#tenant-isolation-row-level-security) tenant isolation. This page covers only what is **specific to the agents subgraph**: its schema and its scope restrictions.
+</Note>
+
+## Schema
+
+The agents subgraph's tenant data lives in a single schema, isolated per tenant by the shared [Row-Level Security](/architecture/gateway/postgraphile-subgraph#tenant-isolation-row-level-security) approach — every tenant-scoped table is keyed on `subdomain`, defaulted from the per-request session setting and enforced by RLS policies. PostGraphile generates the GraphQL surface directly from the tables, so the federated schema tracks the database.
+
+## Scope restrictions
+
+The agents subgraph is the main user of the federation package's [scope restrictions](/architecture/gateway/postgraphile-subgraph#federation-package). Cost-economics fields — the underlying cost and markup behind an agent interaction — are gated behind a dedicated Apollo Router scope, and a small number of cost-related mutations behind a broader scope. The package marks those fields and mutations with `@requiresScopes`, so the router only resolves them for callers whose token carries the matching scope; everyone else sees the rest of the schema without them.
+
+## Operations
+
+How much error detail the subgraph returns is set per environment, following the shared [per-environment error-visibility](/architecture/gateway/postgraphile-subgraph#per-environment-error-visibility) model.

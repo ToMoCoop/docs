@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 560" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#232F3E"/>
+    </marker>
+    <marker id="ao" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#ED7100"/>
+    </marker>
+    <marker id="ap" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#8C4FFF"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1080" height="560" fill="#FFFFFF"/>
+  <text x="540" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#1D4763">PostGraphile Subgraph — Reusable Stack Anatomy</text>
+
+  <!-- GraphOS -->
+  <rect x="40" y="68" width="170" height="58" rx="7" fill="#FFFFFF" stroke="#4B3FAF" stroke-width="2"/>
+  <text x="125" y="92" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1D3A52">Apollo GraphOS</text>
+  <text x="125" y="110" text-anchor="middle" font-size="10.5" fill="#5A6C86">managed federation</text>
+  <!-- Apollo Router -->
+  <rect x="40" y="236" width="170" height="64" rx="7" fill="#FFFFFF" stroke="#8C4FFF" stroke-width="2"/>
+  <text x="125" y="262" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1D3A52">Apollo Router</text>
+  <text x="125" y="280" text-anchor="middle" font-size="10.5" fill="#5A6C86">gateway account</text>
+
+  <!-- VPC -->
+  <rect x="258" y="60" width="640" height="448" rx="9" fill="none" stroke="#248814" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="270" y="80" font-size="11.5" font-weight="700" fill="#248814">Subgraph</text>
+
+  <!-- public subnet -->
+  <rect x="282" y="96" width="592" height="112" rx="7" fill="#F2F8F0" stroke="#248814" stroke-width="1.2" stroke-dasharray="5 3"/>
+  <text x="292" y="114" font-size="10.5" font-weight="600" fill="#248814">Service</text>
+  <rect x="560" y="126" width="290" height="66" rx="7" fill="#FFFFFF" stroke="#ED7100" stroke-width="2"/>
+  <text x="705" y="150" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1D3A52">PostGraphile + federation plugin</text>
+  <text x="705" y="170" text-anchor="middle" font-size="10.5" fill="#5A6C86">Fastify + ECS Fargate · :5000 · /health</text>
+
+  <!-- private subnet -->
+  <rect x="282" y="224" width="592" height="266" rx="7" fill="#FFF6EC" stroke="#ED7100" stroke-width="1.2" stroke-dasharray="5 3"/>
+  <text x="292" y="242" font-size="10.5" font-weight="600" fill="#ED7100">Data &amp; migrations</text>
+
+  <rect x="300" y="262" width="160" height="58" rx="7" fill="#FFFFFF" stroke="#8C4FFF" stroke-width="2"/>
+  <text x="380" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#1D3A52">VPC Endpoint</text>
+  <text x="380" y="303" text-anchor="middle" font-size="10.5" fill="#5A6C86">Service</text>
+
+  <rect x="486" y="262" width="150" height="58" rx="7" fill="#FFFFFF" stroke="#8C4FFF" stroke-width="2"/>
+  <text x="561" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#1D3A52">Internal NLB</text>
+  <text x="561" y="303" text-anchor="middle" font-size="10.5" fill="#5A6C86">:5000</text>
+
+  <rect x="666" y="262" width="184" height="58" rx="7" fill="#FFFFFF" stroke="#3334B9" stroke-width="2"/>
+  <text x="758" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#1D3A52">RDS Postgres</text>
+  <text x="758" y="303" text-anchor="middle" font-size="10.5" fill="#5A6C86">private · encrypted</text>
+
+  <rect x="300" y="406" width="180" height="62" rx="7" fill="#FFFFFF" stroke="#C925D1" stroke-width="2"/>
+  <text x="390" y="431" text-anchor="middle" font-size="12" font-weight="600" fill="#1D3A52">Migrate CodeBuild</text>
+  <text x="390" y="449" text-anchor="middle" font-size="10.5" fill="#5A6C86">Flyway</text>
+
+  <rect x="510" y="406" width="190" height="62" rx="7" fill="#FFFFFF" stroke="#C925D1" stroke-width="2"/>
+  <text x="605" y="431" text-anchor="middle" font-size="12" font-weight="600" fill="#1D3A52">Introspect CodeBuild</text>
+  <text x="605" y="449" text-anchor="middle" font-size="10.5" fill="#5A6C86">curl _service{sdl}</text>
+
+  <!-- arrows -->
+  <!-- graphos <-> router uplink -->
+  <path d="M125,236 L125,128" fill="none" stroke="#4B3FAF" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="148" y="186" text-anchor="middle" font-size="10" fill="#4B3FAF">uplink</text>
+  <!-- router -> vpce -->
+  <path d="M210,278 L298,290" fill="none" stroke="#8C4FFF" stroke-width="1.6" stroke-dasharray="6 3" marker-end="url(#ap)"/>
+  <text x="250" y="262" text-anchor="middle" font-size="10" fill="#8C4FFF">PrivateLink</text>
+  <!-- vpce -> nlb -->
+  <path d="M460,291 L484,291" fill="none" stroke="#232F3E" stroke-width="1.6" marker-end="url(#a)"/>
+  <!-- nlb -> postgraphile -->
+  <path d="M575,262 L640,194" fill="none" stroke="#232F3E" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="560" y="232" text-anchor="middle" font-size="10" fill="#5A6C86">/health</text>
+  <!-- postgraphile -> rds -->
+  <path d="M730,192 L752,260" fill="none" stroke="#232F3E" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="788" y="226" text-anchor="middle" font-size="10" fill="#232F3E">SQL (TLS)</text>
+  <!-- migrate -> rds -->
+  <path d="M480,416 L700,322" fill="none" stroke="#232F3E" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="600" y="388" text-anchor="middle" font-size="10" fill="#232F3E">migrations</text>
+  <!-- introspect -> postgraphile -->
+  <path d="M610,406 L666,194" fill="none" stroke="#ED7100" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#ao)"/>
+  <!-- introspect -> graphos publish -->
+  <path d="M510,430 L210,108" fill="none" stroke="#4B3FAF" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#a)"/>
+  <text x="330" y="300" text-anchor="middle" font-size="10.5" fill="#4B3FAF" transform="rotate(-26 330 300)">publish SDL → GraphOS</text>
+
+  <text x="40" y="540" font-size="10.5" fill="#5A6C86">Request path: Router → PrivateLink → VPCE → NLB → PostGraphile → RDS.  Publish path: Introspect reads live SDL → GraphOS → Router picks it up via uplink.</text>
+</svg>

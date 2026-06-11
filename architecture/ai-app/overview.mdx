@@ -1,21 +1,21 @@
 ---
-title: 'Frontend Integration'
-description: 'Integrating with the AI frontend app — embedding via iframe, file uploads, rich response rendering, and the SSE streaming protocol'
+title: 'AI App Overview'
+description: 'The Clarus AI App — a client of the agent runtime: embedding via iframe, file uploads, rich response rendering, and the SSE streaming protocol'
 icon: 'browser'
 ---
 
-The AI frontend is a Next.js application that can run standalone (as its own web app) or embedded as an iframe inside the main ClarusWMS platform. This page covers the integration patterns you'll need to understand when working with either mode.
+The **AI App** is a Next.js application — one of the [agent runtime](/architecture/agents/overview)'s clients — that can run standalone (as its own web app) or embedded as an iframe inside the main ClarusWMS platform. This page covers the integration patterns you'll need to understand when working with either mode.
 
 ## Tenant Context & Organization Selection
 
-How the frontend knows which tenant to query depends on the mode:
+How the AI App knows which tenant to query depends on the mode:
 
 - **Standalone mode**: After login, the user selects their organization from a picker UI. The selected subdomain is stored in a server-side cookie and persists across page reloads.
 - **Embedded mode**: The parent application provides the subdomain via the `CLARUSWMS_AI_INIT` postMessage during initialization.
 
 ## Embedded Mode (iframe postMessage Protocol)
 
-The frontend can be embedded as an iframe in the main ClarusWMS application by loading it with `?embedded=true` in the URL. Communication between parent and iframe uses a structured postMessage protocol.
+The AI App can be embedded as an iframe in the main ClarusWMS application by loading it with `?embedded=true` in the URL. Communication between parent and iframe uses a structured postMessage protocol.
 
 ### Message Types (Parent → iframe)
 
@@ -88,11 +88,11 @@ Typical use cases include uploading product images for SKU/barcode identificatio
 
 ## Rich Response Rendering
 
-The frontend renders AI responses as Markdown with two custom code fence languages that trigger specialized rendering:
+The AI App renders AI responses as Markdown with two custom code fence languages that trigger specialized rendering:
 
 ### Charts
 
-The agent produces ` ```chart ` code blocks containing a JSON chart definition. The frontend detects these fenced blocks and renders them as interactive charts using Recharts (dynamically imported, no SSR). While the JSON is still streaming, a skeleton placeholder is shown.
+The agent produces ` ```chart ` code blocks containing a JSON chart definition. The AI App detects these fenced blocks and renders them as interactive charts using Recharts (dynamically imported, no SSR). While the JSON is still streaming, a skeleton placeholder is shown.
 
 <Tabs>
   <Tab title="Interface">
@@ -150,7 +150,7 @@ The agent produces ` ```chart ` code blocks containing a JSON chart definition. 
 
 ### File Download Cards
 
-The agent produces ` ```csv-file ` code blocks containing file metadata with a presigned S3 URL. The frontend renders these as download cards with file metadata, a live countdown timer for URL expiry, and a download button. Expired links are visually indicated and the download button is disabled.
+The agent produces ` ```csv-file ` code blocks containing file metadata with a presigned S3 URL. The AI App renders these as download cards with file metadata, a live countdown timer for URL expiry, and a download button. Expired links are visually indicated and the download button is disabled.
 
 <Tabs>
   <Tab title="Interface">
@@ -195,7 +195,7 @@ The agent produces ` ```csv-file ` code blocks containing file metadata with a p
 
 ## SSE Client Protocol
 
-The frontend receives a stream of Server-Sent Events from the `/api/chat` endpoint. Each event has a `type` field:
+The AI App receives a stream of Server-Sent Events from the `/api/chat` endpoint. Each event has a `type` field:
 
 ```typescript
 interface StreamEvent {

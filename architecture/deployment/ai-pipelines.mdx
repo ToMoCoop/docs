@@ -1,10 +1,10 @@
 ---
 title: 'AI Deployment Pipelines'
-description: 'CI/CD pipelines for the AI Lambda tools, agent runtime, interceptor, schema deployments, and the AI frontend app'
+description: 'CI/CD pipelines for the agent platform, the AI App, and AI Messaging'
 icon: 'pipe-section'
 ---
 
-AI deployments span two repositories. The **ClarusWMS_Agents** repo contains Lambda tools, the agent runtime, interceptor, and schema parsers — deployed via five path-filtered pipelines. The **ClarusWMS_AI** repo contains the Next.js frontend app, deployed as a Docker container on ECS via its own pipeline.
+AI deployments span three repositories, all on the same shared cross-account pipeline model: **ClarusWMS_Agents** (the agent platform — Lambda tools, the agent runtime, interceptor, and schema parsers), **ClarusWMS_AI** (the [AI App](/architecture/ai-app/overview), deployed as a container on ECS), and **ClarusWMS_AI_Messaging** (the [AI Messaging](/architecture/ai-messaging/overview) relay and its subgraph).
 
 ## Agent Pipelines
 
@@ -68,12 +68,12 @@ Each pipeline watches specific file paths on the `main` branch:
 The pipeline and build accounts are **shared infrastructure** used by all ClarusWMS services. They are not AI-specific — the same CodePipeline and CodeBuild setup handles deployments for other services as well.
 </Note>
 
-## Frontend App Pipeline
+## AI App Pipeline
 
-The AI frontend (Next.js) is deployed as a Docker container on ECS from the **ClarusWMS_AI** repository, separate from the Lambda pipelines above.
+The [AI App](/architecture/ai-app/overview) (Next.js) is deployed as a Docker container on ECS from the **ClarusWMS_AI** repository, separate from the Lambda pipelines above.
 
 <Frame>
-  <img src="/images/diagrams/ai-frontend-pipeline.drawio.svg" alt="AI frontend app deployment pipeline showing GitHub source flowing through CodeBuild ARM64 Docker build to ECR, with image tag promotion through staging and production ECS deployments" zoom />
+  <img src="/images/diagrams/ai-frontend-pipeline.drawio.svg" alt="AI App deployment pipeline showing GitHub source flowing through CodeBuild ARM64 Docker build to ECR, with image tag promotion through staging and production ECS deployments" zoom />
 </Frame>
 
 <sub><a href="/images/diagrams/ai-frontend-pipeline.drawio.svg" download="ai-frontend-pipeline.drawio.svg">Download SVG</a> · <a href="/images/diagrams/ai-frontend-pipeline.drawio" download="ai-frontend-pipeline.drawio">Download draw.io source</a></sub>
@@ -91,7 +91,7 @@ The AI frontend (Next.js) is deployed as a Docker container on ECS from the **Cl
     ECR manifest re-tag from `latest` to `staging` using `batch-get-image` + `put-image` — no Docker pull required. Outputs `imagedefinitions.json` for the deploy action.
   </Step>
   <Step title="Deploy Staging">
-    CodePipeline ECS deploy action using `imagedefinitions.json`. Cross-account deployment via `PipelinesAccountDeployRole`.
+    CodePipeline ECS deploy action, deploying cross-account into the target environment's account.
   </Step>
   <Step title="Manual Approval">
     Deployment pauses for manual approval before promoting to production.
@@ -112,18 +112,19 @@ A single Docker build produces one image. Rather than rebuilding for each enviro
 2. **Staging** re-tags the manifest as `staging` (no rebuild, no pull)
 3. **Production** re-tags the same manifest as `production`
 
-This guarantees identical image content across all environments — the image digest never changes.
+This guarantees identical image content across all environments — the image digest never changes. The build runs once, on ARM64, in the shared build account; staging and production deploys re-tag the same manifest rather than rebuilding.
 
-### Key Configuration
+## AI Messaging Pipelines
 
-| Setting | Value |
-|---|---|
-| Pipeline | `ai-app` (CodePipeline V2) |
-| Execution mode | SUPERSEDED (new pushes cancel in-progress runs) |
-| Build project | `ai-app-build` |
-| Build image | `amazonlinux2-aarch64-standard:3.0` (ARM64, privileged) |
-| ECR repository | `claruswms-ai` |
-| Artifacts | S3 with KMS encryption, 30-day lifecycle |
-| Build timeout | 15 minutes |
-| Docker Hub credentials | SSM Parameter Store (avoids rate limits) |
-| Caching | Docker layer cache + source cache |
+[AI Messaging](/architecture/ai-messaging/overview) deploys from the **ClarusWMS_AI_Messaging** repository on the same shared model, in two strands:
+
+<Steps>
+  <Step title="Relay Lambdas">
+    The relay's Lambda code is built into bundles, uploaded to the target account, and rolled out by updating each function's code — the same build-and-promote shape as the agent Lambda pipelines. Terraform provisions the functions with placeholder code, so the pipeline owns the running code.
+  </Step>
+  <Step title="Subgraph">
+    The [subgraph](/architecture/ai-messaging/subgraph) image is built and pushed to ECR, then deployed to ECS. Around the deploy, the shared PostGraphile [migrate and introspect](/architecture/gateway/postgraphile-subgraph#migrate-and-introspect-codebuild) jobs apply database migrations and publish the updated SDL to the supergraph via the [publish pipeline](/architecture/gateway/publish-pipeline).
+  </Step>
+</Steps>
+
+Both strands deploy cross-account into each environment's account, with promotion to production gated by manual approval — identical to the agent and AI App pipelines above.

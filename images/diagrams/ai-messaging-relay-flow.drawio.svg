@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#1D4763"/>
+    </marker>
+    <marker id="ag" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#248814"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1000" height="560" fill="#FFFFFF"/>
+  <text x="500" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#1D4763">AI Messaging — Message Relay Flow</text>
+
+  <!-- lifelines -->
+  <line x1="120" y1="86" x2="120" y2="520" stroke="#C5CDD6" stroke-width="1.5"/>
+  <line x1="330" y1="86" x2="330" y2="520" stroke="#C5CDD6" stroke-width="1.5"/>
+  <line x1="520" y1="86" x2="520" y2="520" stroke="#C5CDD6" stroke-width="1.5"/>
+  <line x1="710" y1="86" x2="710" y2="520" stroke="#C5CDD6" stroke-width="1.5"/>
+  <line x1="900" y1="86" x2="900" y2="520" stroke="#C5CDD6" stroke-width="1.5"/>
+
+  <!-- lane headers -->
+  <g font-size="12.5" font-weight="600" fill="#1D3A52" text-anchor="middle">
+    <rect x="56" y="50" width="128" height="36" rx="7" fill="#FFFFFF" stroke="#4A154B" stroke-width="2"/><text x="120" y="73">Slack / WhatsApp</text>
+    <rect x="270" y="50" width="120" height="36" rx="7" fill="#FFFFFF" stroke="#ED7100" stroke-width="2"/><text x="330" y="73">Receiver λ</text>
+    <rect x="464" y="50" width="112" height="36" rx="7" fill="#FFFFFF" stroke="#E7157B" stroke-width="2"/><text x="520" y="73">SQS</text>
+    <rect x="650" y="50" width="120" height="36" rx="7" fill="#FFFFFF" stroke="#ED7100" stroke-width="2"/><text x="710" y="73">Processor λ</text>
+    <rect x="836" y="50" width="128" height="36" rx="7" fill="#FFFFFF" stroke="#01A88D" stroke-width="2"/><text x="900" y="73">Agent Runtime</text>
+  </g>
+
+  <!-- messages -->
+  <g font-size="11" fill="#1D4763" text-anchor="middle">
+    <path d="M120,128 L328,128" fill="none" stroke="#1D4763" stroke-width="1.6" marker-end="url(#a)"/>
+    <text x="224" y="120">webhook event</text>
+
+    <rect x="282" y="150" width="96" height="26" rx="5" fill="#FFF6EC" stroke="#ED7100" stroke-width="1.3"/>
+    <text x="330" y="167">verify signature</text>
+
+    <path d="M330,196 L518,196" fill="none" stroke="#1D4763" stroke-width="1.6" marker-end="url(#a)"/>
+    <text x="424" y="188">enqueue envelope</text>
+
+    <path d="M330,226 L122,226" fill="none" stroke="#248814" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#ag)"/>
+    <text x="224" y="218" fill="#248814">200 OK (within 3s)</text>
+
+    <path d="M520,276 L708,276" fill="none" stroke="#1D4763" stroke-width="1.6" marker-end="url(#a)"/>
+    <text x="614" y="268">deliver (batch size 1)</text>
+
+    <rect x="636" y="298" width="148" height="26" rx="5" fill="#FFF6EC" stroke="#ED7100" stroke-width="1.3"/>
+    <text x="710" y="315">resolve workspace + token</text>
+
+    <path d="M710,346 L122,346" fill="none" stroke="#1D4763" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a)"/>
+    <text x="416" y="338">add ⏳ reaction</text>
+
+    <path d="M710,388 L898,388" fill="none" stroke="#1D4763" stroke-width="1.6" marker-end="url(#a)"/>
+    <text x="804" y="380">invoke (JWT + session id)</text>
+
+    <path d="M900,438 L712,438" fill="none" stroke="#248814" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#ag)"/>
+    <text x="806" y="430" fill="#248814">response (JSONL stream)</text>
+
+    <path d="M710,480 L122,480" fill="none" stroke="#248814" stroke-width="1.6" stroke-dasharray="6 3" marker-end="url(#ag)"/>
+    <text x="416" y="472" fill="#248814">post reply + remove reaction</text>
+  </g>
+
+  <text x="56" y="544" font-size="10.5" fill="#5A6C86">Session id = sha256("platform:workspace_id:channel_id:thread") — every message in a thread maps to the same agent session.</text>
+</svg>

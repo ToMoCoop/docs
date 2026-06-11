@@ -6,7 +6,7 @@ icon: 'diagram-project'
 
 ClarusWMS operates a federated GraphQL gateway built on **[Apollo Router](https://www.apollographql.com/docs/router)**. Clients send a single GraphQL request to one public endpoint; the router resolves each field against the subgraph that owns it and composes the result. Subgraphs run in their own AWS accounts and are reached over **cross-account AWS PrivateLink**.
 
-The first federated subgraph is the **agents [PostGraphile](https://www.graphile.org/postgraphile/) service**, which exposes a Federation v2 schema derived from a Postgres database. The architecture is built to take additional subgraphs (e.g., the Ruby GraphQL surface) without changes to the router image or runtime configuration.
+The federated subgraphs are built from a shared **[PostGraphile](https://www.graphile.org/postgraphile/) stack**, each exposing a Federation v2 schema derived from a Postgres database. The architecture is built to take additional subgraphs without changes to the router image or runtime configuration.
 
 <Note>
 The federation infrastructure spans three repositories: **ClarusWMS_Gateway** contains the Apollo Router image and configuration, **ClarusWMS_Agents** contains the PostGraphile subgraph code and SDL metadata, and **ClarusWMS_OPS** contains the Terraform that wires both into AWS, the build pipelines, and the network path between them.
@@ -86,7 +86,8 @@ Each environment is composed of several AWS accounts. For federated GraphQL:
 | Account | Hosts | Owns |
 |---|---|---|
 | **Gateway** | Apollo Router, public ALB, ACM cert, Route53 zone for `gateway.<domain>`, VPC Interface Endpoints (one per subgraph) | The federated surface |
-| **Agents** | PostGraphile ECS service, RDS Postgres, internal NLB, VPC Endpoint Service | One subgraph |
+| **Agents** | PostGraphile ECS service, RDS Postgres, internal NLB, VPC Endpoint Service | The agents subgraph |
+| **AI Messaging** | PostGraphile ECS service, RDS Postgres, internal NLB, VPC Endpoint Service (plus the messaging relay Lambdas) | The AI Messaging subgraph |
 | **Build and Artifacts** | Shared ECR repositories, CodeBuild publish project, Apollo CI key in SSM | Build/publish infrastructure |
 | **Pipelines** | CodePipeline definitions, artifact S3 bucket, KMS key | Orchestration |
 
@@ -98,8 +99,14 @@ Each subgraph lives in its own AWS account (or shares one if appropriate). The g
   <Card title="Gateway Account" icon="route" href="/architecture/federated-graphql/gateway">
     Apollo Router, ALB, Cognito JWT validation, GraphOS connection
   </Card>
+  <Card title="PostGraphile Subgraphs" icon="layer-group" href="/architecture/federated-graphql/postgraphile-subgraph">
+    The reusable stack: ECS service, federation package, RDS, Row-Level Security, trust model
+  </Card>
   <Card title="Agents Subgraph" icon="database" href="/architecture/federated-graphql/agents-subgraph">
-    PostGraphile, RDS Postgres, internal NLB, federation plugin
+    The agents database, with scope-gated cost fields
+  </Card>
+  <Card title="AI Messaging Subgraph" icon="comments" href="/architecture/ai-messaging/subgraph">
+    The `ai_messaging` schema behind the messaging relay
   </Card>
   <Card title="Cross-Account Network" icon="network-wired" href="/architecture/federated-graphql/network">
     AWS PrivateLink, VPC Endpoint Services, security group layout

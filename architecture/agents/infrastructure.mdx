@@ -8,7 +8,7 @@ This page covers the foundational infrastructure that every request passes throu
 
 ## CloudFront Distribution
 
-CloudFront is the single entry point for all AI services. Every request — whether from an external MCP client, the frontend app, or an OAuth flow — arrives at the same custom domain and gets routed to the right backend based on its URL path.
+CloudFront is the single entry point for all AI services. Every request — whether from an external MCP client, an internal client (e.g. the AI App), or an OAuth flow — arrives at the same custom domain and gets routed to the right backend based on its URL path.
 
 | | |
 |---|---|
@@ -16,7 +16,7 @@ CloudFront is the single entry point for all AI services. Every request — whet
 | **Key config** | Path-based routing to 4 origins (Cognito, public gateway, private gateway, agent runtime data plane) |
 | **Connects to** | MCP gateways, Bedrock AgentCore data plane, Cognito |
 
-CloudFront provides TLS termination, custom domain support, and Lambda@Edge integration. It evaluates cache behaviors in order — more specific path patterns like `/oauth2/authorize` take precedence over broader ones like `/oauth2/*`. See the [CloudFront Routing Table](/architecture/ai/overview#cloudfront-routing-table) on the overview page for the full routing matrix.
+CloudFront provides TLS termination, custom domain support, and Lambda@Edge integration. It evaluates cache behaviors in order — more specific path patterns like `/oauth2/authorize` take precedence over broader ones like `/oauth2/*`. See the [routing table](#cloudfront-routing-table) at the end of this page for the full routing matrix.
 
 ## Cognito Authentication
 
@@ -68,10 +68,68 @@ Here's the flow: when a request arrives at a gateway, the interceptor fires firs
 
 ### Subdomain Extraction
 
-The interceptor checks for the tenant subdomain in both the Bedrock-format header (`X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain`) and the Clarus-native header (`X-Clarus-Subdomain`), including lowercase variants of each. The Bedrock header arrives on requests that pass through AgentCore (the frontend app path), while `X-Clarus-Subdomain` arrives on requests through the public MCP gateway (set by the CloudFront tenant extractor). The extracted value is cached as `subdomain` in DynamoDB for tool Lambdas to retrieve. If no subdomain header is present, `subdomain` is `null` in the cached item.
+The interceptor checks for the tenant subdomain in both the Bedrock-format header (`X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain`) and the Clarus-native header (`X-Clarus-Subdomain`), including lowercase variants of each. The Bedrock header arrives on requests that pass through AgentCore (the agent-runtime path used by internal clients), while `X-Clarus-Subdomain` arrives on requests through the public MCP gateway (set by the CloudFront tenant extractor). The extracted value is cached as `subdomain` in DynamoDB for tool Lambdas to retrieve. If no subdomain header is present, `subdomain` is `null` in the cached item.
 
 ### Error Handling
 
 The interceptor is designed to **never block requests**. All errors during token caching are caught and logged, but the interceptor always returns a passthrough response. A failed cache write means the target Lambda won't find the token in DynamoDB, but the request still reaches it — the Lambda handles the missing-token case rather than the interceptor rejecting the request.
 
 For audit trails, tokens are logged as `first 20 chars...last 20 chars`. Tokens shorter than 40 characters log as `[invalid]`.
+
+
+## CloudFront Routing Table
+
+CloudFront evaluates path-based cache behaviors in order. More specific patterns (like `/oauth2/authorize`) are defined before broader ones (like `/oauth2/*`) to ensure correct handling.
+
+| Path Pattern | Origin | Lambda@Edge / CF Function | Event Type |
+|---|---|---|---|
+| `/mcp*` | Public MCP Gateway | Tenant Extractor (CF Function) | viewer-request |
+| `/mcp*` | Public MCP Gateway | MCP Response Rewrite | origin-response |
+| `/mcp-internal*` | Private MCP Gateway | MCP Response Rewrite | origin-response |
+| `/agent*` | Bedrock AgentCore data plane | Agent Request Rewrite | origin-request |
+| `/oauth2/authorize` | Cognito | OAuth Authorize Rewrite (strips `resource` param) | viewer-request |
+| `/oauth2/*` | Cognito | None | - |
+| `/oauth2/register` | N/A (intercepted) | OAuth Metadata Lambda (handles DCR) | origin-request |
+| `/.well-known/*` | N/A (intercepted) | OAuth Metadata Lambda (serves metadata) | origin-request |
+| `/login` | Cognito | None | - |
+| `/logout` | Cognito | None | - |
+| Default | Cognito | None | - |
+
+## S3 Bucket Structure
+
+### Unified Agents Bucket: `claruswms-{prefix}-agents`
+
+```
+claruswms-{prefix}-agents/
+  clarus-mcp-api.zip                  # API Lambda deployment package
+  clarus-mcp-utils.zip                # Utils Lambda deployment package
+  mcp-interceptor.zip                 # Interceptor Lambda deployment package
+  clarus-mcp-api-tools.json           # API tool schema (JSON array)
+  clarus-mcp-utils-tools.json         # Utils tool schema (JSON array)
+  clarus_agent/
+    deployment.zip                     # Agent runtime deployment package
+  schema/
+    graphql-schema/                    # Parsed GraphQL schema files
+    rest-schema/                       # Parsed REST API schema files
+  context/                             # Context files for Lambda runtime
+  agent-sessions/                      # Agent conversation state (1-day TTL)
+```
+
+- **Versioning**: Enabled
+- **Encryption**: AES256 with bucket key
+- **Lifecycle**: Old versions cleaned after 30 days; `agent-sessions/` prefix expires after 1 day
+- **Public access**: All blocked
+
+### Generated Files Bucket: `claruswms-{prefix}-mcp-generated`
+
+```
+claruswms-{prefix}-mcp-generated/
+  datasets/{uuid}.ndjson               # GraphQL query results (NDJSON, 1-hour TTL)
+  exports/{timestamp}_{filename}       # Generated CSV files
+```
+
+- **Versioning**: Disabled
+- **Encryption**: AES256
+- **Lifecycle**: All objects expire after 7 days
+- **Public access**: All blocked
+- **Purpose**: Temporary storage for files generated during AI conversations (datasets, CSV exports)

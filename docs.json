@@ -422,23 +422,48 @@
             "public": true,
             "groups": [
               {
-                "group": "AI Architecture",
+                "group": "Agents",
                 "pages": [
-                  "architecture/ai/overview",
-                  "architecture/ai/infrastructure",
-                  "architecture/ai/gateways",
-                  "architecture/ai/runtime",
-                  "architecture/ai/authentication",
-                  "architecture/ai/tools",
-                  "architecture/ai/sessions",
-                  "architecture/ai/frontend"
+                  "architecture/agents/overview",
+                  "architecture/agents/infrastructure",
+                  "architecture/agents/gateways",
+                  "architecture/agents/runtime",
+                  "architecture/agents/authentication",
+                  "architecture/agents/tools",
+                  "architecture/agents/sessions"
                 ]
               },
               {
-                "group": "Federated GraphQL",
+                "group": "AI App",
+                "pages": [
+                  "architecture/ai-app/overview"
+                ]
+              },
+              {
+                "group": "AI Messaging",
+                "pages": [
+                  "architecture/ai-messaging/overview",
+                  "architecture/ai-messaging/message-relay",
+                  {
+                    "group": "Platform Integrations",
+                    "pages": [
+                      "architecture/ai-messaging/platform-integrations",
+                      "architecture/ai-messaging/platforms/slack",
+                      "architecture/ai-messaging/platforms/whatsapp"
+                    ]
+                  },
+                  "architecture/ai-messaging/notifications",
+                  "architecture/ai-messaging/infrastructure",
+                  "architecture/ai-messaging/subgraph",
+                  "architecture/ai-messaging/security"
+                ]
+              },
+              {
+                "group": "Gateway",
                 "pages": [
                   "architecture/federated-graphql/overview",
                   "architecture/federated-graphql/gateway",
+                  "architecture/federated-graphql/postgraphile-subgraph",
                   "architecture/federated-graphql/agents-subgraph",
                   "architecture/federated-graphql/network",
                   "architecture/federated-graphql/publish-pipeline",

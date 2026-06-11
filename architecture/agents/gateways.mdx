@@ -30,7 +30,7 @@ The private gateway is the internal tool access point used exclusively by the ag
 | **Key config** | CUSTOM_JWT auth, MCP protocol, two targets (API Lambda + Utils Lambda) |
 | **Connects to** | API Lambda, Utils Lambda, Interceptor Lambda |
 
-The private gateway has a broader allowed clients list including frontend app client IDs and service accounts. It exposes **two gateway targets**:
+The private gateway has a broader allowed clients list including in-house app client IDs (such as the AI App) and service accounts (such as AI Messaging and backend automations). It exposes **two gateway targets**:
 
 1. **Utils target** — Utils Lambda with the `clarus-mcp-utils-tools.json` schema
 2. **API target** — API Lambda with the `clarus-mcp-api-tools.json` schema
@@ -57,7 +57,7 @@ The dual gateway architecture creates a clear boundary along three dimensions:
 
 The key insight is **cost and security control**. External clients connecting through the public gateway cannot trigger resource-intensive operations like CSV generation over large datasets. Those capabilities are reserved for the internal agent runtime, which has its own rate limiting and safety guards.
 
-Both gateways share the same **MCP Interceptor** — every request, regardless of which gateway it enters, goes through the same token caching mechanism before reaching the target Lambda. See [Infrastructure Components](/architecture/ai/infrastructure#mcp-interceptor) for details on how the interceptor works.
+Both gateways share the same **MCP Interceptor** — every request, regardless of which gateway it enters, goes through the same token caching mechanism before reaching the target Lambda. See [Infrastructure Components](/architecture/agents/infrastructure#mcp-interceptor) for details on how the interceptor works.
 
 ## Request Flow
 
@@ -70,4 +70,4 @@ When an MCP request arrives at either gateway, the flow is the same:
 5. **Lambda executes the tool** — uses the JWT to authenticate against the Clarus WMS backend APIs
 6. **Response flows back** — through the gateway, with Lambda@Edge rewriting any `WWW-Authenticate` headers to use the custom domain
 
-For the full token forwarding sequence, see the [Token Forwarding diagram](/architecture/ai/authentication) on the authentication page.
+For the full token forwarding sequence, see the [Token Forwarding diagram](/architecture/agents/authentication) on the authentication page.

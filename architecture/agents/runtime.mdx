@@ -4,10 +4,10 @@ description: 'The Strands-based Python agent that powers AI conversations, inclu
 icon: 'microchip'
 ---
 
-The agent runtime is where AI conversations actually happen. It's a serverless Python application running on AWS Bedrock AgentCore that receives user messages, orchestrates tool calls, and streams responses back to the frontend.
+The agent runtime is where AI conversations actually happen. It's a serverless Python application running on AWS Bedrock AgentCore that receives user messages, orchestrates tool calls, and streams responses back to the calling client.
 
 <Tip>
-**The runtime has a dual nature**: From the outside, it's an HTTP server that the frontend calls via the Bedrock AgentCore data plane. But internally, it acts as an **MCP client** connecting to the private gateway to use tools. The frontend never speaks MCP directly — it sends HTTP requests to the runtime, which translates them into MCP tool calls through the private gateway.
+**The runtime has a dual nature**: From the outside, it's an HTTP server that clients call via the Bedrock AgentCore data plane. But internally, it acts as an **MCP client** connecting to the private gateway to use tools. Clients never speak MCP directly — they send HTTP requests to the runtime, which translates them into MCP tool calls through the private gateway.
 </Tip>
 
 ## Configuration
@@ -23,13 +23,13 @@ The runtime uses a Claude Sonnet model with streaming enabled, extended thinking
 **Environment variables injected:**
 - `MCP_GATEWAY_URL` — Private MCP gateway URL
 - `SESSION_BUCKET` — S3 bucket for conversation state persistence
-- `FRONTEND_DOMAIN` — Allowed frontend domain for CORS
+- `FRONTEND_DOMAIN` — Allowed browser origin (the AI App) for CORS
 
 **Inbound headers:** The runtime receives `Authorization` and `X-Amzn-Bedrock-AgentCore-Runtime-Custom-Subdomain` from AgentCore (the only custom header format AgentCore will pass through via its `requestHeaderAllowlist`). The runtime extracts the subdomain with a fallback chain — checking the Bedrock header first, then `X-Clarus-Subdomain` — and normalizes it to `X-Clarus-Subdomain` for all downstream MCP calls to the private gateway.
 
 ## Entry Point Flow
 
-When the frontend sends a message, here's what happens inside the runtime:
+When a client sends a message, here's what happens inside the runtime:
 
 <Frame>
   <img src="/images/diagrams/runtime-entry-flow.drawio.svg" alt="Agent Runtime Entry Point Flow — request ingress, cache resolution, and streaming execution" zoom />
@@ -58,12 +58,12 @@ The MCP cache is the expensive one — creating a new MCP client connection take
 
 ## Streaming Architecture
 
-The runtime streams events from Bedrock through the Strands framework to the frontend. Each event passes through several processing stages before reaching the client:
+The runtime streams events from Bedrock through the Strands framework to the client. Each event passes through several processing stages before reaching the client:
 
 1. **Bedrock converse-stream** produces raw model events (text deltas, tool use, reasoning)
 2. **Strands Agent** processes events, fires callback handlers, and manages tool execution
 3. **Runtime handler** strips heavy `invocation_state` keys and classifies each event for monitoring
-4. **Event yield** sends the lightweight event to the frontend via the HTTP streaming response
+4. **Event yield** sends the lightweight event to the client via the HTTP streaming response
 
 **Stream size optimization**: The Strands framework merges the full agent invocation state (~350KB) into every streaming event. The runtime strips 10 keys from `invocation_state` before yielding, reducing a typical 6-tool invocation from ~83MB to ~116KB — a 99.86% reduction.
 
@@ -103,7 +103,7 @@ Runtime errors are handled per-event with escalating severity:
 
 ## Warmup Mode
 
-The runtime accepts `{"warmup": true}` payloads that prime the Bedrock model cache and MCP connections without executing full agent logic. This returns immediately with a success response. The warmup system is covered in detail on the [Sessions & Memory](/architecture/ai/sessions#warmup-flow) page.
+The runtime accepts `{"warmup": true}` payloads that prime the Bedrock model cache and MCP connections without executing full agent logic. This returns immediately with a success response. The warmup system is covered in detail on the [Sessions & Memory](/architecture/agents/sessions#warmup-flow) page.
 
 ## Lifecycle
 

@@ -1,10 +1,10 @@
 ---
 title: 'Authentication & Multi-Tenant Routing'
-description: 'OAuth flows for external MCP clients and the frontend app, plus multi-tenant routing via URL path extraction'
+description: 'OAuth flows for external MCP clients and internal clients, plus multi-tenant routing via URL path extraction'
 icon: 'shield-halved'
 ---
 
-Authentication in the AI layer serves two distinct client types — external MCP clients and the frontend application — while multi-tenant routing ensures every request is scoped to the correct warehouse tenant.
+Authentication in the AI layer serves two distinct client types — external MCP clients and internal ClarusWMS clients (such as the AI App) — while multi-tenant routing ensures every request is scoped to the correct warehouse tenant.
 
 ## Multi-Tenant Routing
 
@@ -31,7 +31,7 @@ ClarusWMS is a multi-tenant platform. When an AI request arrives, the system nee
   </Step>
 </Steps>
 
-Direct access without the tenant in the path is also supported when `X-Clarus-Subdomain` is provided as a header directly — this is how the frontend app works.
+Direct access without the tenant in the path is also supported when `X-Clarus-Subdomain` is provided as a header directly — this is how internal clients (such as the AI App) work.
 
 ## Authentication Flows
 
@@ -50,11 +50,11 @@ There are two access patterns into the AI layer — pick the one relevant to you
     The Lambda@Edge OAuth Metadata function synthesizes the OIDC discovery document and handles Dynamic Client Registration (DCR) — returning a pre-configured client ID rather than actually creating one in Cognito. The Authorize Rewrite strips the RFC 8707 `resource` parameter since Cognito doesn't support it.
   </Tab>
 
-  <Tab title="Frontend App">
-    The frontend doesn't connect to Agent Core directly. A Next.js API route (`POST /api/chat`) acts as a server-side SSE bridge that handles auth token management, subdomain resolution, and stream re-serialization before forwarding requests through CloudFront to the agent runtime:
+  <Tab title="AI App">
+    The AI App doesn't connect to Agent Core directly. A Next.js API route (`POST /api/chat`) acts as a server-side SSE bridge that handles auth token management, subdomain resolution, and stream re-serialization before forwarding requests through CloudFront to the agent runtime:
 
     <Frame>
-      <img src="/images/diagrams/auth-frontend-flow.drawio.svg" alt="Frontend app authentication flow from browser through Next.js SSE bridge, CloudFront, Lambda@Edge, Agent Runtime, to Private MCP Gateway" zoom />
+      <img src="/images/diagrams/auth-frontend-flow.drawio.svg" alt="AI App authentication flow from browser through Next.js SSE bridge, CloudFront, Lambda@Edge, Agent Runtime, to Private MCP Gateway" zoom />
     </Frame>
 
     <sub><a href="/images/diagrams/auth-frontend-flow.drawio.svg" download="auth-frontend-flow.drawio.svg">Download SVG</a> · <a href="/images/diagrams/auth-frontend-flow.drawio" download="auth-frontend-flow.drawio">Download draw.io source</a></sub>
@@ -107,7 +107,7 @@ There are two access patterns into the AI layer — pick the one relevant to you
 - **OAuth scopes**: `openid`, `claruswms/full`
 - **PKCE**: S256 method required for authorization code flow
 - **Public gateway**: Restricted to external MCP client IDs only
-- **Private gateway**: Broader allowed clients (frontend app, service accounts, external clients)
+- **Private gateway**: Broader allowed clients (the AI App, service accounts such as AI Messaging, external clients)
 - **Agent runtime**: Own allowed clients list, same OAuth discovery URL
 - **RFC 8707**: `resource` parameter stripped by Lambda@Edge because Cognito doesn't support it
 - **WWW-Authenticate rewrite**: Lambda@Edge rewrites response headers to use custom domain instead of raw Bedrock gateway domain

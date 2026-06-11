@@ -1,0 +1,33 @@
+<mxfile host="docs.claruswms" agent="ClarusWMS Docs" version="29.6.1">
+  <diagram id="postgraphile-subgraph-anatomy" name="PostGraphile Subgraph Anatomy">
+    <mxGraphModel dx="1200" dy="640" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1080" pageHeight="560" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="graphos" value="Apollo GraphOS&#10;managed federation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4B3FAF;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1"><mxGeometry x="40" y="68" width="170" height="58" as="geometry" /></mxCell>
+        <mxCell id="router" value="Apollo Router&#10;gateway account" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8C4FFF;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1"><mxGeometry x="40" y="236" width="170" height="64" as="geometry" /></mxCell>
+
+        <mxCell id="vpc" value="Subgraph" style="rounded=1;html=1;dashed=1;fillColor=none;strokeColor=#248814;verticalAlign=top;align=left;spacingLeft=12;fontSize=11;fontColor=#248814;fontStyle=1" vertex="1" parent="1"><mxGeometry x="258" y="60" width="640" height="448" as="geometry" /></mxCell>
+        <mxCell id="pub" value="Service" style="rounded=1;html=1;dashed=1;fillColor=#F2F8F0;strokeColor=#248814;verticalAlign=top;align=left;spacingLeft=10;fontSize=10;fontColor=#248814;fontStyle=1" vertex="1" parent="1"><mxGeometry x="282" y="96" width="592" height="112" as="geometry" /></mxCell>
+        <mxCell id="priv" value="Data &amp; migrations" style="rounded=1;html=1;dashed=1;fillColor=#FFF6EC;strokeColor=#ED7100;verticalAlign=top;align=left;spacingLeft=10;fontSize=10;fontColor=#ED7100;fontStyle=1" vertex="1" parent="1"><mxGeometry x="282" y="224" width="592" height="266" as="geometry" /></mxCell>
+
+        <mxCell id="pg" value="PostGraphile + federation plugin&#10;Fastify + ECS Fargate · :5000 · /health" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;fontColor=#1D3A52;fontSize=11" vertex="1" parent="1"><mxGeometry x="560" y="126" width="290" height="66" as="geometry" /></mxCell>
+        <mxCell id="vpce" value="VPC Endpoint&#10;Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8C4FFF;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1"><mxGeometry x="300" y="262" width="160" height="58" as="geometry" /></mxCell>
+        <mxCell id="nlb" value="Internal NLB&#10;:5000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8C4FFF;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1"><mxGeometry x="486" y="262" width="150" height="58" as="geometry" /></mxCell>
+        <mxCell id="rds" value="RDS Postgres&#10;private · encrypted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3334B9;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1"><mxGeometry x="666" y="262" width="184" height="58" as="geometry" /></mxCell>
+        <mxCell id="migrate" value="Migrate CodeBuild&#10;Flyway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#C925D1;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1"><mxGeometry x="300" y="406" width="180" height="62" as="geometry" /></mxCell>
+        <mxCell id="introspect" value="Introspect CodeBuild&#10;curl _service{sdl}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#C925D1;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1"><mxGeometry x="510" y="406" width="190" height="62" as="geometry" /></mxCell>
+
+        <mxCell id="y1" value="uplink" style="endArrow=block;html=1;rounded=1;strokeColor=#4B3FAF;fontSize=10;fontColor=#4B3FAF" edge="1" parent="1" source="router" target="graphos"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="y2" value="PrivateLink" style="endArrow=block;html=1;rounded=1;dashed=1;strokeColor=#8C4FFF;fontSize=10;fontColor=#8C4FFF" edge="1" parent="1" source="router" target="vpce"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="y3" style="endArrow=block;html=1;rounded=1;strokeColor=#232F3E" edge="1" parent="1" source="vpce" target="nlb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="y4" value="/health" style="endArrow=block;html=1;rounded=1;strokeColor=#232F3E;fontSize=10;fontColor=#5A6C86" edge="1" parent="1" source="nlb" target="pg"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="y5" value="SQL (TLS)" style="endArrow=block;html=1;rounded=1;strokeColor=#232F3E;fontSize=10;fontColor=#232F3E" edge="1" parent="1" source="pg" target="rds"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="y6" value="migrations" style="endArrow=block;html=1;rounded=1;strokeColor=#232F3E;fontSize=10;fontColor=#232F3E" edge="1" parent="1" source="migrate" target="rds"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="y7" style="endArrow=block;html=1;rounded=1;dashed=1;strokeColor=#ED7100" edge="1" parent="1" source="introspect" target="pg"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="y8" value="publish SDL → GraphOS" style="endArrow=block;html=1;rounded=1;dashed=1;strokeColor=#4B3FAF;fontSize=10;fontColor=#4B3FAF" edge="1" parent="1" source="introspect" target="graphos"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

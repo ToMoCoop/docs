@@ -1,0 +1,73 @@
+<mxfile host="docs.claruswms" agent="ClarusWMS Docs" version="29.6.1">
+  <diagram id="ai-messaging-overview" name="AI Messaging Overview">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1080" pageHeight="620" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="grp_chat" value="Chat Platforms" style="rounded=1;html=1;dashed=1;fillColor=#F7F8FA;strokeColor=#8896A6;verticalAlign=top;align=left;spacingLeft=10;fontSize=12;fontColor=#5A6C86;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="24" y="96" width="170" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="slack" value="Slack&#10;events + Web API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A154B;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="44" y="132" width="130" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="whatsapp" value="WhatsApp&#10;Meta Cloud API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1FAE54;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="44" y="210" width="130" height="62" as="geometry" />
+        </mxCell>
+
+        <mxCell id="grp_acct" value="AI Messaging AWS account (per environment)" style="rounded=1;html=1;dashed=1;fillColor=none;strokeColor=#CD2264;verticalAlign=top;align=left;spacingLeft=12;fontSize=12;fontColor=#CD2264;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="228" y="72" width="600" height="478" as="geometry" />
+        </mxCell>
+        <mxCell id="receiver" value="Receiver λ&#10;verify + queue" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="258" y="140" width="138" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="sqs" value="SQS queue&#10;+ DLQ (2 retries)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E7157B;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="440" y="140" width="120" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="processor" value="Processor λ&#10;invoke agent + reply" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="606" y="140" width="150" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="cognito" value="Cognito&#10;service JWT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DD344C;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="606" y="232" width="150" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="alerts" value="Alerts λ&#10;notify (HMAC)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="606" y="452" width="150" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="grp_vpc" value="AI Messaging subgraph" style="rounded=1;html=1;dashed=1;fillColor=#F2F8F0;strokeColor=#248814;verticalAlign=top;align=left;spacingLeft=10;fontSize=11;fontColor=#248814;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="258" y="312" width="320" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="ecs" value="PostGraphile&#10;ECS Fargate :5000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="276" y="350" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="rds" value="RDS Postgres&#10;ai_messaging schema (RLS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3334B9;fontColor=#1D3A52;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="430" y="350" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="grp_rt" value="Agents-runtime account" style="rounded=1;html=1;dashed=1;fillColor=none;strokeColor=#CD2264;verticalAlign=top;align=left;spacingLeft=10;fontSize=11;fontColor=#CD2264;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="872" y="110" width="192" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="agent" value="Agent Runtime&#10;Bedrock AgentCore" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#01A88D;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="888" y="142" width="160" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="grp_gw" value="Gateway account" style="rounded=1;html=1;dashed=1;fillColor=none;strokeColor=#CD2264;verticalAlign=top;align=left;spacingLeft=10;fontSize=11;fontColor=#CD2264;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="872" y="320" width="192" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="router" value="Apollo Router&#10;federated GraphQL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8C4FFF;fontColor=#1D3A52;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="888" y="354" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" value="webhook" style="endArrow=block;html=1;rounded=1;strokeColor=#1D4763;fontSize=10;fontColor=#1D4763" edge="1" parent="1" source="grp_chat" target="receiver"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" value="enqueue" style="endArrow=block;html=1;rounded=1;strokeColor=#1D4763;fontSize=10;fontColor=#1D4763" edge="1" parent="1" source="receiver" target="sqs"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" value="consume" style="endArrow=block;html=1;rounded=1;strokeColor=#1D4763;fontSize=10;fontColor=#1D4763" edge="1" parent="1" source="sqs" target="processor"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" value="token" style="endArrow=block;html=1;rounded=1;strokeColor=#1D4763;fontSize=10;fontColor=#1D4763" edge="1" parent="1" source="processor" target="cognito"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" value="HTTPS + JWT" style="endArrow=block;html=1;rounded=1;strokeColor=#1D4763;fontSize=10;fontColor=#1D4763" edge="1" parent="1" source="processor" target="agent"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="config (GraphQL)" style="endArrow=block;html=1;rounded=1;strokeColor=#8C4FFF;fontSize=10;fontColor=#8C4FFF" edge="1" parent="1" source="processor" target="router"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" value="SQL" style="endArrow=block;html=1;rounded=1;strokeColor=#1D4763;fontSize=10;fontColor=#5A6C86" edge="1" parent="1" source="ecs" target="rds"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" value="federation (PrivateLink)" style="endArrow=block;html=1;rounded=1;dashed=1;strokeColor=#8C4FFF;fontSize=10;fontColor=#8C4FFF" edge="1" parent="1" source="ecs" target="router"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" value="notify (HMAC)" style="endArrow=block;html=1;rounded=1;dashed=1;strokeColor=#1D4763;fontSize=10;fontColor=#1D4763" edge="1" parent="1" source="agent" target="alerts"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" value="post reply (bot token)" style="endArrow=block;html=1;rounded=1;dashed=1;strokeColor=#248814;fontSize=10;fontColor=#248814" edge="1" parent="1" source="processor" target="grp_chat"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" value="alert posted to chat" style="endArrow=block;html=1;rounded=1;dashed=1;strokeColor=#248814;fontSize=10;fontColor=#248814" edge="1" parent="1" source="alerts" target="grp_chat"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

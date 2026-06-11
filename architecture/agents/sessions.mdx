@@ -4,16 +4,16 @@ description: 'How conversation state persists in S3, semantic summarization mana
 icon: 'database'
 ---
 
-Every AI conversation in ClarusWMS is backed by a session. The frontend creates sessions, the agent runtime persists them in S3, and a hybrid memory system ensures the agent can recall context even from long conversations. This page walks through the full lifecycle.
+Every AI conversation in ClarusWMS is backed by a session. The client creates sessions, the agent runtime persists them in S3, and a hybrid memory system ensures the agent can recall context even from long conversations. This page walks through the full lifecycle.
 
 ## Session Contract
 
-The frontend and runtime share responsibility for session management through a simple contract:
+The client and runtime share responsibility for session management through a simple contract:
 
 | Responsibility | Owner | How |
 |---|---|---|
-| Generate session ID (UUID v4) | Frontend | `POST /api/session` or client-side fallback |
-| Provide session ID with every request | Frontend | `X-Amzn-Bedrock-AgentCore-Runtime-Session-Id` header |
+| Generate a session ID | Client | Client-defined — the AI App uses `POST /api/session`; AI Messaging derives a deterministic id |
+| Provide the session ID on every request | Client | `X-Amzn-Bedrock-AgentCore-Runtime-Session-Id` header |
 | Persist conversation state | Runtime | Auto-save to S3 after every event |
 | Restore state on cold start | Runtime | Auto-load from S3 when session ID matches |
 | Expire old sessions | S3 lifecycle | 1-day TTL on `agent-sessions/` prefix |
@@ -65,9 +65,9 @@ On each new user message, the semantic memory hook searches the vector index for
 | `semantic_search_top_k` | 3 | Number of historical matches to retrieve |
 | `max_context_length` | 2000 | Max characters of prepended historical context |
 
-## Frontend Session Lifecycle
+## Client Session Lifecycle
 
-The frontend manages sessions through a set of API routes and provides session IDs to Agent Core with each request:
+How a client manages sessions is up to the client. The AI App, for example, manages them through a set of API routes and provides session IDs to Agent Core with each request:
 
 - **Session creation**: `POST /api/session` generates a UUID v4 server-side and stores it in an in-memory Map keyed by user ID
 - **Session listing**: `GET /api/session` returns all sessions for the authenticated user, sorted by last activity

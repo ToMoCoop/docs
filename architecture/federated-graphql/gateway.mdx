@@ -57,7 +57,7 @@ The router is configured by `router.yaml` baked into the Docker image. Key block
 
 The router fetches the **composed supergraph schema** from Apollo GraphOS Uplink at runtime — it is not baked into the image. Two environment variables drive this:
 
-- `APOLLO_KEY` — Apollo GraphOS API key (SSM SecureString, injected as a task secret).
+- `APOLLO_KEY` — Apollo GraphOS API key, injected as a task secret.
 - `APOLLO_GRAPH_REF` — graph + variant identifier (e.g. `claruswms@staging`).
 
 ### Subgraph header propagation
@@ -74,7 +74,7 @@ For each subgraph, the router forwards a fixed set of headers on the outbound su
 
 The three `insert.from_context` headers come from claims the router has already validated against the Cognito JWKS, so subgraphs can trust them as authoritative without re-verifying.
 
-`x-clarus-subdomain` is currently propagated from the client header as-is — the active tenant is whatever the client sends. The planned tightening is a Cognito Pre-Token Generation Lambda that injects `custom:subdomain` into issued tokens, at which point this row flips from `propagate` to `insert.from_context: apollo_authentication::JWT::claims.custom:subdomain` and the client header is ignored. Code comments in `router.yaml` flag the interim state. See the [agents subgraph trust model](/architecture/federated-graphql/agents-subgraph#trust-model) for the downstream side.
+`x-clarus-subdomain` is currently propagated from the client request — the active tenant is whatever the client sends, validated downstream by the subgraph (format and tenant-exists checks). See the [PostGraphile subgraph trust model](/architecture/federated-graphql/postgraphile-subgraph#trust-model) for the downstream side.
 
 ### Cognito JWT validation
 

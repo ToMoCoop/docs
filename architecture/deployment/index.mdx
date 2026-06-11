@@ -4,7 +4,7 @@ description: 'How ClarusWMS services are built, tested, and deployed across envi
 icon: 'rocket'
 ---
 
-ClarusWMS uses a **multi-account AWS deployment model** where each environment (develop, staging, production) runs in a dedicated AWS account. A shared Pipelines account orchestrates builds via CodePipeline V2, and CodeBuild deploys cross-account using IAM roles.
+ClarusWMS uses a **multi-account AWS deployment model** where each environment (develop, staging, production) runs in a dedicated AWS account. A shared Pipelines account orchestrates builds via CodePipeline V2, and CodeBuild deploys cross-account into each environment.
 
 This section documents the deployment pipelines and processes for ClarusWMS services. The pipeline and build infrastructure is **shared across all services** — it's not AI-specific.
 
