@@ -406,6 +406,7 @@
               },
               {
                 "group": "Core Resources",
+                "public": true,
                 "pages": [
                   "api-reference/core-resources/address"
                 ]
@@ -419,7 +420,6 @@
           },
           {
             "tab": "Architecture",
-            "public": true,
             "groups": [
               {
                 "group": "Gateway",
