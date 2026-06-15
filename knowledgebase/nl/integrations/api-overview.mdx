@@ -1,0 +1,47 @@
+---
+title: "Bouwen met de Clarus API"
+description: "Hoe de Clarus API in elkaar past — REST om records aan te maken, GraphQL om updates te lezen en webhooks voor event-driven push — plus de gangbare patronen bij het integreren van uw eigen applicatie."
+sidebarTitle: "API-overzicht"
+---
+
+Voor realtime-integratie bouwt u rechtstreeks tegen de Clarus API. Dit is de juiste aanpak wanneer een ander systeem records in Clarus moet plaatsen en gesynchroniseerd moet blijven naarmate ze vorderen.
+
+Alle verzoeken gaan naar de base-URL `https://clarus-api.com` (REST onder `/api`, GraphQL op `/graphql`). De API is geauthenticeerd: elk verzoek draagt een OAuth bearer-token en uw `X-Clarus-Subdomain`-header — zie [Authenticatie & toegang](/knowledgebase/nl/integrations/api-authentication).
+
+<Info>Dit gedeelte legt de **aanpak en patronen** uit. Voor endpoints, velden, payloads en authenticatiegegevens is de [API Reference](/api-reference/introduction) de enige bron van waarheid — raadpleeg deze altijd voor het exacte schema.</Info>
+
+## De drie API's
+
+| API | Gebruik om | Richting |
+|---|---|---|
+| **REST** | Records aan te maken — producten, pre-ontvangsten, verkooporders | Naar Clarus |
+| **Webhooks** | Realtime-updates te ontvangen zodra events plaatsvinden — **aanbevolen** voor statuswijzigingen | Vanuit Clarus |
+| **GraphQL** | Records en details op aanvraag op te halen — voorraadniveaus, order- en ontvangstdetails | Vanuit Clarus |
+
+## Het algemene patroon
+
+<Steps>
+  <Step title="Stuur het record">
+    Het bronsysteem maakt een record aan in Clarus via REST. Zie [Records aanmaken](/knowledgebase/nl/integrations/api-creating-records).
+  </Step>
+  <Step title="Bewaar het teruggegeven ID">
+    Clarus geeft zijn interne ID terug. Bewaar dit bij het bronrecord zodat latere reads en updates geen opzoeking op referentie nodig hebben.
+  </Step>
+  <Step title="Haal statuswijzigingen op">
+    Abonneer u op [webhooks](/knowledgebase/nl/integrations/webhook-events) om realtime-updates te ontvangen terwijl het record vordert. Dit is de aanbevolen aanpak.
+  </Step>
+</Steps>
+
+<Tip>**Geef de voorkeur aan webhooks voor statusupdates.** Met webhooks krijgt u snelle, realtime-meldingen en vermijdt u de overhead van voortdurende verzoeken. [GraphQL pollen](/knowledgebase/nl/integrations/api-polling-updates) wordt ondersteund en is handig wanneer uw systeem geen inkomende HTTP-calls kan ontvangen — maar gebruik het spaarzaam, bijvoorbeeld als een incidentele afstemmingscontrole in plaats van frequent gepland pollen.</Tip>
+
+## Gangbare patronen en tips
+
+- **Bewaar altijd het Clarus-ID in het bronsysteem.** Wanneer u een product, pre-ontvangst of verkooporder aanmaakt, geeft Clarus zijn interne ID terug — bewaar dit bij uw record voor directe reads en updates later.
+- **Gebruik `external_system_reference1` voor uw ID.** De meeste resources bieden `external_system_reference1`–`3`. Per conventie gaat het primaire ID van het bronsysteem in `external_system_reference1`, wat afstemming eenvoudig maakt.
+- **Referentievelden zijn generieke slots.** Velden zoals `string1`–`string5`, `integer1`–`integer5` en `datetime1`–`datetime5` zijn beschikbaar op de meeste regel- en headerrecords. Hun betekenis ligt per integratie vast en moet worden gedocumenteerd (zo kan `string2` altijd de Incoterm zijn).
+- **Laat onbekende optionele velden weg.** Laat optionele velden weg uit de payload in plaats van lege strings te sturen, die validatieruis kunnen veroorzaken.
+- **Datums/tijden zijn ISO 8601.** Stuur een tijdzone mee, bijvoorbeeld `2024-09-16T23:00:00Z`.
+- **Landcodes zijn ISO 3166-1 alpha-2.** Gebruik de tweelettercode: `GB`, `BE`, `DE`, enzovoort.
+- **Standaardwaarden kunnen worden gewijzigd.** Waar de API waarden verwacht zoals pick type, pack strategy, dispatch strategy, receipt kind of order type, passen de standaardwaarden bij de meeste integraties — maar er bestaan alternatieven. Uw implementatieconsultant bevestigt tijdens de onboarding de juiste waarden voor uw opzet.
+
+<Tip>Gebruik een apart gebruikersaccount voor API-toegang en houd referenties geheim. Zie [API-authenticatie & toegang](/knowledgebase/nl/integrations/api-authentication).</Tip>

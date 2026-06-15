@@ -1,0 +1,71 @@
+---
+title: "Retrieving Data via GraphQL"
+description: "How to read data from the Clarus GraphQL layer — authenticating first, an example query, and how connections, filtering, and pagination work."
+sidebarTitle: "Retrieving Data"
+---
+
+Clarus exposes a **GraphQL** layer for reading data on demand. You send a query that names the fields you want and Clarus returns exactly those, which keeps responses lean. GraphQL is also how you **search and filter** for records.
+
+<Info>This page explains the approach with an example. For the full schema — every type, field, and filter argument — the **Operations** reference is the single source of truth. Always check it for current fields.</Info>
+
+All API requests must be authenticated — see [Authentication & Access](/knowledgebase/integrations/api-authentication).
+
+## Sending a query
+
+Send queries as an HTTP `POST` to `https://clarus-api.com/graphql`.
+
+## Example query
+
+This query reads sites. It's a good way to confirm your connection and credentials work, because it returns data without you having to set anything up first. It is illustrative — see the **Operations** reference for the full set of fields and arguments.
+
+```graphql
+query getSites($first: Int, $after: String) {
+  sites {
+    all(first: $first, after: $after) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          id
+          code
+          name
+        }
+      }
+    }
+  }
+}
+```
+
+## Connections, edges, and nodes
+
+Clarus GraphQL queries return **connections**. Rather than a plain list, a connection wraps your results so they can be paged:
+
+- `edges` — the list of results. Each edge has a `cursor` (a pointer to that item) and a `node`.
+- `node` — the actual record and its fields (in the example above, a site's `id`, `code`, and `name`).
+- `pageInfo` — paging metadata, such as `hasNextPage` and `endCursor`.
+
+This is the standard GraphQL cursor-connection shape. If it's new to you, see [graphql.org/learn/pagination](https://graphql.org/learn/pagination/).
+
+## Filtering and searching
+
+List queries accept arguments to narrow what comes back — for example filtering by a field value or limiting to records changed within a date range. The arguments available depend on the resource; the **Operations** reference lists them per query.
+
+## Pagination
+
+Results are paged with cursors. Request a page with `first` (how many) and `after` (the cursor to start from), then read `pageInfo` to decide whether to fetch more:
+
+- `hasNextPage` — whether more records are available.
+- `endCursor` — pass this as the next `after` value to get the following page.
+
+Walk the pages this way rather than requesting everything at once, especially for high-volume reads.
+
+## New to GraphQL?
+
+If you're unfamiliar with GraphQL — how queries, fields, and variables work — [graphql.org/learn](https://graphql.org/learn/) is a good primer.
+
+## When to read vs. subscribe
+
+Use GraphQL for **on-demand lookups**, searches, and reconciliation. For ongoing **status changes**, subscribe to [webhooks](/knowledgebase/integrations/webhook-events) rather than polling on a schedule — see [Building with the Clarus API](/api-reference/introduction) for the recommended approach.

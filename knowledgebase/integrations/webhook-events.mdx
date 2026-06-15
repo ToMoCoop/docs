@@ -1,0 +1,49 @@
+---
+title: "Webhooks & Event Triggers"
+description: "How Clarus webhooks work, the events you can trigger them on, and when to use webhooks instead of polling the API."
+sidebarTitle: "Webhooks & Events"
+---
+
+Webhooks are an alternative to polling the API. Rather than the upstream system asking Clarus "what has changed?" on a schedule, Clarus pushes a notification to a URL you provide as soon as a relevant event happens.
+
+## How they work
+
+When an event fires in Clarus — for example, a sales order being dispatched — Clarus sends an HTTP `POST` to your configured endpoint. The body contains the **full payload** of the affected record, not just an ID, so in most cases your system has everything it needs without a follow-up call.
+
+Your receiving endpoint should:
+
+- Be publicly reachable over **HTTPS**.
+- Respond quickly with a **2xx** status to acknowledge receipt.
+- Be **idempotent** — the same event may occasionally be delivered more than once, so handling the same payload twice must be safe.
+
+<Tip>Validate that incoming calls are genuinely from Clarus using the headers sent with every request. See [Validating Webhook Requests](/knowledgebase/integrations/validate-a-webhook-request).</Tip>
+
+## Available event triggers
+
+Webhooks can be configured against a range of system events. The most commonly used are:
+
+**Sales order events**
+- **Sales order completed (dispatched)** — fires when an order is fully picked and dispatched. The payload includes picked and dispatched quantities, dispatch date, and reference fields.
+
+**Goods in receipt events**
+- **Goods in receipt completed and put away** — fires when a receipt is fully received and put away. Useful for triggering downstream processes such as invoice approval.
+
+**Stock record events**
+- **Stock adjustment (positive)** — fires when stock is increased outside a normal receipt. See [Webhook on Positive Stock Adjustment](/knowledgebase/integrations/webhook-stock-positive).
+- **Stock adjustment (negative)** — fires when stock is decreased outside a normal dispatch. See [Webhook on Negative Stock Adjustment](/knowledgebase/integrations/webhook-stock-negative).
+- **Stock placed on hold** — fires when a stock record moves to a hold status (for example, awaiting QC or quarantined).
+- **Stock taken off hold** — fires when a hold is released and stock becomes available again.
+
+<Info>Many other triggers are available — your implementation consultant can confirm the full list and help you decide which to configure.</Info>
+
+## Configuring a webhook
+
+Webhook endpoints are configured on your domain under the **Automations** section. To set one up, provide the destination URL and select the trigger event(s). For a worked example, see [Webhook on Positive Stock Adjustment](/knowledgebase/integrations/webhook-stock-positive) or send documents by [email automation](/knowledgebase/integrations/email-automations).
+
+## Webhooks vs polling
+
+Both approaches work, and they aren't mutually exclusive.
+
+- **Webhooks** are best when you want prompt updates and have a reliable, always-on endpoint. They reduce load on both systems by removing unnecessary polling traffic.
+- **[Polling via GraphQL](/knowledgebase/integrations/api-polling-updates)** is best when your system can't reliably accept inbound HTTP calls, or when you want to control reconciliation timing (for example, a nightly sweep).
+- **Both together** is common: webhooks for prompt updates during the day, plus a periodic poll as a safety net to catch anything missed during a brief outage of your endpoint.

@@ -1,37 +1,51 @@
 ---
-title: "Introduction"
-description: "ClarusWMS REST API reference"
+title: "Building with the Clarus API"
+description: "An overview of the Clarus API — REST for creating records, GraphQL for reading data, and webhooks for event-driven updates — the patterns to follow, and where to find the full endpoint reference."
+sidebarTitle: "Overview"
 ---
 
-## Welcome
+The Clarus API provides programmatic access to warehouse operations: push records in, read data back, and receive events as they happen. This reference is generated from our OpenAPI specification — browse **Operations** for every endpoint, field, and payload.
 
-The ClarusWMS API provides programmatic access to warehouse management operations. This reference is generated from our OpenAPI specification.
+All requests go to the base URL `https://clarus-api.com` (REST under `/api`, GraphQL at `/graphql`).
 
-## Authentication
+<Info>This page explains the **approach and patterns**. For the exact schema, the **Operations** reference in this section is the single source of truth — always check it. The narrative here is kept high-level so it doesn't drift from the spec.</Info>
 
-The API uses **OAuth 2.0** Bearer tokens. Obtain an access token and send it on every request as an `Authorization: Bearer <token>` header.
+## Before you start
 
-| | URL |
-|---|---|
-| Authorize | `https://clarus-api.com/oauth/authorize` |
-| Token | `https://clarus-api.com/oauth/token` |
+The API is authenticated: every request carries an OAuth bearer token and your `X-Clarus-Subdomain` header. Nothing works until that's set up — start with [Authentication & Access](/knowledgebase/integrations/api-authentication).
 
-Request the scopes your integration requires.
+## The three APIs
 
-## Multi-tenancy: the subdomain header
+| API | Use it to | Direction |
+|---|---|---|
+| **REST** | Create records — products, pre-receipts, sales orders | Into Clarus |
+| **Webhooks** | Receive real-time updates as events happen — **recommended** for status changes | Out of Clarus |
+| **GraphQL** | Read records and look up details on demand — stock levels, order and receipt details | Out of Clarus |
 
-ClarusWMS is multi-tenant. **Every request must include the `X-Clarus-Subdomain` header** identifying which tenant's data you are operating on — it is sent in addition to the Bearer token, not instead of it.
+## The general pattern
 
-```
-Authorization: Bearer <access-token>
-X-Clarus-Subdomain: acme-warehouse
-```
+<Steps>
+  <Step title="Push the record">
+    The upstream system creates a record in Clarus via REST. See [Creating Records](/knowledgebase/integrations/api-creating-records).
+  </Step>
+  <Step title="Store the returned ID">
+    Clarus returns its internal ID. Store it against the upstream record so later reads and updates don't need a lookup by reference.
+  </Step>
+  <Step title="Pick up status changes">
+    Subscribe to [webhooks](/knowledgebase/integrations/webhook-events) to receive real-time updates as the record progresses. This is the recommended approach.
+  </Step>
+</Steps>
 
-## Using the playground
+To read data back, use the [GraphQL API](/knowledgebase/integrations/api-polling-updates) — it's how you retrieve records on demand and search or filter them.
 
-The "Authorize" panel exposes both requirements:
+<Tip>**Prefer webhooks for status updates.** Subscribing to webhooks gives you prompt, real-time notifications and avoids the overhead of constant requests. [Retrieving data via GraphQL](/knowledgebase/integrations/api-polling-updates) is supported and useful where your system can't receive inbound HTTP calls — but use it sparingly, for example as an occasional reconciliation sweep rather than frequent scheduled polling.</Tip>
 
-1. **BearerAuth** — paste an access token (or complete the OAuth flow if configured).
-2. **ClarusSubdomain** — enter your tenant subdomain; it is sent as the `X-Clarus-Subdomain` header on every request.
+## Common patterns and tips
 
-Both are required, so requests sent from the playground carry the token and the subdomain header together.
+- **Always store the Clarus ID upstream.** When you create a product, pre-receipt, or sales order, Clarus returns its internal ID — keep it against your record for direct reads and updates later.
+- **Use `external_system_reference1` for your ID.** Most resources expose `external_system_reference1`–`3`. By convention, the upstream system's primary ID goes into `external_system_reference1`, which makes reconciliation straightforward.
+- **Reference fields are generic slots.** Fields like `string1`–`string5`, `integer1`–`integer5`, and `datetime1`–`datetime5` are available on most line and header records. Their meaning is fixed per integration and should be documented (for example, `string2` might always be the Incoterm).
+- **Omit unknown optional fields.** Leave optional fields out of the payload rather than sending empty strings, which can cause validation noise.
+- **Datetimes are ISO 8601.** Send a timezone, for example `2024-09-16T23:00:00Z`.
+- **Country codes are ISO 3166-1 alpha-2.** Use the two-letter code: `GB`, `BE`, `DE`, and so on.
+- **Defaults can be changed.** Where the API expects values such as pick type, pack strategy, dispatch strategy, receipt kind, or order type, the standard defaults suit most integrations — but alternatives exist. Your implementation consultant will confirm the right values for your setup during onboarding.

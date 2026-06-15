@@ -102,7 +102,8 @@
                       "knowledgebase/accounts/dispatch-strategies",
                       "knowledgebase/accounts/reason-codes",
                       "knowledgebase/accounts/use-reason-codes",
-                      "knowledgebase/accounts/short-order-lines"
+                      "knowledgebase/accounts/short-order-lines",
+                      "knowledgebase/accounts/account-assignments"
                     ],
                     "public": true
                   },
@@ -224,7 +225,8 @@
                         "pages": [
                           "knowledgebase/outbound/create-a-sales-order",
                           "knowledgebase/outbound/create-a-sales-order-without-selecting-a-warehouse",
-                          "knowledgebase/outbound/amend-order-line-quantities"
+                          "knowledgebase/outbound/amend-order-line-quantities",
+                          "knowledgebase/outbound/order-import"
                         ],
                         "public": true
                       },
@@ -328,32 +330,8 @@
                 "public": true
               },
               {
-                "group": "Integrations & Tools",
+                "group": "Tools",
                 "pages": [
-                  {
-                    "group": "SFTP",
-                    "expanded": false,
-                    "pages": [
-                      "knowledgebase/integrations/use-sftp-for-imports",
-                      "knowledgebase/integrations/sftp-order-import",
-                      "knowledgebase/integrations/sftp-account-assignments",
-                      "knowledgebase/integrations/sftp-stock-transfer-file",
-                      "knowledgebase/integrations/asn-export"
-                    ],
-                    "public": true
-                  },
-                  {
-                    "group": "Automations",
-                    "expanded": false,
-                    "pages": [
-                      "knowledgebase/integrations/email-automations",
-                      "knowledgebase/integrations/validate-a-webhook-request",
-                      "knowledgebase/integrations/webhook-stock-positive",
-                      "knowledgebase/integrations/webhook-stock-negative"
-                    ],
-                    "public": true
-                  },
-                  "knowledgebase/integrations/dhl-credentials",
                   {
                     "group": "Cloud Print",
                     "expanded": false,
@@ -432,13 +410,125 @@
             ]
           },
           {
+            "tab": "Integrations",
+            "public": true,
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "knowledgebase/integrations/overview"
+                ],
+                "public": true
+              },
+              {
+                "group": "E-commerce & Marketplaces",
+                "pages": [
+                  "knowledgebase/integrations/marketplace-integrations"
+                ],
+                "public": true
+              },
+              {
+                "group": "ERP & Finance",
+                "pages": [
+                  "knowledgebase/financial/export-charges-to-sage-line-200",
+                  "knowledgebase/financial/export-supplier-data"
+                ],
+                "public": true
+              },
+              {
+                "group": "Couriers & Carriers",
+                "pages": [
+                  "knowledgebase/integrations/carrier-integrations",
+                  "knowledgebase/warehouse-setup/create-carrier",
+                  {
+                    "group": "Carrier-specific setup",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/integrations/carrier-specific-setup",
+                      "knowledgebase/integrations/dhl-credentials"
+                    ],
+                    "public": true
+                  }
+                ],
+                "public": true
+              },
+              {
+                "group": "SFTP",
+                "pages": [
+                  "knowledgebase/integrations/use-sftp-for-imports",
+                  {
+                    "group": "Imports",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/integrations/sftp-order-import",
+                      "knowledgebase/integrations/sftp-pre-receipt-import",
+                      "knowledgebase/integrations/sftp-product-import",
+                      "knowledgebase/integrations/sftp-stock-attribute-import",
+                      "knowledgebase/integrations/sftp-account-assignments",
+                      "knowledgebase/integrations/bespoke-imports"
+                    ],
+                    "public": true
+                  },
+                  {
+                    "group": "Exports",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/integrations/csv-confirmation-exports",
+                      "knowledgebase/integrations/asn-export",
+                      "knowledgebase/outbound/ftp-load-dispatch-file",
+                      "knowledgebase/integrations/bespoke-exports"
+                    ],
+                    "public": true
+                  }
+                ],
+                "public": true
+              },
+              {
+                "group": "Automations",
+                "pages": [
+                  {
+                    "group": "Webhooks",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/integrations/webhook-events",
+                      "knowledgebase/integrations/validate-a-webhook-request",
+                      "knowledgebase/integrations/webhook-stock-positive",
+                      "knowledgebase/integrations/webhook-stock-negative"
+                    ],
+                    "public": true
+                  },
+                  {
+                    "group": "Email",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/integrations/email-automations"
+                    ],
+                    "public": true
+                  },
+                  {
+                    "group": "File transfer",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/integrations/sftp-stock-transfer-file"
+                    ],
+                    "public": true
+                  }
+                ],
+                "public": true
+              }
+            ]
+          },
+          {
             "tab": "API Reference",
             "groups": [
               {
-                "group": "API Documentation",
+                "group": "Guides",
                 "public": true,
                 "pages": [
-                  "api-reference/introduction"
+                  "api-reference/introduction",
+                  "knowledgebase/integrations/api-authentication",
+                  "knowledgebase/integrations/api-creating-records",
+                  "knowledgebase/integrations/api-polling-updates"
                 ]
               },
               {
@@ -589,7 +679,8 @@
                       "knowledgebase/nl/accounts/dispatch-strategies",
                       "knowledgebase/nl/accounts/reason-codes",
                       "knowledgebase/nl/accounts/use-reason-codes",
-                      "knowledgebase/nl/accounts/short-order-lines"
+                      "knowledgebase/nl/accounts/short-order-lines",
+                      "knowledgebase/nl/accounts/account-assignments"
                     ],
                     "public": true
                   },
@@ -709,7 +800,8 @@
                         "pages": [
                           "knowledgebase/nl/outbound/create-a-sales-order",
                           "knowledgebase/nl/outbound/create-a-sales-order-without-selecting-a-warehouse",
-                          "knowledgebase/nl/outbound/amend-order-line-quantities"
+                          "knowledgebase/nl/outbound/amend-order-line-quantities",
+                          "knowledgebase/nl/outbound/order-import"
                         ],
                         "public": true
                       },
@@ -811,32 +903,8 @@
                 "public": true
               },
               {
-                "group": "Integraties & Tools",
+                "group": "Tools",
                 "pages": [
-                  {
-                    "group": "SFTP",
-                    "expanded": false,
-                    "pages": [
-                      "knowledgebase/nl/integrations/use-sftp-for-imports",
-                      "knowledgebase/nl/integrations/sftp-order-import",
-                      "knowledgebase/nl/integrations/sftp-account-assignments",
-                      "knowledgebase/nl/integrations/sftp-stock-transfer-file",
-                      "knowledgebase/nl/integrations/asn-export"
-                    ],
-                    "public": true
-                  },
-                  {
-                    "group": "Automations",
-                    "expanded": false,
-                    "pages": [
-                      "knowledgebase/nl/integrations/email-automations",
-                      "knowledgebase/nl/integrations/validate-a-webhook-request",
-                      "knowledgebase/nl/integrations/webhook-stock-positive",
-                      "knowledgebase/nl/integrations/webhook-stock-negative"
-                    ],
-                    "public": true
-                  },
-                  "knowledgebase/nl/integrations/dhl-credentials",
                   {
                     "group": "Cloud Print",
                     "expanded": false,
@@ -907,6 +975,125 @@
                   "knowledgebase/nl/troubleshooting/random-logout",
                   "knowledgebase/nl/troubleshooting/login-issues",
                   "knowledgebase/nl/troubleshooting/mfa-issues"
+                ],
+                "public": true
+              }
+            ]
+          },
+          {
+            "tab": "Integraties",
+            "public": true,
+            "groups": [
+              {
+                "group": "Overzicht",
+                "pages": [
+                  "knowledgebase/nl/integrations/overview"
+                ],
+                "public": true
+              },
+              {
+                "group": "E-commerce & marktplaatsen",
+                "pages": [
+                  "knowledgebase/nl/integrations/marketplace-integrations"
+                ],
+                "public": true
+              },
+              {
+                "group": "ERP & financieel",
+                "pages": [
+                  "knowledgebase/nl/financial/export-charges-to-sage-line-200",
+                  "knowledgebase/nl/financial/export-supplier-data"
+                ],
+                "public": true
+              },
+              {
+                "group": "Vervoerders",
+                "pages": [
+                  "knowledgebase/nl/integrations/carrier-integrations",
+                  "knowledgebase/nl/warehouse-setup/create-carrier",
+                  {
+                    "group": "Per vervoerder",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/integrations/carrier-specific-setup",
+                      "knowledgebase/nl/integrations/dhl-credentials"
+                    ],
+                    "public": true
+                  }
+                ],
+                "public": true
+              },
+              {
+                "group": "SFTP",
+                "pages": [
+                  "knowledgebase/nl/integrations/use-sftp-for-imports",
+                  {
+                    "group": "Imports",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/integrations/sftp-order-import",
+                      "knowledgebase/nl/integrations/sftp-pre-receipt-import",
+                      "knowledgebase/nl/integrations/sftp-product-import",
+                      "knowledgebase/nl/integrations/sftp-stock-attribute-import",
+                      "knowledgebase/nl/integrations/sftp-account-assignments",
+                      "knowledgebase/nl/integrations/bespoke-imports"
+                    ],
+                    "public": true
+                  },
+                  {
+                    "group": "Exports",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/integrations/csv-confirmation-exports",
+                      "knowledgebase/nl/integrations/asn-export",
+                      "knowledgebase/nl/outbound/ftp-load-dispatch-file",
+                      "knowledgebase/nl/integrations/bespoke-exports"
+                    ],
+                    "public": true
+                  }
+                ],
+                "public": true
+              },
+              {
+                "group": "Bouwen met de Clarus API",
+                "pages": [
+                  "knowledgebase/nl/integrations/api-overview",
+                  "knowledgebase/nl/integrations/api-authentication",
+                  "knowledgebase/nl/integrations/api-creating-records",
+                  "knowledgebase/nl/integrations/api-polling-updates"
+                ],
+                "public": true
+              },
+              {
+                "group": "Automatiseringen",
+                "pages": [
+                  {
+                    "group": "Webhooks",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/integrations/webhook-events",
+                      "knowledgebase/nl/integrations/validate-a-webhook-request",
+                      "knowledgebase/nl/integrations/webhook-stock-positive",
+                      "knowledgebase/nl/integrations/webhook-stock-negative"
+                    ],
+                    "public": true
+                  },
+                  {
+                    "group": "Email",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/integrations/email-automations"
+                    ],
+                    "public": true
+                  },
+                  {
+                    "group": "Bestandsoverdracht",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/integrations/sftp-stock-transfer-file"
+                    ],
+                    "public": true
+                  }
                 ],
                 "public": true
               }

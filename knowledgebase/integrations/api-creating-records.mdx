@@ -1,0 +1,47 @@
+---
+title: "Creating Records via the API"
+description: "The flow for pushing products, goods in receipts, and sales orders into Clarus with the REST API — including looking up a product storage unit and storing the returned ID."
+sidebarTitle: "Creating Records"
+---
+
+Use the REST API to create records in Clarus in real time. This page walks through three **common examples** — products, goods in receipts, and sales orders — to show the typical pattern. They are illustrations, not the full picture: the API can create and manage many more resources than these.
+
+<Info>These are example use cases, chosen because they cover the most common integration flow. For the complete list of resources, endpoints, payloads, and fields, the [API Reference](/api-reference/introduction) is the single source of truth — always check it. The details here are deliberately kept high-level so they don't drift from the canonical schema.</Info>
+
+All API requests must be authenticated — see [Authentication & Access](/knowledgebase/integrations/api-authentication).
+
+## Create products first
+
+Before any order or receipt can reference a product, the product must exist in Clarus. When a product is created upstream for a customer that stores stock in the warehouse, create the same product in Clarus and store its returned ID against the source record.
+
+Post the product to the products endpoint, then keep the returned Clarus product ID — future calls reference it directly without another lookup. Put your own product ID in `external_system_reference1` for reconciliation.
+
+## Create goods in receipts
+
+When an inbound order is created upstream, push it to Clarus so the warehouse team can receive against it.
+
+<Steps>
+  <Step title="Look up the product storage unit">
+    A product can have multiple storage units (single units, cases, pallets). Before creating the receipt, query the product's storage units and use the one with **priority 0**. That value goes into the storage unit field on the receipt line.
+  </Step>
+  <Step title="Post the receipt">
+    Send the receipt header (reference, expected date, warehouse, account) with one or more lines. Provide line-level batch, pallet, and storage-unit quantities only if you have them — they can be captured during receipt instead.
+  </Step>
+  <Step title="Store the returned ID">
+    Keep the Clarus receipt ID against the upstream order, then track its progress with [webhooks](/knowledgebase/integrations/webhook-events) or [polling](/knowledgebase/integrations/api-polling-updates) as it is received and put away.
+  </Step>
+</Steps>
+
+## Create sales orders (goods out)
+
+When a sales order is created upstream, push it to Clarus so it can be picked and dispatched. Send the order header, one or more lines, and the delivery address.
+
+- The **delivery address** is passed as a related address block. Use an [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code, for example `GB`, `BE`, or `DE`.
+- Use the generic reference fields (`string1`–`5`, and so on) for data such as Incoterm or customs status, as agreed for your integration.
+- Store the returned goods out ID, then track dispatch progress with [webhooks](/knowledgebase/integrations/webhook-events) or [polling](/knowledgebase/integrations/api-polling-updates).
+
+<Warning>Values such as pick type, pack strategy, dispatch strategy, receipt kind, and order type have standard defaults but can be configured differently. Confirm the right values for your setup with your implementation consultant — see the notes in [Building with the Clarus API](/api-reference/introduction).</Warning>
+
+## Beyond these examples
+
+Products, receipts, and sales orders are just a few of the records you can work with. The same push-and-store-the-ID pattern applies across the API, and many other resources and operations are available. See the [API Reference](/api-reference/introduction) for the complete list of what you can create, read, and update.

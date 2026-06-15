@@ -1,0 +1,24 @@
+---
+title: "Confirmation Exports (PO & Sales Order)"
+description: "Standard CSV confirmation exports that report what was received against a purchase order and what was picked and dispatched against a sales order, delivered automatically to your download SFTP."
+sidebarTitle: "Confirmation Exports"
+---
+
+Alongside the standard CSV imports, Clarus provides two confirmation exports out of the box. They report back what actually happened in the warehouse so your upstream system can reconcile.
+
+## Available exports
+
+| Export | Confirms |
+|---|---|
+| **PO Confirmation Export** | What was received against a purchase order / pre-receipt |
+| **Sales Order Confirmation Export** | What was picked and dispatched against a sales order |
+
+## How they work
+
+- Delivered as **CSV** files.
+- Can be **scheduled** to run automatically.
+- Dropped onto your **download SFTP** for collection. See [Using SFTP for Imports](/knowledgebase/integrations/use-sftp-for-imports) for connection details — the same SFTP setup is used to retrieve exports.
+
+<Info>Minor tweaks — column ordering, renamed headers, filtering by warehouse — can usually be accommodated without a full bespoke build. If you need a format the standard exports don't cover, see [Bespoke Exports](/knowledgebase/integrations/bespoke-exports).</Info>
+
+<Tip>If you would rather receive updates in real time than collect a scheduled file, you can poll the API or receive [webhooks](/knowledgebase/integrations/webhook-events) instead.</Tip>

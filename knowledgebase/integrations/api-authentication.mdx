@@ -1,0 +1,53 @@
+---
+title: "Authentication & Access"
+description: "How to authenticate against the Clarus API — OAuth 2.0 bearer tokens, the required tenant subdomain header, the request headers to send, and the playground."
+sidebarTitle: "Authentication"
+---
+
+The Clarus API is authenticated. Every request carries an OAuth 2.0 bearer token **and** your tenant subdomain header.
+
+## OAuth 2.0
+
+The API uses **OAuth 2.0** bearer tokens. Obtain an access token and send it on every request as an `Authorization: Bearer <token>` header.
+
+| | URL |
+|---|---|
+| Authorize | `https://clarus-api.com/oauth/authorize` |
+| Token | `https://clarus-api.com/oauth/token` |
+
+Request the scopes your integration requires.
+
+## The subdomain header
+
+ClarusWMS is multi-tenant. Every request must include the `X-Clarus-Subdomain` header identifying which tenant's data you are operating on — it is sent in addition to the bearer token, not instead of it.
+
+## Request headers
+
+Send these headers on **every** request, whether you are calling REST or GraphQL:
+
+| Header | Value |
+|---|---|
+| `Authorization` | `Bearer <access-token>` |
+| `X-Clarus-Subdomain` | your tenant subdomain |
+| `Content-Type` | `application/json` |
+
+## Using the playground
+
+When you try calls from the **Operations** playground, the **Authorize** panel exposes both requirements:
+
+1. **BearerAuth** — paste an access token (or complete the OAuth flow if configured).
+2. **ClarusSubdomain** — enter your tenant subdomain; it is sent as the `X-Clarus-Subdomain` header on every request.
+
+Both are required, so requests sent from the playground carry the token and the subdomain header together.
+
+## Use a dedicated user account
+
+Create a separate user account specifically for API access, distinct from any account used to log into the WMS front-end.
+
+<Warning>Signing into the front-end with the same account the integration uses can end the existing session — and running integration calls while someone is logged in on that account can knock them out of the system. Keeping them separate avoids being logged out mid-task.</Warning>
+
+The same logic applies if you have multiple developers or systems hitting the API: ideally each environment (development, test, production) gets its own account, so auditing, throttling, and troubleshooting can be done independently.
+
+## Treat credentials as secrets
+
+Store API credentials in a secrets manager, environment variables, or your platform's equivalent. Don't commit them to source control or paste them into shared documents.

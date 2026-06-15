@@ -1,0 +1,44 @@
+---
+title: "Integration Options"
+description: "An overview of the ways to connect Clarus WMS to external systems — marketplaces, ERP and finance platforms, couriers, file transfer, and the Clarus API — and how to choose between them."
+sidebarTitle: "Overview"
+---
+
+Clarus WMS exchanges data with external systems such as e-commerce stores, ERPs, finance platforms, couriers, and your own line-of-business applications. The right approach depends on what you are connecting to, how often the data changes, and how much control you need.
+
+## Ways to connect
+
+<CardGroup cols={2}>
+  <Card title="E-commerce & marketplaces" href="/knowledgebase/integrations/marketplace-integrations">
+    Flow orders from Shopify, eBay, Amazon, and other channels straight into the warehouse, and send dispatch and tracking updates back.
+  </Card>
+  <Card title="Couriers & carriers" href="/knowledgebase/integrations/carrier-integrations">
+    Generate shipping labels, retrieve tracking, and pass dispatch information to over 80 parcel and freight carriers.
+  </Card>
+  <Card title="ERP & finance" href="/knowledgebase/financial/export-charges-to-sage-line-200">
+    Export charges and supplier data to finance systems such as Sage, or move records to and from your ERP.
+  </Card>
+  <Card title="File transfer (SFTP)" href="/knowledgebase/integrations/use-sftp-for-imports">
+    Import and export orders, receipts, products, and stock using pre-built CSV templates over SFTP.
+  </Card>
+  <Card title="Bespoke files & EDI" href="/knowledgebase/integrations/bespoke-imports">
+    Custom TXT, CSV, XML, or EDI interfaces built to match a specific upstream or downstream system.
+  </Card>
+  <Card title="Build with the Clarus API" href="/api-reference/introduction">
+    Real-time integration: push records in via REST, read updates via GraphQL, and receive webhooks when events fire.
+  </Card>
+</CardGroup>
+
+## Choosing an approach
+
+| If you want to… | Use |
+|---|---|
+| Go live quickly with standard data | [Standard CSV imports/exports over SFTP](/knowledgebase/integrations/use-sftp-for-imports) |
+| Connect a sales channel | [Marketplace integration](/knowledgebase/integrations/marketplace-integrations) |
+| Ship parcels and freight | [Courier integration](/knowledgebase/integrations/carrier-integrations) |
+| Match a system that the standard templates don't fit | [Bespoke file or EDI interface](/knowledgebase/integrations/bespoke-imports) |
+| Integrate your own application in real time | [The Clarus API](/api-reference/introduction) |
+
+<Info>These approaches can be mixed. It is common to import products and pre-receipts by CSV during go-live, then move to the API once the upstream system is ready.</Info>
+
+<Tip>Not sure which fits? Your implementation consultant can recommend the right approach for your warehouse layout, processes, and the systems you need to connect during onboarding.</Tip>

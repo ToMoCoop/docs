@@ -1,0 +1,49 @@
+---
+title: "Webhooks & event-triggers"
+description: "Hoe Clarus-webhooks werken, op welke events u ze kunt triggeren en wanneer u webhooks gebruikt in plaats van de API te pollen."
+sidebarTitle: "Webhooks & events"
+---
+
+Webhooks zijn een alternatief voor het pollen van de API. In plaats van dat het bronsysteem Clarus volgens een schema vraagt "wat is er gewijzigd?", pusht Clarus een melding naar een URL die u opgeeft zodra een relevant event plaatsvindt.
+
+## Hoe ze werken
+
+Wanneer een event in Clarus plaatsvindt — bijvoorbeeld een verkooporder die wordt verzonden — stuurt Clarus een HTTP `POST` naar uw geconfigureerde endpoint. De body bevat de **volledige payload** van het betrokken record, niet alleen een ID, zodat uw systeem in de meeste gevallen alles heeft zonder een vervolg-call.
+
+Uw ontvangende endpoint moet:
+
+- Publiek bereikbaar zijn via **HTTPS**.
+- Snel reageren met een **2xx**-status om ontvangst te bevestigen.
+- **Idempotent** zijn — hetzelfde event kan af en toe meer dan eens worden geleverd, dus dezelfde payload tweemaal verwerken moet veilig zijn.
+
+<Tip>Valideer dat inkomende calls daadwerkelijk van Clarus komen met de headers die bij elk verzoek worden meegestuurd. Zie [Webhookaanvragen valideren](/knowledgebase/nl/integrations/validate-a-webhook-request).</Tip>
+
+## Beschikbare event-triggers
+
+Webhooks kunnen worden geconfigureerd op een reeks systeem-events. De meest gebruikte zijn:
+
+**Verkooporder-events**
+- **Verkooporder voltooid (verzonden)** — vindt plaats wanneer een order volledig is gepickt en verzonden. De payload bevat gepickte en verzonden aantallen, verzenddatum en referentievelden.
+
+**Goods in receipt-events**
+- **Goods in receipt voltooid en weggezet** — vindt plaats wanneer een ontvangst volledig is ontvangen en weggezet. Handig om downstream-processen zoals factuurgoedkeuring te triggeren.
+
+**Voorraadrecord-events**
+- **Stock adjustment (positief)** — vindt plaats wanneer voorraad buiten een normale ontvangst wordt verhoogd. Zie [Webhook bij positieve voorraadcorrectie](/knowledgebase/nl/integrations/webhook-stock-positive).
+- **Stock adjustment (negatief)** — vindt plaats wanneer voorraad buiten een normale verzending wordt verlaagd. Zie [Webhook bij negatieve voorraadcorrectie](/knowledgebase/nl/integrations/webhook-stock-negative).
+- **Voorraad on hold geplaatst** — vindt plaats wanneer een voorraadrecord naar een hold-status gaat (bijvoorbeeld in afwachting van QC of in quarantaine).
+- **Voorraad off hold gehaald** — vindt plaats wanneer een hold wordt vrijgegeven en voorraad weer beschikbaar komt.
+
+<Info>Er zijn veel andere triggers beschikbaar — uw implementatieconsultant kan de volledige lijst bevestigen en u helpen kiezen welke u configureert.</Info>
+
+## Een webhook configureren
+
+Webhook-endpoints worden op uw domein geconfigureerd onder het gedeelte **Automations**. Geef de bestemmings-URL op en selecteer de trigger-event(s). Zie voor een uitgewerkt voorbeeld [Webhook bij positieve voorraadcorrectie](/knowledgebase/nl/integrations/webhook-stock-positive) of stuur documenten via een [e-mailautomatisering](/knowledgebase/nl/integrations/email-automations).
+
+## Webhooks versus pollen
+
+Beide aanpakken werken en sluiten elkaar niet uit.
+
+- **Webhooks** zijn het beste wanneer u snelle updates wilt en een betrouwbaar, altijd beschikbaar endpoint hebt. Ze verminderen de belasting op beide systemen door onnodig pollverkeer te schrappen.
+- **[Pollen via GraphQL](/knowledgebase/nl/integrations/api-polling-updates)** is het beste wanneer uw systeem niet betrouwbaar inkomende HTTP-calls kan accepteren, of wanneer u het timing van afstemming wilt bepalen (bijvoorbeeld een nachtelijke sweep).
+- **Beide samen** is gebruikelijk: webhooks voor snelle updates overdag, plus een periodieke poll als vangnet om gemiste zaken tijdens een korte storing van uw endpoint op te vangen.

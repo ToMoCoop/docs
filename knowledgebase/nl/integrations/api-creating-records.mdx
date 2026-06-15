@@ -1,0 +1,47 @@
+---
+title: "Records aanmaken via de API"
+description: "De flow voor het in Clarus plaatsen van producten, goods in receipts en verkooporders met de REST API — inclusief het opzoeken van een product storage unit en het bewaren van het teruggegeven ID."
+sidebarTitle: "Records aanmaken"
+---
+
+Gebruik de REST API om records realtime in Clarus aan te maken. Deze pagina behandelt drie **veelvoorkomende voorbeelden** — producten, goods in receipts en verkooporders — om het typische patroon te tonen. Het zijn illustraties, niet het volledige plaatje: de API kan veel meer resources aanmaken en beheren dan deze.
+
+<Info>Dit zijn voorbeeld-use-cases, gekozen omdat ze de meest voorkomende integratieflow dekken. Voor de volledige lijst met resources, endpoints, payloads en velden is de [API Reference](/api-reference/introduction) de enige bron van waarheid — raadpleeg deze altijd. De details hier zijn bewust hoog over gehouden, zodat ze niet afwijken van het canonieke schema.</Info>
+
+Alle API-verzoeken moeten geauthenticeerd zijn — zie [Authenticatie & toegang](/knowledgebase/nl/integrations/api-authentication).
+
+## Maak eerst producten aan
+
+Voordat een order of ontvangst naar een product kan verwijzen, moet het product in Clarus bestaan. Wanneer upstream een product wordt aangemaakt voor een klant die voorraad in het magazijn opslaat, maakt u hetzelfde product in Clarus aan en bewaart u het teruggegeven ID bij het bronrecord.
+
+Stuur het product naar het products-endpoint en bewaar het teruggegeven Clarus product-ID — latere calls verwijzen er rechtstreeks naar zonder nieuwe opzoeking. Plaats uw eigen product-ID in `external_system_reference1` voor afstemming.
+
+## Maak goods in receipts aan
+
+Wanneer upstream een inkomende order wordt aangemaakt, stuurt u die naar Clarus zodat het magazijnteam ertegen kan ontvangen.
+
+<Steps>
+  <Step title="Zoek de product storage unit op">
+    Een product kan meerdere storage units hebben (losse eenheden, dozen, pallets). Voordat u de ontvangst aanmaakt, vraagt u de storage units van het product op en gebruikt u die met **priority 0**. Die waarde gaat in het storage-unitveld op de ontvangstregel.
+  </Step>
+  <Step title="Plaats de ontvangst">
+    Stuur de ontvangst-header (referentie, verwachte datum, magazijn, account) met een of meer regels. Geef batch-, pallet- en storage-unitaantallen op regelniveau alleen op als u ze hebt — ze kunnen ook tijdens de ontvangst worden vastgelegd.
+  </Step>
+  <Step title="Bewaar het teruggegeven ID">
+    Bewaar het Clarus-ontvangst-ID bij de bronorder en volg de voortgang met [webhooks](/knowledgebase/nl/integrations/webhook-events) of [polling](/knowledgebase/nl/integrations/api-polling-updates) terwijl er wordt ontvangen en weggezet.
+  </Step>
+</Steps>
+
+## Maak verkooporders (goods out) aan
+
+Wanneer upstream een verkooporder wordt aangemaakt, stuurt u die naar Clarus zodat hij kan worden gepickt en verzonden. Stuur de orderheader, een of meer regels en het bezorgadres.
+
+- Het **bezorgadres** wordt meegestuurd als een gekoppeld adresblok. Gebruik een [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)-landcode, bijvoorbeeld `GB`, `BE` of `DE`.
+- Gebruik de generieke referentievelden (`string1`–`5`, enzovoort) voor gegevens zoals Incoterm of douanestatus, zoals afgesproken voor uw integratie.
+- Bewaar het teruggegeven goods out-ID en volg de verzendvoortgang met [webhooks](/knowledgebase/nl/integrations/webhook-events) of [polling](/knowledgebase/nl/integrations/api-polling-updates).
+
+<Warning>Waarden zoals pick type, pack strategy, dispatch strategy, receipt kind en order type hebben standaardwaarden maar kunnen anders worden geconfigureerd. Bevestig de juiste waarden voor uw opzet met uw implementatieconsultant — zie de opmerkingen in [Bouwen met de Clarus API](/knowledgebase/nl/integrations/api-overview).</Warning>
+
+## Verder dan deze voorbeelden
+
+Producten, ontvangsten en verkooporders zijn slechts enkele van de records waarmee u kunt werken. Hetzelfde patroon — aanmaken en het ID bewaren — geldt voor de hele API, en er zijn veel andere resources en operaties beschikbaar. Zie de [API Reference](/api-reference/introduction) voor de volledige lijst van wat u kunt aanmaken, lezen en bijwerken.

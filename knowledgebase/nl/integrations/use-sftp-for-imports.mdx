@@ -1,76 +1,78 @@
 ---
-title: "Hoe gebruik ik SFTP voor import?"
-description: "SFTP is een veilige manier om bestanden over te zetten. Dit artikel leidt u door het proces van het uploaden van uw bestanden naar Clarus WMS en hoe u"
+title: "SFTP-overzicht"
+description: "Hoe u verbinding maakt met Clarus WMS via SFTP om importbestanden te uploaden en exports op te halen, inclusief voorbeeld-SFTP-applicaties en waar u uw referenties vindt."
+sidebarTitle: "Overzicht"
 ---
 
-## In deze handleiding wordt uitgelegd hoe u SFTP (Secure File Transfer Protocol) kunt gebruiken voor versleutelde en veilige bestandsoverdrachten naar Clarus WMS. U leert de stappen voor het uploaden van importbestanden en het controleren van de status van uw upload.
+## Overzicht
 
-SFTP is een veilige manier om bestanden over te zetten. Dit artikel leidt u door het proces van het uploaden van uw bestanden naar Clarus WMS en hoe u kunt controleren of ze correct zijn geïmporteerd.
+SFTP (Secure File Transfer Protocol) is een versleutelde manier om bestanden uit te wisselen met Clarus WMS. Gebruik het om **importbestanden te uploaden** (zoals orders, pre-ontvangsten en producten) en om **bestanden op te halen die Clarus exporteert** (zoals bevestigingsexports).
 
-## Stapsgewijze handleiding
+Clarus biedt twee soorten SFTP-accounts:
 
-### 1. Uw CSV-bestand voorbereiden
+- **Upload** — bestanden in Clarus plaatsen om te importeren.
+- **Download** — bestanden ophalen die Clarus heeft geëxporteerd.
 
- **Actie:** Zorg ervoor dat uw bestand klaar is om te uploaden. **Details:** Vul uw spreadsheet volledig in en sla deze op als een **Csv** dossier. Het is belangrijk dat alle gegevens correct worden geformatteerd. Als gegevens ontbreken of onjuist zijn geformatteerd, kan de import mislukken.
+Uw referenties voor beide vindt u onder **FTP Users** in de web app.
 
-### 2. Kies een SFTP applicatie
+## SFTP-applicaties
 
- **Actie:** Selecteer een SFTP-toepassing die u wilt gebruiken voor het uploaden van uw bestandsup. **Details:** Hier zijn enkele veelvoorkomende opties:
+U kunt verbinding maken met **elke applicatie die SFTP ondersteunt** — gebruik de client van uw voorkeur. De onderstaande applicaties zijn voorbeelden waarvan bekend is dat ze via SFTP verbinding maken. Dit is geen volledige lijst, en het vermelden ervan is geen aanbeveling of garantie dat ze met Clarus zijn getest:
 
--  **WinSCP** (aanbevolen in deze gids)
--  **FileZilla** 
--  **CyberDuck** 
--  **FireFTP** 
--  **ClassicFTP** 
--  **FreeFTP door CoffeeCup** 
+- WinSCP
+- FileZilla
+- CyberDuck
+- FireFTP
+- ClassicFTP
+- FreeFTP by CoffeeCup
 
-### 3. Meld u aan bij uw domein
+## Verbinding maken via SFTP
 
- **Actie:** Toegang tot de server om uw bestand te uploaden. **Details:** 
+<Steps>
+  <Step title="Haal uw referenties op">
+    Vind uw SFTP-referenties onder **FTP Users** in de web app. Er zijn aparte accounts voor upload en download.
+  </Step>
+  <Step title="Maak een SFTP-sessie aan">
+    Open uw SFTP-applicatie en maak een nieuwe sessie aan. Kies **SFTP** als bestandsprotocol en voer uw referenties in.
+  </Step>
+  <Step title="Bestanden overdragen">
+    Om te importeren sleept u uw bestand van uw computer (linkerkant) naar de server (rechterkant). Om een export op te halen sleept u het bestand van de server terug naar uw computer. Het proces is vergelijkbaar in alle SFTP-applicaties.
+  </Step>
+</Steps>
 
--  **Open de SFTP-toepassing:** Voor deze gids gebruiken we **WinSCP** .
--  **Voer uw referenties in:** Meld u aan bij uw domein met de referenties die u kunt vinden onder **FTP gebruikers** in de Clarus WMS Web App. Zorg er altijd voor dat u de **Sftp** Protocol voor een veilige overdracht.
--  **Overschakelen naar SFTP:** Open in WinSCP een nieuwe sessie en kies **Sftp** In het dropdownmenu onder **Bestandsprotocol** .
+<Info>SFTP versleutelt bestandsoverdrachten en is daarmee veiliger dan standaard FTP. Gebruik altijd SFTP om uw gegevens te beschermen.</Info>
 
-### 4. Upload het bestand
+## Importbestanden uploaden
 
- **Actie:** Zet uw CSV-bestand over naar de server. **Details:** 
+<Steps>
+  <Step title="Bereid uw bestand voor">
+    Vul uw spreadsheet in en sla deze op als een **CSV**-bestand. Ontbrekende of onjuist geformatteerde gegevens zorgen ervoor dat de import mislukt. De vereiste velden hangen af van wat u importeert — zie de afzonderlijke import-handleidingen in dit gedeelte.
+  </Step>
+  <Step title="Upload het via SFTP">
+    Maak verbinding met uw **upload**-SFTP-account en draag het bestand over zoals hierboven.
+  </Step>
+  <Step title="Controleer de importstatus">
+    Ga naar **System Logs** in de web app. Een **geslaagde** upload toont een bevestigingsbericht; een **mislukte** import toont een foutmelding met de oorzaak.
+  </Step>
+</Steps>
 
--  **Sleep het bestand slepen en neerzetten:** Zoek uw CSV-bestand aan de linkerkant van uw SFTP-toepassing. Sleep het van links en laat het in een lege ruimte aan de rechterkant vallen.
--  **Voltooi de upload:** Het bestand begint te uploaden. Dit proces is vergelijkbaar in alle SFTP-toepassingen.
+<Warning>Bekijk foutmeldingen in System Logs altijd zorgvuldig om importproblemen te begrijpen en op te lossen.</Warning>
 
-### 5. Bekijk de importstatus in Clarus WMS
+## Exports ophalen
 
- **Actie:** Bevestig dat uw bestand succesvol is geüpload. **Details:** 
+Bestanden die Clarus voor u genereert, worden op uw **download**-SFTP-account geplaatst om op te halen. Maak verbinding met dat account en draag het bestand terug naar uw computer. Zie [Bevestigingsexports](/knowledgebase/nl/integrations/csv-confirmation-exports) voor een voorbeeld.
 
--  **Ga naar Systeemlogboeken:** Zodra uw bestand is geüpload, gaat u naar de **Systeemlogboeken** sectie in de Clarus WMS Web App.
--  **Controleer de upload:** 
-
-- A **Succesvol** Upload toont een bevestigingsbericht in de logboeken.
-- A **mislukt** De import geeft een foutbericht weer, waarin wordt uitgelegd waarom de upload is mislukt. Veelvoorkomende redenen zijn onjuiste bestandsopmaak of ontbrekende vereiste informatie.
-
-## FAQs
-
-### Welk bestandsformaat is vereist voor SFTP-import?
-
-Het dossier moet in **Csv** formaat.
-
-### Waar kan ik mijn SFTP-referenties vinden?
-
-U kunt uw referenties vinden onder **FTP gebruikers** in de Clarus WMS Web App.
-
-### Wat moet ik doen als de import mislukt?
-
-Controleer de **Foutmelding** In de **Systeemlogboeken** . Het probleem wordt meestal veroorzaakt door onjuiste opmaak of ontbrekende informatie in uw CSV-bestand.
-
-[CALLOUT:WARNING] **Waarschuwing:** Bekijk de foutmeldingen altijd zorgvuldig om eventuele problemen te begrijpen en op te lossen.
-
-### Is SFTP anders dan FTP?
-
-Ja, **Sftp** is veiliger omdat het de bestandsoverdracht versleutelt, terwijl **Ftp** Niet.
-
- **Herinnering:** Gebruik SFTP altijd voor veilige bestandsoverdracht om uw gegevens te beschermen.
-
-### Kan ik verschillende SFTP-toepassingen gebruiken?
-
-Ja, u kunt elke SFTP-toepassing gebruiken die SFTP-overdrachten ondersteunt, zoals **WinSCP** , **FileZilla** , of **CyberDuck** .
+<AccordionGroup>
+  <Accordion title="Welke SFTP-applicatie moet ik gebruiken?">
+    Elke applicatie die SFTP ondersteunt werkt. De lijst hierboven geeft enkele voorbeelden, maar u bent vrij om elke SFTP-client te gebruiken.
+  </Accordion>
+  <Accordion title="Waar vind ik mijn SFTP-referenties?">
+    Uw referenties staan onder **FTP Users** in de web app, met aparte accounts voor upload en download.
+  </Accordion>
+  <Accordion title="Welk bestandsformaat is vereist voor imports?">
+    Importbestanden zijn **CSV**. De exacte kolommen hangen af van het bestandstype — zie de betreffende import-handleiding.
+  </Accordion>
+  <Accordion title="Wat moet ik doen als een import mislukt?">
+    Controleer de foutmelding in **System Logs**. De oorzaak is meestal onjuiste opmaak of ontbrekende informatie in uw bestand.
+  </Accordion>
+</AccordionGroup>

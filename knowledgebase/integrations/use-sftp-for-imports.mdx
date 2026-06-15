@@ -1,52 +1,78 @@
 ---
-title: "Using SFTP for Imports"
-description: "Step-by-step guide to uploading CSV import files via SFTP using WinSCP or similar clients, and verifying upload status in system logs."
-sidebarTitle: "SFTP Imports"
+title: "SFTP Overview"
+description: "How to connect to Clarus WMS over SFTP to upload import files and retrieve exports, including example SFTP clients and where to find your credentials."
+sidebarTitle: "Overview"
 ---
 
 ## Overview
 
-SFTP (Secure File Transfer Protocol) provides an encrypted, secure way to transfer import files. This guide walks you through preparing your file, connecting via SFTP, uploading, and checking the import status.
+SFTP (Secure File Transfer Protocol) is an encrypted way to exchange files with Clarus WMS. Use it to **upload import files** (such as orders, pre-receipts, and products) and to **retrieve files Clarus exports** for you (such as confirmation exports).
 
-## Supported SFTP applications
+Clarus offers two SFTP account types:
 
-- **WinSCP** (recommended)
+- **Upload** — drop files into Clarus for import.
+- **Download** — collect files Clarus has exported.
+
+Your credentials for both are under **FTP Users** in the web app.
+
+## SFTP applications
+
+You can connect with **any application that supports SFTP** — use whichever client you prefer. The applications below are examples that are known to connect over SFTP. This is not an exhaustive list, and listing one is not an endorsement or a guarantee that it has been tested with Clarus:
+
+- WinSCP
 - FileZilla
 - CyberDuck
 - FireFTP
 - ClassicFTP
 - FreeFTP by CoffeeCup
 
+## Connecting via SFTP
+
 <Steps>
-  <Step title="Prepare your CSV file">
-    Complete your spreadsheet and save it as a **CSV** file. Ensure all data is correctly formatted -- missing or incorrectly formatted data will cause the import to fail.
+  <Step title="Get your credentials">
+    Find your SFTP credentials under **FTP Users** in the web app. There are separate accounts for upload and download.
   </Step>
-  <Step title="Choose an SFTP application">
-    Select an SFTP application from the list above. This guide uses **WinSCP** as an example.
+  <Step title="Create an SFTP session">
+    Open your SFTP application and create a new session. Select **SFTP** as the file protocol, then enter your credentials.
   </Step>
-  <Step title="Sign into your domain">
-    Open your SFTP application, create a new session, and select **SFTP** as the file protocol. Enter the credentials found under **FTP Users** in the web app.
+  <Step title="Transfer files">
+    To import, drag your file from your computer (left side) to the server (right side). To collect an export, drag the file from the server back to your computer. The process is similar across SFTP applications.
   </Step>
-  <Step title="Upload the file">
-    Find your CSV file on the left side of the application. Drag it to the right side (the server) to begin the upload.
+</Steps>
+
+<Info>SFTP encrypts file transfers, making it more secure than standard FTP. Always use SFTP to protect your data.</Info>
+
+## Uploading import files
+
+<Steps>
+  <Step title="Prepare your file">
+    Complete your spreadsheet and save it as a **CSV** file. Missing or incorrectly formatted data will cause the import to fail. The required fields depend on what you are importing — see the individual import guides in this section.
   </Step>
-  <Step title="Check import status">
-    Go to **System Logs** in the web app. A **successful** upload shows a confirmation message. A **failed** import shows an error explaining the cause.
+  <Step title="Upload it via SFTP">
+    Connect to your **upload** SFTP account and transfer the file as above.
+  </Step>
+  <Step title="Check the import status">
+    Go to **System Logs** in the web app. A **successful** upload shows a confirmation message; a **failed** import shows an error explaining the cause.
   </Step>
 </Steps>
 
 <Warning>Always review error messages in System Logs carefully to understand and fix any import issues.</Warning>
 
-<Info>SFTP encrypts file transfers, making it more secure than standard FTP. Always use SFTP to protect your data.</Info>
+## Retrieving exports
+
+Files that Clarus generates for you are placed on your **download** SFTP account for collection. Connect to that account and transfer the file back to your computer. See [Confirmation Exports](/knowledgebase/integrations/csv-confirmation-exports) for an example.
 
 <AccordionGroup>
+  <Accordion title="Which SFTP application should I use?">
+    Any application that supports SFTP will work. The list above gives some examples, but you are free to use any SFTP client.
+  </Accordion>
   <Accordion title="Where can I find my SFTP credentials?">
-    Your credentials are under **FTP Users** in the web app.
+    Your credentials are under **FTP Users** in the web app, with separate accounts for upload and download.
   </Accordion>
-  <Accordion title="What file format is required?">
-    The file must be in **CSV** format.
+  <Accordion title="What file format is required for imports?">
+    Import files are **CSV**. The exact columns depend on the file type — see the relevant import guide.
   </Accordion>
-  <Accordion title="What should I do if the import fails?">
-    Check the error message in **System Logs**. The issue is usually caused by incorrect formatting or missing information in your CSV file.
+  <Accordion title="What should I do if an import fails?">
+    Check the error message in **System Logs**. The cause is usually incorrect formatting or missing information in your file.
   </Accordion>
 </AccordionGroup>

@@ -1,0 +1,50 @@
+Met de functie Standaard productimport in Clarus WMS kunt u veel producten tegelijk toevoegen door een spreadsheet te uploaden. Deze handleiding helpt u te begrijpen welke informatie u nodig hebt en hoe u uw producten correct kunt importeren.
+
+## Stapsgewijze handleiding
+
+<Steps>
+  <Step title="Bereid uw spreadsheet voor">
+    U moet productgegevens invullen in de eerste rij van uw spreadsheet. Dit zijn de velden die u kunt gebruiken:
+
+    - **Code** (Verplicht) - Unieke code voor het product.
+    - **Beschrijving** (Verplicht) - Een korte beschrijving van het product.
+    - **Lange beschrijving** (Verplicht) - Een gedetailleerde beschrijving van het product.
+    - **Referentie van extern systeem** (Optioneel) - Elke externe referentie voor het product.
+    - **Gewicht per item** (Optioneel) - Het gewicht van elk productitem.
+    - **Hoogte per item** (Optioneel) - De hoogte van elk productitem.
+    - **Breedte per item** (Optioneel) - De breedte van elk productitem.
+    - **Lengte per artikel** (Optioneel) - De lengte van elk productartikel.
+    - **Waarde per item** (Optioneel) - De waarde van elk productitem.
+    - **Stop** (Optioneel) - Wordt gebruikt om te voorkomen dat het product wordt gebruikt.
+    - **Verouderde** (Optioneel) - Markeert of het product niet meer wordt gebruikt.
+    - **Het is een nieuw product** (Optioneel) - Geeft aan of dit een nieuw toegevoegd product is.
+    - **Barcode** (Aanbevolen) - Het product barcode, handig voor het scannen.
+  </Step>
+  <Step title="Vul de vereiste informatie in">
+    De **Code**, **Beschrijving**, en **Lange beschrijving** velden zijn essentieel en moeten voor elk product worden ingevuld. Andere gebieden zijn optioneel, maar kunnen zeer nuttig zijn voor het volgen en scannen van uw producten.
+
+    <Info>Het wordt sterk aanbevolen om de **Barcode** op te nemen voor eenvoudig product scannen, ook al is dit niet strikt noodzakelijk.</Info>
+  </Step>
+  <Step title="Uw spreadsheet opslaan en uploaden">
+    1. Sla het bestand op in een **CSV bestandsindeling**.
+    2. Upload het bestand naar Clarus WMS met behulp van de importfunctie.
+    3. U kunt controleren of uw bestand succesvol is voltooid of mislukt door naar het scherm "Event Logs" te kijken.
+  </Step>
+</Steps>
+
+## Veelgestelde vragen
+
+<AccordionGroup>
+<Accordion title="Is de barcode essentieel voor import?">
+Nee, de barcode is niet verplicht voor import, maar het wordt sterk aanbevolen om deze op te nemen voor eenvoudiger productscannen.
+</Accordion>
+<Accordion title="Wat gebeurt er als ik verplichte velden mis?">
+Als er verplichte velden (code, beschrijving of Lange beschrijving) ontbreken voor een product, mislukt de import voor dat specifieke product.
+</Accordion>
+<Accordion title="Kan ik bestaande producten bijwerken via import?">
+Ja, u kunt bestaande producten updaten. Gebruik het *Is een nieuw product* veld om aan te geven of het product nieuw is of al in uw systeem.
+</Accordion>
+<Accordion title="Welk formaat moet het importbestand hebben?">
+Het importbestand moet meestal in CSV- of Excel-indeling zijn.
+</Accordion>
+</AccordionGroup>

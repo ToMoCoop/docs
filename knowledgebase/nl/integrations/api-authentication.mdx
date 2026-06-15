@@ -1,0 +1,53 @@
+---
+title: "Authenticatie & toegang"
+description: "Hoe u authenticeert tegen de Clarus API — OAuth 2.0 bearer-tokens, de vereiste tenant-subdomeinheader, de headers die u meestuurt, en de playground."
+sidebarTitle: "Authenticatie"
+---
+
+De Clarus API is geauthenticeerd. Elk verzoek draagt een OAuth 2.0 bearer-token **en** uw tenant-subdomeinheader.
+
+## OAuth 2.0
+
+De API gebruikt **OAuth 2.0** bearer-tokens. Verkrijg een accesstoken en stuur deze bij elk verzoek mee als een `Authorization: Bearer <token>`-header.
+
+| | URL |
+|---|---|
+| Authorize | `https://clarus-api.com/oauth/authorize` |
+| Token | `https://clarus-api.com/oauth/token` |
+
+Vraag de scopes aan die uw integratie nodig heeft.
+
+## De subdomeinheader
+
+ClarusWMS is multi-tenant. Elk verzoek moet de `X-Clarus-Subdomain`-header bevatten die aangeeft met welke tenant-gegevens u werkt — deze wordt meegestuurd naast het bearer-token, niet in plaats daarvan.
+
+## Request-headers
+
+Stuur deze headers bij **elk** verzoek mee, of u nu REST of GraphQL aanroept:
+
+| Header | Waarde |
+|---|---|
+| `Authorization` | `Bearer <access-token>` |
+| `X-Clarus-Subdomain` | uw tenant-subdomein |
+| `Content-Type` | `application/json` |
+
+## De playground gebruiken
+
+Wanneer u calls uitprobeert vanuit de **Operations**-playground, toont het **Authorize**-paneel beide vereisten:
+
+1. **BearerAuth** — plak een accesstoken (of doorloop de OAuth-flow indien geconfigureerd).
+2. **ClarusSubdomain** — voer uw tenant-subdomein in; dit wordt bij elk verzoek als `X-Clarus-Subdomain`-header meegestuurd.
+
+Beide zijn vereist, zodat verzoeken vanuit de playground het token en de subdomeinheader samen meedragen.
+
+## Gebruik een apart gebruikersaccount
+
+Maak een apart gebruikersaccount aan specifiek voor API-toegang, los van elk account dat wordt gebruikt om in te loggen op de WMS front-end.
+
+<Warning>Inloggen op de front-end met hetzelfde account dat de integratie gebruikt, kan de bestaande sessie beëindigen — en integratie-calls uitvoeren terwijl iemand met dat account is ingelogd, kan die persoon uit het systeem gooien. Door ze gescheiden te houden, voorkomt u dat u midden in een taak wordt uitgelogd.</Warning>
+
+Dezelfde logica geldt als u meerdere ontwikkelaars of systemen op de API hebt: idealiter krijgt elke omgeving (development, test, productie) een eigen account, zodat auditing, throttling en troubleshooting onafhankelijk kunnen gebeuren.
+
+## Behandel referenties als geheimen
+
+Bewaar API-referenties in een secrets manager, omgevingsvariabelen of het equivalent van uw platform. Zet ze niet in versiebeheer en plak ze niet in gedeelde documenten.

@@ -1,0 +1,24 @@
+---
+title: "Bevestigingsexports (PO & verkooporder)"
+description: "Standaard CSV-bevestigingsexports die rapporteren wat is ontvangen tegen een inkooporder en wat is gepickt en verzonden tegen een verkooporder, automatisch geleverd op uw download-SFTP."
+sidebarTitle: "Bevestigingsexports"
+---
+
+Naast de standaard CSV-imports biedt Clarus standaard twee bevestigingsexports. Ze rapporteren wat er daadwerkelijk in het magazijn is gebeurd, zodat uw bronsysteem kan afstemmen.
+
+## Beschikbare exports
+
+| Export | Bevestigt |
+|---|---|
+| **PO Confirmation Export** | Wat is ontvangen tegen een inkooporder / pre-ontvangst |
+| **Sales Order Confirmation Export** | Wat is gepickt en verzonden tegen een verkooporder |
+
+## Hoe ze werken
+
+- Geleverd als **CSV**-bestanden.
+- Kunnen worden **ingepland** om automatisch te draaien.
+- Worden op uw **download-SFTP** geplaatst om op te halen. Zie [SFTP gebruiken voor imports](/knowledgebase/nl/integrations/use-sftp-for-imports) voor de verbindingsgegevens — dezelfde SFTP-opzet wordt gebruikt om exports op te halen.
+
+<Info>Kleine aanpassingen — kolomvolgorde, hernoemde headers, filteren op magazijn — kunnen meestal worden gerealiseerd zonder een volledige maatwerkbouw. Hebt u een formaat nodig dat de standaardexports niet dekken, zie dan [Maatwerkexports](/knowledgebase/nl/integrations/bespoke-exports).</Info>
+
+<Tip>Wilt u liever realtime updates dan een ingepland bestand ophalen, dan kunt u in plaats daarvan de API pollen of [webhooks](/knowledgebase/nl/integrations/webhook-events) ontvangen.</Tip>

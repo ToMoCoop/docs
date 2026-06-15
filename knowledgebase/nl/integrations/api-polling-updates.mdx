@@ -1,0 +1,71 @@
+---
+title: "Gegevens ophalen via GraphQL"
+description: "Hoe u gegevens leest uit de Clarus GraphQL-laag — eerst authenticeren, een voorbeeldquery, en hoe connections, filteren en paginatie werken."
+sidebarTitle: "Gegevens ophalen"
+---
+
+Clarus biedt een **GraphQL**-laag om gegevens op aanvraag te lezen. U stuurt een query die de gewenste velden benoemt en Clarus geeft precies die terug, wat de responses compact houdt. GraphQL is ook de manier waarop u records **zoekt en filtert**.
+
+<Info>Deze pagina legt de aanpak uit met een voorbeeld. Voor het volledige schema — elk type, veld en filterargument — is de **Operations**-referentie de enige bron van waarheid. Controleer deze altijd voor de huidige velden.</Info>
+
+Alle API-verzoeken moeten geauthenticeerd zijn — zie [Authenticatie & toegang](/knowledgebase/nl/integrations/api-authentication).
+
+## Een query versturen
+
+Stuur queries als een HTTP `POST` naar `https://clarus-api.com/graphql`.
+
+## Voorbeeldquery
+
+Deze query leest sites. Het is een goede manier om te bevestigen dat uw verbinding en referenties werken, omdat het gegevens teruggeeft zonder dat u eerst iets hoeft in te stellen. Het is illustratief — zie de **Operations**-referentie voor de volledige set velden en argumenten.
+
+```graphql
+query getSites($first: Int, $after: String) {
+  sites {
+    all(first: $first, after: $after) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          id
+          code
+          name
+        }
+      }
+    }
+  }
+}
+```
+
+## Connections, edges en nodes
+
+Clarus GraphQL-queries geven **connections** terug. In plaats van een platte lijst verpakt een connection uw resultaten zodat ze gepagineerd kunnen worden:
+
+- `edges` — de lijst met resultaten. Elke edge heeft een `cursor` (een verwijzing naar dat item) en een `node`.
+- `node` — het daadwerkelijke record en zijn velden (in het voorbeeld hierboven de `id`, `code` en `name` van een site).
+- `pageInfo` — paginatie-metadata, zoals `hasNextPage` en `endCursor`.
+
+Dit is de standaard GraphQL cursor-connection-vorm. Als dit nieuw voor u is, zie [graphql.org/learn/pagination](https://graphql.org/learn/pagination/).
+
+## Filteren en zoeken
+
+List-queries accepteren argumenten om te beperken wat er terugkomt — bijvoorbeeld filteren op een veldwaarde of beperken tot records die binnen een datumbereik zijn gewijzigd. Welke argumenten beschikbaar zijn, hangt af van de resource; de **Operations**-referentie vermeldt ze per query.
+
+## Paginatie
+
+Resultaten worden gepagineerd met cursors. Vraag een pagina op met `first` (hoeveel) en `after` (de cursor om vanaf te starten), en lees daarna `pageInfo` om te bepalen of u meer ophaalt:
+
+- `hasNextPage` — of er meer records beschikbaar zijn.
+- `endCursor` — geef deze door als de volgende `after`-waarde om de volgende pagina op te halen.
+
+Doorloop de pagina's op deze manier in plaats van alles in één keer op te vragen, vooral bij grote uitvragen.
+
+## Nieuw met GraphQL?
+
+Bent u niet bekend met GraphQL — hoe queries, velden en variabelen werken — dan is [graphql.org/learn](https://graphql.org/learn/) een goede introductie.
+
+## Wanneer lezen versus abonneren
+
+Gebruik GraphQL voor **uitvragen op aanvraag**, zoekopdrachten en afstemming. Voor doorlopende **statuswijzigingen** abonneert u zich op [webhooks](/knowledgebase/nl/integrations/webhook-events) in plaats van volgens een schema te pollen — zie [Bouwen met de Clarus API](/api-reference/introduction) voor de aanbevolen aanpak.

@@ -1,0 +1,44 @@
+---
+title: "Integratieopties"
+description: "Een overzicht van de manieren om Clarus WMS te koppelen aan externe systemen — marktplaatsen, ERP- en financiële platforms, vervoerders, bestandsoverdracht en de Clarus API — en hoe u daartussen kiest."
+sidebarTitle: "Overzicht"
+---
+
+Clarus WMS wisselt gegevens uit met externe systemen zoals webshops, ERP's, financiële platforms, vervoerders en uw eigen bedrijfsapplicaties. De juiste aanpak hangt af van waarmee u koppelt, hoe vaak de gegevens veranderen en hoeveel controle u nodig hebt.
+
+## Manieren om te koppelen
+
+<CardGroup cols={2}>
+  <Card title="E-commerce & marktplaatsen" href="/knowledgebase/nl/integrations/marketplace-integrations">
+    Laat orders uit Shopify, eBay, Amazon en andere kanalen rechtstreeks in het magazijn binnenkomen en stuur verzend- en trackingupdates terug.
+  </Card>
+  <Card title="Vervoerders" href="/knowledgebase/nl/integrations/carrier-integrations">
+    Genereer verzendlabels, haal tracking op en geef verzendgegevens door aan meer dan 80 pakket- en vrachtvervoerders.
+  </Card>
+  <Card title="ERP & financieel" href="/knowledgebase/nl/financial/export-charges-to-sage-line-200">
+    Exporteer kosten en leveranciersgegevens naar financiële systemen zoals Sage, of verplaats records van en naar uw ERP.
+  </Card>
+  <Card title="Bestandsoverdracht (SFTP)" href="/knowledgebase/nl/integrations/use-sftp-for-imports">
+    Importeer en exporteer orders, ontvangsten, producten en voorraad met kant-en-klare CSV-templates via SFTP.
+  </Card>
+  <Card title="Maatwerkbestanden & EDI" href="/knowledgebase/nl/integrations/bespoke-imports">
+    Maatwerk-interfaces in TXT, CSV, XML of EDI, gebouwd om te passen bij een specifiek bron- of doelsysteem.
+  </Card>
+  <Card title="Bouwen met de Clarus API" href="/knowledgebase/nl/integrations/api-overview">
+    Realtime-integratie: stuur records in via REST, lees updates via GraphQL en ontvang webhooks wanneer events plaatsvinden.
+  </Card>
+</CardGroup>
+
+## Een aanpak kiezen
+
+| Als u wilt… | Gebruik |
+|---|---|
+| Snel live gaan met standaardgegevens | [Standaard CSV-imports/exports via SFTP](/knowledgebase/nl/integrations/use-sftp-for-imports) |
+| Een verkoopkanaal koppelen | [Marktplaatsintegratie](/knowledgebase/nl/integrations/marketplace-integrations) |
+| Pakketten en vracht verzenden | [Vervoerdersintegratie](/knowledgebase/nl/integrations/carrier-integrations) |
+| Aansluiten op een systeem dat niet bij de standaardtemplates past | [Maatwerk- of EDI-interface](/knowledgebase/nl/integrations/bespoke-imports) |
+| Uw eigen applicatie realtime integreren | [De Clarus API](/knowledgebase/nl/integrations/api-overview) |
+
+<Info>Deze aanpakken kunnen worden gecombineerd. Het is gebruikelijk om bij go-live producten en pre-ontvangsten via CSV te importeren en daarna over te stappen op de API zodra het bronsysteem klaar is.</Info>
+
+<Tip>Niet zeker welke past? Uw implementatieconsultant kan tijdens de onboarding de juiste aanpak aanbevelen voor uw magazijnindeling, processen en de systemen die u wilt koppelen.</Tip>

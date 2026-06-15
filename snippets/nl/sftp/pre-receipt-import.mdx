@@ -1,0 +1,41 @@
+## Pre-ontvangen importfunctie
+
+Met de functie Standaard Pre-Receipt importeren in Clarus WMS kunt u snel pre-ontvangipts aan het systeem toevoegen door een spreadsheet te uploaden. In deze handleiding worden de vereiste velden en het proces voor een succesvolle import uitgelegd.
+
+## Stapsgewijze handleiding
+
+### 1. Bereid het spreadsheet voor
+
+Maak een spreadsheet met de informatie vooraf ontvangen. Hieronder staan de velden die u mogelijk moet opnemen:
+VeldTypeVerplicht?Beschrijving **Ontvangst Referentie** SnaarJaKlantreferentie die het ontvangstbewijs identificeert. **Magazijncode** SnaarJaUnieke code die het magazijn identificeert. **Accountcode** SnaarJaUnieke code die het account identificeert. **Leverancierscode** SnaarNeeUnieke code die de leverancier identificeert. **Verwachte datum van ontvangst** SnaarJaAangepaste datum wordt weergegeven wanneer het ontvangstbewijs naar verwachting zal worden ontvangen. **Opmerkingen** SnaarNeeAangepast veld voor extra informatie. **Itemhoeveelheid** SnaarJaHet aantal artikelen per opslagunit. **Opslag eenheid Hoeveelheid** SnaarJaDe hoeveelheid opslagunits items wordt geplaatst. **Datetijd 1-5** SnaarNeeDatetime 1 is voor de verkoop op datum. De rest van de velden kunnen van alles zijn. (Dit zouden afzonderlijke velden zijn: datetime2, datetime3, enz.) **Snaar 1-5** SnaarNeeSnaar 1 is voor het batchnummer. De rest van de velden kunnen van alles zijn. (Dit zouden afzonderlijke velden zijn: string2, string3, enz.) **Alt lijnnummer** SnaarNeeAangepast veld voor een alternatief lijnnummer voor externe systemen. **Alt Line Referentie** SnaarNeeAangepast veld voor een alternatieve lijnreferentie voor externe systemen. **Alt Line Notitie** SnaarNeeAangepast veld voor notities op externe systemen.
+### 2. Vul de gewenste velden in
+
+De velden **Ontvang_referentie** , **magazijn_code** , **Account_code** , **Verwacht_date_of_receipt** , **item_hoeveelheid** , en **opslag_unit_hoeveelheid** Ze zijn allemaal verplicht. U moet deze velden invullen voor elke regel vooraf ontvangen.
+
+ **Leverancier_code** , **Notities** , **Datetijd1-5** , **Snaar1-5** , **alt_line_nummer** , **alt_line_referentie** , en **alt_line_note** Het zijn optionele velden. Als u deze invult, kunt u meer informatie toevoegen en de tracking verbeteren.
+
+### 3. Het spreadsheet opslaan en uploaden
+
+Zodra uw spreadsheet is voltooid:
+
+1. **Opslaan** Het als een **.csv** dossier.
+
+2. Gebruik de **Importeren functionaliteit** In Clarus WMS om het bestand te uploaden.
+
+## FAQs
+
+### Wat gebeurt er als ik verplichte velden mis?
+
+Als verplichte velden informatie missen, wordt het bestand niet correct geïmporteerd en wordt de pre-ontvangst niet gemaakt.
+
+### Kan ik bestaande pre-ontvangipts bijwerken met deze import?
+
+Nee, deze importfunctie is alleen voor het maken van nieuwe pre-ontvangstips. Het kan niet worden gebruikt om bestaande bij te werken.
+
+### Welk formaat moet het importbestand hebben?
+
+Het importdossier moet in **.csv** formaat.
+
+### Waar vind ik het sjabloonbestand?
+
+Een koppeling om het sjabloonbestand te downloaden is beschikbaar onderaan het importartikel. U kunt dit gebruiken als uitgangspunt voor uw productimport.

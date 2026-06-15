@@ -1,0 +1,51 @@
+## Standard Pre-Receipt Import
+
+The pre-receipt import lets you create multiple pre-receipts at once by uploading a CSV spreadsheet. This is faster than entering each receipt manually and is ideal for high-volume inbound operations.
+
+### Required and Optional Fields
+
+Prepare a spreadsheet with the following columns:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| **Receipt Reference** | String | Yes | Customer reference identifying the receipt |
+| **Warehouse Code** | String | Yes | Unique code for the warehouse |
+| **Account Code** | String | Yes | Unique code for the account |
+| **Expected Date of Receipt** | String | Yes | When the receipt is expected |
+| **Item Quantity** | String | Yes | Quantity of items per storage unit |
+| **Storage Unit Quantity** | String | Yes | Number of storage units |
+| **Supplier Code** | String | No | Unique code for the supplier |
+| **Notes** | String | No | Any extra information |
+| **Datetime 1** | String | No | Sell by date (Datetime 2-5 are custom fields) |
+| **String 1** | String | No | Batch number (String 2-5 are custom fields) |
+| **Alt Line Number** | String | No | Alternate line number for external systems |
+| **Alt Line Reference** | String | No | Alternate line reference for external systems |
+| **Alt Line Note** | String | No | Notes for external systems |
+
+<Warning>All required fields must be populated for every line. Missing mandatory data will cause the import to fail.</Warning>
+
+<Steps>
+  <Step title="Prepare the spreadsheet">
+    Create a spreadsheet with the columns listed above. Fill in all required fields for each pre-receipt line, and add optional fields as needed for tracking.
+  </Step>
+  <Step title="Save as CSV">
+    Save the spreadsheet as a **.csv** file.
+  </Step>
+  <Step title="Upload the file">
+    Use the **import functionality** to upload the CSV file. The system will create pre-receipts based on the data in the file.
+  </Step>
+</Steps>
+
+<Accordion title="Frequently asked questions">
+  **What file format is required?**
+
+  The import file must be in **.csv** format.
+
+  **Can I update existing pre-receipts with this import?**
+
+  No. The import feature only creates new pre-receipts. It cannot update existing ones.
+
+  **Where can I find a template file?**
+
+  A template file link is available at the bottom of the import screen. Use it as a starting point for your imports.
+</Accordion>
