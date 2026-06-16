@@ -4,6 +4,56 @@ sidebarTitle: "Order Import"
 description: "How to prepare and upload order import files via SFTP, including all required fields, validation rules, and file format requirements."
 ---
 
-import OrderImport from '/snippets/sftp/order-import.mdx';
+## Overview
 
-<OrderImport />
+You can quickly add orders to the system using SFTP (Secure File Transfer Protocol). This guide covers how to prepare your import file, fill in mandatory fields, validate your data, and upload it.
+
+## Import file fields
+
+| Field | Type | Mandatory | Description |
+|-------|------|-----------|-------------|
+| **order_reference** | String | Yes | Unique identifier for each order |
+| **warehouse_code** | String | Yes | Code for the warehouse (must exist) |
+| **account_code** | String | Yes | Account creating the order (must exist) |
+| **supplier_code** | String | No | Supplier code (must exist if provided) |
+| **carrier_code** | String | No | Carrier code (must exist if provided) |
+| **customer_code** | String | Yes | Customer linked to the order (must exist) |
+| **expected_date_of_dispatch** | String | Yes | Expected dispatch date |
+| **address 1-5** | String | Yes | Delivery address lines |
+| **postcode** | String | Yes | Delivery address postcode |
+| **notes** | String | No | Extra notes about the order |
+| **load_reference** | String | Conditional | Required if using loads |
+| **pick_reference** | String | Conditional | Required if using picking lists |
+| **line_number** | String | Yes | Line number for the order item |
+| **product_code** | String | Yes | Product code (must exist) |
+| **quantity** | String | Yes | Number of the product |
+
+## Preparing and uploading
+
+<Steps>
+  <Step title="Prepare the order import file">
+    Ensure your file includes all mandatory fields listed above.
+  </Step>
+  <Step title="Fill in the mandatory fields">
+    Complete all fields marked as mandatory. Optional fields like **supplier_code**, **carrier_code**, **notes**, **load_reference**, and **pick_reference** can be left blank if not applicable.
+  </Step>
+  <Step title="Validate the data">
+    Verify that all codes (warehouse_code, account_code, product_code, etc.) already exist in the system. Mismatched codes will cause the import to fail.
+  </Step>
+  <Step title="Save and upload the file">
+    Save your file in **CSV** or **Excel** format, then upload it via SFTP.
+  </Step>
+</Steps>
+
+<Warning>Incorrect or missing data in mandatory fields will cause the import to fail. Double-check all codes before uploading.</Warning>
+
+<Note>The exact minimum required fields can vary by deployment. If your configuration differs from the table above, your implementation consultant will confirm which fields your feed needs.</Note>
+
+<AccordionGroup>
+  <Accordion title="What format should the import file be?">
+    The file should be in **CSV** or **Excel** format for a successful SFTP upload.
+  </Accordion>
+  <Accordion title="Do I need a load_reference and pick_reference?">
+    These are only needed if your order uses loads or picking lists. Otherwise, leave them empty.
+  </Accordion>
+</AccordionGroup>

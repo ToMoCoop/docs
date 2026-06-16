@@ -4,6 +4,176 @@ description: "Met deze functie kunt u snel bestellingen aan het systeem toevoege
 sidebarTitle: "Orderimport"
 ---
 
-import OrderImport from '/snippets/nl/sftp/order-import.mdx';
+## Standaard orderimport via SFTP
 
-<OrderImport />
+Met deze functie kunt u snel bestellingen aan het systeem toevoegen met behulp van SFTP, wat een veilige manier is om bestanden over te zetten. U gebruikt uw unieke Clarus WMS-adres om dit efficiënt te doen.
+
+## Stapsgewijze handleiding
+
+### 1. Bereid het bestand Bestelimport voorbereiden
+
+Uw orderimportbestand moet specifieke gegevens hebben die overeenkomen met uw bestelinformatie. Hier is een lijst met de velden die u moet overwegen:
+
+ **Veld** 
+
+ **Type** 
+
+ **Verplicht?** 
+
+ **Beschrijving** 
+
+ **Order_referentie** 
+
+Snaar
+
+Ja
+
+Een unieke identificatiecode voor elke bestelling.
+
+ **magazijn_code** 
+
+Snaar
+
+Ja
+
+De code voor het magazijn gekoppeld aan de bestelling. Dit moet een bestaand magazijn zijn.
+
+ **Account_code** 
+
+Snaar
+
+Ja
+
+De accountcode die de bestelling maakt. Dit moet een bestaand account zijn.
+
+ **Leverancier_code** 
+
+Snaar
+
+Nee
+
+De code voor de leverancier op de bestelling. Dit moet een bestaande leverancier zijn.
+
+ **Carrier_code** 
+
+Snaar
+
+Nee
+
+De code voor de vervoerder van de bestelling. Dit moet een bestaande vervoerder zijn.
+
+ **Klant_code** 
+
+Snaar
+
+Ja
+
+De code voor de klant gekoppeld aan de bestelling. Dit moet een bestaande klant zijn.
+
+ **Verwacht_date_of_dispatch** 
+
+Snaar
+
+Ja
+
+De datum waarop de bestelling naar verwachting wordt verzonden.
+
+ **adres 1 - 5** 
+
+Snaar
+
+Ja
+
+De regels voor het afleveradres van de bestelling (lijnen 1 tot 5).
+
+ **Postcode** 
+
+Snaar
+
+Ja
+
+De postcode voor het adres van de bestelling.
+
+ **Notities** 
+
+Snaar
+
+Nee
+
+Eventuele extra notities over de bestelling.
+
+ **load_referentie** 
+
+Snaar
+
+Ja/Nee
+
+Vereist als u ladingen gebruikt. Dit is de referentie voor de lading die op de bestelling is aangesloten.
+
+ **Pick_referentie** 
+
+Snaar
+
+Ja/Nee
+
+Vereist als u picklijsten gebruikt. Dit is de referentie voor de picklijst die is gekoppeld aan de bestelling.
+
+ **Lijn_nummer** 
+
+Snaar
+
+Ja
+
+Het regelnummer voor het bestelartikel.
+
+ **Product_code** 
+
+Snaar
+
+Ja
+
+De code voor het product dat aan de bestelling wordt toegevoegd. Dit moet een bestaand product zijn.
+
+ **Hoeveelheid** 
+
+Snaar
+
+Ja
+
+Het nummer van het product in de bestelling.
+
+### 2. Vul de verplichte velden in
+
+U moet informatie verstrekken voor alle velden gemarkeerd als ""Ja"" in het 'Verplicht?'Kolom. Deze omvatten: **Order_referentie** , **magazijn_code** , **Account_code** , **Klant_code** , **Verwacht_date_of_dispatch** , **adres 1 - 5** , **Postcode** , **Lijn_nummer** , **Product_code** , en **Hoeveelheid** . U kunt optionele velden achterlaten zoals **Leverancier_code** , **Carrier_code** , **Notities** , **load_referentie** , en **Pick_referentie** Blanco als ze niet van toepassing zijn op uw bestelling.
+
+### 3. Valideer de gegevens
+
+Zorg ervoor dat alle codes, zoals **magazijn_code** , **Account_code** , en **Product_code** Er bestaat al in het systeem. Als codes niet overeenkomen, mislukt de import.
+
+ **Waarschuwing:** Onjuiste of ontbrekende gegevens in verplichte velden zorgen ervoor dat de import mislukt.
+
+### 4. Het bestand opslaan en uploaden
+
+Zodra u alle benodigde velden hebt ingevuld, slaat u uw bestand op. Het moet ook in **Csv** Of **Excel** formaat. Upload dit bestand vervolgens naar Clarus WMS met FTP.
+
+## FAQs
+
+### Wat gebeurt er als ik geen verplicht veld invul?
+
+De orderimport mislukt als verplichte velden leeg blijven of onjuiste informatie bevatten.
+
+### Kan ik extra notities bij de bestelling opnemen?
+
+Ja, u kunt de **Notities** veld om extra informatie over de bestelling toe te voegen. Dit veld is optioneel.
+
+### Heb ik een load_reference en pick_referentie nodig?
+
+Deze referenties zijn alleen nodig als uw bestelling ladingen of picklijsten gebruikt. Zo niet, dan kun je ze leeg laten.
+
+### Welk formaat moet het importbestand hebben?
+
+Voor een succesvolle FTP-upload moet het bestand in **Csv** Of **Excel** formaat.
+
+### Waar vind ik het sjabloonbestand voor orderimport?
+
+Een sjabloonbestand wordt meestal onderaan het oorspronkelijke ondersteuningsartikel verstrekt. U kunt dit gebruiken als uitgangspunt voor uw orderimport.

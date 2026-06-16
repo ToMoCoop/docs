@@ -4,6 +4,28 @@ description: "In deze handleiding wordt uitgelegd hoe u het standaardbestandimpo
 sidebarTitle: "Account Assignments"
 ---
 
-import AccountAssignments from '/snippets/nl/sftp/account-assignments.mdx';
+## Productaccounts bijwerken met behulp van het standaard importeren
 
-<AccountAssignments />
+In deze handleiding wordt uitgelegd hoe u het standaardbestandimportbestand voor productaccounts gebruikt om meerdere productaccounts tegelijkertijd bij te werken, of u nu nieuwe accounts toewijst of bestaande accounts niet toewijst.
+
+## Stapsgewijze handleiding
+
+### 1. Uw importbestand voorbereiden
+
+Het importbestand heeft een eenvoudige lay-out. Je hebt de **Productcodes** voor de items die u wilt bijwerken en de **Accountcodes** U wilt toevoegen of verwijderen.
+
+### 2. Geef uw actie op
+
+Typ in het derde veld van het importbestand 'ASSIGN' of 'UNASSIGN'. Dit zal Clarus WMS vertellen of het account voor het opgegeven product moet worden toegevoegd of verwijderd.
+
+ **Herinnering:** Elke bewerking in het importbestand kan slechts één account tegelijk toevoegen of verwijderen voor een product.
+
+## FAQs
+
+### Kan ik meerdere accounts voor één product tegelijk bijwerken?
+
+Ja, u kunt meerdere accounts voor één product bijwerken, maar elke regel in het importbestand kan slechts één account toewijzen of uitwijzen. U hebt meerdere regels nodig voor één product om meerdere accounts bij te werken.
+
+### Kan ik accounts voor meerdere producten tegelijk bijwerken?
+
+Ja, met het importbestand kunt u accounts voor meerdere producten tegelijkertijd bijwerken.

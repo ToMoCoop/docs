@@ -4,6 +4,47 @@ sidebarTitle: "Stock Attribute Import"
 description: "Step-by-step guide to updating stock attributes such as descriptions, dates, and FIFO information via SFTP import."
 ---
 
-import StockAttributes from '/snippets/sftp/stock-attributes.mdx';
+When you receive new stock and need to update its details, you can import the Stock Attribute file via SFTP. This file lets you change descriptions, dates, and FIFO information for existing stock.
 
-<StockAttributes />
+<Steps>
+<Step title="Understand the stock attribute file">
+The file includes the following fields:
+
+| Field | Type | Mandatory | Description |
+|-------|------|-----------|-------------|
+| storage_unit_reference | String | Yes | Unique code for the storage unit holding the stock |
+| string1 - 5 | String | Yes | Various stock attributes to update |
+| stock_description | String | Yes | Description of the stock to change |
+| datetime1 - 5 | String | Yes | Dates related to each stock line |
+| fifo_date | String | No | Expiry date of the stock |
+</Step>
+<Step title="Match storage unit references">
+Ensure the **storage_unit_reference** you enter matches the reference of the stock you want to update. This is how the system identifies the correct stock for changes.
+</Step>
+<Step title="Fill in the attribute information">
+- **string1 - 5**: Update specific attributes of your stock
+- **stock_description**: Enter the updated description
+- **datetime1 - 5**: Provide the relevant dates for each stock line
+- **fifo_date**: Update the FIFO date if needed
+</Step>
+<Step title="Save and upload the file">
+Save the file and upload it to the system using SFTP.
+</Step>
+</Steps>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="What is the importance of the storage unit reference?">
+It uniquely identifies the stock, ensuring changes are applied to the correct items.
+</Accordion>
+<Accordion title="Are all fields mandatory?">
+The storage_unit_reference, string1-5, stock_description, and datetime1-5 fields are mandatory. The fifo_date is optional.
+</Accordion>
+<Accordion title="Can I change multiple attributes at once?">
+Yes, you can update descriptions, dates, and FIFO information in a single file import.
+</Accordion>
+<Accordion title="What format should I use for datetime fields?">
+Use the format required by your system settings, typically `yyyy-mm-dd`.
+</Accordion>
+</AccordionGroup>

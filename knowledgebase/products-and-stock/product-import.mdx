@@ -4,6 +4,53 @@ sidebarTitle: "Product Import"
 description: "Step-by-step guide to importing multiple products at once by uploading a spreadsheet."
 ---
 
-import ProductImport from '/snippets/sftp/product-import.mdx';
+The Standard Product Import feature lets you add many products at once by uploading a spreadsheet. This is much faster than adding products one by one.
 
-<ProductImport />
+<Steps>
+<Step title="Prepare your spreadsheet">
+Fill in product details in the first row of your spreadsheet. The available fields are:
+
+| Field | Type | Mandatory | Description |
+|-------|------|-----------|-------------|
+| Code | String | Yes | Unique code for the product |
+| Description | String | Yes | Short description |
+| Long Description | String | Yes | Detailed description |
+| External System Reference | String | No | External reference |
+| Weight Per Item | String | No | Weight of each item |
+| Height Per Item | String | No | Height of each item |
+| Width Per Item | String | No | Width of each item |
+| Length Per Item | String | No | Length of each item |
+| Value Per Item | String | No | Value of each item |
+| Stop | String | No | Stops the product from being used |
+| Obsolete | String | No | Marks the product as no longer used |
+| Is New Product | String | No | Indicates a newly added product |
+| Barcode | String | Recommended | Product barcode for scanning |
+</Step>
+<Step title="Fill in the required information">
+The **Code**, **Description**, and **Long Description** fields are essential. Other fields are optional but can be helpful for tracking and scanning.
+</Step>
+<Step title="Save and upload">
+Save the file in **CSV format**. Upload it using the import function. Check the **Event Logs** screen to see whether your upload succeeded or failed.
+</Step>
+</Steps>
+
+<Tip>
+It is highly recommended to include the **Barcode** for easy product scanning, even though it is not strictly mandatory.
+</Tip>
+
+## Frequently asked questions
+
+<AccordionGroup>
+<Accordion title="Is the barcode essential for import?">
+No, but it is strongly recommended for easier product scanning.
+</Accordion>
+<Accordion title="What happens if I miss mandatory fields?">
+The import will fail for any product missing the Code, Description, or Long Description.
+</Accordion>
+<Accordion title="Can I update existing products through import?">
+Yes, use the Is New Product field to indicate whether the product is new or already exists.
+</Accordion>
+<Accordion title="What format should the import file be?">
+The file should be in CSV or Excel format.
+</Accordion>
+</AccordionGroup>
