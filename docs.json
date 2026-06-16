@@ -21,7 +21,8 @@
         "python",
         "javascript"
       ],
-      "defaults": "all"
+      "defaults": "all",
+      "prefill": true
     }
   },
   "navigation": {
