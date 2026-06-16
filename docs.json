@@ -7,6 +7,9 @@
     "light": "#6B9DC2",
     "dark": "#B1C5DE"
   },
+  "background": {
+    "decoration": "gradient"
+  },
   "favicon": "/favicon.png",
   "api": {
     "playground": {
@@ -31,14 +34,14 @@
             "public": true,
             "groups": [
               {
-                "group": "Overview",
+                "group": "🏠 Overview",
                 "pages": [
                   "index"
                 ],
                 "public": true
               },
               {
-                "group": "Account & Sign-in",
+                "group": "🔑 Account & Sign-in",
                 "pages": [
                   {
                     "group": "Multi-Factor Authentication",
@@ -65,7 +68,7 @@
                 "public": true
               },
               {
-                "group": "Using Clarus",
+                "group": "🧭 Using Clarus",
                 "pages": [
                   "knowledgebase/reporting/customise-data-grids",
                   "knowledgebase/reporting/data-grid-columns"
@@ -73,7 +76,7 @@
                 "public": true
               },
               {
-                "group": "System Setup",
+                "group": "⚙️ System Setup",
                 "pages": [
                   {
                     "group": "Users & Roles",
@@ -206,7 +209,7 @@
                 "public": true
               },
               {
-                "group": "Products & Stock",
+                "group": "📦 Products & Stock",
                 "pages": [
                   "knowledgebase/products-and-stock/add-new-products",
                   "knowledgebase/advanced/serial-number-tracking",
@@ -237,7 +240,7 @@
                 "public": true
               },
               {
-                "group": "Warehouse Operations",
+                "group": "🏭 Warehouse Operations",
                 "pages": [
                   "knowledgebase/getting-started/use-the-booking-diary",
                   {
@@ -340,7 +343,7 @@
                 "public": true
               },
               {
-                "group": "Handheld Devices (HHD)",
+                "group": "📱 Handheld Devices (HHD)",
                 "pages": [
                   "knowledgebase/hardware/hhd-conditions",
                   "knowledgebase/hardware/hhd-previews-duplication",
@@ -349,7 +352,7 @@
                 "public": true
               },
               {
-                "group": "Financial & Reporting",
+                "group": "💷 Financial & Reporting",
                 "pages": [
                   {
                     "group": "Charges",
@@ -399,7 +402,7 @@
                 "public": true
               },
               {
-                "group": "SFTP",
+                "group": "📂 SFTP",
                 "pages": [
                   "knowledgebase/integrations/use-sftp-for-imports",
                   {
@@ -438,7 +441,7 @@
                 "public": true
               },
               {
-                "group": "Automations",
+                "group": "⚡ Automations",
                 "pages": [
                   {
                     "group": "Webhooks",
@@ -472,7 +475,7 @@
                 "public": true
               },
               {
-                "group": "Integration",
+                "group": "🔌 Integration",
                 "pages": [
                   "knowledgebase/integrations/marketplace-integrations",
                   {
@@ -505,7 +508,7 @@
                 "public": true
               },
               {
-                "group": "Compliance",
+                "group": "🛡️ Compliance",
                 "pages": [
                   "knowledgebase/security/subprocessors",
                   "knowledgebase/security/database-backup"
@@ -612,7 +615,7 @@
             "public": true,
             "groups": [
               {
-                "group": "Account & Inloggen",
+                "group": "🔑 Account & Inloggen",
                 "pages": [
                   {
                     "group": "Multi-Factor Authenticatie",
@@ -639,7 +642,7 @@
                 "public": true
               },
               {
-                "group": "Clarus gebruiken",
+                "group": "🧭 Clarus gebruiken",
                 "pages": [
                   "knowledgebase/nl/reporting/customise-data-grids",
                   "knowledgebase/nl/reporting/data-grid-columns"
@@ -647,7 +650,7 @@
                 "public": true
               },
               {
-                "group": "Systeeminstellingen",
+                "group": "⚙️ Systeeminstellingen",
                 "pages": [
                   {
                     "group": "Gebruikers & Rollen",
@@ -780,7 +783,7 @@
                 "public": true
               },
               {
-                "group": "Producten & Voorraad",
+                "group": "📦 Producten & Voorraad",
                 "pages": [
                   "knowledgebase/nl/products-and-stock/add-new-products",
                   "knowledgebase/nl/advanced/serial-number-tracking",
@@ -811,7 +814,7 @@
                 "public": true
               },
               {
-                "group": "Magazijnoperaties",
+                "group": "🏭 Magazijnoperaties",
                 "pages": [
                   "knowledgebase/nl/getting-started/use-the-booking-diary",
                   {
@@ -914,7 +917,7 @@
                 "public": true
               },
               {
-                "group": "Handheld Devices (HHD)",
+                "group": "📱 Handheld Devices (HHD)",
                 "pages": [
                   "knowledgebase/nl/hardware/hhd-conditions",
                   "knowledgebase/nl/hardware/hhd-previews-duplication",
@@ -923,7 +926,7 @@
                 "public": true
               },
               {
-                "group": "Financieel & Rapportage",
+                "group": "💷 Financieel & Rapportage",
                 "pages": [
                   {
                     "group": "Kosten",
@@ -973,7 +976,7 @@
                 "public": true
               },
               {
-                "group": "SFTP",
+                "group": "📂 SFTP",
                 "pages": [
                   "knowledgebase/nl/integrations/use-sftp-for-imports",
                   {
@@ -1012,7 +1015,7 @@
                 "public": true
               },
               {
-                "group": "Automatiseringen",
+                "group": "⚡ Automatiseringen",
                 "pages": [
                   {
                     "group": "Webhooks",
@@ -1046,7 +1049,7 @@
                 "public": true
               },
               {
-                "group": "Bouwen met de Clarus API",
+                "group": "💻 Bouwen met de Clarus API",
                 "pages": [
                   "knowledgebase/nl/integrations/api-overview",
                   "knowledgebase/nl/integrations/api-authentication",
@@ -1056,7 +1059,7 @@
                 "public": true
               },
               {
-                "group": "Integratie",
+                "group": "🔌 Integratie",
                 "pages": [
                   "knowledgebase/nl/integrations/marketplace-integrations",
                   {
@@ -1089,7 +1092,7 @@
                 "public": true
               },
               {
-                "group": "Compliance",
+                "group": "🛡️ Compliance",
                 "pages": [
                   "knowledgebase/nl/security/subprocessors",
                   "knowledgebase/nl/security/database-backup"
