@@ -51,6 +51,15 @@
                       "knowledgebase/security/disable-mfa"
                     ],
                     "public": true
+                  },
+                  {
+                    "group": "Troubleshooting",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/troubleshooting/signing-in",
+                      "knowledgebase/troubleshooting/mfa-issues"
+                    ],
+                    "public": true
                   }
                 ],
                 "public": true
@@ -205,7 +214,8 @@
                       "knowledgebase/products-and-stock/perform-a-warehouse-transfer",
                       "knowledgebase/products-and-stock/mixed-pallets",
                       "knowledgebase/products-and-stock/merge-split-pallets",
-                      "knowledgebase/products-and-stock/reusing-dispatched-storage-units"
+                      "knowledgebase/products-and-stock/reusing-dispatched-storage-units",
+                      "knowledgebase/troubleshooting/attrup-meaning"
                     ],
                     "public": true
                   }
@@ -228,7 +238,16 @@
                       "knowledgebase/inbound/confirm-all-button",
                       "knowledgebase/inbound/cancel-a-receipt",
                       "knowledgebase/inbound/cancel-receive-tasks",
-                      "knowledgebase/inbound/goods-in-report"
+                      "knowledgebase/inbound/goods-in-report",
+                      {
+                        "group": "Troubleshooting",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/troubleshooting/wrong-account-booking",
+                          "knowledgebase/troubleshooting/why-cant-i-putaway"
+                        ],
+                        "public": true
+                      }
                     ],
                     "public": true
                   },
@@ -279,6 +298,16 @@
                           "knowledgebase/outbound/download-backups"
                         ],
                         "public": true
+                      },
+                      {
+                        "group": "Troubleshooting",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/troubleshooting/sales-order-allocation",
+                          "knowledgebase/troubleshooting/pallet-allocation-issue",
+                          "knowledgebase/troubleshooting/storage-unit-part-pick"
+                        ],
+                        "public": true
                       }
                     ],
                     "public": true
@@ -298,7 +327,8 @@
                       "knowledgebase/financial/charge-period-dates",
                       "knowledgebase/financial/export-charges-to-sage-line-200",
                       "knowledgebase/financial/commercial-invoices",
-                      "knowledgebase/financial/pick-charge-subtypes"
+                      "knowledgebase/financial/pick-charge-subtypes",
+                      "knowledgebase/troubleshooting/no-charge-applied"
                     ],
                     "public": true
                   },
@@ -379,6 +409,15 @@
                       "knowledgebase/integrations/bespoke-exports"
                     ],
                     "public": true
+                  },
+                  {
+                    "group": "Troubleshooting",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/troubleshooting/sftp-upload-errors",
+                      "knowledgebase/troubleshooting/import-errors"
+                    ],
+                    "public": true
                   }
                 ],
                 "public": true
@@ -433,7 +472,16 @@
                       "knowledgebase/cloud-print/viewing-printers",
                       "knowledgebase/cloud-print/cloud-print-communication",
                       "knowledgebase/cloud-print/cloud-print-network",
-                      "knowledgebase/cloud-print/upgrading"
+                      "knowledgebase/cloud-print/upgrading",
+                      {
+                        "group": "Troubleshooting",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/troubleshooting/cloud-print-troubleshooting",
+                          "knowledgebase/troubleshooting/label-printing-issues"
+                        ],
+                        "public": true
+                      }
                     ],
                     "public": true
                   },
@@ -469,29 +517,6 @@
                 "pages": [
                   "knowledgebase/security/subprocessors",
                   "knowledgebase/security/database-backup"
-                ],
-                "public": true
-              },
-              {
-                "group": "Troubleshooting",
-                "pages": [
-                  "knowledgebase/troubleshooting/attrup-meaning",
-                  "knowledgebase/troubleshooting/sales-order-allocation",
-                  "knowledgebase/troubleshooting/wrong-account-booking",
-                  "knowledgebase/troubleshooting/why-cant-i-putaway",
-                  "knowledgebase/troubleshooting/pallet-allocation-issue",
-                  "knowledgebase/troubleshooting/no-charge-applied",
-                  "knowledgebase/troubleshooting/label-printing-issues",
-                  "knowledgebase/troubleshooting/storage-unit-part-pick",
-                  "knowledgebase/troubleshooting/sftp-upload-errors",
-                  "knowledgebase/troubleshooting/import-errors",
-                  "knowledgebase/troubleshooting/ftp-sftp-queue",
-                  "knowledgebase/troubleshooting/failed-scheduled-reports",
-                  "knowledgebase/troubleshooting/datagrid-error",
-                  "knowledgebase/troubleshooting/cloud-print-troubleshooting",
-                  "knowledgebase/troubleshooting/random-logout",
-                  "knowledgebase/troubleshooting/login-issues",
-                  "knowledgebase/troubleshooting/mfa-issues"
                 ],
                 "public": true
               }
@@ -606,6 +631,15 @@
                       "knowledgebase/nl/security/set-up-mfa",
                       "knowledgebase/nl/security/enable-mfa",
                       "knowledgebase/nl/security/disable-mfa"
+                    ],
+                    "public": true
+                  },
+                  {
+                    "group": "Troubleshooting",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/troubleshooting/signing-in",
+                      "knowledgebase/nl/troubleshooting/mfa-issues"
                     ],
                     "public": true
                   }
@@ -759,7 +793,8 @@
                       "knowledgebase/nl/products-and-stock/transfer-stock-or-pallets",
                       "knowledgebase/nl/products-and-stock/perform-a-warehouse-transfer",
                       "knowledgebase/nl/products-and-stock/mixed-pallets",
-                      "knowledgebase/nl/products-and-stock/merge-split-pallets"
+                      "knowledgebase/nl/products-and-stock/merge-split-pallets",
+                      "knowledgebase/nl/troubleshooting/attrup-meaning"
                     ],
                     "public": true
                   }
@@ -782,7 +817,16 @@
                       "knowledgebase/nl/inbound/confirm-all-button",
                       "knowledgebase/nl/inbound/cancel-a-receipt",
                       "knowledgebase/nl/inbound/cancel-receive-tasks",
-                      "knowledgebase/nl/inbound/goods-in-report"
+                      "knowledgebase/nl/inbound/goods-in-report",
+                      {
+                        "group": "Troubleshooting",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/troubleshooting/wrong-account-booking",
+                          "knowledgebase/nl/troubleshooting/why-cant-i-putaway"
+                        ],
+                        "public": true
+                      }
                     ],
                     "public": true
                   },
@@ -831,6 +875,16 @@
                           "knowledgebase/nl/outbound/download-backups"
                         ],
                         "public": true
+                      },
+                      {
+                        "group": "Troubleshooting",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/troubleshooting/sales-order-allocation",
+                          "knowledgebase/nl/troubleshooting/pallet-allocation-issue",
+                          "knowledgebase/nl/troubleshooting/storage-unit-part-pick"
+                        ],
+                        "public": true
                       }
                     ],
                     "public": true
@@ -850,7 +904,8 @@
                       "knowledgebase/nl/financial/charge-period-dates",
                       "knowledgebase/nl/financial/export-charges-to-sage-line-200",
                       "knowledgebase/nl/financial/commercial-invoices",
-                      "knowledgebase/nl/financial/pick-charge-subtypes"
+                      "knowledgebase/nl/financial/pick-charge-subtypes",
+                      "knowledgebase/nl/troubleshooting/no-charge-applied"
                     ],
                     "public": true
                   },
@@ -931,6 +986,15 @@
                       "knowledgebase/nl/integrations/bespoke-exports"
                     ],
                     "public": true
+                  },
+                  {
+                    "group": "Troubleshooting",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/troubleshooting/sftp-upload-errors",
+                      "knowledgebase/nl/troubleshooting/import-errors"
+                    ],
+                    "public": true
                   }
                 ],
                 "public": true
@@ -995,7 +1059,16 @@
                       "knowledgebase/nl/cloud-print/viewing-printers",
                       "knowledgebase/nl/cloud-print/cloud-print-communication",
                       "knowledgebase/nl/cloud-print/cloud-print-network",
-                      "knowledgebase/nl/cloud-print/upgrading"
+                      "knowledgebase/nl/cloud-print/upgrading",
+                      {
+                        "group": "Troubleshooting",
+                        "expanded": false,
+                        "pages": [
+                          "knowledgebase/nl/troubleshooting/cloud-print-troubleshooting",
+                          "knowledgebase/nl/troubleshooting/label-printing-issues"
+                        ],
+                        "public": true
+                      }
                     ],
                     "public": true
                   },
@@ -1029,29 +1102,6 @@
                 "pages": [
                   "knowledgebase/nl/security/subprocessors",
                   "knowledgebase/nl/security/database-backup"
-                ],
-                "public": true
-              },
-              {
-                "group": "Probleemoplossing",
-                "pages": [
-                  "knowledgebase/nl/troubleshooting/attrup-meaning",
-                  "knowledgebase/nl/troubleshooting/sales-order-allocation",
-                  "knowledgebase/nl/troubleshooting/wrong-account-booking",
-                  "knowledgebase/nl/troubleshooting/why-cant-i-putaway",
-                  "knowledgebase/nl/troubleshooting/pallet-allocation-issue",
-                  "knowledgebase/nl/troubleshooting/no-charge-applied",
-                  "knowledgebase/nl/troubleshooting/label-printing-issues",
-                  "knowledgebase/nl/troubleshooting/storage-unit-part-pick",
-                  "knowledgebase/nl/troubleshooting/sftp-upload-errors",
-                  "knowledgebase/nl/troubleshooting/import-errors",
-                  "knowledgebase/nl/troubleshooting/ftp-sftp-queue",
-                  "knowledgebase/nl/troubleshooting/failed-scheduled-reports",
-                  "knowledgebase/nl/troubleshooting/datagrid-error",
-                  "knowledgebase/nl/troubleshooting/cloud-print-troubleshooting",
-                  "knowledgebase/nl/troubleshooting/random-logout",
-                  "knowledgebase/nl/troubleshooting/login-issues",
-                  "knowledgebase/nl/troubleshooting/mfa-issues"
                 ],
                 "public": true
               }
