@@ -36,7 +36,7 @@ Similar to Loading, but assigns stock to a shipment before dispatching. Ideal fo
 
 ## Additional options
 
-- **Dispatch by Output Quantity** -- prioritises dispatch based on item count, sending larger quantities first
+- **Dispatch by Output Quantity** -- controls how many dispatch tasks are created for assembled (Assemble on Pick) kits (see [below](#dispatch-by-output-quantity))
 - **Footer Notes** -- add custom notes to generated dispatch notes
 
 <Warning>Tailoring dispatch strategies can significantly streamline the dispatch process for each account.</Warning>
@@ -49,3 +49,30 @@ Similar to Loading, but assigns stock to a shipment before dispatching. Ideal fo
     Yes. Use the **Footer Notes** field to add custom text to any generated dispatch note.
   </Accordion>
 </AccordionGroup>
+
+## Dispatch by output quantity
+
+This setting controls how dispatch tasks are created for products made from a Bill of Materials (BOM) when **Assemble on Pick** is enabled. It determines whether the system creates one dispatch task per pick task, or one per individual component.
+
+| Setting | Behaviour | Best for |
+|---|---|---|
+| **Off** (recommended) | One dispatch task per pick task | Large dispatches where detailed component tracking is not needed |
+| **On** | One dispatch task per individual component for each assembled kit | Detailed tracking and auditing, especially when components are shipped separately |
+
+<Info>This setting does not affect pick tasks — it only changes the number of dispatch tasks created.</Info>
+
+### Example: Xbox and Cyberpunk 2077 Bundle
+
+You have 10 Xboxes and 10 copies of Cyberpunk 2077. Your BOM product is an "Xbox and Cyberpunk 2077 Bundle" (one of each, output quantity: 1, Assemble on Pick on). A sales order for 10 bundles creates 2 pick tasks.
+
+**Off:** 1 dispatch task for Xbox + 1 for Cyberpunk 2077 = **2 total**.
+
+**On:** 10 dispatch tasks for Xbox + 10 for Cyberpunk 2077 = **20 total**.
+
+### Example: Tin Can Telephone
+
+Your BOM product requires 1 Wire and 2 Tin Cans (output quantity: 1). A sales order for 10 telephones creates 3 pick tasks.
+
+**Off:** 1 dispatch task for Wire + 2 for Tin Can = **3 total**.
+
+**On:** 10 dispatch tasks for Wire (qty 1 each) + 10 for Tin Can (qty 2 each) = **20 total**.

@@ -112,7 +112,8 @@
                       "knowledgebase/accounts/reason-codes",
                       "knowledgebase/accounts/use-reason-codes",
                       "knowledgebase/accounts/short-order-lines",
-                      "knowledgebase/accounts/account-assignments"
+                      "knowledgebase/accounts/account-assignments",
+                      "knowledgebase/advanced/use-templates"
                     ],
                     "public": true
                   },
@@ -196,6 +197,7 @@
                 "group": "Products & Stock",
                 "pages": [
                   "knowledgebase/products-and-stock/add-new-products",
+                  "knowledgebase/advanced/serial-number-tracking",
                   "knowledgebase/products-and-stock/product-import",
                   "knowledgebase/products-and-stock/use-product-groups",
                   "knowledgebase/products-and-stock/multi-account-products",
@@ -239,6 +241,7 @@
                       "knowledgebase/inbound/cancel-a-receipt",
                       "knowledgebase/inbound/cancel-receive-tasks",
                       "knowledgebase/inbound/goods-in-report",
+                      "knowledgebase/advanced/date-validation",
                       {
                         "group": "Troubleshooting",
                         "expanded": false,
@@ -309,6 +312,15 @@
                         ],
                         "public": true
                       }
+                    ],
+                    "public": true
+                  },
+                  {
+                    "group": "Works Orders & Kitting",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/advanced/works-orders",
+                      "knowledgebase/advanced/create-a-kit"
                     ],
                     "public": true
                   }
@@ -499,20 +511,6 @@
                 "public": true
               },
               {
-                "group": "Advanced Features",
-                "pages": [
-                  "knowledgebase/advanced/serial-number-tracking",
-                  "knowledgebase/advanced/date-validation",
-                  "knowledgebase/advanced/works-orders",
-                  "knowledgebase/advanced/manage-jobs",
-                  "knowledgebase/advanced/create-a-kit",
-                  "knowledgebase/advanced/use-templates",
-                  "knowledgebase/advanced/dispatch-by-output-qty",
-                  "knowledgebase/advanced/convert-by-output-qty"
-                ],
-                "public": true
-              },
-              {
                 "group": "Compliance",
                 "pages": [
                   "knowledgebase/security/subprocessors",
@@ -693,7 +691,8 @@
                       "knowledgebase/nl/accounts/reason-codes",
                       "knowledgebase/nl/accounts/use-reason-codes",
                       "knowledgebase/nl/accounts/short-order-lines",
-                      "knowledgebase/nl/accounts/account-assignments"
+                      "knowledgebase/nl/accounts/account-assignments",
+                      "knowledgebase/nl/advanced/use-templates"
                     ],
                     "public": true
                   },
@@ -818,6 +817,7 @@
                       "knowledgebase/nl/inbound/cancel-a-receipt",
                       "knowledgebase/nl/inbound/cancel-receive-tasks",
                       "knowledgebase/nl/inbound/goods-in-report",
+                      "knowledgebase/nl/advanced/date-validation",
                       {
                         "group": "Troubleshooting",
                         "expanded": false,
@@ -886,6 +886,15 @@
                         ],
                         "public": true
                       }
+                    ],
+                    "public": true
+                  },
+                  {
+                    "group": "Werkorders & kitting",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/advanced/works-orders",
+                      "knowledgebase/nl/advanced/create-a-kit"
                     ],
                     "public": true
                   }
@@ -1081,19 +1090,6 @@
                     ],
                     "public": true
                   }
-                ],
-                "public": true
-              },
-              {
-                "group": "Geavanceerde Functies",
-                "pages": [
-                  "knowledgebase/nl/advanced/date-validation",
-                  "knowledgebase/nl/advanced/works-orders",
-                  "knowledgebase/nl/advanced/manage-jobs",
-                  "knowledgebase/nl/advanced/create-a-kit",
-                  "knowledgebase/nl/advanced/use-templates",
-                  "knowledgebase/nl/advanced/dispatch-by-output-qty",
-                  "knowledgebase/nl/advanced/convert-by-output-qty"
                 ],
                 "public": true
               },

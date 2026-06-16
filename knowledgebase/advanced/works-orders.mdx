@@ -72,3 +72,30 @@ Once all tasks are complete, the works order status updates to **Completed** and
 
   The status changes to **Completed** on the Works Order screen, and the parent product is added to your stock list.
 </Accordion>
+
+## Convert by output quantity
+
+This account setting controls how conversion tasks are generated when you process works orders. Find it in the **Conversion** section of your account settings. It determines whether the system creates one conversion task per pick task, or one per child product per job.
+
+| Setting | Behaviour | Best for |
+|---|---|---|
+| **Off** | One conversion task per pick task | Bulk conversions without detailed individual tracking |
+| **On** (recommended) | One conversion task per child product per job | Detailed stock tracking and full auditability |
+
+<Info>This setting does not affect pick tasks — it only changes the number of conversion tasks created.</Info>
+
+### Example: Xbox and Cyberpunk 2077 Bundle
+
+Your BOM product requires one Xbox and one Cyberpunk 2077 (output quantity: 1). A works order for 10 bundles creates 2 pick tasks.
+
+**Off:** 1 conversion task for Xbox + 1 for Cyberpunk 2077 = **2 total**.
+
+**On:** 10 conversion tasks for Xbox + 10 for Cyberpunk 2077 = **20 total**.
+
+### Example: Tin Can Telephone
+
+Your BOM product requires 1 Wire and 2 Tin Cans (output quantity: 1). A works order for 10 telephones creates 3 pick tasks.
+
+**Off:** 1 conversion task for Wire + 2 for Tin Can = **3 total**.
+
+**On:** 10 conversion tasks for Wire (qty 1 each) + 10 for Tin Can (qty 2 each) = **20 total**.

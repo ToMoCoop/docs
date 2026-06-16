@@ -81,3 +81,30 @@ De status verandert in **Voltooid** Op het scherm Werken Bestelling en het ouder
 ### Kan ik de productgegevens wijzigen tijdens het werkbestellingsproces?
 
 Ja, u kunt informatie bijwerken met behulp van de RF-scanner voordat u de taak voltooit.
+
+## Converteren op uitvoerhoeveelheid
+
+Deze accountinstelling bepaalt hoe conversietaken worden gegenereerd wanneer u werkorders verwerkt. U vindt deze in het gedeelte **Conversie** van uw accountinstellingen. Het bepaalt of het systeem één conversietaak per picktaak maakt, of één per kindproduct per job.
+
+| Instelling | Gedrag | Geschikt voor |
+|---|---|---|
+| **Off** | Eén conversietaak per picktaak | Bulkconversies zonder gedetailleerde tracking per onderdeel |
+| **On** (aanbevolen) | Eén conversietaak per kindproduct per job | Gedetailleerde voorraadtracking en volledige controleerbaarheid |
+
+<Info>Deze instelling wijzigt geen picktaken — alleen het aantal conversietaken dat wordt gemaakt.</Info>
+
+### Voorbeeld: Xbox en Cyberpunk 2077-bundel
+
+Uw BOM-product vereist één Xbox en één Cyberpunk 2077 (uitvoerhoeveelheid: 1). Een werkorder voor 10 bundels maakt 2 picktaken.
+
+**Uit:** 1 conversietaak voor Xbox + 1 voor Cyberpunk 2077 = **2 in totaal**.
+
+**Aan:** 10 conversietaken voor Xbox + 10 voor Cyberpunk 2077 = **20 in totaal**.
+
+### Voorbeeld: Tin Can Telephone
+
+Uw BOM-product vereist 1 Wire en 2 Tin Cans (uitvoerhoeveelheid: 1). Een werkorder voor 10 telefoons maakt 3 picktaken.
+
+**Uit:** 1 conversietaak voor Wire + 2 voor Tin Can = **3 in totaal**.
+
+**Aan:** 10 conversietaken voor Wire (elk 1) + 10 voor Tin Can (elk 2) = **20 in totaal**.

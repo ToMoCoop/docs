@@ -32,7 +32,7 @@ Vergelijkbaar met de **Laden** Hiermee kunt u voorraad toewijzen aan een zending
 
 ### 4. Overweeg extra configuratieopties
 
--  **Verzending op Output Hoeveelheid** Dit geeft prioriteit aan verzending op basis van het aantal artikelen, zodat eerst grotere hoeveelheden eerst worden verzonden.
+-  **Verzending op uitvoerhoeveelheid** : bepaalt hoeveel verzendtaken worden gemaakt voor geassembleerde (Assemble on Pick) kits (zie hieronder).
 -  **Voettekstnotities** : U kunt aangepaste notities toevoegen onderaan elke gegenereerde verzendnota. Dit geeft u flexibiliteit voor extra informatie of instructies.
 
 ## FAQs
@@ -49,3 +49,30 @@ Ja, u kunt aangepaste voettekstnotities toevoegen aan elke gegenereerde verzendn
 
 Beide strategieën maken een groepering van aandelen mogelijk. Het laden van groepen voorraad in een "last" voor bulk handling, terwijl verzending voorraad toewijst aan een "verzending" die ideaal is voor het consolideren van meerdere bestellingen voordat u wordt verzonden.
 [CALLOUT:WARNING] **Herinnering:** Het aanpassen van deze instellingen kan het verzendproces voor elk account in Clarus WMS aanzienlijk stroomlijnen.
+
+## Verzending op uitvoerhoeveelheid
+
+Deze instelling bepaalt hoe verzendtaken worden gemaakt voor producten die zijn gemaakt van een Bill of Materials (BOM) wanneer **Assemble on Pick** is ingeschakeld. Het bepaalt of het systeem één verzendtaak per picktaak maakt, of één per afzonderlijk onderdeel.
+
+| Instelling | Gedrag | Geschikt voor |
+|---|---|---|
+| **Off** (aanbevolen) | Eén verzendtaak per picktaak | Grote verzendingen waarbij gedetailleerde tracking per onderdeel niet nodig is |
+| **On** | Eén verzendtaak per afzonderlijk onderdeel voor elke geassembleerde kit | Gedetailleerde tracking en controle, vooral als onderdelen apart worden verzonden |
+
+<Info>Deze instelling wijzigt geen picktaken — alleen het aantal verzendtaken dat wordt gemaakt.</Info>
+
+### Voorbeeld: Xbox en Cyberpunk 2077-bundel
+
+U hebt 10 Xboxes en 10 exemplaren van Cyberpunk 2077. Uw BOM-product is een "Xbox en Cyberpunk 2077 Bundle" (één van elk, uitvoerhoeveelheid: 1, Assemble on Pick aan). Een verkooporder voor 10 bundels maakt 2 picktaken.
+
+**Uit:** 1 verzendtaak voor Xbox + 1 voor Cyberpunk 2077 = **2 in totaal**.
+
+**Aan:** 10 verzendtaken voor Xbox + 10 voor Cyberpunk 2077 = **20 in totaal**.
+
+### Voorbeeld: Tin Can Telephone
+
+Uw BOM-product vereist 1 Wire en 2 Tin Cans (uitvoerhoeveelheid: 1). Een verkooporder voor 10 telefoons maakt 3 picktaken.
+
+**Uit:** 1 verzendtaak voor Wire + 2 voor Tin Can = **3 in totaal**.
+
+**Aan:** 10 verzendtaken voor Wire (elk 1) + 10 voor Tin Can (elk 2) = **20 in totaal**.
