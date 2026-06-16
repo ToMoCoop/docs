@@ -10592,7 +10592,7 @@
         "summary": "Move stock to another location",
         "description": "Move a quantity of stock from its current location to a different location within the same warehouse. Creates a transfer transaction for audit purposes.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 100,\n      \"to_location_id\": 456,\n      \"reason_code_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to move (must be > 0 and <= available) |\n| `to_location_id` | Yes | Destination location ID within the warehouse |\n| `reason_code_id` | No | Reason code for audit trail |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 100,\n      \"to_location_id\": 456,\n      \"reason_code_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to move (must be > 0 and &lt;= available) |\n| `to_location_id` | Yes | Destination location ID within the warehouse |\n| `reason_code_id` | No | Reason code for audit trail |"
         },
         "operationId": "moveStock",
         "parameters": [
@@ -10644,7 +10644,7 @@
         "summary": "Perform negative stock adjustment",
         "description": "Reduce the quantity of stock at a location. Use this for stock corrections, write-offs, or recording damaged/lost inventory.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 10,\n      \"reason_code_id\": 2\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to reduce (must be > 0 and <= available) |\n| `reason_code_id` | No | Reason code for audit trail (e.g., damaged, expired) |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 10,\n      \"reason_code_id\": 2\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to reduce (must be > 0 and &lt;= available) |\n| `reason_code_id` | No | Reason code for audit trail (e.g., damaged, expired) |"
         },
         "operationId": "negativeAdjustmentStock",
         "parameters": [
@@ -10696,7 +10696,7 @@
         "summary": "Transfer stock to another account",
         "description": "Transfer ownership of a quantity of stock from one account (customer) to another. The stock remains at the same location but changes ownership.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 100,\n      \"to_account_id\": 789,\n      \"reason_code_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to transfer (must be > 0 and <= available) |\n| `to_account_id` | Yes | Destination stock account ID (the new owner) |\n| `reason_code_id` | No | Reason code for audit trail |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stocks\",\n    \"attributes\": {\n      \"quantity\": 100,\n      \"to_account_id\": 789,\n      \"reason_code_id\": 1\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | Yes | Quantity to transfer (must be > 0 and &lt;= available) |\n| `to_account_id` | Yes | Destination stock account ID (the new owner) |\n| `reason_code_id` | No | Reason code for audit trail |"
         },
         "operationId": "transferStock",
         "parameters": [
@@ -17295,7 +17295,7 @@
                 },
                 "operator": {
                   "type": "string",
-                  "description": "Comparison operator (e.g., >=, <=, =)"
+                  "description": "Comparison operator (e.g., >=, &lt;=, =)"
                 },
                 "prompt": {
                   "type": "string",
