@@ -189,6 +189,18 @@
                       }
                     ],
                     "public": true
+                  },
+                  {
+                    "group": "Suppliers",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/financial/add-a-new-supplier",
+                      "knowledgebase/financial/edit-or-delete-a-supplier",
+                      "knowledgebase/financial/set-a-supplier-as-active-or-inactive",
+                      "knowledgebase/financial/view-the-supplier-data-grid",
+                      "knowledgebase/financial/export-supplier-data"
+                    ],
+                    "public": true
                   }
                 ],
                 "public": true
@@ -328,7 +340,16 @@
                 "public": true
               },
               {
-                "group": "Financial",
+                "group": "Handheld Devices (HHD)",
+                "pages": [
+                  "knowledgebase/hardware/hhd-conditions",
+                  "knowledgebase/hardware/hhd-previews-duplication",
+                  "knowledgebase/hardware/image-capture"
+                ],
+                "public": true
+              },
+              {
+                "group": "Financial & Reporting",
                 "pages": [
                   {
                     "group": "Charges",
@@ -361,37 +382,19 @@
                     "public": true
                   },
                   {
-                    "group": "Suppliers",
+                    "group": "Reporting",
                     "expanded": false,
                     "pages": [
-                      "knowledgebase/financial/add-a-new-supplier",
-                      "knowledgebase/financial/edit-or-delete-a-supplier",
-                      "knowledgebase/financial/set-a-supplier-as-active-or-inactive",
-                      "knowledgebase/financial/view-the-supplier-data-grid",
-                      "knowledgebase/financial/export-supplier-data"
+                      "knowledgebase/reporting/use-reports",
+                      "knowledgebase/reporting/add-variables-to-reports",
+                      "knowledgebase/reporting/select-and-group-data-by-warehouse",
+                      "knowledgebase/reporting/goods-out-report",
+                      "knowledgebase/reporting/sell-by-date-report",
+                      "knowledgebase/reporting/set-up-scheduled-reports",
+                      "knowledgebase/reporting/remove-a-scheduled-report"
                     ],
                     "public": true
                   }
-                ],
-                "public": true
-              },
-              {
-                "group": "Reporting",
-                "pages": [
-                  "knowledgebase/reporting/use-reports",
-                  "knowledgebase/reporting/add-variables-to-reports",
-                  "knowledgebase/reporting/select-and-group-data-by-warehouse",
-                  "knowledgebase/reporting/goods-out-report",
-                  "knowledgebase/reporting/sell-by-date-report",
-                  "knowledgebase/reporting/set-up-scheduled-reports",
-                  "knowledgebase/reporting/remove-a-scheduled-report"
-                ],
-                "public": true
-              },
-              {
-                "group": "E-commerce & Marketplaces",
-                "pages": [
-                  "knowledgebase/integrations/marketplace-integrations"
                 ],
                 "public": true
               },
@@ -469,8 +472,9 @@
                 "public": true
               },
               {
-                "group": "Tools",
+                "group": "Integration",
                 "pages": [
+                  "knowledgebase/integrations/marketplace-integrations",
                   {
                     "group": "Cloud Print",
                     "expanded": false,
@@ -494,16 +498,6 @@
                         ],
                         "public": true
                       }
-                    ],
-                    "public": true
-                  },
-                  {
-                    "group": "Hardware",
-                    "expanded": false,
-                    "pages": [
-                      "knowledgebase/hardware/hhd-conditions",
-                      "knowledgebase/hardware/hhd-previews-duplication",
-                      "knowledgebase/hardware/image-capture"
                     ],
                     "public": true
                   }
@@ -767,6 +761,18 @@
                       }
                     ],
                     "public": true
+                  },
+                  {
+                    "group": "Leveranciers",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/financial/add-a-new-supplier",
+                      "knowledgebase/nl/financial/edit-or-delete-a-supplier",
+                      "knowledgebase/nl/financial/set-a-supplier-as-active-or-inactive",
+                      "knowledgebase/nl/financial/view-the-supplier-data-grid",
+                      "knowledgebase/nl/financial/export-supplier-data"
+                    ],
+                    "public": true
                   }
                 ],
                 "public": true
@@ -902,7 +908,15 @@
                 "public": true
               },
               {
-                "group": "Financieel",
+                "group": "Handheld Devices (HHD)",
+                "pages": [
+                  "knowledgebase/nl/hardware/hhd-conditions",
+                  "knowledgebase/nl/hardware/hhd-previews-duplication"
+                ],
+                "public": true
+              },
+              {
+                "group": "Financieel & Rapportage",
                 "pages": [
                   {
                     "group": "Kosten",
@@ -935,37 +949,19 @@
                     "public": true
                   },
                   {
-                    "group": "Leveranciers",
+                    "group": "Rapportage",
                     "expanded": false,
                     "pages": [
-                      "knowledgebase/nl/financial/add-a-new-supplier",
-                      "knowledgebase/nl/financial/edit-or-delete-a-supplier",
-                      "knowledgebase/nl/financial/set-a-supplier-as-active-or-inactive",
-                      "knowledgebase/nl/financial/view-the-supplier-data-grid",
-                      "knowledgebase/nl/financial/export-supplier-data"
+                      "knowledgebase/nl/reporting/use-reports",
+                      "knowledgebase/nl/reporting/add-variables-to-reports",
+                      "knowledgebase/nl/reporting/select-and-group-data-by-warehouse",
+                      "knowledgebase/nl/reporting/goods-out-report",
+                      "knowledgebase/nl/reporting/sell-by-date-report",
+                      "knowledgebase/nl/reporting/set-up-scheduled-reports",
+                      "knowledgebase/nl/reporting/remove-a-scheduled-report"
                     ],
                     "public": true
                   }
-                ],
-                "public": true
-              },
-              {
-                "group": "Rapportage",
-                "pages": [
-                  "knowledgebase/nl/reporting/use-reports",
-                  "knowledgebase/nl/reporting/add-variables-to-reports",
-                  "knowledgebase/nl/reporting/select-and-group-data-by-warehouse",
-                  "knowledgebase/nl/reporting/goods-out-report",
-                  "knowledgebase/nl/reporting/sell-by-date-report",
-                  "knowledgebase/nl/reporting/set-up-scheduled-reports",
-                  "knowledgebase/nl/reporting/remove-a-scheduled-report"
-                ],
-                "public": true
-              },
-              {
-                "group": "E-commerce & marktplaatsen",
-                "pages": [
-                  "knowledgebase/nl/integrations/marketplace-integrations"
                 ],
                 "public": true
               },
@@ -1053,8 +1049,9 @@
                 "public": true
               },
               {
-                "group": "Tools",
+                "group": "Integratie",
                 "pages": [
+                  "knowledgebase/nl/integrations/marketplace-integrations",
                   {
                     "group": "Cloud Print",
                     "expanded": false,
@@ -1078,15 +1075,6 @@
                         ],
                         "public": true
                       }
-                    ],
-                    "public": true
-                  },
-                  {
-                    "group": "Hardware",
-                    "expanded": false,
-                    "pages": [
-                      "knowledgebase/nl/hardware/hhd-conditions",
-                      "knowledgebase/nl/hardware/hhd-previews-duplication"
                     ],
                     "public": true
                   }
