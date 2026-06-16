@@ -131,6 +131,7 @@
                         "expanded": false,
                         "pages": [
                           "knowledgebase/warehouse-setup/create-a-location",
+                          "knowledgebase/warehouse-setup/location-import",
                           "knowledgebase/warehouse-setup/location-groups",
                           "knowledgebase/warehouse-setup/location-check-digits",
                           "knowledgebase/warehouse-setup/warehouse-map-locations",
@@ -218,6 +219,8 @@
                   "knowledgebase/products-and-stock/multi-account-products",
                   "knowledgebase/products-and-stock/product-storage-units",
                   "knowledgebase/products-and-stock/create-a-bill-of-materials-bom",
+                  "knowledgebase/products-and-stock/bom-import",
+                  "knowledgebase/products-and-stock/hazardous-phrase-assignment",
                   {
                     "group": "Stock Management",
                     "expanded": false,
@@ -249,6 +252,7 @@
                     "pages": [
                       "knowledgebase/inbound/book-goods-in",
                       "knowledgebase/inbound/pre-receipt-import",
+                      "knowledgebase/inbound/crossdock-pre-receipt-import",
                       "knowledgebase/inbound/pre-receipt-putaway-labels",
                       "knowledgebase/inbound/guided-putaway-rules",
                       "knowledgebase/inbound/put-away-products-via-groups",
@@ -311,6 +315,7 @@
                           "knowledgebase/outbound/dispatching-loads",
                           "knowledgebase/outbound/delivery-addresses",
                           "knowledgebase/outbound/collection-addresses",
+                          "knowledgebase/outbound/address-import",
                           "knowledgebase/outbound/ftp-load-dispatch-file",
                           "knowledgebase/outbound/download-an-invoice",
                           "knowledgebase/outbound/download-backups"
@@ -411,9 +416,14 @@
                     "pages": [
                       "knowledgebase/outbound/order-import",
                       "knowledgebase/inbound/pre-receipt-import",
+                      "knowledgebase/inbound/crossdock-pre-receipt-import",
                       "knowledgebase/products-and-stock/product-import",
+                      "knowledgebase/products-and-stock/bom-import",
+                      "knowledgebase/products-and-stock/hazardous-phrase-assignment",
                       "knowledgebase/products-and-stock/sftp-stock-attributes",
                       "knowledgebase/accounts/account-assignments",
+                      "knowledgebase/warehouse-setup/location-import",
+                      "knowledgebase/outbound/address-import",
                       "knowledgebase/integrations/bespoke-imports"
                     ],
                     "public": true
@@ -705,6 +715,7 @@
                         "expanded": false,
                         "pages": [
                           "knowledgebase/nl/warehouse-setup/create-a-location",
+                          "knowledgebase/nl/warehouse-setup/location-import",
                           "knowledgebase/nl/warehouse-setup/location-groups",
                           "knowledgebase/nl/warehouse-setup/location-check-digits",
                           "knowledgebase/nl/warehouse-setup/warehouse-map-locations",
@@ -792,6 +803,8 @@
                   "knowledgebase/nl/products-and-stock/multi-account-products",
                   "knowledgebase/nl/products-and-stock/product-storage-units",
                   "knowledgebase/nl/products-and-stock/create-a-bill-of-materials-bom",
+                  "knowledgebase/nl/products-and-stock/bom-import",
+                  "knowledgebase/nl/products-and-stock/hazardous-phrase-assignment",
                   {
                     "group": "Voorraadbeheer",
                     "expanded": false,
@@ -823,6 +836,7 @@
                     "pages": [
                       "knowledgebase/nl/inbound/book-goods-in",
                       "knowledgebase/nl/inbound/pre-receipt-import",
+                      "knowledgebase/nl/inbound/crossdock-pre-receipt-import",
                       "knowledgebase/nl/inbound/pre-receipt-putaway-labels",
                       "knowledgebase/nl/inbound/guided-putaway-rules",
                       "knowledgebase/nl/inbound/put-away-products-via-groups",
@@ -885,6 +899,7 @@
                           "knowledgebase/nl/outbound/dispatching-loads",
                           "knowledgebase/nl/outbound/delivery-addresses",
                           "knowledgebase/nl/outbound/collection-addresses",
+                          "knowledgebase/nl/outbound/address-import",
                           "knowledgebase/nl/outbound/ftp-load-dispatch-file",
                           "knowledgebase/nl/outbound/download-an-invoice",
                           "knowledgebase/nl/outbound/download-backups"
@@ -985,9 +1000,14 @@
                     "pages": [
                       "knowledgebase/nl/outbound/order-import",
                       "knowledgebase/nl/inbound/pre-receipt-import",
+                      "knowledgebase/nl/inbound/crossdock-pre-receipt-import",
                       "knowledgebase/nl/products-and-stock/product-import",
+                      "knowledgebase/nl/products-and-stock/bom-import",
+                      "knowledgebase/nl/products-and-stock/hazardous-phrase-assignment",
                       "knowledgebase/nl/products-and-stock/sftp-stock-attributes",
                       "knowledgebase/nl/accounts/account-assignments",
+                      "knowledgebase/nl/warehouse-setup/location-import",
+                      "knowledgebase/nl/outbound/address-import",
                       "knowledgebase/nl/integrations/bespoke-imports"
                     ],
                     "public": true
@@ -1108,13 +1128,6 @@
   "logo": {
     "light": "/logo/light.png",
     "dark": "/logo/dark.png"
-  },
-  "navbar": {
-    "primary": {
-      "type": "button",
-      "label": "Support",
-      "href": "https://support.claruswms.com"
-    }
   },
   "footer": {
     "socials": {

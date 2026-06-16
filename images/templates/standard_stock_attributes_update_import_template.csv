@@ -1,0 +1,2 @@
+storage_unit_reference,product_code,stock_description,fifo_date,string1,string2,string3,string4,string5,integer1,integer2,integer3,integer4,integer5,datetime1,datetime2,datetime3,datetime4,datetime5,boolean1,boolean2,boolean3,boolean4,boolean5
+PALLET-DEMO-001,DEMO-001,Updated stock description,2026-06-15,Custom value 1,,,,,42,,,,,,,,,,TRUE,,,,

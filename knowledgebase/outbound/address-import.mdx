@@ -1,0 +1,29 @@
+---
+title: "Address Import via SFTP"
+description: "Create delivery and collection addresses in bulk by uploading a CSV via SFTP, linked to the relevant account."
+sidebarTitle: "Address Import"
+---
+
+You can create delivery and collection addresses in bulk by uploading a CSV via SFTP, rather than adding each one manually.
+
+<Tip>**Template:** <a href="/images/templates/standard_address_import_template.csv" download>standard_address_import_template.csv</a> — download it, fill in your data, and upload it via SFTP.</Tip>
+
+## Key fields
+
+The template includes every available column. The essentials are:
+
+| Field | Purpose |
+|---|---|
+| `code` | Unique address code |
+| `address_type` | `DeliveryAddress` or `CollectionAddress` |
+| `name` | Contact / recipient name |
+| `address_1`–`address_5` | Address lines |
+| `postcode` | Postcode |
+| `country` | ISO 3166-1 alpha-2 country code (e.g. `GB`) |
+| `account_code` | The account the address belongs to |
+
+Contact details (`phone_number`, `email_address`) and `external_system_reference1`–`3` are also included — fill in any that apply.
+
+<Note>For managing addresses individually, see [Delivery Addresses](/knowledgebase/outbound/delivery-addresses) and [Collection Addresses](/knowledgebase/outbound/collection-addresses).</Note>
+
+See [SFTP Overview](/knowledgebase/integrations/use-sftp-for-imports) for how to connect and upload.

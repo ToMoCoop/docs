@@ -1,0 +1,32 @@
+---
+title: "Crossdock Pre-Receipt Import via SFTP"
+description: "Importeer crossdock-pre-receipts in bulk via SFTP — ontvangsten die direct doorstromen naar een uitgaande verzending, met de bezorggegevens op dezelfde regel."
+sidebarTitle: "Crossdock Pre-Receipt Import"
+---
+
+Een crossdock-pre-receipt is een ontvangst die **direct doorstroomt naar verzending** in plaats van te worden weggezet in voorraad. Met de crossdock-import maakt u deze in bulk aan door een CSV via SFTP te uploaden — elke regel bevat zowel de ontvangstgegevens als de uitgaande verzend- en bezorggegevens.
+
+<Tip>**Template:** <a href="/images/templates/standard_pre_receipt_crossdock_import_template.csv" download>standard_pre_receipt_crossdock_import_template.csv</a> — download het, vul uw gegevens in en upload het via SFTP.</Tip>
+
+## Belangrijkste velden
+
+De template bevat alle beschikbare kolommen. De essentiële zijn:
+
+| Veld | Doel |
+|---|---|
+| `receipt_reference` | Uw unieke referentie voor de ontvangst |
+| `account_code` | Het account waartoe de voorraad behoort |
+| `receipt_type` | Ingesteld op `crossdock` |
+| `warehouse_code` | Magazijn dat de voorraad ontvangt |
+| `expected_date_of_receipt` | Wanneer de voorraad wordt verwacht |
+| `product_code` | Ontvangen product |
+| `item_quantity` / `quantity_dimension` | Hoeveelheid en eenheid |
+| `expected_date_of_dispatch` | Wanneer de crossdock-voorraad moet worden verzonden |
+| `goods_out_reference` | Referentie voor de aangemaakte uitgaande order |
+| Bezorgadres (`address_1`–`address_5`, `postcode`, `country_code`, …) | Waar de crossdock-voorraad naartoe gaat |
+
+Optionele header-, regel- en referentievelden (`receipt_string1`–`5`, `line_integer1`–`5`, enzovoort) staan in de template — laat velden die u niet nodig hebt leeg.
+
+<Note>Dit komt overeen met de [standaard pre-receipt import](/knowledgebase/nl/inbound/pre-receipt-import), met extra verzend- en bezorgkolommen voor het uitgaande deel.</Note>
+
+Zie [SFTP-overzicht](/knowledgebase/nl/integrations/use-sftp-for-imports) voor verbinden en uploaden.

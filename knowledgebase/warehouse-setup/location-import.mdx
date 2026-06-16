@@ -1,0 +1,31 @@
+---
+title: "Location Import via SFTP"
+description: "Create warehouse locations in bulk by uploading a CSV via SFTP, including location type, position coordinates, capacities, and pick/putaway rules."
+sidebarTitle: "Location Import"
+---
+
+You can create warehouse locations in bulk by uploading a CSV via SFTP, rather than adding each one by hand. This is ideal when setting up a new warehouse or a large zone.
+
+<Tip>**Template:** <a href="/images/templates/standard_location_import_template.csv" download>standard_location_import_template.csv</a> — download it, fill in your data, and upload it via SFTP.</Tip>
+
+## Key fields
+
+The template includes every available column. The essentials are:
+
+| Field | Purpose |
+|---|---|
+| `Code` | Unique location code |
+| `Warehouse Code` | Warehouse the location belongs to |
+| `Location Type` | e.g. `PICK` |
+| `Zone` / `Aisle` / `Column` / `Row` / `Slot` | Position coordinates |
+| `Walk Sequence` | Pick-walk ordering |
+| `Check Digit` | Optional location check digit |
+| `Allow Putaway` / `Allow Picking` | Whether the location can be used for each |
+| `Active` | Whether the location is in use |
+| `Is Pickface` | Whether the location is a pickface |
+
+Capacity limits (`Max Pallets`, `Max Items`, `Max Weight`, `Max Height`, …) and mixing rules (`Mix Accounts`, `Mix Products`, `Mix Batches`, …) are also in the template — set them as needed.
+
+<Note>For creating locations individually and understanding location types, see [Create a Location](/knowledgebase/warehouse-setup/create-a-location).</Note>
+
+See [SFTP Overview](/knowledgebase/integrations/use-sftp-for-imports) for how to connect and upload.

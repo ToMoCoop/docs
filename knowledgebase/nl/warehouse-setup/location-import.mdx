@@ -1,0 +1,31 @@
+---
+title: "Location Import via SFTP"
+description: "Maak magazijnlocaties in bulk aan door een CSV via SFTP te uploaden, inclusief locatietype, coördinaten, capaciteiten en pick-/putaway-regels."
+sidebarTitle: "Location Import"
+---
+
+U kunt magazijnlocaties in bulk aanmaken door een CSV via SFTP te uploaden, in plaats van ze één voor één toe te voegen. Ideaal bij het inrichten van een nieuw magazijn of een grote zone.
+
+<Tip>**Template:** <a href="/images/templates/standard_location_import_template.csv" download>standard_location_import_template.csv</a> — download het, vul uw gegevens in en upload het via SFTP.</Tip>
+
+## Belangrijkste velden
+
+De template bevat alle beschikbare kolommen. De essentiële zijn:
+
+| Veld | Doel |
+|---|---|
+| `Code` | Unieke locatiecode |
+| `Warehouse Code` | Magazijn waartoe de locatie behoort |
+| `Location Type` | bijv. `PICK` |
+| `Zone` / `Aisle` / `Column` / `Row` / `Slot` | Positiecoördinaten |
+| `Walk Sequence` | Volgorde voor de pickroute |
+| `Check Digit` | Optioneel controlecijfer voor de locatie |
+| `Allow Putaway` / `Allow Picking` | Of de locatie hiervoor mag worden gebruikt |
+| `Active` | Of de locatie in gebruik is |
+| `Is Pickface` | Of de locatie een pickface is |
+
+Capaciteitslimieten (`Max Pallets`, `Max Items`, `Max Weight`, `Max Height`, …) en mengregels (`Mix Accounts`, `Mix Products`, `Mix Batches`, …) staan ook in de template — stel ze in naar behoefte.
+
+<Note>Voor het individueel aanmaken van locaties en uitleg over locatietypen, zie [Een locatie aanmaken](/knowledgebase/nl/warehouse-setup/create-a-location).</Note>
+
+Zie [SFTP-overzicht](/knowledgebase/nl/integrations/use-sftp-for-imports) voor verbinden en uploaden.

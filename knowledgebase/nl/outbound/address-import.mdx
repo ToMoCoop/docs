@@ -1,0 +1,29 @@
+---
+title: "Address Import via SFTP"
+description: "Maak bezorg- en ophaaladressen in bulk aan door een CSV via SFTP te uploaden, gekoppeld aan het juiste account."
+sidebarTitle: "Address Import"
+---
+
+U kunt bezorg- en ophaaladressen in bulk aanmaken door een CSV via SFTP te uploaden, in plaats van ze handmatig toe te voegen.
+
+<Tip>**Template:** <a href="/images/templates/standard_address_import_template.csv" download>standard_address_import_template.csv</a> — download het, vul uw gegevens in en upload het via SFTP.</Tip>
+
+## Belangrijkste velden
+
+De template bevat alle beschikbare kolommen. De essentiële zijn:
+
+| Veld | Doel |
+|---|---|
+| `code` | Unieke adrescode |
+| `address_type` | `DeliveryAddress` of `CollectionAddress` |
+| `name` | Naam van contactpersoon / ontvanger |
+| `address_1`–`address_5` | Adresregels |
+| `postcode` | Postcode |
+| `country` | ISO 3166-1 alpha-2-landcode (bijv. `GB`) |
+| `account_code` | Het account waartoe het adres behoort |
+
+Contactgegevens (`phone_number`, `email_address`) en `external_system_reference1`–`3` staan er ook in — vul in wat van toepassing is.
+
+<Note>Voor het individueel beheren van adressen, zie [Bezorgadressen](/knowledgebase/nl/outbound/delivery-addresses) en [Ophaaladressen](/knowledgebase/nl/outbound/collection-addresses).</Note>
+
+Zie [SFTP-overzicht](/knowledgebase/nl/integrations/use-sftp-for-imports) voor verbinden en uploaden.

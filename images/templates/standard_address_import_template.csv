@@ -1,0 +1,2 @@
+code,address_type,name,address_1,address_2,address_3,address_4,address_5,postcode,phone_number,email_address,country,external_system_reference1,external_system_reference2,external_system_reference3,account_code
+ACME-DEL-001,DeliveryAddress,John Smith,123 Example Street,Industrial Estate,London,,,SW1A 1AA,+44 20 1234 5678,john.smith@example.com,GB,EXT-ACME-DEL-001,,,ACME

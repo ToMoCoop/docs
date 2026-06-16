@@ -1,0 +1,23 @@
+---
+title: "BOM Import via SFTP"
+description: "Build Bills of Materials in bulk by uploading a CSV via SFTP — one row per parent/child component, with quantity and assemble-on-pick options."
+sidebarTitle: "BOM Import"
+---
+
+You can build Bills of Materials (BOMs) in bulk by uploading a CSV via SFTP. Each row links a child component to its parent product, so a multi-component BOM spans several rows that share the same parent.
+
+<Tip>**Template:** <a href="/images/templates/standard_product_bom_import.csv" download>standard_product_bom_import.csv</a> — download it, fill in your data, and upload it via SFTP.</Tip>
+
+## Key fields
+
+| Field | Purpose |
+|---|---|
+| `parent_product_code` | The finished parent product the BOM builds |
+| `child_product_code` | A component product that goes into the parent |
+| `quantity` | How many of the child are required |
+| `output_quantity` | How many of the parent the BOM produces |
+| `assemble_on_pick` | `TRUE` to assemble the kit during picking (see [Create a Kit](/knowledgebase/advanced/create-a-kit)); `FALSE` for works-order assembly |
+
+<Note>To build a BOM manually instead, see [Bill of Materials](/knowledgebase/products-and-stock/create-a-bill-of-materials-bom).</Note>
+
+See [SFTP Overview](/knowledgebase/integrations/use-sftp-for-imports) for how to connect and upload.

@@ -1,0 +1,32 @@
+---
+title: "Crossdock Pre-Receipt Import via SFTP"
+description: "Import crossdock pre-receipts in bulk via SFTP — receipts that flow straight through to an outbound dispatch, with the delivery details on the same row."
+sidebarTitle: "Crossdock Pre-Receipt Import"
+---
+
+A crossdock pre-receipt is a receipt that flows **straight through to dispatch** rather than being put away into stock. The crossdock import lets you create these in bulk by uploading a CSV via SFTP — each row carries both the receipt details and the outbound dispatch and delivery details.
+
+<Tip>**Template:** <a href="/images/templates/standard_pre_receipt_crossdock_import_template.csv" download>standard_pre_receipt_crossdock_import_template.csv</a> — download it, fill in your data, and upload it via SFTP.</Tip>
+
+## Key fields
+
+The template includes every available column. The essentials are:
+
+| Field | Purpose |
+|---|---|
+| `receipt_reference` | Your unique reference for the receipt |
+| `account_code` | The account the stock belongs to |
+| `receipt_type` | Set to `crossdock` |
+| `warehouse_code` | Warehouse receiving the stock |
+| `expected_date_of_receipt` | When the stock is expected in |
+| `product_code` | Product being received |
+| `item_quantity` / `quantity_dimension` | Quantity and its unit |
+| `expected_date_of_dispatch` | When the crossdocked stock should ship |
+| `goods_out_reference` | Reference for the outbound order created |
+| Delivery address (`address_1`–`address_5`, `postcode`, `country_code`, …) | Where the crossdocked stock is sent |
+
+Optional header, line, and reference fields (`receipt_string1`–`5`, `line_integer1`–`5`, and so on) are included in the template — leave any you don't need blank.
+
+<Note>This mirrors the [standard pre-receipt import](/knowledgebase/inbound/pre-receipt-import), with added dispatch and delivery columns for the outbound leg.</Note>
+
+See [SFTP Overview](/knowledgebase/integrations/use-sftp-for-imports) for how to connect and upload.

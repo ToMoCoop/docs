@@ -1,0 +1,21 @@
+---
+title: "Hazardous Phrase Assignment via SFTP"
+description: "Assign or unassign hazardous phrases to products in bulk by uploading a CSV via SFTP."
+sidebarTitle: "Hazardous Phrase Assignment"
+---
+
+You can assign or unassign hazardous phrases (such as `H301`) to products in bulk by uploading a CSV via SFTP. Each row links one hazardous phrase to one product.
+
+<Tip>**Template:** <a href="/images/templates/hazardous_phrases_product_assignment.csv" download>hazardous_phrases_product_assignment.csv</a> — download it, fill in your data, and upload it via SFTP.</Tip>
+
+## Key fields
+
+| Field | Purpose |
+|---|---|
+| `Product Code` | The product to update |
+| `Hazardous Phrase Code` | The hazardous phrase code to assign or remove (e.g. `H301`) |
+| `Operation` | `ASSIGN` to add the phrase, or `UNASSIGN` to remove it |
+
+<Info>Use one row per product and phrase. To update several phrases for a product, add multiple rows.</Info>
+
+See [SFTP Overview](/knowledgebase/integrations/use-sftp-for-imports) for how to connect and upload.

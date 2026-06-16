@@ -1,0 +1,2 @@
+Code,Description,Warehouse Code,Location Type,Prefix,Zone,Aisle,Column,Row,Slot,Walk Sequence,Check Digit,Max Pallets,Max Items,Max Weight,Max Height,Max Cube,Max Width,Max Depth,Stack Factor,Allow Putaway,Allow Picking,Allow Replen From,Mix Accounts,Mix Products,Mix Batches,Mix Dates,Mix Pallet Qty,Allow Unpalletised,Allow Palletised,Allow Hold Stock,Active,Is Pickface,Unit Of Measure,Safety Height Clearance
+A-01-01-01,Aisle A Pick Location,WHS01,PICK,,,A,01,01,01,100,,1,,1000,200,,100,120,,TRUE,TRUE,0,0,0,1,1,0,1,1,0,TRUE,TRUE,centimetre,10

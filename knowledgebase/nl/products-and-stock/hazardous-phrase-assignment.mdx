@@ -1,0 +1,21 @@
+---
+title: "Hazardous Phrase Assignment via SFTP"
+description: "Wijs hazardous phrases in bulk toe aan of verwijder ze van producten door een CSV via SFTP te uploaden."
+sidebarTitle: "Hazardous Phrase Assignment"
+---
+
+U kunt hazardous phrases (zoals `H301`) in bulk aan producten toewijzen of ervan verwijderen door een CSV via SFTP te uploaden. Elke regel koppelt één hazardous phrase aan één product.
+
+<Tip>**Template:** <a href="/images/templates/hazardous_phrases_product_assignment.csv" download>hazardous_phrases_product_assignment.csv</a> — download het, vul uw gegevens in en upload het via SFTP.</Tip>
+
+## Belangrijkste velden
+
+| Veld | Doel |
+|---|---|
+| `Product Code` | Het bij te werken product |
+| `Hazardous Phrase Code` | De hazardous-phrase-code om toe te wijzen of te verwijderen (bijv. `H301`) |
+| `Operation` | `ASSIGN` om de phrase toe te voegen, of `UNASSIGN` om deze te verwijderen |
+
+<Info>Gebruik één regel per product en phrase. Wilt u meerdere phrases voor een product bijwerken, voeg dan meerdere regels toe.</Info>
+
+Zie [SFTP-overzicht](/knowledgebase/nl/integrations/use-sftp-for-imports) voor verbinden en uploaden.
