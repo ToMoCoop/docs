@@ -3151,403 +3151,6 @@
         }
       }
     },
-    "/graphql#ListChargeLines": {
-      "post": {
-        "tags": [
-          "Charging: Lines"
-        ],
-        "summary": "List charge lines",
-        "description": "Retrieve charge lines using GraphQL. Supports filtering by charge type, code, date range, and associated records.",
-        "operationId": "listChargeLines",
-        "x-mint": {
-          "content": "## Query Structure\n\n```graphql\nquery($filter: ChargeLineFilterType) {\n  charge_lines {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          charge_type\n          quantity\n          price\n          total\n          unit_of_measure\n          description\n          created_at\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"charge_type\": {\n      \"eq\": \"picking\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge line code |\n| `charge_type` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Type of charge |\n| `goods_in_receipt_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by goods in receipt |\n| `goods_out_order_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by goods out order |\n| `created_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | Filter by creation date |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "query"
-                ],
-                "properties": {
-                  "query": {
-                    "type": "string",
-                    "description": "GraphQL query string",
-                    "format": "textarea",
-                    "example": "query($filter: ChargeLineFilterType) { charge_lines { all(filter: $filter) { edges { node { id code name charge_type quantity price total unit_of_measure description created_at } } } } }"
-                  },
-                  "variables": {
-                    "type": "object",
-                    "description": "Query variables including the filter object",
-                    "example": {
-                      "filter": {
-                        "charge_type": {
-                          "eq": "picking"
-                        }
-                      }
-                    },
-                    "properties": {
-                      "filter": {
-                        "type": "object",
-                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "query": "query($filter: ChargeLineFilterType) { charge_lines { all(filter: $filter) { edges { node { id code name charge_type quantity price total unit_of_measure description created_at } } } } }",
-                "variables": {
-                  "filter": {
-                    "charge_type": {
-                      "eq": "picking"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful GraphQL response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "description": "Query result data",
-                      "properties": {
-                        "charge_lines": {
-                          "type": "object",
-                          "properties": {
-                            "all": {
-                              "type": "object",
-                              "properties": {
-                                "edges": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "object",
-                                    "properties": {
-                                      "node": {
-                                        "type": "object",
-                                        "description": "A Charge Lines record"
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      },
-                      "description": "GraphQL errors, if any"
-                    }
-                  }
-                },
-                "example": {
-                  "data": {
-                    "charge_lines": {
-                      "all": {
-                        "edges": [
-                          {
-                            "node": {
-                              "id": "1",
-                              "code": "PICK-001",
-                              "name": "Picking Charge",
-                              "charge_type": "picking",
-                              "quantity": 10,
-                              "price": 1.5,
-                              "total": 15.0,
-                              "unit_of_measure": "unit",
-                              "description": "Standard picking charge",
-                              "created_at": "2026-03-10T08:00:00Z"
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        }
-      }
-    },
-    "/api/charge_lines": {
-      "post": {
-        "tags": [
-          "Charging: Lines"
-        ],
-        "summary": "Create a charge line",
-        "description": "Create a new charge line to record a billable item. Charge lines are used for invoicing and billing operations.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity × price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
-        },
-        "operationId": "createChargeLine",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "type": "object",
-                    "required": [
-                      "type",
-                      "attributes"
-                    ],
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "charge_lines"
-                        ]
-                      },
-                      "attributes": {
-                        "$ref": "#/components/schemas/ChargeLineCreateAttributes"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "data": {
-                  "type": "charge_lines",
-                  "attributes": {
-                    "charge_basket_id": 1,
-                    "code": "PICK-001",
-                    "name": "Picking Charge",
-                    "charge_type": "PICK",
-                    "quantity": 10,
-                    "price": 0.5
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Charge line created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "charge_lines"
-                          ]
-                        },
-                        "attributes": {
-                          "$ref": "#/components/schemas/ChargeLineAttributes"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Charging: Lines"
-        ],
-        "summary": "Delete multiple charge lines",
-        "description": "Delete multiple charge lines by providing a comma-separated list of IDs.",
-        "x-mint": {
-          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Pass IDs as comma-separated query parameter: `?ids=1,2,3`\n- Invoiced charge lines cannot be deleted"
-        },
-        "operationId": "destroyChargeLineCollection",
-        "parameters": [
-          {
-            "name": "ids",
-            "in": "query",
-            "required": true,
-            "description": "Comma-separated list of charge line IDs to delete",
-            "schema": {
-              "type": "string"
-            },
-            "example": "1,2,3"
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/NoContent"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/charge_lines/{id}": {
-      "patch": {
-        "tags": [
-          "Charging: Lines"
-        ],
-        "summary": "Update a charge line",
-        "description": "Update an existing charge line's attributes.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"quantity\": 15,\n      \"price\": 0.75,\n      \"description\": \"Updated picking charge\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | No | Updated quantity |\n| `price` | No | Updated price per unit |\n| `description` | No | Updated description |"
-        },
-        "operationId": "updateChargeLine",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the charge line to update",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "type": "object",
-                    "required": [
-                      "type",
-                      "attributes"
-                    ],
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "charge_lines"
-                        ]
-                      },
-                      "attributes": {
-                        "$ref": "#/components/schemas/ChargeLineUpdateAttributes"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Charge line updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "charge_lines"
-                          ]
-                        },
-                        "attributes": {
-                          "$ref": "#/components/schemas/ChargeLineAttributes"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Charging: Lines"
-        ],
-        "summary": "Delete a charge line",
-        "description": "Delete a single charge line.",
-        "x-mint": {
-          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Invoiced charge lines cannot be deleted"
-        },
-        "operationId": "destroyChargeLine",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the charge line to delete",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/NoContent"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
-      }
-    },
     "/graphql#ListChargeBaskets": {
       "post": {
         "tags": [
@@ -4884,6 +4487,403 @@
             "in": "path",
             "required": true,
             "description": "The unique identifier of the charge window to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/graphql#ListChargeLines": {
+      "post": {
+        "tags": [
+          "Charging: Lines"
+        ],
+        "summary": "List charge lines",
+        "description": "Retrieve charge lines using GraphQL. Supports filtering by charge type, code, date range, and associated records.",
+        "operationId": "listChargeLines",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: ChargeLineFilterType) {\n  charge_lines {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          charge_type\n          quantity\n          price\n          total\n          unit_of_measure\n          description\n          created_at\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"charge_type\": {\n      \"eq\": \"picking\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Charge line code |\n| `charge_type` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Type of charge |\n| `goods_in_receipt_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by goods in receipt |\n| `goods_out_order_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by goods out order |\n| `created_at` | DatetimeInputType | `eq`, `from`, `to`, `between` | Filter by creation date |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea",
+                    "example": "query($filter: ChargeLineFilterType) { charge_lines { all(filter: $filter) { edges { node { id code name charge_type quantity price total unit_of_measure description created_at } } } } }"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "example": {
+                      "filter": {
+                        "charge_type": {
+                          "eq": "picking"
+                        }
+                      }
+                    },
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: ChargeLineFilterType) { charge_lines { all(filter: $filter) { edges { node { id code name charge_type quantity price total unit_of_measure description created_at } } } } }",
+                "variables": {
+                  "filter": {
+                    "charge_type": {
+                      "eq": "picking"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "charge_lines": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Charge Lines record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "charge_lines": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "1",
+                              "code": "PICK-001",
+                              "name": "Picking Charge",
+                              "charge_type": "picking",
+                              "quantity": 10,
+                              "price": 1.5,
+                              "total": 15.0,
+                              "unit_of_measure": "unit",
+                              "description": "Standard picking charge",
+                              "created_at": "2026-03-10T08:00:00Z"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/charge_lines": {
+      "post": {
+        "tags": [
+          "Charging: Lines"
+        ],
+        "summary": "Create a charge line",
+        "description": "Create a new charge line to record a billable item. Charge lines are used for invoicing and billing operations.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"charge_basket_id\": 1,\n      \"code\": \"PICK-001\",\n      \"name\": \"Picking Charge\",\n      \"charge_type\": \"PICK\",\n      \"quantity\": 10,\n      \"price\": 0.50,\n      \"goods_out_id\": 123\n    }\n  }\n}\n```\n\n## Required Fields\n\n| Field | Description |\n|-------|-------------|\n| `charge_basket_id` | Charge basket to add the line to |\n| `code` | Unique code for the charge line (1-30 chars) |\n| `name` | Display name for the charge (max 50 chars) |\n| `charge_type` | One of: `PICK`, `RECEIPT`, `RENTAL`, `SUNDRY` |\n\n## Optional Fields\n\n| Field | Description |\n|-------|-------------|\n| `quantity` | Quantity to charge (defaults to 1.0) |\n| `price` | Unit price (defaults to 0.0) |\n| `description` | Additional description |\n| `charge_price_id` | Reference to a charge price template |\n\n## Charge Types & Recommended Associations\n\nWhile all association fields are technically optional, each charge type has **recommended associations** based on what you're charging for:\n\n### PICK - Picking/Outbound Charges\nCharges for picking and packing operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `goods_out_id` | Yes | Link to the outbound order being charged |\n| `goods_out_pick_list_id` | Optional | Link to specific pick list if applicable |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"PICK\",\n  \"goods_out_id\": 123,\n  \"goods_out_pick_list_id\": 456,\n  \"code\": \"PICK-001\",\n  \"name\": \"Order Picking Fee\",\n  \"quantity\": 10,\n  \"price\": 0.50\n}\n```\n\n### RECEIPT - Receiving/Inbound Charges\nCharges for receiving goods into the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `inbound_good_id` | Yes | Link to the goods in receipt |\n| `inbound_item_id` | Optional | Link to specific receipt line |\n| `product_id` | Optional | Link to product if product-specific pricing |\n\n```json\n{\n  \"charge_type\": \"RECEIPT\",\n  \"inbound_good_id\": 789,\n  \"inbound_item_id\": 101,\n  \"code\": \"RCV-001\",\n  \"name\": \"Receiving Fee\",\n  \"quantity\": 50,\n  \"price\": 0.25\n}\n```\n\n### RENTAL - Storage Charges\nCharges for storing goods in the warehouse.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| `storage_unit_id` | Yes | Link to the storage unit being charged for |\n| `product_id` | Optional | Link to product if product-specific rates |\n\n```json\n{\n  \"charge_type\": \"RENTAL\",\n  \"storage_unit_id\": 555,\n  \"code\": \"RENT-001\",\n  \"name\": \"Weekly Pallet Storage\",\n  \"quantity\": 4,\n  \"price\": 5.00\n}\n```\n\n### SUNDRY - Miscellaneous Charges\nAd-hoc charges not tied to specific operations.\n\n| Field | Recommended | Purpose |\n|-------|-------------|--------|\n| Any | Optional | Can link to any entity as needed |\n\n```json\n{\n  \"charge_type\": \"SUNDRY\",\n  \"code\": \"ADMIN-001\",\n  \"name\": \"Administrative Fee\",\n  \"quantity\": 1,\n  \"price\": 25.00\n}\n```\n\n## Important Notes\n\n- **Total calculation**: The `total` field is automatically calculated as `quantity × price`\n- **Invoiced charges**: Once a charge line is invoiced (linked to an AR document), it cannot be modified or deleted\n- **Warehouse access**: Users can only create/update charge lines for warehouses they have access to"
+        },
+        "operationId": "createChargeLine",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_lines"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargeLineCreateAttributes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "charge_lines",
+                  "attributes": {
+                    "charge_basket_id": 1,
+                    "code": "PICK-001",
+                    "name": "Picking Charge",
+                    "charge_type": "PICK",
+                    "quantity": 10,
+                    "price": 0.5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge line created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "charge_lines"
+                          ]
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/ChargeLineAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Charging: Lines"
+        ],
+        "summary": "Delete multiple charge lines",
+        "description": "Delete multiple charge lines by providing a comma-separated list of IDs.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Pass IDs as comma-separated query parameter: `?ids=1,2,3`\n- Invoiced charge lines cannot be deleted"
+        },
+        "operationId": "destroyChargeLineCollection",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated list of charge line IDs to delete",
+            "schema": {
+              "type": "string"
+            },
+            "example": "1,2,3"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/charge_lines/{id}": {
+      "patch": {
+        "tags": [
+          "Charging: Lines"
+        ],
+        "summary": "Update a charge line",
+        "description": "Update an existing charge line's attributes.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"charge_lines\",\n    \"attributes\": {\n      \"quantity\": 15,\n      \"price\": 0.75,\n      \"description\": \"Updated picking charge\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `quantity` | No | Updated quantity |\n| `price` | No | Updated price per unit |\n| `description` | No | Updated description |"
+        },
+        "operationId": "updateChargeLine",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge line to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "charge_lines"
+                        ]
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/ChargeLineUpdateAttributes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge line updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "charge_lines"
+                          ]
+                        },
+                        "attributes": {
+                          "$ref": "#/components/schemas/ChargeLineAttributes"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Charging: Lines"
+        ],
+        "summary": "Delete a charge line",
+        "description": "Delete a single charge line.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Invoiced charge lines cannot be deleted"
+        },
+        "operationId": "destroyChargeLine",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the charge line to delete",
             "schema": {
               "type": "integer"
             }
@@ -7418,346 +7418,6 @@
             "in": "path",
             "required": true,
             "description": "The unique identifier of the external entity to delete",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/NoContent"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
-      }
-    },
-    "/api/ftp_users": {
-      "post": {
-        "tags": [
-          "SFTP Users"
-        ],
-        "summary": "Create an FTP user",
-        "description": "Create an FTP user that can connect to the tenant SFTP server to upload (inbound) or download (outbound) files.",
-        "x-mint": {
-          "content": "## Request Structure\n\n```json\n{\n  \"data\": {\n    \"type\": \"ftp_users\",\n    \"attributes\": {\n      \"direction\": \"upload\",\n      \"name\": \"Acme Inbound Feed\",\n      \"username\": \"acme_inbound\",\n      \"password\": \"S3cure-Pass!\",\n      \"password_confirmation\": \"S3cure-Pass!\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `direction` | Yes | `download` or `upload` |\n| `name` | Yes | Display name |\n| `username` | Yes | Login username (min 6 chars, unique) |\n| `password` | Yes | Password (write-only) |\n| `password_confirmation` | Yes | Must match `password` |\n\n## Notes\n\n- On update, omitting `password` (or sending it blank) leaves the existing password unchanged.\n- Creating an `upload` FTP user auto-provisions a default set of import templates."
-        },
-        "operationId": "createFtpUser",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "type": "object",
-                    "required": [
-                      "type",
-                      "attributes"
-                    ],
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "ftp_users"
-                        ],
-                        "description": "Resource type identifier"
-                      },
-                      "attributes": {
-                        "type": "object",
-                        "description": "FTP user attributes",
-                        "required": [
-                          "direction",
-                          "name",
-                          "username",
-                          "password"
-                        ],
-                        "properties": {
-                          "direction": {
-                            "type": "string",
-                            "enum": [
-                              "download",
-                              "upload"
-                            ],
-                            "description": "FTP transfer direction"
-                          },
-                          "name": {
-                            "type": "string",
-                            "description": "Display name for the FTP user"
-                          },
-                          "username": {
-                            "type": "string",
-                            "minLength": 6,
-                            "description": "FTP login username (minimum 6 characters, must be unique)"
-                          },
-                          "password": {
-                            "type": "string",
-                            "description": "FTP password (write-only; must satisfy password complexity rules)"
-                          },
-                          "password_confirmation": {
-                            "type": "string",
-                            "description": "Password confirmation (must match `password`)"
-                          },
-                          "description": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Description"
-                          },
-                          "active": {
-                            "type": "boolean",
-                            "description": "Whether the FTP user is active"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "data": {
-                  "type": "ftp_users",
-                  "attributes": {
-                    "direction": "upload",
-                    "name": "Acme Inbound Feed",
-                    "username": "acme_inbound",
-                    "password": "S3cure-Pass!",
-                    "password_confirmation": "S3cure-Pass!"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "N ftp user created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "description": "Record ID"
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "ftp_users"
-                          ],
-                          "description": "Resource type"
-                        },
-                        "attributes": {
-                          "type": "object",
-                          "description": "Created resource attributes"
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "data": {
-                    "id": "31",
-                    "type": "ftp_users",
-                    "attributes": {
-                      "direction": "upload",
-                      "name": "Acme Inbound Feed",
-                      "username": "acme_inbound",
-                      "active": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
-    "/api/ftp_users/{id}": {
-      "patch": {
-        "tags": [
-          "SFTP Users"
-        ],
-        "summary": "Update an FTP user",
-        "description": "Update an existing FTP user. Sending a blank or omitted `password` leaves the current password unchanged. The `direction` cannot be changed while the FTP user is referenced by scheduled report recipients or event triggers.",
-        "operationId": "updateFtpUser",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the FTP user to update",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "type": "object",
-                    "required": [
-                      "type",
-                      "attributes"
-                    ],
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "ftp_users"
-                        ],
-                        "description": "Resource type identifier"
-                      },
-                      "attributes": {
-                        "type": "object",
-                        "description": "FTP user attributes to update",
-                        "properties": {
-                          "direction": {
-                            "type": "string",
-                            "enum": [
-                              "download",
-                              "upload"
-                            ],
-                            "description": "FTP transfer direction"
-                          },
-                          "name": {
-                            "type": "string",
-                            "description": "Display name for the FTP user"
-                          },
-                          "username": {
-                            "type": "string",
-                            "minLength": 6,
-                            "description": "FTP login username (minimum 6 characters, must be unique)"
-                          },
-                          "password": {
-                            "type": "string",
-                            "description": "New FTP password (write-only; omit or leave blank to keep the current password)"
-                          },
-                          "password_confirmation": {
-                            "type": "string",
-                            "description": "Password confirmation (must match `password` when changing it)"
-                          },
-                          "description": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Description"
-                          },
-                          "active": {
-                            "type": "boolean",
-                            "description": "Whether the FTP user is active"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "data": {
-                  "type": "ftp_users",
-                  "attributes": {
-                    "name": "Acme Inbound Feed (EU)",
-                    "active": false
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "description": "Record ID"
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "ftp_users"
-                          ],
-                          "description": "Resource type"
-                        },
-                        "attributes": {
-                          "type": "object",
-                          "description": "Updated resource attributes"
-                        }
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "data": {
-                    "id": "31",
-                    "type": "ftp_users",
-                    "attributes": {
-                      "direction": "upload",
-                      "name": "Acme Inbound Feed (EU)",
-                      "username": "acme_inbound",
-                      "active": false
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "SFTP Users"
-        ],
-        "summary": "Delete an FTP user",
-        "description": "Delete an FTP user by ID.",
-        "operationId": "destroyFtpUser",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the FTP user to delete",
             "schema": {
               "type": "integer"
             }
@@ -10417,6 +10077,146 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/graphql#ListRfUsers": {
+      "post": {
+        "tags": [
+          "HHD Users"
+        ],
+        "summary": "List RF users",
+        "description": "Retrieve RF (handheld device) users using GraphQL. RF users are dedicated warehouse device operators. Supports filtering, sorting, and pagination via relay-style connections.",
+        "operationId": "listRfUsers",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: RfUserFilterType) {\n  rf_users {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          username\n          user { id }\n          warehouse { id code }\n          default_rf_implementation { id }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators (e.g. `eq`, `ilike`, `from`, `to`, `between`):\n\n```json\n{\n  \"filter\": {\n    \"user_id\": {\n      \"eq\": \"value\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `user_id` | IdInputType | `eq`, `in`, `gt`, `gteq`, `lt`, `lteq`, `filled` | Linked user ID |\n| `username` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | RF login username |\n| `user_name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Display name |\n| `warehouse_id` | IdInputType | `eq`, `in`, `gt`, `gteq`, `lt`, `lteq`, `filled` | Warehouse ID |\n| `warehouse_code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Warehouse code |\n| `default_rf_implementation_id` | IdInputType | `eq`, `in`, `gt`, `gteq`, `lt`, `lteq`, `filled` | Default RF implementation ID |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea",
+                    "example": "query($filter: RfUserFilterType) { rf_users { all(filter: $filter) { edges { node { id name username user { id } warehouse { id code } default_rf_implementation { id } } } } } }"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "example": {
+                      "filter": {
+                        "username": {
+                          "ilike": "scanner"
+                        }
+                      }
+                    },
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: RfUserFilterType) { rf_users { all(filter: $filter) { edges { node { id name username user { id } warehouse { id code } default_rf_implementation { id } } } } } }",
+                "variables": {
+                  "filter": {
+                    "username": {
+                      "ilike": "scanner"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "rf_users": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A RF users record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "rf_users": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "55",
+                              "name": "Warehouse Scanner 3",
+                              "username": "rf_scanner_03",
+                              "user": {
+                                "id": "210"
+                              },
+                              "warehouse": {
+                                "id": "2",
+                                "code": "MAIN"
+                              },
+                              "default_rf_implementation": {
+                                "id": "4"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           }
         }
       }
@@ -18126,146 +17926,6 @@
         }
       }
     },
-    "/graphql#ListRfUsers": {
-      "post": {
-        "tags": [
-          "HHD Users"
-        ],
-        "summary": "List RF users",
-        "description": "Retrieve RF (handheld device) users using GraphQL. RF users are dedicated warehouse device operators. Supports filtering, sorting, and pagination via relay-style connections.",
-        "operationId": "listRfUsers",
-        "x-mint": {
-          "content": "## Query Structure\n\n```graphql\nquery($filter: RfUserFilterType) {\n  rf_users {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          name\n          username\n          user { id }\n          warehouse { id code }\n          default_rf_implementation { id }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators (e.g. `eq`, `ilike`, `from`, `to`, `between`):\n\n```json\n{\n  \"filter\": {\n    \"user_id\": {\n      \"eq\": \"value\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `user_id` | IdInputType | `eq`, `in`, `gt`, `gteq`, `lt`, `lteq`, `filled` | Linked user ID |\n| `username` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | RF login username |\n| `user_name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Display name |\n| `warehouse_id` | IdInputType | `eq`, `in`, `gt`, `gteq`, `lt`, `lteq`, `filled` | Warehouse ID |\n| `warehouse_code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Warehouse code |\n| `default_rf_implementation_id` | IdInputType | `eq`, `in`, `gt`, `gteq`, `lt`, `lteq`, `filled` | Default RF implementation ID |\n\n*More fields and filters available via GraphQL introspection.*"
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "query"
-                ],
-                "properties": {
-                  "query": {
-                    "type": "string",
-                    "description": "GraphQL query string",
-                    "format": "textarea",
-                    "example": "query($filter: RfUserFilterType) { rf_users { all(filter: $filter) { edges { node { id name username user { id } warehouse { id code } default_rf_implementation { id } } } } } }"
-                  },
-                  "variables": {
-                    "type": "object",
-                    "description": "Query variables including the filter object",
-                    "example": {
-                      "filter": {
-                        "username": {
-                          "ilike": "scanner"
-                        }
-                      }
-                    },
-                    "properties": {
-                      "filter": {
-                        "type": "object",
-                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "query": "query($filter: RfUserFilterType) { rf_users { all(filter: $filter) { edges { node { id name username user { id } warehouse { id code } default_rf_implementation { id } } } } } }",
-                "variables": {
-                  "filter": {
-                    "username": {
-                      "ilike": "scanner"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful GraphQL response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "description": "Query result data",
-                      "properties": {
-                        "rf_users": {
-                          "type": "object",
-                          "properties": {
-                            "all": {
-                              "type": "object",
-                              "properties": {
-                                "edges": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "object",
-                                    "properties": {
-                                      "node": {
-                                        "type": "object",
-                                        "description": "A RF users record"
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      },
-                      "description": "GraphQL errors, if any"
-                    }
-                  }
-                },
-                "example": {
-                  "data": {
-                    "rf_users": {
-                      "all": {
-                        "edges": [
-                          {
-                            "node": {
-                              "id": "55",
-                              "name": "Warehouse Scanner 3",
-                              "username": "rf_scanner_03",
-                              "user": {
-                                "id": "210"
-                              },
-                              "warehouse": {
-                                "id": "2",
-                                "code": "MAIN"
-                              },
-                              "default_rf_implementation": {
-                                "id": "4"
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        }
-      }
-    },
     "/graphql#ListRoles": {
       "post": {
         "tags": [
@@ -19078,6 +18738,346 @@
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/ftp_users": {
+      "post": {
+        "tags": [
+          "SFTP Users"
+        ],
+        "summary": "Create an FTP user",
+        "description": "Create an FTP user that can connect to the tenant SFTP server to upload (inbound) or download (outbound) files.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json\n{\n  \"data\": {\n    \"type\": \"ftp_users\",\n    \"attributes\": {\n      \"direction\": \"upload\",\n      \"name\": \"Acme Inbound Feed\",\n      \"username\": \"acme_inbound\",\n      \"password\": \"S3cure-Pass!\",\n      \"password_confirmation\": \"S3cure-Pass!\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `direction` | Yes | `download` or `upload` |\n| `name` | Yes | Display name |\n| `username` | Yes | Login username (min 6 chars, unique) |\n| `password` | Yes | Password (write-only) |\n| `password_confirmation` | Yes | Must match `password` |\n\n## Notes\n\n- On update, omitting `password` (or sending it blank) leaves the existing password unchanged.\n- Creating an `upload` FTP user auto-provisions a default set of import templates."
+        },
+        "operationId": "createFtpUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "ftp_users"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "description": "FTP user attributes",
+                        "required": [
+                          "direction",
+                          "name",
+                          "username",
+                          "password"
+                        ],
+                        "properties": {
+                          "direction": {
+                            "type": "string",
+                            "enum": [
+                              "download",
+                              "upload"
+                            ],
+                            "description": "FTP transfer direction"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Display name for the FTP user"
+                          },
+                          "username": {
+                            "type": "string",
+                            "minLength": 6,
+                            "description": "FTP login username (minimum 6 characters, must be unique)"
+                          },
+                          "password": {
+                            "type": "string",
+                            "description": "FTP password (write-only; must satisfy password complexity rules)"
+                          },
+                          "password_confirmation": {
+                            "type": "string",
+                            "description": "Password confirmation (must match `password`)"
+                          },
+                          "description": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Description"
+                          },
+                          "active": {
+                            "type": "boolean",
+                            "description": "Whether the FTP user is active"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "ftp_users",
+                  "attributes": {
+                    "direction": "upload",
+                    "name": "Acme Inbound Feed",
+                    "username": "acme_inbound",
+                    "password": "S3cure-Pass!",
+                    "password_confirmation": "S3cure-Pass!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "N ftp user created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Record ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "ftp_users"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "type": "object",
+                          "description": "Created resource attributes"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "id": "31",
+                    "type": "ftp_users",
+                    "attributes": {
+                      "direction": "upload",
+                      "name": "Acme Inbound Feed",
+                      "username": "acme_inbound",
+                      "active": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/ftp_users/{id}": {
+      "patch": {
+        "tags": [
+          "SFTP Users"
+        ],
+        "summary": "Update an FTP user",
+        "description": "Update an existing FTP user. Sending a blank or omitted `password` leaves the current password unchanged. The `direction` cannot be changed while the FTP user is referenced by scheduled report recipients or event triggers.",
+        "operationId": "updateFtpUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the FTP user to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "ftp_users"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "description": "FTP user attributes to update",
+                        "properties": {
+                          "direction": {
+                            "type": "string",
+                            "enum": [
+                              "download",
+                              "upload"
+                            ],
+                            "description": "FTP transfer direction"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Display name for the FTP user"
+                          },
+                          "username": {
+                            "type": "string",
+                            "minLength": 6,
+                            "description": "FTP login username (minimum 6 characters, must be unique)"
+                          },
+                          "password": {
+                            "type": "string",
+                            "description": "New FTP password (write-only; omit or leave blank to keep the current password)"
+                          },
+                          "password_confirmation": {
+                            "type": "string",
+                            "description": "Password confirmation (must match `password` when changing it)"
+                          },
+                          "description": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Description"
+                          },
+                          "active": {
+                            "type": "boolean",
+                            "description": "Whether the FTP user is active"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "ftp_users",
+                  "attributes": {
+                    "name": "Acme Inbound Feed (EU)",
+                    "active": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Record ID"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "ftp_users"
+                          ],
+                          "description": "Resource type"
+                        },
+                        "attributes": {
+                          "type": "object",
+                          "description": "Updated resource attributes"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "id": "31",
+                    "type": "ftp_users",
+                    "attributes": {
+                      "direction": "upload",
+                      "name": "Acme Inbound Feed (EU)",
+                      "username": "acme_inbound",
+                      "active": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "SFTP Users"
+        ],
+        "summary": "Delete an FTP user",
+        "description": "Delete an FTP user by ID.",
+        "operationId": "destroyFtpUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the FTP user to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
