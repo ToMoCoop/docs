@@ -1,0 +1,86 @@
+---
+title: "Ladingen maken en verzenden"
+description: "Configureer, maak en verzend ladingen, inclusief het koppelen van verkooporders, het beheren van load drops en het toewijzen van pallets."
+sidebarTitle: "Ladingen verzenden"
+---
+
+## Ladingen maken en verzenden
+
+Deze handleiding loodst u door het volledige proces van het maken en verzenden van ladingen, van pre-configuratie tot de uiteindelijke verzending.
+
+## Fase 1: Pre-configuratie
+
+Zorg ervoor dat de volgende elementen in **Settings** zijn geconfigureerd voordat u uw eerste lading maakt:
+
+- **Warehouses**: Selecteer een standaard **Goods Out**- en **Goods In**-bay.
+- **Vehicles**: Maak een **Trailer** en het bijbehorende **Trailer Type** aan.
+- **Carriers**: Zorg dat een vervoerderprofiel actief is.
+- **Locations**: U moet minimaal één locatie hebben met het locatietype **"Bay"**.
+- **Addresses**: Zorg dat u de benodigde **Delivery Addresses** hebt opgeslagen.
+
+---
+
+## Fase 2: De lading maken
+
+<Steps>
+  <Step title="Maak een nieuwe lading">
+    Ga naar **Goods Out** > **Loads** > **New**.
+  </Step>
+  <Step title="Vul de ladinggegevens in">
+    Voer de Carrier, Trailer/Trailer Type, Warehouse en Bay in.
+
+    **Optionele instellingen:**
+    - Schakel **Enforce Matching Load Drops** in om laden te beperken tot overeenkomende adressen of orderreferenties.
+    - Selecteer een **Trunking Warehouse** voor overdrachten tussen magazijnen.
+  </Step>
+  <Step title="Sla de lading op">
+    Klik op **Save & Edit**.
+  </Step>
+</Steps>
+
+---
+
+## Fase 3: Verkooporders koppelen
+
+Om artikelen aan uw lading toe te voegen, moeten ze correct zijn gemarkeerd:
+
+<Steps>
+  <Step title="Maak een verkooporder">
+    Stel de **Dispatch Strategy** in op **"Load"**.
+
+    <Tip>U kunt "Load" als standaardstrategie instellen in uw accountinstellingen om deze stap in de toekomst over te slaan.</Tip>
+  </Step>
+  <Step title="Verwerk de order">
+    Genereer de picklijst en voltooi alle picktaken.
+  </Step>
+  <Step title="Koppel aan de lading">
+    Ga terug naar uw lading en zorg dat de status op **"Open"** staat (klik rechtsboven op **Open Load** indien nodig).
+  </Step>
+  <Step title="Voeg de order toe">
+    Zoek onder het tabblad **Add Sales Order** naar uw referentie en klik op **Add**.
+  </Step>
+  <Step title="Voeg het adres toe">
+    Gebruik het tabblad **Add Delivery Address** om de bestemming te koppelen.
+  </Step>
+</Steps>
+
+---
+
+## Fase 4: Afronden en verzenden
+
+Zowel de verkooporder als het adres verschijnen nu onder **Load Drops**.
+
+<Steps>
+  <Step title="Wijs pallets toe">
+    Klik op de load drop van de verkooporder op **Open** > **Manage Tasks**.
+  </Step>
+  <Step title="Voltooi taken">
+    Selecteer uw pallets en kies **Assign** (om ze te koppelen) of **Assign and Complete** (om ze te koppelen en direct af te ronden).
+  </Step>
+  <Step title="Sluit drops">
+    Zodra de taken klaar zijn, sluit u de load drop voor de verkooporder, daarna opent en sluit u de load drop voor het bezorgadres.
+  </Step>
+  <Step title="Verzenden">
+    Klik rechtsboven op **Close Load**. Na het sluiten klikt u op **Dispatch** om het proces af te ronden.
+  </Step>
+</Steps>

@@ -1,0 +1,57 @@
+---
+title: "Voorraadconsolidatie voor pickfaces"
+description: "Leer hoe u voorraadconsolidatie inschakelt om meerdere voorraadregels binnen een pickface samen te voegen tot één record."
+sidebarTitle: "Voorraadconsolidatie"
+---
+
+Voorraadconsolidatie voor pickfaces voegt meerdere voorraadregels voor hetzelfde product binnen een pickface samen tot één voorraadrecord, wat picken eenvoudiger en efficiënter maakt.
+
+## Hoe schakelt u het in
+
+<Steps>
+<Step title="Ga naar het product">
+Ga naar de sectie **Products** en selecteer het product waarvoor u consolidatie wilt inschakelen.
+</Step>
+<Step title="Schakel de consolidatievlag in">
+Scroll naar het tabblad **Flags**. Zet **Enforce Pickface Stock Consolidation** aan.
+</Step>
+</Steps>
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-1.png" alt="Vlag Enforce Pickface Stock Consolidation op het tabblad Flags van het product" />
+</Frame>
+
+<Warning>
+Deze optie werkt alleen als het product een pickface toegewezen heeft. Is er geen toegewezen, dan is de vlag niet van toepassing. U kunt een pickface toewijzen na het inschakelen van de vlag, waarna het correct werkt.
+</Warning>
+
+## Wat verandert er met consolidatie?
+
+Voorheen werden voorraadregels apart weergegeven als een product voorraad in meerdere regels binnen dezelfde pickface had. Met consolidatie ingeschakeld:
+
+- Alle voorraadregels voor hetzelfde product binnen een pickface worden automatisch samengevoegd tot één **voorraadrecord**
+- Bij het zoeken op locatiecode ziet u niet langer meerdere regels voor hetzelfde product
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-2.png" alt="Voorraadlijst vóór consolidatie met meerdere regels" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-3.png" alt="Voorraaddetailweergave met geconsolideerd record" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-4.png" alt="Voorraadlijst na consolidatie met één samengevoegde regel" />
+</Frame>
+
+## Impact op de functie Add Stock
+
+Dit geldt ook bij gebruik van de functie **Add Stock** vanuit de voorraadlijst. In plaats van een nieuwe regel te maken, wordt toegevoegde voorraad automatisch samengevoegd met de bestaande voorraadregel in die pickface.
+
+<Frame>
+  <img src="/images/knowledgebase/stock-consolidation-pickfaces-5.png" alt="Functie Add Stock met consolidatie actief" />
+</Frame>
+
+## Consolidatieregels
+
+Voorraadconsolidatie gebeurt alleen wanneer het product en zijn **attributen** (zoals batchnummer, sell-by date, enz.) identiek zijn. Als de attribuutgegevens verschillen, blijven de voorraadregels apart om nauwkeurigheid te waarborgen.

@@ -1,0 +1,46 @@
+---
+title: "Verzonden opslageenheden hergebruiken"
+description: "Begrijp hoe verzonden opslageenheden werken en hoe u referenties na verzending kunt hergebruiken."
+sidebarTitle: "Verzonden opslageenheden"
+---
+
+Wanneer een opslageenheidstype is geconfigureerd met **Leaves Warehouse?** op **Yes**, gaat de opslageenheid bij vertrek uit het magazijn over naar de status "Dispatched". Dit helpt bij het volgen van assets die uw faciliteit verlaten.
+
+<Frame>
+  <img src="/images/knowledgebase/reusing-storage-units-dispatched-1.png" alt="Configuratie van opslageenheidstype met de Leaves Warehouse-schakelaar" />
+</Frame>
+
+## Wat gebeurt er wanneer een opslageenheid wordt verzonden?
+
+- De eenheid verplaatst naar de sectie **Dispatched** op het scherm Storage Units
+- Het specifieke record wordt buiten gebruik gesteld en **kan niet worden hergebruikt** (de referentienaam kan echter wel worden hergebruikt door een nieuwe opslageenheid met dezelfde referentie aan te maken)
+
+## De status van een eenheid controleren
+
+<Steps>
+<Step title="Ga naar storage units">
+Ga naar **Settings > Storage Units**.
+</Step>
+<Step title="Zoek de referentie">
+Zoek naar uw **Storage Unit Reference**.
+</Step>
+<Step title="Controleer de weergave">
+Verschijnt de eenheid in de standaardweergave, dan is deze nog actief. Verschijnt deze niet, scroll dan naar het filter **In Warehouse** onderaan en zet het op **Dispatched**.
+
+<Frame>
+  <img src="/images/knowledgebase/reusing-storage-units-dispatched-2.png" alt="Dispatched-filter op het scherm Storage Units" />
+</Frame>
+</Step>
+<Step title="Bevestig de status">
+Verschijnt de eenheid onder het Dispatched-filter, dan is deze officieel vergrendeld en uit omloop.
+</Step>
+</Steps>
+
+## Tijdelijke oplossingen om referenties te hergebruiken
+
+Als u een verzonden referentie wilt blijven gebruiken, hebt u twee opties:
+
+| Optie | Actie | Impact |
+|--------|--------|--------|
+| **Handmatig hergebruik** | Maak een **nieuwe** opslageenheid aan met dezelfde referentienaam | Behoudt uw naamgevingsconventie en houdt een schone historie voor de oude eenheid |
+| **Configuratiewijziging** | Zet de schakelaar "Leaves Warehouse?" op **No** voor dat eenheidstype | Voorkomt dat eenheden de Dispatched-status krijgen, maar **kan** verzendingen of externe crossdock-workflows **verstoren** |

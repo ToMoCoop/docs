@@ -1,0 +1,106 @@
+---
+title: "Serienummertracering"
+description: "Hoe u serienummertracering inschakelt en gebruikt om serienummers te beheren, traceren en controleren over producten tijdens goods in en goods out."
+---
+
+## Overzicht van serienummertracering
+
+Met serienummertracering kunt u serienummers over uw producten beheren, traceren en controleren. U kunt serienummers vastleggen tijdens goods in (ontvangst) en goods out (picken/verzenden), wat u volledige traceerbaarheid geeft van ontvangst tot verzending.
+
+## Aan de slag
+
+<Steps>
+  <Step title="Serienummertracering op een product inschakelen">
+    Ga naar **Products** en selecteer **New** om een product aan te maken.
+
+    <Frame>
+      <img src="/images/knowledgebase/introducing-serial-number-tracking-1.png" alt="Een nieuw product aanmaken in het Products-menu" />
+    </Frame>
+
+    In het instelscherm vindt u het veld **Serial Number Tracking Setting**. Kies een van de drie traceringstypen:
+
+    - **No Tracking** -- Serienummers zijn in geen enkele fase vereist.
+    - **Track During Pick** -- Serienummers zijn alleen vereist tijdens goods-out-verwerking. Ideaal voor waardevolle artikelen zoals elektronica.
+    - **Full Tracking** -- Serienummers zijn vereist bij zowel goods-in als goods-out. Ideaal wanneer volledige leverancierszichtbaarheid nodig is.
+
+    <Frame>
+      <img src="/images/knowledgebase/introducing-serial-number-tracking-2.png" alt="Veld Serial Number Tracking Setting met opties voor traceringstype" />
+    </Frame>
+  </Step>
+  <Step title="Configureer uw HHD-flow">
+    Het vastleggen van serienummers moet in uw Handheld Device (HHD)-flow worden geconfigureerd voordat het kan worden gebruikt. Werk samen met uw beheerder om ervoor te zorgen dat het invoerscherm voor serienummers is opgenomen in uw goods-in- en goods-out-implementaties.
+  </Step>
+</Steps>
+
+<Tip>U kunt de traceringsinstellingen op elk moment aanpassen op het productscherm onder het tabblad Serial Numbers. Let op: wijzigingen gelden alleen voor nieuw aangemaakte producten, niet voor bestaande.</Tip>
+
+## Full tracking in de praktijk
+
+Wanneer Full Tracking is ingeschakeld, verschijnen er extra velden in de view manager tijdens de pre-receipt-instelling: **Serial Number Tracking Type**, **Serial Numbers** en **Edit Serial Numbers**.
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-3.png" alt="View manager met serienummervelden tijdens pre-receipt-instelling" />
+</Frame>
+
+In de pre-receipt-fase:
+
+- U moet alle verwachte serienummers invoeren of helemaal geen.
+- Als u ze allemaal invoert, kunnen ze niet meer worden gewijzigd nadat de pre-receipt is ontvangen.
+- Als u er geen invoert, moeten de serienummers in de ontvangstfase worden vastgelegd. Meer of minder invoeren dan verwacht past de bevestigde hoeveelheid dienovereenkomstig aan.
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-4.png" alt="Invoerscherm voor serienummers bij pre-receipt" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-5.png" alt="Serienummers bewerken op ontvangstregels" />
+</Frame>
+
+## Serienummers beheren
+
+Zodra voorraad is ontvangen en opgeslagen, kunt u:
+
+- Alle serienummers en hun traceringstypen bekijken onder het menu **Stock List**.
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-6.png" alt="Stock List-weergave met serienummers en traceringstypen" />
+</Frame>
+
+- Een voorraadregel openen om een apart tabblad **Serial Numbers** te zien.
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-7.png" alt="Tabblad Serial Numbers op een voorraadregel" />
+</Frame>
+
+- Het menu **Transactions** filteren met de weergave "Transactions with Serial Numbers".
+
+## Track during pick
+
+Voor producten ingesteld op **Track During Pick** werkt goods-in zoals gebruikelijk zonder serienummers vast te leggen. Serienummers zijn alleen vereist bij het voltooien van een picktaak.
+
+## HHD-compatibiliteit
+
+Serienummertracering wordt momenteel ondersteund in twee HHD-workflows:
+
+- **Pre-Receipt Receive**
+- **Pick Tasks by Pick List**
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-8.png" alt="Serienummers vastleggen op HHD tijdens pre-receipt receive" />
+</Frame>
+
+<Frame>
+  <img src="/images/knowledgebase/introducing-serial-number-tracking-9.png" alt="Serienummers vastleggen op HHD tijdens picktaak" />
+</Frame>
+
+<Info>Serienummertracering biedt end-to-end traceerbaarheid, wat essentieel is voor recalls, garantieclaims en naleving van regelgeving.</Info>
+
+<Accordion title="Wat wordt nog niet ondersteund?">
+  De volgende processen ondersteunen momenteel geen serienummertracering:
+
+  - Accountoverdrachten
+  - Magazijnoverdrachten
+  - Aanpassingen
+  - Batch pick
+  - Tote picking
+</Accordion>

@@ -668,6 +668,7 @@
                         "public": true
                       },
                       "knowledgebase/nl/users-and-roles/assigning-different-user-views",
+                      "knowledgebase/nl/users-and-roles/restrict-user-visibility",
                       "knowledgebase/nl/users-and-roles/hhd-user-creation"
                     ],
                     "public": true
@@ -724,6 +725,7 @@
                         "pages": [
                           "knowledgebase/nl/warehouse-setup/create-pickface",
                           "knowledgebase/nl/warehouse-setup/enforcing-pick-types",
+                          "knowledgebase/nl/warehouse-setup/stock-consolidation",
                           {
                             "group": "Aanvulling",
                             "expanded": false,
@@ -781,6 +783,7 @@
                 "group": "Producten & Voorraad",
                 "pages": [
                   "knowledgebase/nl/products-and-stock/add-new-products",
+                  "knowledgebase/nl/advanced/serial-number-tracking",
                   "knowledgebase/nl/products-and-stock/product-import",
                   "knowledgebase/nl/products-and-stock/use-product-groups",
                   "knowledgebase/nl/products-and-stock/multi-account-products",
@@ -799,6 +802,7 @@
                       "knowledgebase/nl/products-and-stock/perform-a-warehouse-transfer",
                       "knowledgebase/nl/products-and-stock/mixed-pallets",
                       "knowledgebase/nl/products-and-stock/merge-split-pallets",
+                      "knowledgebase/nl/products-and-stock/reusing-dispatched-storage-units",
                       "knowledgebase/nl/troubleshooting/attrup-meaning"
                     ],
                     "public": true
@@ -863,6 +867,7 @@
                           "knowledgebase/nl/outbound/account-pick-rules",
                           "knowledgebase/nl/outbound/batch-picking",
                           "knowledgebase/nl/outbound/consolidated-picking",
+                          "knowledgebase/nl/outbound/round-up-storage-units",
                           "knowledgebase/nl/outbound/stock-lines-pick-removal",
                           "knowledgebase/nl/outbound/tally-records"
                         ],
@@ -874,6 +879,7 @@
                         "pages": [
                           "knowledgebase/nl/outbound/packing-desk",
                           "knowledgebase/nl/outbound/pre-requisites-for-shipments",
+                          "knowledgebase/nl/outbound/dispatching-loads",
                           "knowledgebase/nl/outbound/delivery-addresses",
                           "knowledgebase/nl/outbound/collection-addresses",
                           "knowledgebase/nl/outbound/ftp-load-dispatch-file",
@@ -911,7 +917,8 @@
                 "group": "Handheld Devices (HHD)",
                 "pages": [
                   "knowledgebase/nl/hardware/hhd-conditions",
-                  "knowledgebase/nl/hardware/hhd-previews-duplication"
+                  "knowledgebase/nl/hardware/hhd-previews-duplication",
+                  "knowledgebase/nl/hardware/image-capture"
                 ],
                 "public": true
               },
