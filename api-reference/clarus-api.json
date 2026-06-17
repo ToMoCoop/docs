@@ -187,7 +187,7 @@
       "description": "Product management endpoints for creating, updating, and deleting products in the warehouse catalog.\n\n## GraphQL Filtering Guide\n\nProducts support individual code/barcode filters: `code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`. Each supports operators: `eq`, `ilike`, `in`, `like`, `between`. When multiple individual filters are used together, they are AND'd (all conditions must match).\n\n### The `all_codes` filter\n\n`all_codes` is a **specialized cross-field search** that ORs across all 5 code fields (`code`, `barcode`, `case_barcode`, `inner_barcode`, `outer_barcode`) in a single query. It performs exact matching (IN operator), not partial/ILIKE matching.\n\n**When to use `all_codes`:** Only when you have a code or barcode value and don't know which field it belongs to — e.g., a user scans a barcode that could be a unit barcode, case barcode, inner barcode, or outer barcode.\n\n**When NOT to use `all_codes`:** When you know which specific code field to search. Use the individual filter instead for better performance and precision."
     },
     {
-      "name": "Products: Account Assignments",
+      "name": "Products: Accounts",
       "description": "Assignments linking products to stock accounts."
     },
     {
@@ -20366,7 +20366,7 @@
     "/graphql#ListAccountProducts": {
       "post": {
         "tags": [
-          "Products: Account Assignments"
+          "Products: Accounts"
         ],
         "summary": "List account product assignments",
         "description": "Retrieve account product assignments using GraphQL. Supports filtering, sorting, and pagination via relay-style connections.",
@@ -20481,7 +20481,7 @@
     "/api/products/{product_id}/account_products": {
       "post": {
         "tags": [
-          "Products: Account Assignments"
+          "Products: Accounts"
         ],
         "summary": "Create an account product assignment",
         "description": "Create a account product assignment.",
@@ -20580,7 +20580,7 @@
     "/api/products/{product_id}/account_products/{id}": {
       "delete": {
         "tags": [
-          "Products: Account Assignments"
+          "Products: Accounts"
         ],
         "summary": "Delete an account product assignment",
         "description": "Delete a account product assignment by ID.",
