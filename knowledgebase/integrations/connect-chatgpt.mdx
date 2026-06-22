@@ -1,0 +1,80 @@
+---
+title: "Connect ChatGPT to Clarus"
+description: "Add Clarus as a custom app in ChatGPT so you can work with your warehouse data in plain English, using your own Clarus login."
+sidebarTitle: "Connect ChatGPT"
+---
+
+Add Clarus to ChatGPT as a custom **app**, then ask ChatGPT about your warehouse — and have it make changes — in plain English. It uses your normal Clarus sign-in; there's nothing to copy or configure.
+
+<Warning>
+**AI accuracy:** AI-generated responses can sometimes be inaccurate, incomplete, or misleading. Always verify the assistant's output before acting on it — especially for stock movements, order changes, or any actions that affect your live warehouse data. The assistant is a tool to help you, not a replacement for your own judgement.
+</Warning>
+
+Before you start, have your connection address ready:
+
+```text
+https://agents.claruswms.ai/mcp/{subdomain}
+```
+
+Replace `{subdomain}` with your Clarus subdomain. See [Connect AI assistants to Clarus](/knowledgebase/integrations/ai-assistants-overview) if you're unsure what yours is.
+
+<Info>
+Custom apps (connectors) are available on ChatGPT plans that support them and may need enabling by your workspace owner. Menu names can vary between ChatGPT versions.
+</Info>
+
+## Add the Clarus app
+
+<Steps>
+  <Step title="Open Apps">
+    In ChatGPT, open **Settings → Apps**.
+    <Frame>
+      <img src="/images/knowledgebase/integrations/chatgpt-apps.png" alt="ChatGPT Settings Apps page with Advanced settings and Create app" />
+    </Frame>
+  </Step>
+  <Step title="Create an app">
+    Next to **Advanced settings**, click **Create app**.
+  </Step>
+  <Step title="Enter the Clarus details">
+    In the **New App** dialog:
+    - **Name:** `Clarus`. Optionally add a **Description**, and an **Icon** — you can [download the Clarus logo](/images/knowledgebase/integrations/clarus-app-icon.png) (PNG, 256×256 or larger) to use here.
+    - **Connection:** choose **Server URL** and paste your connection address (`https://agents.claruswms.ai/mcp/{subdomain}`)
+    - **Authentication:** choose **OAuth**. Leave **Advanced OAuth settings** on the discovered defaults — you don't need to enter a client ID or secret.
+    - Tick **I understand and want to continue**, then click **Create**.
+    <Frame>
+      <img src="/images/knowledgebase/integrations/chatgpt-new-app.png" alt="The ChatGPT New App dialog with name Clarus, Server URL, and OAuth authentication" />
+    </Frame>
+  </Step>
+  <Step title="Sign in to Clarus">
+    In the **Add Clarus to ChatGPT** dialog, click **Sign in with Clarus** and complete the Clarus login. ChatGPT only ever has the permissions your Clarus account has.
+    <Frame>
+      <img src="/images/knowledgebase/integrations/chatgpt-add-clarus-signin.png" alt="The Add Clarus to ChatGPT dialog with a Sign in with Clarus button" />
+    </Frame>
+  </Step>
+  <Step title="Use it in a chat">
+    Start a chat, make sure the **Clarus** app is enabled, and ask a question such as "What's the status of sales order `SO-2026-0042`?"
+  </Step>
+</Steps>
+
+<Warning>
+ChatGPT connects **as you** and uses your Clarus permissions, so it can change data as well as read it — for example updating an order or adjusting stock. Be specific about what you ask, and review any changes before confirming them.
+</Warning>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Do I need to enter OAuth client details?">
+    No. Set **Authentication** to **OAuth** and leave the **Advanced OAuth settings** on the discovered defaults — Clarus sets these up automatically, so you don't create or paste a client ID or secret.
+  </Accordion>
+  <Accordion title="What's the 'Custom MCP servers introduce risk' warning?">
+    That's ChatGPT's standard notice for any custom app — it just means OpenAI hasn't reviewed it. The Clarus app connects to your own Clarus account over a secure connection. Tick **I understand and want to continue** to proceed, and keep the AI-accuracy guidance above in mind when acting on responses.
+  </Accordion>
+  <Accordion title="I can't find Apps in Settings">
+    Apps may need to be enabled for your workspace by an owner/admin, and they require a ChatGPT plan that supports them. Check with whoever manages your ChatGPT workspace.
+  </Accordion>
+  <Accordion title="The app won't create or shows an error">
+    Make sure **Connection** is set to **Server URL** (not Tunnel) and the address is exactly `https://agents.claruswms.ai/mcp/{subdomain}` with your real subdomain in place of `{subdomain}` and no trailing spaces. Your subdomain is your organisation's short name in Clarus (see the [overview](/knowledgebase/integrations/ai-assistants-overview)).
+  </Accordion>
+  <Accordion title="ChatGPT says it can't find data or isn't allowed">
+    The assistant can only see and do what your Clarus account can. If data is missing or an action fails, check your own Clarus permissions for that account, warehouse, or feature — or ask your administrator.
+  </Accordion>
+</AccordionGroup>

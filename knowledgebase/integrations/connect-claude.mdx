@@ -1,0 +1,119 @@
+---
+title: "Connect Claude to Clarus"
+description: "Add Clarus as a custom connector in Claude — for your own account or your whole organisation — so you can work with your warehouse data using your own Clarus login."
+sidebarTitle: "Connect Claude"
+---
+
+Add Clarus to Claude as a **custom connector**, then ask Claude about your warehouse — and have it make changes — in plain English. Setup takes a minute and uses your normal Clarus sign-in.
+
+<Warning>
+**AI accuracy:** AI-generated responses can sometimes be inaccurate, incomplete, or misleading. Always verify the assistant's output before acting on it — especially for stock movements, order changes, or any actions that affect your live warehouse data. The assistant is a tool to help you, not a replacement for your own judgement.
+</Warning>
+
+Before you start, have your connection address ready:
+
+```text
+https://agents.claruswms.ai/mcp/{subdomain}
+```
+
+Replace `{subdomain}` with your Clarus subdomain. See [Connect AI assistants to Clarus](/knowledgebase/integrations/ai-assistants-overview) if you're unsure what yours is.
+
+<Info>
+Custom connectors are a Claude feature (currently in beta) available on plans that support them — Pro, Max, Team, and Enterprise. Menu names can vary between Claude versions.
+</Info>
+
+## Add the connector
+
+<Tabs>
+  <Tab title="For your own account (Pro / Max)">
+    <Steps>
+      <Step title="Open Connectors">
+        In Claude, go to **Customize → Connectors**. (You can also open the **+** menu in a chat, choose **Connectors**, then **Manage connectors**.)
+      </Step>
+      <Step title="Add a custom connector">
+        Click the **+** next to Connectors, then choose **Add custom connector**.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-connectors-add-custom.png" alt="The Connectors + menu showing Browse connectors and Add custom connector" />
+        </Frame>
+      </Step>
+      <Step title="Enter the Clarus details">
+        In the dialog, give it a name like `Clarus` and paste your connection address (`https://agents.claruswms.ai/mcp/{subdomain}`). Under **Advanced settings**, leave **OAuth Client ID** and **OAuth Client Secret** **blank** — Clarus handles sign-in for you. Then click **Add**.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-add-custom-connector.png" alt="The Add custom connector dialog with a name and the Clarus URL, and the OAuth fields left blank" />
+        </Frame>
+      </Step>
+      <Step title="Sign in to Clarus">
+        Claude opens a Clarus sign-in window — sign in with your Clarus username and password and **approve** access.
+      </Step>
+      <Step title="Use it in a chat">
+        Start a new chat, make sure the **Clarus** connector is enabled (via the **+** menu), and ask a question such as "How many units of `WIDGET-RED-500` are in stock?"
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="For your whole organisation (Team / Enterprise)">
+    An organisation owner adds Clarus once for the team. It's then available to everyone, but each person still signs in with their **own** Clarus account — so they only see and do what their account allows.
+    <Steps>
+      <Step title="Owner: open organisation connectors">
+        An organisation **Owner** goes to **Organization settings → Connectors**.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-connectors-add.png" alt="Claude Connectors page with the + Add button" />
+        </Frame>
+      </Step>
+      <Step title="Owner: add a custom Web connector">
+        Click **+ Add**, choose **Custom**, then choose **Web** (Clarus is a hosted server, so it's a Web connector — not Desktop).
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-add-custom-web.png" alt="The Add menu showing Custom, then Web and Desktop options" />
+        </Frame>
+      </Step>
+      <Step title="Owner: enter the Clarus details">
+        In the **Add custom connector** dialog:
+        - **Name:** `Clarus`
+        - **URL:** your connection address (`https://agents.claruswms.ai/mcp/{subdomain}`)
+        - Under **Advanced settings**, leave **OAuth Client ID** and **OAuth Client Secret** **blank**.
+        - Under **How your team connects**, choose **Individual sign-in** (each person signs in to Clarus with their own account).
+
+        Then click **Add**.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-add-custom-connector.png" alt="The Add custom connector dialog with name, URL, blank OAuth fields, and Individual sign-in selected" />
+        </Frame>
+      </Step>
+      <Step title="Each member: sign in to Clarus">
+        Every team member opens **Customize → Connectors** and selects **Clarus**, then clicks **Connect** and signs in with their own Clarus username and password.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-connector-connect.png" alt="The Clarus connector card with a Connect button before signing in" />
+        </Frame>
+        Once connected, Clarus shows as available along with the tools Claude can use. You can set each tool to run automatically, ask for approval, or be blocked — Claude only ever sees the tools your organisation has given you access to.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-connector-connected.png" alt="The connected Clarus connector showing its available tools and per-tool permission controls" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Warning>
+Claude connects **as you** and uses your Clarus permissions, so it can change data as well as read it — for example updating an order or adjusting stock. Be specific about what you ask, and review any changes before confirming them.
+</Warning>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Should I fill in OAuth Client ID / Secret?">
+    No — leave both blank. Clarus uses a sign-in (OAuth) flow that's set up automatically, so you don't create or paste any client ID or secret.
+  </Accordion>
+  <Accordion title="I can't find Connectors">
+    On a personal account, connectors live under **Customize → Connectors**. On a Team or Enterprise account, an owner adds connectors under **Organization settings → Connectors**, and members then manage their own sign-in under **Customize → Connectors**.
+  </Accordion>
+  <Accordion title="The connector won't add or shows an error">
+    Double-check the address is exactly `https://agents.claruswms.ai/mcp/{subdomain}` with your real subdomain in place of `{subdomain}` and no trailing spaces. If you're an organisation owner, make sure you chose **Web** (not Desktop). Your subdomain is your organisation's short name in Clarus (see the [overview](/knowledgebase/integrations/ai-assistants-overview)).
+  </Accordion>
+  <Accordion title="It keeps asking me to sign in">
+    Make sure you complete the Clarus sign-in **and** approve access in the pop-up window. If your browser blocks pop-ups, allow them for claude.ai and try again.
+  </Accordion>
+  <Accordion title="Claude says it can't find data or isn't allowed">
+    The assistant can only see and do what your Clarus account can. If you're missing data or an action fails, check your own Clarus permissions for that account, warehouse, or feature — or ask your administrator.
+  </Accordion>
+  <Accordion title="Can Claude change my data?">
+    Yes — within your permissions it can make changes as well as read. Ask precisely and confirm anything important before it acts.
+  </Accordion>
+</AccordionGroup>

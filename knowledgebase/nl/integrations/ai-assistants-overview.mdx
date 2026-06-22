@@ -1,0 +1,79 @@
+---
+title: "AI-assistenten koppelen aan Clarus"
+description: "Gebruik Claude of ChatGPT om in gewone taal met je Clarus-magazijngegevens te werken — hoe de koppeling werkt, wat je kunt doen en hoe je het instelt."
+sidebarTitle: "AI-assistenten"
+---
+
+Je kunt AI-assistenten zoals **Claude** en **ChatGPT** rechtstreeks aan Clarus koppelen en ze vervolgens in gewone taal vragen stellen over je magazijn — en wijzigingen laten doorvoeren. Er zijn geen API-sleutels, bestanden of technische installatie nodig: je plakt één adres in je assistent en logt in met je gewone Clarus-account.
+
+Dit werkt via **MCP** (Model Context Protocol), een open standaard die AI-tools gebruiken om verbinding te maken met externe systemen. Je hoeft niet te weten hoe het werkt — volg gewoon de handleiding voor jouw tool.
+
+<Warning>
+**AI-nauwkeurigheid:** door AI gegenereerde antwoorden kunnen soms onjuist, onvolledig of misleidend zijn. Controleer de output van de assistent altijd voordat je ernaar handelt — vooral bij voorraadmutaties, orderwijzigingen of andere acties die invloed hebben op je live magazijngegevens. De assistent is een hulpmiddel, geen vervanging van je eigen oordeel.
+</Warning>
+
+<CardGroup cols={2}>
+  <Card title="Claude koppelen" icon="robot" href="/knowledgebase/nl/integrations/connect-claude">
+    Stel Clarus in op claude.ai of in de Claude-desktopapp.
+  </Card>
+  <Card title="ChatGPT koppelen" icon="comments" href="/knowledgebase/nl/integrations/connect-chatgpt">
+    Stel Clarus in via ChatGPT-connectors of de ontwikkelaarsmodus.
+  </Card>
+</CardGroup>
+
+## Je verbindingsadres
+
+Elke organisatie heeft een eigen verbindingsadres:
+
+```text
+https://agents.claruswms.ai/mcp/{subdomain}
+```
+
+Vervang `{subdomain}` door je Clarus-subdomein — de korte naam van je organisatie in Clarus, dezelfde die in je Clarus-webadres staat. Weet je het niet zeker? Kijk in de adresbalk terwijl je bent ingelogd in Clarus, of vraag het je Clarus-beheerder.
+
+Als je subdomein bijvoorbeeld `acme` is, dan is je verbindingsadres:
+
+```text
+https://agents.claruswms.ai/mcp/acme
+```
+
+## Inloggen
+
+Wanneer je de koppeling in je AI-tool toevoegt, word je naar een Clarus-inlogpagina gestuurd. Log in met je **gewone Clarus-gebruikersnaam en -wachtwoord** en geef toegang. Dat is alles — geen sleutels om te kopiëren, niets om in te stellen.
+
+De assistent maakt vervolgens verbinding **als jou**: hij kan precies zien en doen wat je eigen Clarus-account mag, en niets meer. Als jouw account geen toegang heeft tot een bepaald account, magazijn of een bepaalde actie, dan heeft de assistent dat ook niet.
+
+<Warning>
+De assistent gebruikt jouw Clarus-rechten en kan dus gegevens **wijzigen** en niet alleen lezen — bijvoorbeeld een order bijwerken of voorraad aanpassen. Wees specifiek in wat je vraagt en controleer voorgestelde wijzigingen voordat je ze bevestigt.
+</Warning>
+
+## Wat je kunt doen
+
+Zodra je verbonden bent, kun je de assistent vragen om dingen op te zoeken, bijvoorbeeld:
+
+- "Hoeveel stuks `WIDGET-RED-500` zijn er op voorraad?"
+- "Wat is de status van verkooporder `SO-2026-0042`?"
+- "Toon de openstaande verkooporders voor het account ACME."
+- "Welke producten zitten onder hun bestelniveau in het magazijn Manchester?"
+
+Je kunt hem ook vragen om wijzigingen door te voeren (binnen jouw rechten), bijvoorbeeld:
+
+- "Zet de voorraad voor `WIDGET-RED-500` op hold in locatie A-01-01."
+- "Wijzig de vervoerder op order `SO-2026-0042` naar DPD."
+
+Hier zie je een eenvoudige opzoekactie in actie:
+
+<Frame>
+  <img src="/images/knowledgebase/integrations/claude-example-query.png" alt="Een assistent die de vraag 'Wat is het eerste product in mijn magazijn?' beantwoordt via de Clarus-koppeling" />
+</Frame>
+
+<Tip>
+Behandel de assistent als een collega: geef hem de details die hij nodig heeft (orderreferentie, productcode, account, magazijn) en bevestig belangrijke acties voordat hij ze uitvoert.
+</Tip>
+
+## Vereisten
+
+- Een Clarus-gebruikersaccount met de rechten voor wat je vraagt — de assistent erft jouw toegang.
+- Een versie van Claude of ChatGPT die het toevoegen van eigen connectors ondersteunt (zie de handleidingen per tool).
+
+Gebruik een apart, duidelijk benoemd Clarus-account als je AI-activiteit makkelijk wilt kunnen herkennen in je audithistorie.

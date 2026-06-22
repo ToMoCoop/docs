@@ -1,0 +1,119 @@
+---
+title: "Claude koppelen aan Clarus"
+description: "Voeg Clarus toe als eigen connector in Claude — voor je eigen account of je hele organisatie — zodat je met je eigen Clarus-account met je magazijngegevens kunt werken."
+sidebarTitle: "Claude koppelen"
+---
+
+Voeg Clarus toe aan Claude als **eigen connector** en stel Claude vervolgens in gewone taal vragen over je magazijn — en laat het wijzigingen doorvoeren. Het instellen kost een minuut en gebruikt je gewone Clarus-login.
+
+<Warning>
+**AI-nauwkeurigheid:** door AI gegenereerde antwoorden kunnen soms onjuist, onvolledig of misleidend zijn. Controleer de output van de assistent altijd voordat je ernaar handelt — vooral bij voorraadmutaties, orderwijzigingen of andere acties die invloed hebben op je live magazijngegevens. De assistent is een hulpmiddel, geen vervanging van je eigen oordeel.
+</Warning>
+
+Houd voordat je begint je verbindingsadres bij de hand:
+
+```text
+https://agents.claruswms.ai/mcp/{subdomain}
+```
+
+Vervang `{subdomain}` door je Clarus-subdomein. Zie [AI-assistenten koppelen aan Clarus](/knowledgebase/nl/integrations/ai-assistants-overview) als je niet zeker weet wat dat van jou is.
+
+<Info>
+Eigen connectors zijn een functie van Claude (momenteel in bèta), beschikbaar op abonnementen die dit ondersteunen — Pro, Max, Team en Enterprise. Menunamen kunnen per Claude-versie verschillen.
+</Info>
+
+## De connector toevoegen
+
+<Tabs>
+  <Tab title="Voor je eigen account (Pro / Max)">
+    <Steps>
+      <Step title="Open Connectors">
+        Ga in Claude naar **Customize → Connectors**. (Je kunt ook het **+**-menu in een chat openen, **Connectors** kiezen en daarna **Manage connectors**.)
+      </Step>
+      <Step title="Voeg een eigen connector toe">
+        Klik op de **+** naast Connectors en kies daarna **Add custom connector**.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-connectors-add-custom.png" alt="Het +-menu bij Connectors met Browse connectors en Add custom connector" />
+        </Frame>
+      </Step>
+      <Step title="Vul de Clarus-gegevens in">
+        Geef hem in het dialoogvenster een naam zoals `Clarus` en plak je verbindingsadres (`https://agents.claruswms.ai/mcp/{subdomain}`). Laat onder **Advanced settings** de velden **OAuth Client ID** en **OAuth Client Secret** **leeg** — Clarus regelt het inloggen voor je. Klik daarna op **Add**.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-add-custom-connector.png" alt="Het dialoogvenster Add custom connector met een naam en de Clarus-URL, met de OAuth-velden leeg gelaten" />
+        </Frame>
+      </Step>
+      <Step title="Log in bij Clarus">
+        Claude opent een Clarus-inlogvenster — log in met je Clarus-gebruikersnaam en -wachtwoord en **geef toegang**.
+      </Step>
+      <Step title="Gebruik het in een chat">
+        Start een nieuwe chat, zorg dat de **Clarus**-connector is ingeschakeld (via het **+**-menu) en stel een vraag zoals "Hoeveel stuks `WIDGET-RED-500` zijn er op voorraad?"
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Voor je hele organisatie (Team / Enterprise)">
+    Een organisatie-eigenaar voegt Clarus één keer toe voor het team. Daarna is het voor iedereen beschikbaar, maar elke persoon logt nog steeds in met zijn **eigen** Clarus-account — zodat hij alleen ziet en doet wat zijn account toestaat.
+    <Steps>
+      <Step title="Eigenaar: open de organisatieconnectors">
+        Een organisatie-**Owner** gaat naar **Organization settings → Connectors**.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-connectors-add.png" alt="Claude Connectors-pagina met de knop + Add" />
+        </Frame>
+      </Step>
+      <Step title="Eigenaar: voeg een Web-connector toe">
+        Klik op **+ Add**, kies **Custom** en kies daarna **Web** (Clarus is een gehoste server, dus het is een Web-connector — niet Desktop).
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-add-custom-web.png" alt="Het Add-menu met Custom en daarna de opties Web en Desktop" />
+        </Frame>
+      </Step>
+      <Step title="Eigenaar: vul de Clarus-gegevens in">
+        Vul in het dialoogvenster **Add custom connector** in:
+        - **Name:** `Clarus`
+        - **URL:** je verbindingsadres (`https://agents.claruswms.ai/mcp/{subdomain}`)
+        - Laat onder **Advanced settings** de velden **OAuth Client ID** en **OAuth Client Secret** **leeg**.
+        - Kies onder **How your team connects** de optie **Individual sign-in** (iedereen logt met zijn eigen account in bij Clarus).
+
+        Klik daarna op **Add**.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-add-custom-connector.png" alt="Het dialoogvenster Add custom connector met naam, URL, lege OAuth-velden en Individual sign-in geselecteerd" />
+        </Frame>
+      </Step>
+      <Step title="Elk teamlid: log in bij Clarus">
+        Elk teamlid opent **Customize → Connectors** en selecteert **Clarus**, klikt vervolgens op **Connect** en logt in met zijn eigen Clarus-gebruikersnaam en -wachtwoord.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-connector-connect.png" alt="De Clarus-connectorkaart met een Connect-knop vóór het inloggen" />
+        </Frame>
+        Eenmaal verbonden wordt Clarus als beschikbaar weergegeven, samen met de tools die Claude mag gebruiken. Je kunt per tool instellen of deze automatisch wordt uitgevoerd, goedkeuring vereist of geblokkeerd is — Claude ziet alleen de tools waartoe je organisatie je toegang heeft gegeven.
+        <Frame>
+          <img src="/images/knowledgebase/integrations/claude-connector-connected.png" alt="De verbonden Clarus-connector met de beschikbare tools en de per-tool rechteninstellingen" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Warning>
+Claude maakt verbinding **als jou** en gebruikt jouw Clarus-rechten, dus het kan gegevens wijzigen en niet alleen lezen — bijvoorbeeld een order bijwerken of voorraad aanpassen. Wees specifiek in wat je vraagt en controleer wijzigingen voordat je ze bevestigt.
+</Warning>
+
+## Problemen oplossen
+
+<AccordionGroup>
+  <Accordion title="Moet ik OAuth Client ID / Secret invullen?">
+    Nee — laat beide leeg. Clarus gebruikt een inlog- (OAuth-)flow die automatisch is ingesteld, dus je maakt of plakt geen client-ID of secret.
+  </Accordion>
+  <Accordion title="Ik kan Connectors niet vinden">
+    Op een persoonlijk account staan connectors onder **Customize → Connectors**. Op een Team- of Enterprise-account voegt een eigenaar connectors toe onder **Organization settings → Connectors**, waarna leden hun eigen aanmelding beheren onder **Customize → Connectors**.
+  </Accordion>
+  <Accordion title="De connector wordt niet toegevoegd of geeft een foutmelding">
+    Controleer of het adres exact `https://agents.claruswms.ai/mcp/{subdomain}` is, met je echte subdomein in plaats van `{subdomain}` en zonder spaties aan het eind. Ben je organisatie-eigenaar, zorg dan dat je **Web** hebt gekozen (niet Desktop). Je subdomein is de korte naam van je organisatie in Clarus (zie het [overzicht](/knowledgebase/nl/integrations/ai-assistants-overview)).
+  </Accordion>
+  <Accordion title="Hij blijft me vragen om in te loggen">
+    Zorg dat je het Clarus-inloggen voltooit **én** toegang geeft in het pop-upvenster. Blokkeert je browser pop-ups, sta ze dan toe voor claude.ai en probeer het opnieuw.
+  </Accordion>
+  <Accordion title="Claude zegt dat het gegevens niet kan vinden of geen toegang heeft">
+    De assistent kan alleen zien en doen wat jouw Clarus-account mag. Mis je gegevens of mislukt een actie, controleer dan je eigen Clarus-rechten voor dat account, magazijn of die functie — of vraag het je beheerder.
+  </Accordion>
+  <Accordion title="Kan Claude mijn gegevens wijzigen?">
+    Ja — binnen jouw rechten kan het zowel lezen als wijzigingen doorvoeren. Vraag nauwkeurig en bevestig belangrijke acties voordat hij ze uitvoert.
+  </Accordion>
+</AccordionGroup>

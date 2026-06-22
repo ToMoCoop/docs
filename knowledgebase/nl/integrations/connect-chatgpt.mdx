@@ -1,0 +1,80 @@
+---
+title: "ChatGPT koppelen aan Clarus"
+description: "Voeg Clarus toe als eigen app in ChatGPT, zodat je in gewone taal met je magazijngegevens kunt werken met je eigen Clarus-account."
+sidebarTitle: "ChatGPT koppelen"
+---
+
+Voeg Clarus toe aan ChatGPT als eigen **app** en stel ChatGPT vervolgens in gewone taal vragen over je magazijn — en laat het wijzigingen doorvoeren. Het gebruikt je gewone Clarus-login; er is niets te kopiëren of in te stellen.
+
+<Warning>
+**AI-nauwkeurigheid:** door AI gegenereerde antwoorden kunnen soms onjuist, onvolledig of misleidend zijn. Controleer de output van de assistent altijd voordat je ernaar handelt — vooral bij voorraadmutaties, orderwijzigingen of andere acties die invloed hebben op je live magazijngegevens. De assistent is een hulpmiddel, geen vervanging van je eigen oordeel.
+</Warning>
+
+Houd voordat je begint je verbindingsadres bij de hand:
+
+```text
+https://agents.claruswms.ai/mcp/{subdomain}
+```
+
+Vervang `{subdomain}` door je Clarus-subdomein. Zie [AI-assistenten koppelen aan Clarus](/knowledgebase/nl/integrations/ai-assistants-overview) als je niet zeker weet wat dat van jou is.
+
+<Info>
+Eigen apps (connectors) zijn beschikbaar op ChatGPT-abonnementen die dit ondersteunen en moeten mogelijk eerst door de beheerder van je workspace worden ingeschakeld. Menunamen kunnen per ChatGPT-versie verschillen.
+</Info>
+
+## De Clarus-app toevoegen
+
+<Steps>
+  <Step title="Open Apps">
+    Open in ChatGPT **Settings → Apps**.
+    <Frame>
+      <img src="/images/knowledgebase/integrations/chatgpt-apps.png" alt="ChatGPT Settings Apps-pagina met Advanced settings en Create app" />
+    </Frame>
+  </Step>
+  <Step title="Maak een app aan">
+    Klik naast **Advanced settings** op **Create app**.
+  </Step>
+  <Step title="Vul de Clarus-gegevens in">
+    Vul in het dialoogvenster **New App** in:
+    - **Name:** `Clarus`. Voeg eventueel een **Description** en een **Icon** toe — je kunt het [Clarus-logo downloaden](/images/knowledgebase/integrations/clarus-app-icon.png) (PNG, 256×256 of groter) om hier te gebruiken.
+    - **Connection:** kies **Server URL** en plak je verbindingsadres (`https://agents.claruswms.ai/mcp/{subdomain}`)
+    - **Authentication:** kies **OAuth**. Laat **Advanced OAuth settings** op de gevonden standaardwaarden staan — je hoeft geen client-ID of secret in te voeren.
+    - Vink **I understand and want to continue** aan en klik op **Create**.
+    <Frame>
+      <img src="/images/knowledgebase/integrations/chatgpt-new-app.png" alt="Het ChatGPT New App-dialoogvenster met de naam Clarus, Server URL en OAuth-authenticatie" />
+    </Frame>
+  </Step>
+  <Step title="Log in bij Clarus">
+    Klik in het dialoogvenster **Add Clarus to ChatGPT** op **Sign in with Clarus** en voltooi het Clarus-inloggen. ChatGPT heeft alleen de rechten die jouw Clarus-account heeft.
+    <Frame>
+      <img src="/images/knowledgebase/integrations/chatgpt-add-clarus-signin.png" alt="Het dialoogvenster Add Clarus to ChatGPT met een knop Sign in with Clarus" />
+    </Frame>
+  </Step>
+  <Step title="Gebruik het in een chat">
+    Start een chat, zorg dat de **Clarus**-app is ingeschakeld en stel een vraag zoals "Wat is de status van verkooporder `SO-2026-0042`?"
+  </Step>
+</Steps>
+
+<Warning>
+ChatGPT maakt verbinding **als jou** en gebruikt jouw Clarus-rechten, dus het kan gegevens wijzigen en niet alleen lezen — bijvoorbeeld een order bijwerken of voorraad aanpassen. Wees specifiek in wat je vraagt en controleer wijzigingen voordat je ze bevestigt.
+</Warning>
+
+## Problemen oplossen
+
+<AccordionGroup>
+  <Accordion title="Moet ik OAuth-clientgegevens invullen?">
+    Nee. Zet **Authentication** op **OAuth** en laat de **Advanced OAuth settings** op de gevonden standaardwaarden staan — Clarus stelt deze automatisch in, dus je maakt of plakt geen client-ID of secret.
+  </Accordion>
+  <Accordion title="Wat betekent de melding 'Custom MCP servers introduce risk'?">
+    Dat is de standaardmelding van ChatGPT voor elke eigen app — het betekent alleen dat OpenAI deze niet heeft beoordeeld. De Clarus-app maakt via een beveiligde verbinding verbinding met je eigen Clarus-account. Vink **I understand and want to continue** aan om door te gaan, en houd de AI-nauwkeurigheidsrichtlijn hierboven in gedachten bij het handelen naar antwoorden.
+  </Accordion>
+  <Accordion title="Ik kan Apps niet vinden in Settings">
+    Apps moeten mogelijk eerst door een beheerder/eigenaar voor je workspace worden ingeschakeld en vereisen een ChatGPT-abonnement dat dit ondersteunt. Vraag het degene die je ChatGPT-workspace beheert.
+  </Accordion>
+  <Accordion title="De app wordt niet aangemaakt of geeft een foutmelding">
+    Zorg dat **Connection** op **Server URL** staat (niet Tunnel) en dat het adres exact `https://agents.claruswms.ai/mcp/{subdomain}` is, met je echte subdomein in plaats van `{subdomain}` en zonder spaties aan het eind. Je subdomein is de korte naam van je organisatie in Clarus (zie het [overzicht](/knowledgebase/nl/integrations/ai-assistants-overview)).
+  </Accordion>
+  <Accordion title="ChatGPT zegt dat het gegevens niet kan vinden of geen toegang heeft">
+    De assistent kan alleen zien en doen wat jouw Clarus-account mag. Mis je gegevens of mislukt een actie, controleer dan je eigen Clarus-rechten voor dat account, magazijn of die functie — of vraag het je beheerder.
+  </Accordion>
+</AccordionGroup>

@@ -490,6 +490,16 @@
                 "pages": [
                   "knowledgebase/integrations/marketplace-integrations",
                   {
+                    "group": "AI assistants",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/integrations/ai-assistants-overview",
+                      "knowledgebase/integrations/connect-claude",
+                      "knowledgebase/integrations/connect-chatgpt"
+                    ],
+                    "public": true
+                  },
+                  {
                     "group": "Cloud Print",
                     "expanded": false,
                     "pages": [
@@ -1083,6 +1093,16 @@
                 "group": "🔌 Integratie",
                 "pages": [
                   "knowledgebase/nl/integrations/marketplace-integrations",
+                  {
+                    "group": "AI-assistenten",
+                    "expanded": false,
+                    "pages": [
+                      "knowledgebase/nl/integrations/ai-assistants-overview",
+                      "knowledgebase/nl/integrations/connect-claude",
+                      "knowledgebase/nl/integrations/connect-chatgpt"
+                    ],
+                    "public": true
+                  },
                   {
                     "group": "Cloud Print",
                     "expanded": false,
