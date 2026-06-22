@@ -551,7 +551,8 @@
                   "api-reference/introduction",
                   "knowledgebase/integrations/api-authentication",
                   "knowledgebase/integrations/api-creating-records",
-                  "knowledgebase/integrations/api-polling-updates"
+                  "knowledgebase/integrations/api-polling-updates",
+                  "knowledgebase/integrations/openapi-spec"
                 ]
               },
               {
@@ -1088,7 +1089,8 @@
                   "knowledgebase/nl/integrations/api-overview",
                   "knowledgebase/nl/integrations/api-authentication",
                   "knowledgebase/nl/integrations/api-creating-records",
-                  "knowledgebase/nl/integrations/api-polling-updates"
+                  "knowledgebase/nl/integrations/api-polling-updates",
+                  "knowledgebase/nl/integrations/openapi-spec"
                 ],
                 "public": true
               },

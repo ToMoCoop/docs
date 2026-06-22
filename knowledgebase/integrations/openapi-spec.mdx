@@ -1,0 +1,79 @@
+---
+title: "Download the OpenAPI spec"
+description: "Download the Clarus OpenAPI specification and import it into Postman, Insomnia, or Bruno to explore and call the API from your own tools."
+sidebarTitle: "OpenAPI spec"
+---
+
+The Clarus REST and GraphQL API is described by an **OpenAPI specification**. Download it and import it into your preferred API client to get a ready-made request for every documented endpoint.
+
+<Card title="Download the OpenAPI spec" icon="download" href="/api-reference/clarus-api.json">
+  `clarus-api.json` — the full Clarus API specification.
+</Card>
+
+<Info>
+You can also point your tool at the spec's **URL** instead of a saved file, so it stays up to date as the API evolves. Right-click the download link above and copy the link address to get the full URL.
+</Info>
+
+## Before you start
+
+Whichever tool you use, every request needs two things (see [Authentication & Access](/knowledgebase/integrations/api-authentication)):
+
+- An OAuth 2.0 **bearer token** in the `Authorization` header.
+- Your tenant **`X-Clarus-Subdomain`** header.
+
+Set both once at the collection or environment level so they apply to every request.
+
+## Import into your tool
+
+<Tabs>
+  <Tab title="Postman">
+    <Steps>
+      <Step title="Import the spec">
+        In Postman, click **Import**, then drop in the `clarus-api.json` file (or paste the spec's URL).
+      </Step>
+      <Step title="Generate the collection">
+        Postman creates a collection with a request for every endpoint, grouped by tag.
+      </Step>
+      <Step title="Set authentication">
+        On the collection's **Authorization** tab, choose **Bearer Token** and paste your access token. Add an `X-Clarus-Subdomain` header — a collection variable works well so you can switch tenants easily.
+      </Step>
+      <Step title="Send a request">
+        Open any request, fill in the body if needed, and click **Send**.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Insomnia">
+    <Steps>
+      <Step title="Import the spec">
+        Click **Create → Import**, then choose the `clarus-api.json` file or paste its URL.
+      </Step>
+      <Step title="Review the requests">
+        Insomnia builds a collection from the spec, organised by tag.
+      </Step>
+      <Step title="Set authentication">
+        Add a **Bearer** token and an `X-Clarus-Subdomain` header. Use an environment so both apply across every request.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Bruno">
+    <Steps>
+      <Step title="Import the spec">
+        In Bruno, choose **Import Collection → OpenAPI**, then select the `clarus-api.json` file.
+      </Step>
+      <Step title="Review the requests">
+        Bruno creates a collection you can keep in your own git repository.
+      </Step>
+      <Step title="Set authentication">
+        Add a **Bearer** token and an `X-Clarus-Subdomain` header at the collection level.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Warning>
+Requests sent from these tools act with the permissions of the token you use and the subdomain you set — exactly like calling the API directly. The API can **read and change** data, so be careful which requests you run against a live tenant.
+</Warning>
+
+<Tip>
+The spec covers REST mutation endpoints and GraphQL list queries. For retrieving data with GraphQL, see [Polling for updates](/knowledgebase/integrations/api-polling-updates).
+</Tip>

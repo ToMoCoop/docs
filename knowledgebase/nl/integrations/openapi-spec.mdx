@@ -1,0 +1,79 @@
+---
+title: "De OpenAPI-spec downloaden"
+description: "Download de Clarus OpenAPI-specificatie en importeer hem in Postman, Insomnia of Bruno om de API vanuit je eigen tools te verkennen en aan te roepen."
+sidebarTitle: "OpenAPI-spec"
+---
+
+De Clarus REST- en GraphQL-API wordt beschreven door een **OpenAPI-specificatie**. Download hem en importeer hem in je favoriete API-client om voor elk gedocumenteerd endpoint een kant-en-klaar verzoek te krijgen.
+
+<Card title="Download de OpenAPI-spec" icon="download" href="/api-reference/clarus-api.json">
+  `clarus-api.json` — de volledige Clarus API-specificatie.
+</Card>
+
+<Info>
+Je kunt je tool ook naar de **URL** van de spec laten verwijzen in plaats van een opgeslagen bestand, zodat deze up-to-date blijft naarmate de API zich ontwikkelt. Klik met de rechtermuisknop op de downloadlink hierboven en kopieer het adres om de volledige URL te krijgen.
+</Info>
+
+## Voordat je begint
+
+Welke tool je ook gebruikt, elk verzoek heeft twee dingen nodig (zie [Authenticatie en toegang](/knowledgebase/nl/integrations/api-authentication)):
+
+- Een OAuth 2.0-**bearertoken** in de `Authorization`-header.
+- Je tenant-header **`X-Clarus-Subdomain`**.
+
+Stel beide één keer in op het niveau van de collection of environment, zodat ze voor elk verzoek gelden.
+
+## Importeren in je tool
+
+<Tabs>
+  <Tab title="Postman">
+    <Steps>
+      <Step title="Importeer de spec">
+        Klik in Postman op **Import** en sleep het bestand `clarus-api.json` erin (of plak de URL van de spec).
+      </Step>
+      <Step title="Genereer de collection">
+        Postman maakt een collection met een verzoek voor elk endpoint, gegroepeerd per tag.
+      </Step>
+      <Step title="Stel authenticatie in">
+        Kies op het tabblad **Authorization** van de collection voor **Bearer Token** en plak je access token. Voeg een `X-Clarus-Subdomain`-header toe — een collection-variabele werkt goed, zodat je makkelijk van tenant kunt wisselen.
+      </Step>
+      <Step title="Verstuur een verzoek">
+        Open een verzoek, vul indien nodig de body in en klik op **Send**.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Insomnia">
+    <Steps>
+      <Step title="Importeer de spec">
+        Klik op **Create → Import** en kies het bestand `clarus-api.json` of plak de URL.
+      </Step>
+      <Step title="Bekijk de verzoeken">
+        Insomnia bouwt een collection op basis van de spec, geordend per tag.
+      </Step>
+      <Step title="Stel authenticatie in">
+        Voeg een **Bearer**-token en een `X-Clarus-Subdomain`-header toe. Gebruik een environment zodat beide voor elk verzoek gelden.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Bruno">
+    <Steps>
+      <Step title="Importeer de spec">
+        Kies in Bruno **Import Collection → OpenAPI** en selecteer het bestand `clarus-api.json`.
+      </Step>
+      <Step title="Bekijk de verzoeken">
+        Bruno maakt een collection die je in je eigen git-repository kunt bewaren.
+      </Step>
+      <Step title="Stel authenticatie in">
+        Voeg een **Bearer**-token en een `X-Clarus-Subdomain`-header toe op collectionniveau.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Warning>
+Verzoeken die je vanuit deze tools verstuurt, handelen met de rechten van het token dat je gebruikt en het subdomein dat je instelt — precies zoals bij het rechtstreeks aanroepen van de API. De API kan gegevens **lezen en wijzigen**, dus wees voorzichtig met welke verzoeken je tegen een live tenant uitvoert.
+</Warning>
+
+<Tip>
+De spec dekt REST-mutatie-endpoints en GraphQL-lijstquery's. Voor het ophalen van gegevens met GraphQL, zie [Updates ophalen](/knowledgebase/nl/integrations/api-polling-updates).
+</Tip>
