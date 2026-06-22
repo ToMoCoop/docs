@@ -11,6 +11,9 @@
     "decoration": "gradient"
   },
   "favicon": "/favicon.png",
+  "contextual": {
+    "options": ["copy", "download-spec", "chatgpt", "claude"]
+  },
   "api": {
     "playground": {
       "display": "interactive"
