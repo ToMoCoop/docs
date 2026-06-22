@@ -95,6 +95,14 @@
       "description": "Customer management endpoints. Customers are the end-recipients of goods (distinct from stock accounts)."
     },
     {
+      "name": "Dashboard Widgets",
+      "description": "Dashboard widget management endpoints for creating, updating, and deleting widgets. Each widget is bound to a report query and rendered on dashboards as a configurable chart (bar, line, pie, gauge, etc.). Widgets are placed onto dashboards via the dashboard's widget placement endpoint."
+    },
+    {
+      "name": "Dashboards",
+      "description": "Dashboard management endpoints for creating, updating, and deleting dashboards together with the widgets placed on them. Dashboards are role-scoped collections of widgets that render report query data as charts. Use the placement endpoint to atomically replace the widgets shown on a dashboard."
+    },
+    {
       "name": "Delivery Addresses",
       "description": "Delivery address management endpoints. Delivery addresses belong to an end customer and are used for outbound deliveries."
     },
@@ -107,8 +115,8 @@
       "description": "External entity endpoints — references to items in external systems (e.g. Shopify products, carriers, shipping rates, warehouses) that are linked to internal ClarusWMS entities via mappings."
     },
     {
-      "name": "Goods In Receipts",
-      "description": "Inbound receipt management endpoints for receiving inventory into the warehouse"
+      "name": "Goods In: Receipts",
+      "description": "Inbound receipt management endpoints for receiving inventory into the warehouse, including the receive task actions used to confirm stock has been received against a receipt"
     },
     {
       "name": "Goods Out: Orders",
@@ -241,6 +249,10 @@
     {
       "name": "Stock Balances",
       "description": "Aggregated stock balance query endpoints summarising available, allocated, ordered, received, and picked quantities per product/account/warehouse."
+    },
+    {
+      "name": "Stock Checks",
+      "description": "Stock check endpoints for counting the products held at a location and reconciling them against the system. A stock check moves through `pending` to either `passed` or `failed`, and failed checks can subsequently be `resolved` with a reason code."
     },
     {
       "name": "Stock Unit Types",
@@ -3245,7 +3257,8 @@
                                 "$ref": "#/components/schemas/AccountId"
                               }
                             ],
-                            "nullable": true
+                            "nullable": true,
+                            "type": "integer"
                           },
                           "account_reference": {
                             "type": "string",
@@ -3308,7 +3321,8 @@
                                 "$ref": "#/components/schemas/LocationId"
                               }
                             ],
-                            "nullable": true
+                            "nullable": true,
+                            "type": "integer"
                           },
                           "notes": {
                             "type": "string",
@@ -8408,6 +8422,940 @@
         }
       }
     },
+    "/graphql#ListDashboardWidgets": {
+      "post": {
+        "tags": [
+          "Dashboard Widgets"
+        ],
+        "summary": "List dashboard widgets",
+        "description": "Retrieve dashboard widgets using GraphQL. Widgets are reusable chart components bound to a report query; they are placed onto dashboards via the dashboard widget placement endpoint.",
+        "operationId": "listDashboardWidgets",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: DashboardWidgetFilterType) {\n  dashboard_widgets {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          description\n          widget_type\n          configuration\n          dashboard_filters\n          report_query_id\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"widget_type\": {\n      \"eq\": \"bar\"\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Widget code |\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Widget name |\n| `widget_type` | DashboardWidgetTypeInputType | `eq`, `in` | Rendering type (`bar`, `line`, `pie`, etc. — see create endpoint for full list) |\n| `report_query_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by linked report query |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea",
+                    "example": "query($filter: DashboardWidgetFilterType) { dashboard_widgets { all(filter: $filter) { edges { node { id code name description widget_type configuration dashboard_filters report_query_id } } } } }"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "example": {
+                      "filter": {
+                        "widget_type": {
+                          "eq": "bar"
+                        }
+                      }
+                    },
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: DashboardWidgetFilterType) { dashboard_widgets { all(filter: $filter) { edges { node { id code name description widget_type configuration dashboard_filters report_query_id } } } } }",
+                "variables": {
+                  "filter": {
+                    "widget_type": {
+                      "eq": "bar"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "dashboard_widgets": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Dashboard Widget record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "dashboard_widgets": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "12",
+                              "code": "tasks-by-type",
+                              "name": "Tasks by Type",
+                              "description": "Open tasks grouped by task type",
+                              "widget_type": "bar",
+                              "configuration": {
+                                "metric": "total_records",
+                                "color_palette": "default",
+                                "show_legend": true,
+                                "legend_position": "bottom",
+                                "horizontal": false,
+                                "log_scale": false,
+                                "limit": 10
+                              },
+                              "dashboard_filters": {
+                                "warehouse_id": 1
+                              },
+                              "report_query_id": "4"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/dashboard_widgets": {
+      "post": {
+        "tags": [
+          "Dashboard Widgets"
+        ],
+        "summary": "Create a dashboard widget",
+        "description": "Create a new dashboard widget. A widget is a chart component bound to a report query; the `widget_type` selects the chart rendering and `configuration` provides per-chart options (legend, palette, metric field, type-specific keys). The widget becomes visible to users only once it has been placed on a dashboard via the dashboard's widget placement endpoint.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"dashboard_widgets\",\n    \"attributes\": {\n      \"code\": \"tasks-by-type\",\n      \"name\": \"Tasks by Type\",\n      \"description\": \"Open tasks grouped by task type\",\n      \"widget_type\": \"bar\",\n      \"report_query_id\": 4,\n      \"configuration\": {\n        \"metric\": \"total_records\",\n        \"color_palette\": \"default\",\n        \"show_legend\": true,\n        \"legend_position\": \"bottom\",\n        \"horizontal\": false,\n        \"log_scale\": false,\n        \"limit\": 10\n      },\n      \"dashboard_filters\": {\n        \"warehouse_id\": 1\n      }\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `code` | Yes | Unique widget code (max 30 chars) |\n| `name` | Yes | Display name (max 50 chars) |\n| `description` | No | Optional description (max 255 chars) |\n| `widget_type` | Yes | Chart rendering type. One of: `area`, `bar`, `funnel`, `gauge`, `graph`, `grid`, `heatmap`, `line`, `pictorial_bar`, `pie`, `radar`, `sankey`, `scatter`, `single`, `sunburst`, `tree`, `treemap` |\n| `report_query_id` | No | Linked report query that supplies the data |\n| `configuration` | No | Chart options — see per-widget-type reference below |\n| `dashboard_filters` | No | Default filter values applied to the report query when the widget renders, e.g. `{ \"warehouse_id\": 1 }` |\n\n## `configuration` reference\n\nThe `configuration` JSON object's keys vary by `widget_type`. All keys are snake_case.\n\n### Common keys\n\n| Key | Type | Notes |\n|-----|------|-------|\n| `metric` | string | Field from the report query result to chart (e.g. `quantity`, `count`, `total_records`) |\n| `color_palette` | string | One of `default`, `vivid`, `pastel`, `cool`, `warm`, `mono` |\n| `show_legend` | boolean | Toggle legend visibility (chart types that support a legend) |\n| `legend_position` | string | One of `top`, `bottom`, `left`, `right` |\n| `limit` | integer | `5`, `10`, or `20` — max data points (chart types where limiting applies) |\n\n### Per-type keys\n\n| `widget_type` | Type-specific keys | Example `configuration` |\n|---|---|---|\n| `bar` | `horizontal` (bool), `log_scale` (bool) | `{ \"metric\": \"quantity\", \"color_palette\": \"default\", \"show_legend\": true, \"legend_position\": \"bottom\", \"horizontal\": false, \"log_scale\": false, \"limit\": 10 }` |\n| `line` | `smooth` (bool), `log_scale` (bool) | `{ \"metric\": \"quantity\", \"color_palette\": \"cool\", \"show_legend\": true, \"legend_position\": \"bottom\", \"smooth\": true, \"log_scale\": false, \"limit\": 10 }` |\n| `area` | `smooth` (bool), `log_scale` (bool) | `{ \"metric\": \"total_records\", \"color_palette\": \"pastel\", \"show_legend\": true, \"legend_position\": \"bottom\", \"smooth\": true, \"log_scale\": false, \"limit\": 10 }` |\n| `scatter` | `log_scale` (bool) | `{ \"metric\": \"quantity\", \"color_palette\": \"vivid\", \"show_legend\": true, \"legend_position\": \"bottom\", \"log_scale\": false, \"limit\": 10 }` |\n| `pictorial_bar` | `horizontal` (bool) | `{ \"metric\": \"total_records\", \"color_palette\": \"vivid\", \"show_legend\": true, \"legend_position\": \"bottom\", \"horizontal\": false, \"limit\": 10 }` |\n| `heatmap` | — (common keys only, no legend) | `{ \"metric\": \"quantity\", \"color_palette\": \"mono\", \"limit\": 10 }` |\n| `pie` | `donut_hole` (integer, 0–80), `pie_label_content` (`name` \\| `value` \\| `percent` \\| `name_percent` \\| `name_value`); no `limit` | `{ \"metric\": \"count\", \"color_palette\": \"default\", \"show_legend\": true, \"legend_position\": \"bottom\", \"donut_hole\": 36, \"pie_label_content\": \"name_percent\" }` |\n| `funnel` | `funnel_ascending` (bool), `funnel_min_size` (integer, 0–50) | `{ \"metric\": \"total_records\", \"color_palette\": \"warm\", \"show_legend\": true, \"legend_position\": \"bottom\", \"funnel_ascending\": false, \"funnel_min_size\": 20, \"limit\": 10 }` |\n| `gauge` | `gauge_min` (integer), `gauge_max` (integer), `gauge_thresholds` (`none` \\| `traffic_light` \\| `reverse_traffic_light`), `gauge_format` (`number` \\| `percentage`); no legend/limit | `{ \"metric\": \"count\", \"color_palette\": \"default\", \"gauge_min\": 0, \"gauge_max\": 100, \"gauge_thresholds\": \"traffic_light\", \"gauge_format\": \"percentage\" }` |\n| `graph` | `graph_layout` (`force` \\| `circular`) | `{ \"metric\": \"quantity\", \"color_palette\": \"cool\", \"show_legend\": true, \"legend_position\": \"bottom\", \"graph_layout\": \"force\", \"limit\": 10 }` |\n| `radar` | `radar_max` (integer; 0 = inferred from data) | `{ \"metric\": \"quantity\", \"color_palette\": \"cool\", \"show_legend\": true, \"legend_position\": \"bottom\", \"radar_max\": 100 }` |\n| `sankey` | — (color + metric only) | `{ \"metric\": \"quantity\", \"color_palette\": \"default\" }` |\n| `sunburst` | — (legend + color, no `limit`) | `{ \"metric\": \"total_records\", \"color_palette\": \"pastel\", \"show_legend\": true, \"legend_position\": \"bottom\" }` |\n| `tree` | — (color + metric only, no legend/limit) | `{ \"metric\": \"quantity\", \"color_palette\": \"default\" }` |\n| `treemap` | — (color + metric only, no legend/limit) | `{ \"metric\": \"quantity\", \"color_palette\": \"cool\" }` |\n| `single` | `single_color` (`green` \\| `blue` \\| `orange` \\| `purple` \\| `red` \\| `teal` \\| `pink` \\| `yellow`); no legend/limit | `{ \"metric\": \"count\", \"single_color\": \"green\" }` |\n| `grid` | Tabular data view. No `configuration` keys are currently consumed by the renderer; supply an empty object | `{}` |"
+        },
+        "operationId": "createDashboardWidget",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "dashboard_widgets"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/DashboardWidgetAttributes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "dashboard_widgets",
+                  "attributes": {
+                    "code": "tasks-by-type",
+                    "name": "Tasks by Type",
+                    "description": "Open tasks grouped by task type",
+                    "widget_type": "bar",
+                    "report_query_id": 4,
+                    "configuration": {
+                      "metric": "total_records",
+                      "color_palette": "default",
+                      "show_legend": true,
+                      "legend_position": "bottom",
+                      "horizontal": false,
+                      "log_scale": false,
+                      "limit": 10
+                    },
+                    "dashboard_filters": {
+                      "warehouse_id": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dashboard widget created successfully. Response contains the new widget's id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Identifier of the created widget"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 12
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/dashboard_widgets/{id}": {
+      "patch": {
+        "tags": [
+          "Dashboard Widgets"
+        ],
+        "summary": "Update a dashboard widget",
+        "description": "Update an existing dashboard widget's attributes. All fields are optional; only supplied fields are updated.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"dashboard_widgets\",\n    \"attributes\": {\n      \"name\": \"Tasks by Type (last 7 days)\",\n      \"configuration\": {\n        \"metric\": \"total_records\",\n        \"color_palette\": \"cool\",\n        \"show_legend\": true,\n        \"legend_position\": \"bottom\",\n        \"horizontal\": false,\n        \"log_scale\": false,\n        \"limit\": 5\n      }\n    }\n  }\n}\n```\n\nSee the create endpoint for the full list of `widget_type` values and the per-type `configuration` reference."
+        },
+        "operationId": "updateDashboardWidget",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the dashboard widget to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "dashboard_widgets"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "description": "Dashboard widget attributes to update. All fields optional; see DashboardWidgetAttributes for the field reference.",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "maxLength": 30,
+                            "description": "Unique widget code"
+                          },
+                          "configuration": {
+                            "type": "object",
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "description": "Chart options. See create endpoint for the per-widget-type reference."
+                          },
+                          "dashboard_filters": {
+                            "type": "object",
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "description": "Default filter values applied to the report query when the widget renders"
+                          },
+                          "description": {
+                            "type": "string",
+                            "maxLength": 255,
+                            "nullable": true,
+                            "description": "Optional widget description"
+                          },
+                          "name": {
+                            "type": "string",
+                            "maxLength": 50,
+                            "description": "Display name"
+                          },
+                          "report_query_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Linked report query that supplies the data"
+                          },
+                          "widget_type": {
+                            "type": "string",
+                            "enum": [
+                              "area",
+                              "bar",
+                              "funnel",
+                              "gauge",
+                              "graph",
+                              "grid",
+                              "heatmap",
+                              "line",
+                              "pictorial_bar",
+                              "pie",
+                              "radar",
+                              "sankey",
+                              "scatter",
+                              "single",
+                              "sunburst",
+                              "tree",
+                              "treemap"
+                            ],
+                            "description": "Chart rendering type"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "dashboard_widgets",
+                  "attributes": {
+                    "name": "Tasks by Type (last 7 days)",
+                    "configuration": {
+                      "metric": "total_records",
+                      "color_palette": "cool",
+                      "show_legend": true,
+                      "legend_position": "bottom",
+                      "horizontal": false,
+                      "log_scale": false,
+                      "limit": 5
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dashboard Widgets"
+        ],
+        "summary": "Delete a dashboard widget",
+        "description": "Delete a dashboard widget. Any placements of the widget on dashboards are removed atomically.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Removes all placements of the widget from every dashboard it was placed on\n- This action is permanent and cannot be undone"
+        },
+        "operationId": "destroyDashboardWidget",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the dashboard widget to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/graphql#ListDashboards": {
+      "post": {
+        "tags": [
+          "Dashboards"
+        ],
+        "summary": "List dashboards",
+        "description": "Retrieve dashboards using GraphQL. Each dashboard groups a set of widget placements and is visible to users assigned to one of its associated roles.",
+        "operationId": "listDashboards",
+        "x-mint": {
+          "content": "## Query Structure\n\n```graphql\nquery($filter: DashboardFilterType) {\n  dashboards {\n    all(filter: $filter) {\n      edges {\n        node {\n          id\n          code\n          name\n          description\n          is_active\n          is_default\n          roles { id name }\n          dashboard_widget_placements {\n            id\n            position\n            dashboard_widget { id code name widget_type }\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n## Filter Argument\n\nAll filters are passed inside the `filter` argument. Each filter field accepts an input object with operators:\n\n```json\n{\n  \"filter\": {\n    \"is_active\": {\n      \"eq\": true\n    }\n  }\n}\n```\n\n### Available Filters\n\n| Filter | Input Type | Operators | Description |\n|--------|-----------|-----------|-------------|\n| `code` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Dashboard code |\n| `name` | StringInputType | `eq`, `ilike`, `like`, `in`, `between` | Dashboard name |\n| `is_active` | BooleanInputType | `eq` | Active flag |\n| `is_default` | BooleanInputType | `eq` | Default-dashboard flag |\n| `role_id` | IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` | Filter by an associated role ID |\n\n### Filter Operators\n\n| Input Type | Operators |\n|-----------|----------|\n| StringInputType | `eq` (exact), `ilike` (case-insensitive partial), `like` (case-sensitive partial), `in` (array match), `between` (range) |\n| IntegerInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `between` |\n| DatetimeInputType | `eq`, `from`, `to`, `between` |\n| BooleanInputType | `eq` (required) |\n| IdInputType | `eq`, `gt`, `gteq`, `lt`, `lteq`, `in`, `filled` |\n\n*More fields and filters available via GraphQL introspection.*"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query string",
+                    "format": "textarea",
+                    "example": "query($filter: DashboardFilterType) { dashboards { all(filter: $filter) { edges { node { id code name description is_active is_default roles { id name } dashboard_widget_placements { id position dashboard_widget { id code name widget_type } } } } } } }"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Query variables including the filter object",
+                    "example": {
+                      "filter": {
+                        "is_active": {
+                          "eq": true
+                        }
+                      }
+                    },
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Filter criteria for narrowing results. Each field accepts an input object with operators (eq, ilike, from, to, etc.)"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "query": "query($filter: DashboardFilterType) { dashboards { all(filter: $filter) { edges { node { id code name description is_active is_default roles { id name } dashboard_widget_placements { id position dashboard_widget { id code name widget_type } } } } } } }",
+                "variables": {
+                  "filter": {
+                    "is_active": {
+                      "eq": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query result data",
+                      "properties": {
+                        "dashboards": {
+                          "type": "object",
+                          "properties": {
+                            "all": {
+                              "type": "object",
+                              "properties": {
+                                "edges": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "node": {
+                                        "type": "object",
+                                        "description": "A Dashboard record"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "GraphQL errors, if any"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "dashboards": {
+                      "all": {
+                        "edges": [
+                          {
+                            "node": {
+                              "id": "3",
+                              "code": "warehouse-ops",
+                              "name": "Warehouse Operations",
+                              "description": "Day-to-day operational view",
+                              "is_active": true,
+                              "is_default": true,
+                              "roles": [
+                                {
+                                  "id": "1",
+                                  "name": "Administrator"
+                                }
+                              ],
+                              "dashboard_widget_placements": [
+                                {
+                                  "id": "21",
+                                  "position": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "w": 2,
+                                    "h": 2
+                                  },
+                                  "dashboard_widget": {
+                                    "id": "12",
+                                    "code": "tasks-by-type",
+                                    "name": "Tasks by Type",
+                                    "widget_type": "bar"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/dashboards": {
+      "post": {
+        "tags": [
+          "Dashboards"
+        ],
+        "summary": "Create a dashboard",
+        "description": "Create a new dashboard. Associate roles by passing `role_ids` inside `attributes`. Setting `is_default: true` clears the default flag from every other dashboard atomically.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"dashboards\",\n    \"attributes\": {\n      \"code\": \"warehouse-ops\",\n      \"name\": \"Warehouse Operations\",\n      \"description\": \"Day-to-day operational view\",\n      \"is_active\": true,\n      \"is_default\": true,\n      \"role_ids\": [1, 4]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `code` | Yes | Unique dashboard code (max 30 chars) |\n| `name` | Yes | Display name (max 50 chars) |\n| `description` | No | Optional description (max 255 chars) |\n| `is_active` | No | Whether the dashboard is visible to users (default `true`) |\n| `is_default` | No | When `true`, this dashboard becomes the default for users — the previous default is cleared atomically (default `false`) |\n| `role_ids` | No | Array of role IDs that can access this dashboard. Passed inside `attributes` (not `relationships`) |\n\n## Adding widgets\n\nUse `PUT /api/dashboards/{id}/widgets` (`setDashboardWidgetPlacements`) to attach widgets to the dashboard. That endpoint replaces all placements atomically."
+        },
+        "operationId": "createDashboard",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "dashboards"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "$ref": "#/components/schemas/DashboardAttributes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "dashboards",
+                  "attributes": {
+                    "code": "warehouse-ops",
+                    "name": "Warehouse Operations",
+                    "description": "Day-to-day operational view",
+                    "is_active": true,
+                    "is_default": true,
+                    "role_ids": [
+                      1,
+                      4
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dashboard created successfully. Response contains the new dashboard's id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "Identifier of the created dashboard"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 3
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/dashboards/{id}": {
+      "patch": {
+        "tags": [
+          "Dashboards"
+        ],
+        "summary": "Update a dashboard",
+        "description": "Update an existing dashboard's attributes. All fields are optional; only supplied fields are updated. Setting `is_default: true` clears the default flag from every other dashboard.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"dashboards\",\n    \"attributes\": {\n      \"name\": \"Warehouse Operations (live)\",\n      \"is_default\": true,\n      \"role_ids\": [1, 4, 7]\n    }\n  }\n}\n```\n\n## Notes\n\n- `role_ids` replaces the existing role associations — supply the full set you want associated, not a delta.\n- Widget placements are managed through `PUT /api/dashboards/{id}/widgets`, not through this endpoint."
+        },
+        "operationId": "updateDashboard",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the dashboard to update",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "dashboards"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "description": "Dashboard attributes to update. All fields optional; see DashboardAttributes for the field reference.",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "maxLength": 30,
+                            "description": "Unique dashboard code"
+                          },
+                          "description": {
+                            "type": "string",
+                            "maxLength": 255,
+                            "nullable": true,
+                            "description": "Optional description"
+                          },
+                          "is_active": {
+                            "type": "boolean",
+                            "description": "Whether the dashboard is visible to users"
+                          },
+                          "is_default": {
+                            "type": "boolean",
+                            "description": "When true, clears the default flag on every other dashboard"
+                          },
+                          "name": {
+                            "type": "string",
+                            "maxLength": 50,
+                            "description": "Display name"
+                          },
+                          "role_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer"
+                            },
+                            "description": "Replaces the dashboard's role associations with the supplied list of role IDs"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "dashboards",
+                  "attributes": {
+                    "name": "Warehouse Operations (live)",
+                    "is_default": true,
+                    "role_ids": [
+                      1,
+                      4,
+                      7
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dashboards"
+        ],
+        "summary": "Delete a dashboard",
+        "description": "Delete a dashboard. All role associations and widget placements are removed atomically; the widgets themselves are not deleted.",
+        "x-mint": {
+          "content": "## Behavior\n\n- Returns 204 No Content on success\n- Removes role associations and widget placements\n- Widgets remain available and can be placed on other dashboards\n- This action is permanent and cannot be undone"
+        },
+        "operationId": "destroyDashboard",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the dashboard to delete",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/dashboards/{id}/widgets": {
+      "put": {
+        "tags": [
+          "Dashboards"
+        ],
+        "summary": "Set dashboard widget placements",
+        "description": "Atomically replace the widget placements for a dashboard. The full set of placements you want on the dashboard must be supplied in `placements`; any existing placements not in the list are removed.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"dashboards\",\n    \"attributes\": {\n      \"placements\": [\n        { \"dashboard_widget_id\": 12, \"position\": { \"x\": 0, \"y\": 0, \"w\": 2, \"h\": 2 } },\n        { \"dashboard_widget_id\": 17, \"position\": { \"x\": 2, \"y\": 0, \"w\": 4, \"h\": 2 } }\n      ]\n    }\n  }\n}\n```\n\n## Behavior\n\n- Replaces every placement on the dashboard with the supplied list, inside a single database transaction\n- A `dashboard_widget_id` may appear at most once in the list — duplicates are rejected with 422\n- `position` is optional; if omitted it is stored as an empty object and the dashboard renderer falls back to a default layout slot\n- Returns 204 No Content on success\n\n## Position object\n\n`position` carries gridstack layout coordinates. Keys: `x` (column offset), `y` (row offset), `w` (column width), `h` (row height). All integers.\n\n## Acquiring widget IDs\n\nList available widgets via the [List dashboard widgets](/graphql#ListDashboardWidgets) GraphQL endpoint."
+        },
+        "operationId": "setDashboardWidgetPlacements",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the dashboard to set placements on",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "dashboards"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "required": [
+                          "placements"
+                        ],
+                        "properties": {
+                          "placements": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/components/schemas/DashboardWidgetPlacementInput"
+                            },
+                            "description": "Full set of widget placements for the dashboard. Replaces any existing placements."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "dashboards",
+                  "attributes": {
+                    "placements": [
+                      {
+                        "dashboard_widget_id": 12,
+                        "position": {
+                          "x": 0,
+                          "y": 0,
+                          "w": 2,
+                          "h": 2
+                        }
+                      },
+                      {
+                        "dashboard_widget_id": 17,
+                        "position": {
+                          "x": 2,
+                          "y": 0,
+                          "w": 4,
+                          "h": 2
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
     "/api/delivery_addresses": {
       "post": {
         "tags": [
@@ -9678,7 +10626,7 @@
     "/graphql#ListGoodsInReceipts": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "List goods in receipts",
         "description": "Retrieve inbound receipts using GraphQL. Supports filtering by reference, status, account, warehouse, and date ranges.",
@@ -9822,7 +10770,7 @@
     "/api/goods_in_receipts": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Create a goods in receipt",
         "description": "Create a new goods in receipt (purchase order/ASN) to receive inventory into the warehouse. Include line items using the lines_changes array.",
@@ -9944,7 +10892,7 @@
     "/api/goods_in_receipts/{id}": {
       "patch": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Update a goods in receipt",
         "description": "Update an existing goods in receipt. Use lines_changes to add, update, or remove line items. Receipts that have started receiving may have restrictions on what can be changed.",
@@ -10042,7 +10990,7 @@
       },
       "delete": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Delete a goods in receipt",
         "description": "Delete a goods in receipt. Receipts that have started receiving cannot be deleted.",
@@ -10077,7 +11025,7 @@
     "/api/goods_in_receipts/{id}/receive": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Receive a goods in receipt",
         "description": "Trigger the receiving process for a goods in receipt. The receipt must be in PENDING status with at least one line item. This changes the receipt status to RCV and creates receive tasks for each line item. Stock records are not created until individual receive tasks are completed.",
@@ -10153,7 +11101,7 @@
     "/api/goods_in_receipts/{id}/revert": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Revert a goods in receipt",
         "description": "Revert a received goods in receipt back to its previous state. The receipt must not have any completed tasks associated with it.",
@@ -10229,7 +11177,7 @@
     "/api/goods_in_receipts/{id}/storage_unit_labels": {
       "post": {
         "tags": [
-          "Goods In Receipts"
+          "Goods In: Receipts"
         ],
         "summary": "Print storage unit labels for a receipt",
         "description": "Generate storage unit labels for a goods in receipt. When `cloud_print` is true, the label is sent directly to the specified printer. When `cloud_print` is false or omitted, the response is a PDF binary stream (not JSON).",
@@ -10333,6 +11281,289 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}/export_receipt_task_confirmation": {
+      "get": {
+        "tags": [
+          "Goods In: Receipts"
+        ],
+        "summary": "Export receipt task confirmation",
+        "description": "Generate and download a receipt confirmation document for a completed receipt task. Returns the confirmation in the configured export format (CSV, JSON, or EDI).",
+        "x-mint": {
+          "content": "## Behavior\n\n- Generates a receipt confirmation document for the specified task\n- The task must be a completed receipt (RCV) task\n- Output format depends on system configuration (CSV, JSON, or EDI)\n- Returns the file content directly in the response body\n- Returns 404 if the task does not exist\n- Returns 422 if the task is not a completed receipt task"
+        },
+        "operationId": "exportReceiptTaskConfirmation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the completed receipt task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Receipt task confirmation document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Receipt confirmation data in the configured export format"
+                },
+                "example": {
+                  "task_id": 1,
+                  "status": "COMPLETED",
+                  "product_code": "SKU-001",
+                  "confirmed_quantity": 10.0,
+                  "location_code": "A-01-01",
+                  "completed_at": "2026-03-12T10:30:00Z"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/receive_tasks/{id}/receive": {
+      "post": {
+        "tags": [
+          "Goods In: Receipts"
+        ],
+        "summary": "Receive stock against a receive task",
+        "description": "Complete a receive task by recording that the inbound stock has been physically received into the receiving area. The task is updated, the inbound item's `quantity_received` is incremented, a follow-on putaway task is generated, and a receive transaction is recorded. Use this endpoint when stock first lands at the receiving location; use `/api/receive_tasks/{id}/receive_to_putaway_location` when receiving directly into a putaway location instead.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"tasks\",\n    \"attributes\": {\n      \"location_to_id\": 25,\n      \"storage_unit_to_id\": 18,\n      \"confirmed_quantity\": 10.0,\n      \"serial_numbers\": [\"SN-001\", \"SN-002\"]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `location_to_id` | No | Location into which the stock is received |\n| `storage_unit_to_id` | No | Storage unit the received stock lands in |\n| `confirmed_quantity` | No | Quantity actually received (>= 0). Defaults to the task's `start_quantity` when omitted. |\n| `serial_numbers` | No | Serial numbers to assign to the received stock |\n| `base_storage_unit_type_id` | No | Base storage unit type for the received stock, when relevant |"
+        },
+        "operationId": "receiveStock",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the receive task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "tasks"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "properties": {
+                          "location_to_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Location into which the stock is received"
+                          },
+                          "storage_unit_to_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Storage unit the received stock lands in"
+                          },
+                          "confirmed_quantity": {
+                            "type": "number",
+                            "nullable": true,
+                            "minimum": 0,
+                            "description": "Quantity actually received. Defaults to the task's start quantity when omitted."
+                          },
+                          "serial_numbers": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Serial numbers to assign to the received stock"
+                          },
+                          "base_storage_unit_type_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Base storage unit type for the received stock"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "tasks",
+                  "attributes": {
+                    "location_to_id": 25,
+                    "storage_unit_to_id": 18,
+                    "confirmed_quantity": 10.0,
+                    "serial_numbers": [
+                      "SN-001",
+                      "SN-002"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/receive_tasks/{id}/receive_to_putaway_location": {
+      "post": {
+        "tags": [
+          "Goods In: Receipts"
+        ],
+        "summary": "Receive stock straight into a putaway location",
+        "description": "Complete a receive task by landing the stock directly into a putaway location instead of the receiving area. The destination `location_to_id` is required because the stock bypasses the receiving step. Otherwise behaves like `/api/receive_tasks/{id}/receive`: updates the task, increments the inbound item's `quantity_received`, and records the receive transaction.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"tasks\",\n    \"attributes\": {\n      \"location_to_id\": 47,\n      \"storage_unit_to_id\": 18,\n      \"confirmed_quantity\": 10.0,\n      \"serial_numbers\": [\"SN-001\", \"SN-002\"]\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `location_to_id` | Yes | Putaway location where the stock is received |\n| `storage_unit_to_id` | No | Storage unit the received stock lands in |\n| `confirmed_quantity` | No | Quantity actually received (>= 0). Defaults to the task's `start_quantity` when omitted. |\n| `serial_numbers` | No | Serial numbers to assign to the received stock |"
+        },
+        "operationId": "receiveStockToPutawayLocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the receive task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "tasks"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "required": [
+                          "location_to_id"
+                        ],
+                        "properties": {
+                          "location_to_id": {
+                            "type": "integer",
+                            "description": "Putaway location where the stock is received"
+                          },
+                          "storage_unit_to_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Storage unit the received stock lands in"
+                          },
+                          "confirmed_quantity": {
+                            "type": "number",
+                            "nullable": true,
+                            "minimum": 0,
+                            "description": "Quantity actually received. Defaults to the task's start quantity when omitted."
+                          },
+                          "serial_numbers": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Serial numbers to assign to the received stock"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "tasks",
+                  "attributes": {
+                    "location_to_id": 47,
+                    "storage_unit_to_id": 18,
+                    "confirmed_quantity": 10.0,
+                    "serial_numbers": [
+                      "SN-001",
+                      "SN-002"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -14675,6 +15906,159 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/load_tasks/{id}/assign_storage_unit": {
+      "post": {
+        "tags": [
+          "Loads"
+        ],
+        "summary": "Assign a storage unit to a load",
+        "description": "Assign the load task's storage unit to a load and/or load drop without yet completing the load. Used by loading workflows that need to reserve a storage unit against a specific load (or drop within a load) before the operator physically loads it. At least one of `load_id` or `load_drop_id` must be supplied. This endpoint does NOT use JSON:API format.",
+        "operationId": "assignLoadTaskStorageUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the load task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "load_id": {
+                    "type": "integer",
+                    "description": "Load to assign the storage unit to"
+                  },
+                  "load_drop_id": {
+                    "type": "integer",
+                    "description": "Specific load drop within a load to assign the storage unit to"
+                  }
+                }
+              },
+              "example": {
+                "load_id": 14,
+                "load_drop_id": 27
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/load_tasks/{id}/load_storage_unit": {
+      "post": {
+        "tags": [
+          "Loads"
+        ],
+        "summary": "Load a storage unit onto a load",
+        "description": "Complete a load task by recording that its storage unit has been physically loaded onto the supplied load (or load drop). Validates the load's status, the load drop's status, and — when loading validation settings are enabled — any configured pick list / booking date / delivery address checks. The task transitions to `COMPLETED`, the load and load drop counters are incremented, and a `load` transaction is recorded. This endpoint does NOT use JSON:API format.",
+        "operationId": "loadStorageUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the load task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "load_id": {
+                    "type": "integer",
+                    "description": "Load to load onto. Required unless the task already has a load assigned."
+                  },
+                  "load_drop_id": {
+                    "type": "integer",
+                    "description": "Load drop within the load. Required unless the task already has a load drop assigned."
+                  }
+                }
+              },
+              "example": {
+                "load_id": 14,
+                "load_drop_id": 27
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/load_tasks/{id}/unload_storage_unit": {
+      "post": {
+        "tags": [
+          "Loads"
+        ],
+        "summary": "Unload a storage unit from a load",
+        "description": "Reverse a previously loaded storage unit, returning the load task to an available state and decrementing the load and load drop counters. Used when a storage unit needs to be taken back off a load before dispatch.",
+        "operationId": "unloadStorageUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the load task",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
       }
@@ -25568,6 +26952,361 @@
         }
       }
     },
+    "/api/stock_checks": {
+      "post": {
+        "tags": [
+          "Stock Checks"
+        ],
+        "summary": "Create a stock check",
+        "description": "Create a new stock check for a location. A stock check is a request to physically count the products held at a location and reconcile them against the system count. Creating a stock check also creates an associated task that operators can be assigned to. If a stock check is already pending for the supplied location, the existing one is returned instead of a duplicate being created.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"stock_checks\",\n    \"attributes\": {\n      \"location_id\": 25,\n      \"expected_completion_date\": \"2026-05-25T17:00:00Z\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `location_id` | Yes | ID of the location whose stock will be counted |\n| `expected_completion_date` | Yes | ISO 8601 datetime by which the count is expected to be completed |\n\n## Behavior\n\n- If a pending stock check already exists for the location, the existing one is returned and no new record is created.\n- Otherwise a new stock check is created in `pending` status together with an associated task.\n- The response returns both the stock check ID and the ID of the associated task."
+        },
+        "operationId": "createStockCheck",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "stock_checks"
+                        ],
+                        "description": "Resource type identifier"
+                      },
+                      "attributes": {
+                        "type": "object",
+                        "required": [
+                          "location_id",
+                          "expected_completion_date"
+                        ],
+                        "properties": {
+                          "location_id": {
+                            "type": "integer",
+                            "description": "ID of the location whose stock will be counted"
+                          },
+                          "expected_completion_date": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "ISO 8601 datetime by which the count is expected to be completed"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "type": "stock_checks",
+                  "attributes": {
+                    "location_id": 25,
+                    "expected_completion_date": "2026-05-25T17:00:00Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stock check created, or existing pending stock check returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stock_check_id": {
+                      "type": "integer",
+                      "description": "ID of the stock check"
+                    },
+                    "task_id": {
+                      "type": "integer",
+                      "description": "ID of the task associated with the stock check"
+                    }
+                  }
+                },
+                "example": {
+                  "stock_check_id": 42,
+                  "task_id": 101
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stock_checks/{id}/record_attempt": {
+      "post": {
+        "tags": [
+          "Stock Checks"
+        ],
+        "summary": "Record a stock check count attempt",
+        "description": "Log a physical count of a product at the stock check's location. The system compares the supplied physical count against its expected (system) count for the matching product group and records whether the attempt succeeded or failed. Each product group can have up to two attempts; if both attempts fail the group must be resolved before the stock check can move on.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"attributes\": {\n      \"product_id\": 42,\n      \"physical_count\": 5.0,\n      \"batch\": \"BATCH_A\",\n      \"sell_by_date\": \"2026-06-01\",\n      \"best_before_date\": \"2026-12-01\"\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `product_id` | Yes | ID of the product being counted |\n| `physical_count` | Yes | Quantity actually counted in the location |\n| `batch` | No | Batch identifier when the account uses batch tracking |\n| `sell_by_date` | No | Sell-by date when the account uses sell-by tracking |\n| `best_before_date` | No | Best-before date when the account uses best-before tracking |\n\n## Behavior\n\n- The product, batch and date fields together identify a *stock group* within the stock check. Repeat counts for the same group accumulate as numbered attempts.\n- The attempt is `success` when `physical_count` matches the system count for that group, otherwise `failure`.\n- A third attempt for the same group is rejected with 422; failed groups must be resolved via `POST /api/stock_checks/resolve`.\n- The stock check and its associated task must still be active. Completed, cancelled or non-pending checks return 422."
+        },
+        "operationId": "recordStockCheckAttempt",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the stock check",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "attributes"
+                    ],
+                    "properties": {
+                      "attributes": {
+                        "type": "object",
+                        "required": [
+                          "product_id",
+                          "physical_count"
+                        ],
+                        "properties": {
+                          "product_id": {
+                            "type": "integer",
+                            "description": "ID of the product being counted"
+                          },
+                          "physical_count": {
+                            "type": "number",
+                            "description": "Quantity actually counted in the location"
+                          },
+                          "batch": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Batch identifier when the account uses batch tracking"
+                          },
+                          "sell_by_date": {
+                            "type": "string",
+                            "format": "date",
+                            "nullable": true,
+                            "description": "Sell-by date when the account uses sell-by tracking"
+                          },
+                          "best_before_date": {
+                            "type": "string",
+                            "format": "date",
+                            "nullable": true,
+                            "description": "Best-before date when the account uses best-before tracking"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "attributes": {
+                    "product_id": 42,
+                    "physical_count": 5.0,
+                    "batch": "BATCH_A",
+                    "sell_by_date": "2026-06-01",
+                    "best_before_date": "2026-12-01"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attempt recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "attempt_result": {
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "failure"
+                      ],
+                      "description": "Whether the physical count matched the system count for the matched stock group"
+                    },
+                    "attempt_number": {
+                      "type": "integer",
+                      "description": "Which attempt this is for the matched stock group (1 or 2)"
+                    }
+                  }
+                },
+                "example": {
+                  "attempt_result": "success",
+                  "attempt_number": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stock_checks/{id}/complete": {
+      "post": {
+        "tags": [
+          "Stock Checks"
+        ],
+        "summary": "Complete a stock check",
+        "description": "Finalize a stock check after counts have been recorded. Any product groups that were not counted are implicitly recorded as a physical count of zero. The stock check transitions to `passed` if every group's latest attempt matched the system count, or to `failed` otherwise. The associated task is marked as completed at the same time.",
+        "x-mint": {
+          "content": "## Request Structure\n\nNo request body is required.\n\n## Behavior\n\n- Any product group with no recorded attempt is automatically counted as zero, producing a failed attempt where stock was expected.\n- The stock check's final status is `passed` when all groups' latest attempts succeeded, otherwise `failed`.\n- The associated task is completed and `last_counted_at` is set on the location and any matched stocks.\n- The stock check must currently be in `pending` status and its task must not be completed or cancelled; otherwise 422 is returned.\n- Failed stock check records can subsequently be resolved with a reason code via `POST /api/stock_checks/resolve`."
+        },
+        "operationId": "completeStockCheck",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the stock check",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stock check completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "passed",
+                        "failed"
+                      ],
+                      "description": "Final status of the stock check after completion"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "passed"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/api/stock_checks/resolve": {
+      "post": {
+        "tags": [
+          "Stock Checks"
+        ],
+        "summary": "Resolve failed stock check records",
+        "description": "Resolve one or more failed stock check records by attaching a reason code to explain the discrepancy. Once every failed record on a stock check has been resolved, the stock check itself transitions from `failed` to `resolved`. This endpoint does NOT use JSON:API format.",
+        "x-mint": {
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"stock_check_record_ids\": [1, 2, 3],\n  \"reason_code_id\": 5\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `stock_check_record_ids` | Yes | IDs of the failed stock check records to resolve (must contain at least one) |\n| `reason_code_id` | Yes | ID of an active reason code of type `stock_check` |\n\n## Behavior\n\n- Each record's latest attempt must be a failure and the record must not already be resolved, otherwise 422 is returned.\n- The reason code must exist, be of type `stock_check`, and be active.\n- When every failed record on a stock check has been resolved, the stock check's status changes from `failed` to `resolved`.\n- Returns 204 No Content on success."
+        },
+        "operationId": "resolveStockCheckRecords",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "stock_check_record_ids",
+                  "reason_code_id"
+                ],
+                "properties": {
+                  "stock_check_record_ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "IDs of the failed stock check records to resolve"
+                  },
+                  "reason_code_id": {
+                    "type": "integer",
+                    "description": "ID of an active reason code of type `stock_check`"
+                  }
+                }
+              },
+              "example": {
+                "stock_check_record_ids": [
+                  1,
+                  2,
+                  3
+                ],
+                "reason_code_id": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
     "/graphql#ListStockUnitTypes": {
       "post": {
         "tags": [
@@ -28473,10 +30212,10 @@
         "tags": [
           "Tasks"
         ],
-        "summary": "Update a task",
-        "description": "Update attributes of an existing task. Tasks are created automatically by warehouse operations and this endpoint allows modifying task properties such as priority, notes, locations, quantities, and custom fields.",
+        "summary": "Update or complete a task",
+        "description": "Update attributes of an existing task, or complete it. Tasks are created automatically by warehouse operations and this endpoint allows modifying task properties such as priority, notes, locations, quantities, and custom fields. To complete a single task, send `status: \"completed\"` together with the attributes required by that task's type. To complete multiple tasks of the same type in one call use `POST /api/tasks/complete_collection`. Type-specific receive and load actions are documented under the *Goods In: Receipts* and *Loads* tags respectively.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"tasks\",\n    \"attributes\": {\n      \"priority\": 10,\n      \"notes\": \"Urgent - customer waiting\",\n      \"location_to_id\": 25,\n      \"confirmed_quantity\": 8.0\n    }\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | No | Stock account ID |\n| `warehouse_id` | No | Warehouse ID |\n| `priority` | No | Task priority (higher = more urgent) |\n| `notes` | No | Free-text notes |\n| `status` | No | Task status |\n| `location_from_id` | No | Source location ID |\n| `location_to_id` | No | Destination location ID |\n| `product_id` | No | Product ID |\n| `start_quantity` | No | Starting quantity (>= 0) |\n| `confirmed_quantity` | No | Confirmed/completed quantity (>= 0) |\n| `start_at` | No | Planned start datetime |\n| `end_at` | No | Planned end datetime |\n| `completed_at` | No | Completion datetime |\n| `assigned_at` | No | Assignment datetime |\n| `user_id` | No | Assigned user ID |\n| `user_created_by_id` | No | User who created the task |\n| `user_completed_by_id` | No | User who completed the task |\n| `device_type_id` | No | Device type ID |\n| `device_id` | No | Device ID |\n| `storage_unit_from_id` | No | Source storage unit ID |\n| `storage_unit_to_id` | No | Destination storage unit ID |\n| `stock_id` | No | Associated stock record ID |\n| `load_id` | No | Associated load ID |\n| `load_drop_id` | No | Associated load drop ID |\n| `dispatch_container_id` | No | Associated dispatch container ID |\n| `parent_task_id` | No | Parent task ID for subtasks |\n| `transaction_number_id` | No | Transaction number ID |\n| `transaction_line_id` | No | Transaction line ID |\n| `stock_description` | No | Stock description text |\n| `drop_sequence` | No | Drop sequence (1-9999999999) |\n| `serial_numbers` | No | Array of serial number strings |\n| `string1`-`string5` | No | Custom string fields |\n| `integer1`-`integer5` | No | Custom integer fields |\n| `datetime1`-`datetime5` | No | Custom datetime fields |\n| `boolean1`-`boolean5` | No | Custom boolean fields |"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"data\": {\n    \"type\": \"tasks\",\n    \"attributes\": {\n      \"priority\": 10,\n      \"notes\": \"Urgent - customer waiting\",\n      \"location_to_id\": 25,\n      \"confirmed_quantity\": 8.0\n    }\n  }\n}\n```\n\n## Completing a Task\n\nA single task is completed through this endpoint by setting `status` to `\"completed\"` together with the attributes required for the task's type. The table below lists the minimum payload to complete each type; additional fields may be set in the same request when they need updating at the same time.\n\n| Task type | Minimum attributes to complete |\n|-----------|-------------------------------|\n| `PICK` | `status`, `confirmed_quantity`, `location_to_id` (drop location) |\n| `RCV` | `status`, `confirmed_quantity`, `location_to_id`, `storage_unit_to_id` |\n| `PWAY` | `status`, `confirmed_quantity`, `location_to_id`, `storage_unit_to_id` |\n| `TRAN` | `status`, `location_to_id`, `storage_unit_to_id` |\n| `CONV` | `status` (optionally `confirmed_quantity`; defaults to the task's `start_quantity`) |\n| `REPLEN` | `status`, `confirmed_quantity`, `location_to_id` |\n| `DISP` | `status` for `SHIPMENT` subtype only. `LOAD`-subtype DISP tasks must be completed by dispatching the load, not via this endpoint. |\n| `LOAD` | Not completable via this endpoint. Use `POST /api/load_tasks/{id}/load_storage_unit`. |\n\nTo complete many tasks of the same type in one call, use `POST /api/tasks/complete_collection` with a `task_type_code` and a `filters` block.\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `account_id` | No | Stock account ID |\n| `warehouse_id` | No | Warehouse ID |\n| `priority` | No | Task priority (higher = more urgent) |\n| `notes` | No | Free-text notes |\n| `status` | No | Task status. Set to `completed` to complete the task (see *Completing a Task* above). |\n| `location_from_id` | No | Source location ID |\n| `location_to_id` | No | Destination location ID |\n| `product_id` | No | Product ID |\n| `start_quantity` | No | Starting quantity (>= 0) |\n| `confirmed_quantity` | No | Confirmed/completed quantity (>= 0) |\n| `start_at` | No | Planned start datetime |\n| `end_at` | No | Planned end datetime |\n| `completed_at` | No | Completion datetime |\n| `assigned_at` | No | Assignment datetime |\n| `user_id` | No | Assigned user ID |\n| `user_created_by_id` | No | User who created the task |\n| `user_completed_by_id` | No | User who completed the task |\n| `device_type_id` | No | Device type ID |\n| `device_id` | No | Device ID |\n| `storage_unit_from_id` | No | Source storage unit ID |\n| `storage_unit_to_id` | No | Destination storage unit ID |\n| `stock_id` | No | Associated stock record ID |\n| `load_id` | No | Associated load ID |\n| `load_drop_id` | No | Associated load drop ID |\n| `dispatch_container_id` | No | Associated dispatch container ID |\n| `parent_task_id` | No | Parent task ID for subtasks |\n| `transaction_number_id` | No | Transaction number ID |\n| `transaction_line_id` | No | Transaction line ID |\n| `stock_description` | No | Stock description text |\n| `drop_sequence` | No | Drop sequence (1-9999999999) |\n| `serial_numbers` | No | Array of serial number strings |\n| `string1`-`string5` | No | Custom string fields |\n| `integer1`-`integer5` | No | Custom integer fields |\n| `datetime1`-`datetime5` | No | Custom datetime fields |\n| `boolean1`-`boolean5` | No | Custom boolean fields |"
         },
         "operationId": "updateTask",
         "parameters": [
@@ -28846,60 +30585,6 @@
         }
       }
     },
-    "/api/tasks/{id}/export_receipt_task_confirmation": {
-      "get": {
-        "tags": [
-          "Tasks"
-        ],
-        "summary": "Export receipt task confirmation",
-        "description": "Generate and download a receipt confirmation document for a completed receipt task. Returns the confirmation in the configured export format (CSV, JSON, or EDI).",
-        "x-mint": {
-          "content": "## Behavior\n\n- Generates a receipt confirmation document for the specified task\n- The task must be a completed receipt (RCV) task\n- Output format depends on system configuration (CSV, JSON, or EDI)\n- Returns the file content directly in the response body\n- Returns 404 if the task does not exist\n- Returns 422 if the task is not a completed receipt task"
-        },
-        "operationId": "exportReceiptTaskConfirmation",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the completed receipt task",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Receipt task confirmation document",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "description": "Receipt confirmation data in the configured export format"
-                },
-                "example": {
-                  "task_id": 1,
-                  "status": "COMPLETED",
-                  "product_code": "SKU-001",
-                  "confirmed_quantity": 10.0,
-                  "location_code": "A-01-01",
-                  "completed_at": "2026-03-12T10:30:00Z"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        }
-      }
-    },
     "/api/tasks/allocate": {
       "post": {
         "tags": [
@@ -28965,9 +30650,9 @@
           "Tasks"
         ],
         "summary": "Complete filtered tasks",
-        "description": "Complete multiple tasks matching the specified filters in a single request. Tasks are identified by warehouse, task type, and optional filters. Maximum 50 tasks per request. This endpoint does NOT use JSON:API format.",
+        "description": "Complete multiple tasks of a single type matching the supplied filters in one request. Tasks are matched by warehouse, task type, and the contents of `filters`; up to 50 are completed per call. The values in `attributes` are applied to each matched task before completion, so they apply uniformly to the whole set. This endpoint does NOT use JSON:API format.",
         "x-mint": {
-          "content": "## Request Structure\n\n```json expandable\n{\n  \"warehouse_id\": 1,\n  \"task_type_code\": \"PICK\",\n  \"filters\": {\n    \"location_from_id\": 10,\n    \"product_id\": 42\n  },\n  \"attributes\": {\n    \"confirmed_quantity\": 10.0,\n    \"notes\": \"Completed via bulk action\"\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `warehouse_id` | Yes | Warehouse ID to scope the tasks |\n| `task_type_code` | Yes | Task type code: `PICK`, `DISP`, `RCV`, `PWAY`, `TRAN`, `REPLEN`, `LOAD`, `CONV` |\n| `filters` | Yes | At least one filter must be specified |\n| `filters.location_from_id` | No | Filter by source location ID |\n| `filters.product_id` | No | Filter by product ID |\n| `filters.storage_unit_from_id` | No | Filter by source storage unit ID |\n| `attributes` | No | Optional attributes to set on each completed task (same as update attributes) |\n\n## Behavior\n\n- Finds tasks matching the warehouse, task type, and filters\n- Completes up to 50 matching tasks per request\n- Optionally updates task attributes before completion\n- Returns 204 No Content on success\n- Returns 422 if no filters are specified or no matching tasks found"
+          "content": "## Request Structure\n\n```json expandable\n{\n  \"warehouse_id\": 1,\n  \"task_type_code\": \"PICK\",\n  \"filters\": {\n    \"location_from_id\": 10,\n    \"product_id\": 42\n  },\n  \"attributes\": {\n    \"confirmed_quantity\": 10.0,\n    \"notes\": \"Completed via bulk action\"\n  }\n}\n```\n\n## Key Fields\n\n| Field | Required | Description |\n|-------|----------|-------------|\n| `warehouse_id` | Yes | Warehouse ID to scope the tasks |\n| `task_type_code` | Yes | Task type code. One of: `PICK`, `DISP`, `RCV`, `PWAY`, `TRAN`, `REPLEN`, `LOAD`, `CONV` |\n| `filters` | Yes | Must contain at least one filter key. Filters are combined with AND. |\n| `filters.location_from_id` | No | Restrict to tasks with this source location |\n| `filters.product_id` | No | Restrict to tasks for this product |\n| `filters.storage_unit_from_id` | No | Restrict to tasks with this source storage unit |\n| `attributes` | No | Attributes applied to each matched task before completion. Same shape as the PATCH `/api/tasks/{id}` attributes. |\n\n## Minimum Attributes per Task Type\n\nThe `attributes` block needs to carry the fields each task type requires in order to complete. The minimum payload per type mirrors the single-task completion path:\n\n| Task type | Minimum attributes |\n|-----------|--------------------|\n| `PICK` | `confirmed_quantity`, `location_to_id` |\n| `RCV` | `confirmed_quantity`, `location_to_id`, `storage_unit_to_id` |\n| `PWAY` | `confirmed_quantity`, `location_to_id`, `storage_unit_to_id` |\n| `TRAN` | `location_to_id`, `storage_unit_to_id` |\n| `CONV` | `confirmed_quantity` (optional; defaults to the task's `start_quantity`) |\n| `REPLEN` | `confirmed_quantity`, `location_to_id` |\n\n`DISP` and `LOAD` tasks are not usually completed via this endpoint. Use the shipment dispatch flow for `DISP` and `POST /api/load_tasks/{id}/load_storage_unit` for `LOAD`.\n\n## Behavior\n\n- Matches tasks by `warehouse_id`, `task_type_code`, and the supplied filters (AND-combined).\n- Up to 50 matching tasks are completed per request.\n- Returns 204 No Content on success.\n- Returns 422 if no filters are supplied, if no tasks match, or if a matched task fails its per-type validations (e.g. missing `confirmed_quantity` on a `PICK`)."
         },
         "operationId": "completeTasksCollection",
         "requestBody": {
@@ -29022,10 +30707,14 @@
                     }
                   },
                   "attributes": {
-                    "type": "object",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/TaskUpdateAttributes"
+                      }
+                    ],
                     "nullable": true,
                     "description": "Optional attributes to set on each task before completion. Accepts the same fields as the task update endpoint.",
-                    "$ref": "#/components/schemas/TaskUpdateAttributes"
+                    "type": "object"
                   }
                 }
               },
@@ -34830,7 +36519,8 @@
                 "$ref": "#/components/schemas/CarrierId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "carrier_service_id": {
             "allOf": [
@@ -34838,7 +36528,8 @@
                 "$ref": "#/components/schemas/CarrierServiceId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "customer_id": {
             "allOf": [
@@ -34846,7 +36537,8 @@
                 "$ref": "#/components/schemas/CustomerId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "datetime1": {
             "type": "string",
@@ -34933,7 +36625,8 @@
                 "$ref": "#/components/schemas/GoodsOutStatusId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "goods_out_type": {
             "type": "string",
@@ -34976,7 +36669,8 @@
                 "$ref": "#/components/schemas/IntegrationId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "lines_changes": {
             "type": "array",
@@ -34997,7 +36691,8 @@
                 "$ref": "#/components/schemas/LocationId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "order_notes": {
             "type": "string",
@@ -35011,7 +36706,8 @@
                 "$ref": "#/components/schemas/OrderTypeId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "original_delivery_address_id": {
             "type": "integer",
@@ -35064,7 +36760,8 @@
                 "$ref": "#/components/schemas/Priority"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           },
           "reference": {
             "allOf": [
@@ -35114,7 +36811,8 @@
                 "$ref": "#/components/schemas/WarehouseId"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "type": "integer"
           }
         }
       },
@@ -35180,7 +36878,8 @@
                     "$ref": "#/components/schemas/CarrierId"
                   }
                 ],
-                "nullable": true
+                "nullable": true,
+                "type": "integer"
               },
               "carrier_service_id": {
                 "allOf": [
@@ -35188,7 +36887,8 @@
                     "$ref": "#/components/schemas/CarrierServiceId"
                   }
                 ],
-                "nullable": true
+                "nullable": true,
+                "type": "integer"
               },
               "datetime1": {
                 "type": "string",
@@ -39390,6 +41090,200 @@
             "manual_processing_flows": []
           },
           "version": 1
+        }
+      },
+      "DashboardAttributes": {
+        "type": "object",
+        "description": "Dashboard attributes. Dashboards group widget placements and are visible to users assigned to one of the associated roles. `role_ids` is supplied inside `attributes` (not in a separate `relationships` object) and replaces the dashboard's existing role associations. Widget placements are managed separately through the `PUT /api/dashboards/{id}/widgets` endpoint.",
+        "required": [
+          "code",
+          "name"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 30,
+            "description": "Unique dashboard code"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 255,
+            "nullable": true,
+            "description": "Optional dashboard description"
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Whether the dashboard is visible to users. Defaults to true on create."
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "When true, this dashboard becomes the default for users. Setting true clears `is_default` on every other dashboard in the same transaction. Defaults to false on create."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Display name"
+          },
+          "role_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Role IDs that can access this dashboard. On update, the supplied list replaces all existing role associations."
+          }
+        },
+        "example": {
+          "code": "warehouse-ops",
+          "name": "Warehouse Operations",
+          "description": "Day-to-day operational view",
+          "is_active": true,
+          "is_default": true,
+          "role_ids": [
+            1,
+            4
+          ]
+        }
+      },
+      "DashboardWidgetAttributes": {
+        "type": "object",
+        "description": "Dashboard widget attributes. A widget is a chart component bound to a report query; `widget_type` selects the chart rendering and `configuration` carries per-chart options. See the create endpoint's x-mint block for the per-type `configuration` keys.",
+        "required": [
+          "code",
+          "name",
+          "widget_type"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 30,
+            "description": "Unique widget code"
+          },
+          "configuration": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true,
+            "description": "Chart rendering options. Shape varies by `widget_type` — common keys: `metric`, `color_palette`, `show_legend`, `legend_position`, `limit`. See the create endpoint's x-mint reference for per-type keys.",
+            "example": {
+              "metric": "total_records",
+              "color_palette": "default",
+              "show_legend": true,
+              "legend_position": "bottom",
+              "horizontal": false,
+              "log_scale": false,
+              "limit": 10
+            }
+          },
+          "dashboard_filters": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true,
+            "description": "Default filter values applied to the linked report query when the widget renders, e.g. `{ \"warehouse_id\": 1 }`",
+            "example": {
+              "warehouse_id": 1
+            }
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 255,
+            "nullable": true,
+            "description": "Optional widget description"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Display name"
+          },
+          "report_query_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Linked report query that supplies the data. Optional — a widget may be standalone."
+          },
+          "widget_type": {
+            "type": "string",
+            "enum": [
+              "area",
+              "bar",
+              "funnel",
+              "gauge",
+              "graph",
+              "grid",
+              "heatmap",
+              "line",
+              "pictorial_bar",
+              "pie",
+              "radar",
+              "sankey",
+              "scatter",
+              "single",
+              "sunburst",
+              "tree",
+              "treemap"
+            ],
+            "description": "Chart rendering type. `grid` renders as a tabular data view rather than a chart."
+          }
+        },
+        "example": {
+          "code": "tasks-by-type",
+          "name": "Tasks by Type",
+          "description": "Open tasks grouped by task type",
+          "widget_type": "bar",
+          "report_query_id": 4,
+          "configuration": {
+            "metric": "total_records",
+            "color_palette": "default",
+            "show_legend": true,
+            "legend_position": "bottom",
+            "horizontal": false,
+            "log_scale": false,
+            "limit": 10
+          },
+          "dashboard_filters": {
+            "warehouse_id": 1
+          }
+        }
+      },
+      "DashboardWidgetPlacementInput": {
+        "type": "object",
+        "description": "Placement of a widget on a dashboard. Used inside the `placements` array on `PUT /api/dashboards/{id}/widgets`. Each `dashboard_widget_id` may appear at most once per request.",
+        "required": [
+          "dashboard_widget_id"
+        ],
+        "properties": {
+          "dashboard_widget_id": {
+            "type": "integer",
+            "description": "ID of the widget to place on the dashboard"
+          },
+          "position": {
+            "type": "object",
+            "description": "Gridstack layout coordinates. Omit or supply an empty object to defer placement to the renderer's default.",
+            "properties": {
+              "h": {
+                "type": "integer",
+                "description": "Row height in grid units"
+              },
+              "w": {
+                "type": "integer",
+                "description": "Column width in grid units"
+              },
+              "x": {
+                "type": "integer",
+                "description": "Column offset (0-indexed from left)"
+              },
+              "y": {
+                "type": "integer",
+                "description": "Row offset (0-indexed from top)"
+              }
+            }
+          }
+        },
+        "example": {
+          "dashboard_widget_id": 12,
+          "position": {
+            "x": 0,
+            "y": 0,
+            "w": 2,
+            "h": 2
+          }
         }
       }
     }
