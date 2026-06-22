@@ -553,16 +553,48 @@
                 ]
               },
               {
-                "group": "Core Resources",
-                "public": true,
-                "pages": [
-                  "api-reference/core-resources/address"
-                ]
-              },
-              {
                 "group": "Operations",
                 "openapi": "api-reference/clarus-api.json",
                 "public": true
+              },
+              {
+                "group": "Core Resources",
+                "public": true,
+                "pages": [
+                  "api-reference/core-resources/account",
+                  "api-reference/core-resources/account-warehouse",
+                  "api-reference/core-resources/address",
+                  "api-reference/core-resources/automation",
+                  "api-reference/core-resources/booking",
+                  "api-reference/core-resources/charge-basket",
+                  "api-reference/core-resources/charge-card",
+                  "api-reference/core-resources/charge-line",
+                  "api-reference/core-resources/charge-price",
+                  "api-reference/core-resources/charge-window",
+                  "api-reference/core-resources/dashboard",
+                  "api-reference/core-resources/dashboard-widget",
+                  "api-reference/core-resources/document",
+                  "api-reference/core-resources/goods-in-receipt",
+                  "api-reference/core-resources/goods-out",
+                  "api-reference/core-resources/goods-out-pick-list",
+                  "api-reference/core-resources/hhd-flow",
+                  "api-reference/core-resources/import-configuration",
+                  "api-reference/core-resources/integration",
+                  "api-reference/core-resources/load",
+                  "api-reference/core-resources/location",
+                  "api-reference/core-resources/pickface-product",
+                  "api-reference/core-resources/product",
+                  "api-reference/core-resources/report",
+                  "api-reference/core-resources/report-query",
+                  "api-reference/core-resources/role",
+                  "api-reference/core-resources/scheduled-report",
+                  "api-reference/core-resources/shipment",
+                  "api-reference/core-resources/storage-unit",
+                  "api-reference/core-resources/task",
+                  "api-reference/core-resources/template",
+                  "api-reference/core-resources/user",
+                  "api-reference/core-resources/warehouse"
+                ]
               }
             ]
           },
